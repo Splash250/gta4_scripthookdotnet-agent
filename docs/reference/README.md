@@ -25,6 +25,8 @@ This section is intended to grow into the normalized reference surface for:
 - concept pages that explain tricky behavior
 - links into compatibility notes when API behavior depends on game or runtime assumptions
 
+Use [Legacy CHM And Markdown Export](legacy-chm.md) when you need to understand how the supported reference structure relates to `docs/md/` and `docs/chm/`, or when you are tracing an older reference page back to its archival source.
+
 Reference content should stay lookup-oriented. It should answer "what is this API and where do I go next?" while letting [Guides](../guides/README.md) and [Examples](../examples/README.md) handle teaching and workflow.
 
 ## How It Relates To `docs/md`
@@ -48,3 +50,5 @@ Use this section first only when you are already asking a reference-shaped quest
 - [Guides](../guides/README.md)
 - [Examples](../examples/README.md)
 - [Compatibility](../compatibility/README.md)
+- [Legacy CHM And Markdown Export](legacy-chm.md)
+- [Version Matrix](../compatibility/version-matrix.md)

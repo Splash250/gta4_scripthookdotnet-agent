@@ -25,6 +25,8 @@ This section should centralize the repo's support boundaries:
 - ScriptHook and ASI-loader dependencies
 - open questions that still need confirmation before the docs can make a stronger claim
 
+Start with [Version Matrix](version-matrix.md) when you need the current repository facts, the legacy runtime statements that still matter, and the unresolved compatibility questions separated clearly.
+
 That keeps warnings and version notes out of unrelated pages while giving guides and reference docs one canonical destination to link back to.
 
 ## How It Relates To `docs/md`
@@ -48,3 +50,5 @@ If you already know your environment is in scope, continue into [Guides](../guid
 - [Guides](../guides/README.md)
 - [Examples](../examples/README.md)
 - [Reference](../reference/README.md)
+- [Version Matrix](version-matrix.md)
+- [Legacy CHM And Markdown Export](../reference/legacy-chm.md)
