@@ -1,5 +1,25 @@
 # Vehicle Class
 
+## Curated Summary
+
+`GTA.Vehicle` wraps cars, bikes, helicopters, and other drivable world entities. Scripts typically pair it with `World` and `Ped` APIs to spawn transport, inspect seats, coordinate drivers and passengers, or build vehicle-centric gameplay mechanics.
+
+## Common Use Notes
+
+- Use `Vehicle` when you need seat management, movement state, door and wheel behavior, damage inspection, or model-specific logic after a spawn or world query.
+- The repo examples use it both for simple spawning and for more stateful behaviors such as taxi routing, window/form controls tied to the current vehicle, and the larger `GrabScript` mechanic.
+- Combine this page with [World And Entity APIs](../topics/world-and-entities.md) and [Sample Projects](../../../examples/sample-projects.md) when tracing how vehicles are created, owned, and released in practice.
+
+## Notes And Warnings
+
+> Release temporary scripted vehicles intentionally. The bundled examples call `NoLongerNeeded()` on throwaway spawns so the game does not keep those vehicles pinned forever.
+
+## Related Guides And Examples
+
+- [World And Entity APIs](../topics/world-and-entities.md)
+- [Sample Projects](../../../examples/sample-projects.md)
+- [Write Your First Script](../../../guides/first-script.md)
+
 For a list of all members of this type, see [Vehicle Members](VehicleMembers.md).
 
 [System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
