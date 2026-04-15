@@ -1,0 +1,143 @@
+import shutil
+import subprocess
+import tempfile
+import unittest
+from pathlib import Path
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+SCRIPT_PATH = REPO_ROOT / "docs" / "tools" / "compare_chm_to_docs.py"
+
+
+class CompareChmToDocsTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.temp_dir = Path(tempfile.mkdtemp(prefix="compare-chm-"))
+        self.repo_root = self.temp_dir / "repo"
+        self.decompiled_root = self.repo_root / ".maestro" / "tmp" / "chm-verify"
+        self.production_docs = self.repo_root / "docs" / "production-docs"
+        self.reference_api = self.repo_root / "docs" / "reference" / "api"
+        self.report_path = self.production_docs / "chm-parity-report.md"
+        self.page_map_path = self.production_docs / "reference-page-map.csv"
+
+        self.decompiled_root.mkdir(parents=True)
+        self.reference_api.mkdir(parents=True)
+        self.production_docs.mkdir(parents=True)
+        (self.repo_root / "docs").mkdir(exist_ok=True)
+
+    def tearDown(self) -> None:
+        shutil.rmtree(self.temp_dir)
+
+    def run_script(self) -> subprocess.CompletedProcess[str]:
+        return subprocess.run(
+            [
+                "python",
+                str(SCRIPT_PATH),
+                "--repo-root",
+                str(self.repo_root),
+                "--decompiled-root",
+                str(self.decompiled_root),
+                "--page-map",
+                str(self.page_map_path),
+                "--report",
+                str(self.report_path),
+            ],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+        )
+
+    def write_html(self, relative_path: str, title: str, body: str) -> None:
+        path = self.decompiled_root / relative_path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            (
+                "<html><head>"
+                f"<title>{title}</title>"
+                "</head><body>"
+                f"{body}"
+                "</body></html>"
+            ),
+            encoding="utf-8",
+        )
+
+    def write_markdown(self, relative_path: str, text: str) -> None:
+        path = self.repo_root / relative_path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+
+    def test_compare_chm_to_docs_writes_report_with_required_sections(self) -> None:
+        self.page_map_path.write_text(
+            "\n".join(
+                [
+                    '"source_path","doc_kind","namespace_or_section","target_path","notes"',
+                    '"docs/md/index.md","root-index","reference-root","docs/README.md","Landing page maps to supported docs root."',
+                    '"docs/md/GTA/index.md","namespace-index","GTA","docs/reference/api/GTA/index.md","Keep the GTA namespace landing page."',
+                    '"docs/md/GTA/Script.md","type-page","GTA","docs/reference/api/GTA/Script.md","Keep the Script type page."',
+                    '"docs/md/GTA/World.md","type-page","GTA","docs/reference/api/GTA/World.md","Keep the World type page."',
+                    '"docs/md/GTA.Native/Function.md","type-page","GTA.Native","docs/reference/api/GTA.Native/Function.md","Keep the Function type page."',
+                ]
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+
+        self.write_html("index.html", "ScriptHookDotNet Documentation", "landing")
+        self.write_html("GTA.index.html", "GTA Namespace", "World Script Player")
+        self.write_html(
+            "GTA.Script.html",
+            "Script Class",
+            "BindKey BindConsoleCommand BindPhoneNumber Tick Interval",
+        )
+        self.write_html(
+            "GTA.World.html",
+            "World Class",
+            "CreateVehicle CreatePed GetClosestPed Weather",
+        )
+        self.write_html(
+            "GTA.Native.Function.html",
+            "Function Class",
+            "Call Parameter Pointer Native",
+        )
+        self.write_html("GTA.Unmapped.html", "Unmapped Class", "Spare page")
+
+        self.write_markdown("docs/README.md", "# ScriptHookDotNet Docs\n")
+        self.write_markdown("docs/reference/api/GTA/index.md", "# GTA\n")
+        self.write_markdown(
+            "docs/reference/api/GTA/Script.md",
+            "# Script\n\nBindKey\n\nBindConsoleCommand\n",
+        )
+        self.write_markdown(
+            "docs/reference/api/GTA/World.md",
+            "# World\n\nCreateVehicle\n\nGetClosestPed\n",
+        )
+
+        result = self.run_script()
+
+        self.assertEqual(result.returncode, 0, msg=result.stdout + result.stderr)
+        report = self.report_path.read_text(encoding="utf-8")
+        self.assertIn("# CHM Parity Report", report)
+        self.assertIn("## Missing Pages", report)
+        self.assertIn("## Mismatched Mappings", report)
+        self.assertIn("## Unresolved Review Items", report)
+        self.assertIn("`docs/md/GTA/Unmapped.md`", report)
+        self.assertIn("`docs/md/GTA.Native/Function.md`", report)
+        self.assertIn("Body markers missing from mapped target", report)
+        self.assertIn("- total_decompiled_html_pages: 6", report)
+        self.assertIn("- unmapped_html_pages: 1", report)
+        self.assertIn("- title_parity_mismatches: 0", report)
+        self.assertIn("Report written to", result.stdout)
+
+    def test_compare_chm_to_docs_fails_when_no_html_pages_exist(self) -> None:
+        self.page_map_path.write_text(
+            '"source_path","doc_kind","namespace_or_section","target_path","notes"\n',
+            encoding="utf-8",
+        )
+
+        result = self.run_script()
+
+        self.assertEqual(result.returncode, 1, msg=result.stdout + result.stderr)
+        self.assertIn("No decompiled CHM HTML files were found", result.stderr)
+
+
+if __name__ == "__main__":
+    unittest.main()
