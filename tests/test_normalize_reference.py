@@ -98,6 +98,20 @@ class NormalizeReferenceCliTests(unittest.TestCase):
             ),
             encoding="utf-8",
         )
+        (self.source_root / "GTA" / "LegacyAliases.md").write_text(
+            textwrap.dedent(
+                """\
+                # Legacy Aliases
+
+                [C#]
+
+                Public Shared Widening Operator CType(source As [UInteger](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemUInt32ClassTopic.asp)) As GTA.Model
+
+                public class PedCollection **: [List`1](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericListClassTopic.asp)**
+                """
+            ),
+            encoding="utf-8",
+        )
 
     def tearDown(self) -> None:
         shutil.rmtree(self.temp_dir)
@@ -131,7 +145,7 @@ class NormalizeReferenceCliTests(unittest.TestCase):
         self.assertNotIn("[Visual Basic]", normalized)
         self.assertNotIn("[C#]", normalized)
 
-        self.assertIn("Processed 7 Markdown pages", result.stdout)
+        self.assertIn("Processed 8 Markdown pages", result.stdout)
         self.assertIn("Namespaces: GTA, GTA.base", result.stdout)
 
     def test_cli_rewrites_legacy_links_and_reports_legacy_summary(self) -> None:
@@ -170,7 +184,7 @@ class NormalizeReferenceCliTests(unittest.TestCase):
         self.assertNotIn("(GTA.base.T.md)", normalized)
         self.assertNotIn("(GTA.md)", normalized)
 
-        self.assertIn("Legacy MSDN links rewritten: 7", result.stdout)
+        self.assertIn("Legacy MSDN links rewritten: 9", result.stdout)
         self.assertIn("Legacy export-era links removed: 4", result.stdout)
 
     def test_cli_rewrites_complex_msdn_labels_and_removes_generic_placeholder_links(self) -> None:
@@ -212,6 +226,37 @@ class NormalizeReferenceCliTests(unittest.TestCase):
         )
         self.assertIn("GTA.base.T[]", normalized)
         self.assertNotIn("(GTA.base.T.md)", normalized)
+
+    def test_cli_rewrites_legacy_alias_labels_that_use_vb_names_or_generic_arity_suffixes(self) -> None:
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(SCRIPT_PATH),
+                "--source",
+                str(self.source_root),
+                "--output",
+                str(self.output_root),
+            ],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+        )
+
+        self.assertEqual(result.returncode, 0, msg=result.stderr or result.stdout)
+
+        output_file = self.output_root / "GTA" / "LegacyAliases.md"
+        self.assertTrue(output_file.exists())
+
+        normalized = output_file.read_text(encoding="utf-8")
+        self.assertIn(
+            "[UInteger](https://learn.microsoft.com/dotnet/api/system.uint32)",
+            normalized,
+        )
+        self.assertIn(
+            "[List`1](https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1)",
+            normalized,
+        )
+        self.assertNotIn("msdn.microsoft.com", normalized)
 
 
 if __name__ == "__main__":

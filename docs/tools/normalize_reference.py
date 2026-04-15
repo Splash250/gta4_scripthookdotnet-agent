@@ -60,8 +60,11 @@ DOTNET_PRIMITIVE_ALIASES = {
     "ilist": "System.Collections.Generic.IList",
     "ilist1": "System.Collections.Generic.IList",
     "keys": "System.Windows.Forms.Keys",
+    "list": "System.Collections.Generic.List",
+    "list1": "System.Collections.Generic.List",
     "marshalbyrefobject": "System.MarshalByRefObject",
     "stream": "System.IO.Stream",
+    "uinteger": "System.UInt32",
 }
 
 
