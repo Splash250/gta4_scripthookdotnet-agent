@@ -16,7 +16,7 @@
 
 ## Related Guides And Examples
 
-- [Native Interop](../topics/native-interop.md)
+- [Native Calls](../../concepts/native-calls.md)
 - [Sample Projects](../../../examples/sample-projects.md)
 - [Debug ScriptHookDotNet Scripts](../../../guides/debugging.md)
 

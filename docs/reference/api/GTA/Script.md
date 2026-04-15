@@ -16,7 +16,7 @@
 
 ## Related Guides And Examples
 
-- [Scripting Lifecycle](../topics/scripting-lifecycle.md)
+- [Script Lifecycle](../../concepts/script-lifecycle.md)
 - [Write Your First Script](../../../guides/first-script.md)
 - [Sample Projects](../../../examples/sample-projects.md)
 

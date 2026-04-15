@@ -16,7 +16,7 @@
 
 ## Related Guides And Examples
 
-- [World And Entity APIs](../topics/world-and-entities.md)
+- [Entity Model](../../concepts/entity-model.md)
 - [Write Your First Script](../../../guides/first-script.md)
 - [Sample Projects](../../../examples/sample-projects.md)
 
