@@ -1,7 +1,7 @@
 ---
 type: report
 title: CHM Parity Report
-created: 2026-04-15
+created: 2026-04-16
 tags:
   - docs
   - chm
@@ -24,16 +24,16 @@ Compared decompiled HTML from `D:/Games/GTAIV_Modding/gta4_scripthookdotnet-agen
 - mapped_target_pages_missing: 0
 - title_parity_checked: 175
 - title_parity_mismatches: 0
-- namespace_indexes_checked: 6
+- namespace_indexes_checked: 7
 - namespace_indexes_missing: 0
-- root_indexes_checked: 0
+- root_indexes_checked: 1
 - root_indexes_missing: 0
 - high_value_marker_checks: 7
 - high_value_marker_failures: 0
 
 ## Page Coverage
 
-Page coverage is driven by whether a decompiled HTML page can be traced to a `reference-page-map.csv` row.
+Page coverage is driven by whether a decompiled HTML page can be traced to a `reference-page-map.csv` row, and the mapped `target_path` must exist on disk without silent fallback.
 
 ## Title Parity
 
@@ -60,7 +60,7 @@ Marker checks sample a small set of high-value pages and verify a few legacy bod
 
 - `docs/md/GTA IV ScriptHook.Net Single File Documentation.md` remains mapped to `docs/reference/archive/legacy-single-file-export.md` as an intentional curated difference: Archive the monolithic export for parity checks only; do not treat it as supported public documentation.
 - `docs/md/index.md` remains mapped to `docs/README.md` as an intentional curated difference: Promote the export landing page into the curated docs root overview.
-- `docs/md/misc/index.md` remains mapped to `docs/reference/misc/index.md` as an intentional curated difference: Namespace landing page retained as the entry point for generated API reference.
+- `docs/md/misc/index.md` remains mapped to `docs/reference/api/misc/index.md` as an intentional curated difference: Namespace landing page retained as the entry point for generated API reference.
 - `docs/md/TOC.md` remains mapped to `docs/reference/archive/legacy-export-toc.md` as an intentional curated difference: Keep as an archival navigation aid instead of a primary entry page.
 
 ## Missing Pages

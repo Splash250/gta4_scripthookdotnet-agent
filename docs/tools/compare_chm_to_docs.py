@@ -278,6 +278,46 @@ def is_intentional_curation_difference(row: MappingRow) -> bool:
     return row.source_path in INTENTIONAL_CURATION_SOURCES
 
 
+def resolve_target_path(repo_root: Path, row: MappingRow) -> Path:
+    return resolve_path(repo_root, Path(row.target_path))
+
+
+def fallback_warning(row: MappingRow, repo_root: Path) -> str | None:
+    normalized_target = normalized_api_target_for_source(row.source_path)
+    if normalized_target is None:
+        return None
+
+    normalized_resolved = resolve_path(repo_root, normalized_target)
+    if not normalized_resolved.exists():
+        return None
+
+    return (
+        f"Expected normalized API target `{normalized_target.as_posix()}` exists, "
+        "so the page map should be updated instead of relying on fallback resolution."
+    )
+
+
+def check_index_target(
+    row: MappingRow,
+    target_path: Path,
+    target_heading: str,
+    mismatched_mappings: list[str],
+) -> int:
+    if row.doc_kind == "namespace-index":
+        if not target_heading:
+            mismatched_mappings.append(
+                f"`{row.target_path}` is missing an H1 needed for namespace navigation parity."
+            )
+            return 1
+    elif row.doc_kind == "root-index":
+        if not target_heading:
+            mismatched_mappings.append(
+                f"`{row.target_path}` is missing an H1 needed for root-index parity."
+            )
+            return 1
+    return 0
+
+
 def compare_pages(
     repo_root: Path,
     page_map_rows: list[MappingRow],
@@ -308,9 +348,55 @@ def compare_pages(
     high_value_marker_failures = 0
 
     for row in page_map_rows:
+        target_path = resolve_target_path(repo_root, row)
+        target_exists = target_path.exists()
+        target_text = target_path.read_text(encoding="utf-8") if target_exists else ""
+        target_heading = extract_markdown_heading(target_text) if target_exists else ""
+
+        if row.doc_kind == "namespace-index":
+            namespace_indexes_checked += 1
+            if not target_exists:
+                namespace_indexes_missing += 1
+            else:
+                namespace_indexes_missing += check_index_target(
+                    row,
+                    target_path,
+                    target_heading,
+                    mismatched_mappings,
+                )
+        elif row.doc_kind == "root-index":
+            root_indexes_checked += 1
+            if not target_exists:
+                root_indexes_missing += 1
+            else:
+                root_indexes_missing += check_index_target(
+                    row,
+                    target_path,
+                    target_heading,
+                    mismatched_mappings,
+                )
+
         page = html_by_source.get(row.source_path)
         if page is None:
             if is_intentional_curation_difference(row):
+                if not target_exists:
+                    mapped_target_pages_missing += 1
+                    mismatched_mappings.append(
+                        f"`{row.source_path}` intentional curation target `{row.target_path}` is missing on disk."
+                    )
+                    unresolved_review_items.append(
+                        f"`{row.source_path}` is an intentional curation row, but its mapped target still needs to exist for parity reporting."
+                    )
+                    warning = fallback_warning(row, repo_root)
+                    if warning is not None:
+                        unresolved_review_items.append(f"`{row.source_path}`: {warning}")
+                    if row.source_path in HIGH_VALUE_MARKERS:
+                        high_value_marker_checks += 1
+                        high_value_marker_failures += 1
+                        unresolved_review_items.append(
+                            f"`{row.source_path}` high-value target is missing entirely at `{row.target_path}`."
+                        )
+                    continue
                 intentional_curation_differences.append(
                     f"`{row.source_path}` remains mapped to `{row.target_path}` as an intentional curated difference: {row.notes}"
                 )
@@ -318,33 +404,18 @@ def compare_pages(
             mismatched_mappings.append(
                 f"`{row.source_path}` is mapped to `{row.target_path}` but no matching decompiled HTML page was found."
             )
-            if row.doc_kind == "namespace-index":
-                namespace_indexes_checked += 1
-                namespace_indexes_missing += 1
-            elif row.doc_kind == "root-index":
-                root_indexes_checked += 1
-                root_indexes_missing += 1
             continue
 
         mapped_html_pages += 1
-        target_path = resolve_path(repo_root, Path(row.target_path))
-        fallback_target_path = normalized_api_target_for_source(row.source_path)
-        if not target_path.exists() and fallback_target_path is not None:
-            resolved_fallback = resolve_path(repo_root, fallback_target_path)
-            if resolved_fallback.exists():
-                target_path = resolved_fallback
 
-        if not target_path.exists():
+        if not target_exists:
             mismatched_mappings.append(
                 f"`{row.source_path}` maps to missing target `{row.target_path}`."
             )
             mapped_target_pages_missing += 1
-            if row.doc_kind == "namespace-index":
-                namespace_indexes_checked += 1
-                namespace_indexes_missing += 1
-            elif row.doc_kind == "root-index":
-                root_indexes_checked += 1
-                root_indexes_missing += 1
+            warning = fallback_warning(row, repo_root)
+            if warning is not None:
+                unresolved_review_items.append(f"`{row.source_path}`: {warning}")
             if row.source_path in HIGH_VALUE_MARKERS:
                 high_value_marker_checks += 1
                 high_value_marker_failures += 1
@@ -354,8 +425,6 @@ def compare_pages(
             continue
 
         mapped_target_pages_present += 1
-        target_text = target_path.read_text(encoding="utf-8")
-        target_heading = extract_markdown_heading(target_text)
 
         if row.doc_kind == "type-page":
             title_parity_checked += 1
@@ -363,20 +432,6 @@ def compare_pages(
                 title_parity_mismatches += 1
                 mismatched_mappings.append(
                     f"`{row.source_path}` title `{page.title}` does not match target heading `{target_heading}`."
-                )
-        elif row.doc_kind == "namespace-index":
-            namespace_indexes_checked += 1
-            if not target_heading:
-                namespace_indexes_missing += 1
-                mismatched_mappings.append(
-                    f"`{row.target_path}` is missing an H1 needed for namespace navigation parity."
-                )
-        elif row.doc_kind == "root-index":
-            root_indexes_checked += 1
-            if not target_heading:
-                root_indexes_missing += 1
-                mismatched_mappings.append(
-                    f"`{row.target_path}` is missing an H1 needed for root-index parity."
                 )
 
         if row.source_path in HIGH_VALUE_MARKERS:
@@ -468,7 +523,7 @@ def render_report(
         f"- high_value_marker_checks: {summary.high_value_marker_checks}\n"
         f"- high_value_marker_failures: {summary.high_value_marker_failures}\n\n"
         "## Page Coverage\n\n"
-        "Page coverage is driven by whether a decompiled HTML page can be traced to a `reference-page-map.csv` row.\n\n"
+        "Page coverage is driven by whether a decompiled HTML page can be traced to a `reference-page-map.csv` row, and the mapped `target_path` must exist on disk without silent fallback.\n\n"
         "## Title Parity\n\n"
         "Title parity checks only evaluate `type-page` mappings so folded member pages do not create noise.\n\n"
         "## Namespace And Index Coverage\n\n"

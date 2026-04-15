@@ -127,7 +127,7 @@ class CompareChmToDocsTests(unittest.TestCase):
         self.assertIn("- title_parity_mismatches: 0", report)
         self.assertIn("Report written to", result.stdout)
 
-    def test_compare_chm_to_docs_uses_normalized_api_fallback_for_missing_target_paths(self) -> None:
+    def test_compare_chm_to_docs_reports_missing_mapped_targets_even_when_a_normalized_api_path_exists(self) -> None:
         self.page_map_path.write_text(
             "\n".join(
                 [
@@ -184,10 +184,20 @@ class CompareChmToDocsTests(unittest.TestCase):
 
         self.assertEqual(result.returncode, 0, msg=result.stdout + result.stderr)
         report = self.report_path.read_text(encoding="utf-8")
-        self.assertIn("- mapped_target_pages_missing: 0", report)
-        self.assertIn("- high_value_marker_failures: 0", report)
-        self.assertIn("## Mismatched Mappings\n\n- None", report)
-        self.assertIn("## Unresolved Review Items\n\n- None", report)
+        self.assertIn("- mapped_target_pages_missing: 4", report)
+        self.assertIn("- high_value_marker_failures: 4", report)
+        self.assertIn(
+            "`docs/md/GTA/Player.md` maps to missing target `docs/reference/gta/player.md`.",
+            report,
+        )
+        self.assertIn(
+            "Expected normalized API target `docs/reference/api/GTA/Player.md` exists, so the page map should be updated instead of relying on fallback resolution.",
+            report,
+        )
+        self.assertIn(
+            "`docs/md/GTA/Player.md` high-value target is missing entirely at `docs/reference/gta/player.md`.",
+            report,
+        )
 
     def test_compare_chm_to_docs_does_not_flag_missing_source_markers_as_target_failures(self) -> None:
         self.page_map_path.write_text(
@@ -240,6 +250,19 @@ class CompareChmToDocsTests(unittest.TestCase):
             "docs/reference/api/GTA/Player.md",
             "# Player Class\n\nCharacter\n\nModel\n\nCanControlCharacter\n",
         )
+        self.write_markdown("docs/README.md", "# ScriptHookDotNet Docs\n")
+        self.write_markdown(
+            "docs/reference/archive/legacy-single-file-export.md",
+            "# Legacy Single-File Export\n",
+        )
+        self.write_markdown(
+            "docs/reference/misc/index.md",
+            "# misc\n",
+        )
+        self.write_markdown(
+            "docs/reference/archive/legacy-export-toc.md",
+            "# Legacy Export TOC\n",
+        )
 
         result = self.run_script()
 
@@ -257,8 +280,50 @@ class CompareChmToDocsTests(unittest.TestCase):
         self.assertIn("archival navigation aid", report)
         self.assertIn("## Mismatched Mappings\n\n- None", report)
         self.assertIn("## Unresolved Review Items\n\n- None", report)
+        self.assertIn("- root_indexes_checked: 1", report)
         self.assertIn("- root_indexes_missing: 0", report)
+        self.assertIn("- namespace_indexes_checked: 1", report)
         self.assertIn("- namespace_indexes_missing: 0", report)
+
+    def test_compare_chm_to_docs_reports_missing_intentional_targets(self) -> None:
+        self.page_map_path.write_text(
+            "\n".join(
+                [
+                    '"source_path","doc_kind","namespace_or_section","target_path","notes"',
+                    '"docs/md/GTA/Player.md","type-page","GTA","docs/reference/api/GTA/Player.md","Keep the Player type page."',
+                    '"docs/md/index.md","root-index","reference-root","docs/README.md","Promote the export landing page into the curated docs root overview."',
+                    '"docs/md/TOC.md","legacy-toc","archive","docs/reference/archive/legacy-export-toc.md","Keep as an archival navigation aid instead of a primary entry page."',
+                ]
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+
+        self.write_html(
+            "GTA.Player.html",
+            "Player Class",
+            "Character Model CanControlCharacter money",
+        )
+        self.write_markdown("docs/README.md", "# ScriptHookDotNet Docs\n")
+        self.write_markdown(
+            "docs/reference/api/GTA/Player.md",
+            "# Player Class\n\nCharacter\n\nModel\n\nCanControlCharacter\n",
+        )
+
+        result = self.run_script()
+
+        self.assertEqual(result.returncode, 0, msg=result.stdout + result.stderr)
+        report = self.report_path.read_text(encoding="utf-8")
+        self.assertIn("- root_indexes_checked: 1", report)
+        self.assertIn("- mapped_target_pages_missing: 1", report)
+        self.assertIn(
+            "`docs/md/TOC.md` intentional curation target `docs/reference/archive/legacy-export-toc.md` is missing on disk.",
+            report,
+        )
+        self.assertIn(
+            "`docs/md/TOC.md` is an intentional curation row, but its mapped target still needs to exist for parity reporting.",
+            report,
+        )
 
     def test_compare_chm_to_docs_fails_when_no_html_pages_exist(self) -> None:
         self.page_map_path.write_text(
