@@ -29,6 +29,17 @@ Use [Legacy CHM And Markdown Export](legacy-chm.md) when you need to understand 
 
 Reference content should stay lookup-oriented. It should answer "what is this API and where do I go next?" while letting [Guides](../guides/README.md) and [Examples](../examples/README.md) handle teaching and workflow.
 
+## High-Value Entry Points
+
+Use these pages first when you want the most useful documented surfaces added in this phase:
+
+- [Script Lifecycle](concepts/script-lifecycle.md) with [`GTA.Script`](api/GTA/Script.md)
+- [Entity Model](concepts/entity-model.md) with [`GTA.World`](api/GTA/World.md), [`GTA.Player`](api/GTA/Player.md), [`GTA.Ped`](api/GTA/Ped.md), and [`GTA.Vehicle`](api/GTA/Vehicle.md)
+- [Native Calls](concepts/native-calls.md) with [`GTA.Native.Function`](api/GTA.Native/Function.md)
+- [Forms And UI](concepts/forms-ui.md) for render hooks, immediate drawing, and `GTA.Forms`
+
+If you are starting from repo-backed walkthroughs instead of raw lookup, pair those pages with [Write Your First Script](../guides/first-script.md), [Debug ScriptHookDotNet Scripts](../guides/debugging.md), [Sample Projects](../examples/sample-projects.md), and [Common Script Patterns](../examples/common-patterns.md).
+
 ## How It Relates To `docs/md`
 
 The `docs/md/` tree is the archive of the original exported documentation, including `docs/md/index.md`, `docs/md/TOC.md`, and the large namespace-by-namespace page set. That material remains important for migration traceability and deep parity checks, but it exposes readers directly to export-era filenames and fragmented member pages.
@@ -54,3 +65,13 @@ Use this section first only when you are already asking a reference-shaped quest
 - [Compatibility](../compatibility/README.md)
 - [Legacy CHM And Markdown Export](legacy-chm.md)
 - [Version Matrix](../compatibility/version-matrix.md)
+- [Script Lifecycle](concepts/script-lifecycle.md)
+- [Entity Model](concepts/entity-model.md)
+- [Native Calls](concepts/native-calls.md)
+- [Forms And UI](concepts/forms-ui.md)
+- [`GTA.Script`](api/GTA/Script.md)
+- [`GTA.World`](api/GTA/World.md)
+- [`GTA.Player`](api/GTA/Player.md)
+- [`GTA.Ped`](api/GTA/Ped.md)
+- [`GTA.Vehicle`](api/GTA/Vehicle.md)
+- [`GTA.Native.Function`](api/GTA.Native/Function.md)

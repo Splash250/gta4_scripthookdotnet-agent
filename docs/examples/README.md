@@ -28,6 +28,15 @@ Example pages belong here when they answer questions like:
 
 The first project-oriented pages in this section are [Sample Projects](sample-projects.md), which compares the bundled C#, VB, and GrabScript solutions, and [Common Script Patterns](common-patterns.md), which distills recurring techniques from the sample scripts into concrete starting points.
 
+## High-Value Reference Shortcuts
+
+When an example raises an API question, jump directly to the paired concept and type pages:
+
+- [Script Lifecycle](../reference/concepts/script-lifecycle.md) and [`GTA.Script`](../reference/api/GTA/Script.md) for event wiring, `Tick`, waits, and commands.
+- [Entity Model](../reference/concepts/entity-model.md) with [`World`](../reference/api/GTA/World.md), [`Player`](../reference/api/GTA/Player.md), [`Ped`](../reference/api/GTA/Ped.md), and [`Vehicle`](../reference/api/GTA/Vehicle.md) for actor and vehicle logic.
+- [Native Calls](../reference/concepts/native-calls.md) with [`GTA.Native.Function`](../reference/api/GTA.Native/Function.md) when a sample crosses into raw interop.
+- [Forms And UI](../reference/concepts/forms-ui.md) when following drawing or `GTA.Forms` examples.
+
 ## How It Relates To `docs/md`
 
 The `docs/md/` export is useful when you already know which namespace or type to inspect. It does not show readers how the repository's own sample code fits together.
@@ -51,3 +60,7 @@ If you are already comfortable with the runtime setup, use [ScriptHookDotNet Doc
 - [Guides](../guides/README.md)
 - [Reference](../reference/README.md)
 - [Compatibility](../compatibility/README.md)
+- [Script Lifecycle](../reference/concepts/script-lifecycle.md)
+- [Entity Model](../reference/concepts/entity-model.md)
+- [Native Calls](../reference/concepts/native-calls.md)
+- [Forms And UI](../reference/concepts/forms-ui.md)

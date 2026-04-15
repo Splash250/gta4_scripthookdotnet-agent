@@ -78,9 +78,22 @@ Stop treating the problem as a simple script bug when you observe one of these r
 
 Those are environment or compatibility problems and belong with [Compatibility](../compatibility/README.md), not with normal script debugging.
 
+## Reference Escalation Paths
+
+Use the shortest reference jump that matches the failure mode:
+
+- [Script Lifecycle](../reference/concepts/script-lifecycle.md) and [`GTA.Script`](../reference/api/GTA/Script.md) when the bug looks tied to event timing, `Tick`, or `Wait`.
+- [Entity Model](../reference/concepts/entity-model.md) with [`World`](../reference/api/GTA/World.md), [`Ped`](../reference/api/GTA/Ped.md), and [`Vehicle`](../reference/api/GTA/Vehicle.md) when cached entities stop existing or world queries behave unexpectedly.
+- [Native Calls](../reference/concepts/native-calls.md) with [`GTA.Native.Function`](../reference/api/GTA.Native/Function.md) when the failure involves raw native names, pointer outputs, or marshaling.
+- [Forms And UI](../reference/concepts/forms-ui.md) when the issue is specific to drawing hooks or `GTA.Forms`.
+
 ## Related Pages
 
 - [Getting Started](getting-started.md)
 - [Install ScriptHookDotNet for GTA IV](installation.md)
 - [Write Your First Script](first-script.md)
 - [Compatibility](../compatibility/README.md)
+- [Script Lifecycle](../reference/concepts/script-lifecycle.md)
+- [Entity Model](../reference/concepts/entity-model.md)
+- [Native Calls](../reference/concepts/native-calls.md)
+- [Forms And UI](../reference/concepts/forms-ui.md)

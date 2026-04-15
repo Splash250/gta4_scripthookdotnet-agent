@@ -67,9 +67,27 @@ These are the main gaps the docs should not overstate:
 - Treat `ScriptHookDotNet.readme.txt` as the current best in-repo runtime statement for GTA IV, EFLC, and ASI-loader expectations.
 - Treat anything under `docs\chm\` and `docs\md\` as archival reference material, not proof that a compatibility claim has been freshly confirmed.
 
+After confirming the environment is in scope, use these docs for the next layer of detail:
+
+- [Write Your First Script](../guides/first-script.md) and [Sample Projects](../examples/sample-projects.md) for the supported workflow through the bundled scripts.
+- [Script Lifecycle](../reference/concepts/script-lifecycle.md) and [`GTA.Script`](../reference/api/GTA/Script.md) for host timing assumptions.
+- [Entity Model](../reference/concepts/entity-model.md) with [`World`](../reference/api/GTA/World.md), [`Player`](../reference/api/GTA/Player.md), [`Ped`](../reference/api/GTA/Ped.md), and [`Vehicle`](../reference/api/GTA/Vehicle.md) for gameplay object behavior.
+- [Native Calls](../reference/concepts/native-calls.md) with [`GTA.Native.Function`](../reference/api/GTA.Native/Function.md) when support questions depend on raw native interop.
+
 ## Related Pages
 
 - [Compatibility](README.md)
 - [Getting Started](../guides/getting-started.md)
 - [Reference](../reference/README.md)
 - [Legacy CHM And Markdown Export](../reference/legacy-chm.md)
+- [Write Your First Script](../guides/first-script.md)
+- [Sample Projects](../examples/sample-projects.md)
+- [Script Lifecycle](../reference/concepts/script-lifecycle.md)
+- [Entity Model](../reference/concepts/entity-model.md)
+- [Native Calls](../reference/concepts/native-calls.md)
+- [`GTA.Script`](../reference/api/GTA/Script.md)
+- [`GTA.World`](../reference/api/GTA/World.md)
+- [`GTA.Player`](../reference/api/GTA/Player.md)
+- [`GTA.Ped`](../reference/api/GTA/Ped.md)
+- [`GTA.Vehicle`](../reference/api/GTA/Vehicle.md)
+- [`GTA.Native.Function`](../reference/api/GTA.Native/Function.md)

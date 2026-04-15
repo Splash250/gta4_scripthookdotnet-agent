@@ -46,9 +46,22 @@ Future guide pages in this section should send readers onward to:
 - [Examples](../examples/README.md) for sample-project context
 - [Compatibility](../compatibility/README.md) for version and runtime caveats
 
+## High-Value Reference Shortcuts
+
+Use these when a workflow page turns into an API question:
+
+- [Script Lifecycle](../reference/concepts/script-lifecycle.md) and [`GTA.Script`](../reference/api/GTA/Script.md) for event timing, waits, and host behavior.
+- [Entity Model](../reference/concepts/entity-model.md) with [`World`](../reference/api/GTA/World.md), [`Player`](../reference/api/GTA/Player.md), [`Ped`](../reference/api/GTA/Ped.md), and [`Vehicle`](../reference/api/GTA/Vehicle.md) for gameplay-facing script logic.
+- [Native Calls](../reference/concepts/native-calls.md) with [`GTA.Native.Function`](../reference/api/GTA.Native/Function.md) when a sample or guide has to drop below the wrapper layer.
+- [Forms And UI](../reference/concepts/forms-ui.md) when a guide touches rendering, overlays, or `GTA.Forms`.
+
 ## Related Pages
 
 - [ScriptHookDotNet Docs](../README.md)
 - [Examples](../examples/README.md)
 - [Reference](../reference/README.md)
 - [Compatibility](../compatibility/README.md)
+- [Script Lifecycle](../reference/concepts/script-lifecycle.md)
+- [Entity Model](../reference/concepts/entity-model.md)
+- [Native Calls](../reference/concepts/native-calls.md)
+- [Forms And UI](../reference/concepts/forms-ui.md)

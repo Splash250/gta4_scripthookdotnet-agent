@@ -46,17 +46,36 @@ Use `docs/md/` only when you need the raw namespace export, such as `docs/md/ind
 
 [Guides](guides/README.md) collects the walkthrough-style material for people installing the plugin, writing their first script, or debugging script load failures. It translates the repo's existing README text and sample-project conventions into a guided path.
 
+High-value guide-driven reference entry points:
+
+- [Write Your First Script](guides/first-script.md) pairs directly with [Script Lifecycle](reference/concepts/script-lifecycle.md) and the [`GTA.Script` API page](reference/api/GTA/Script.md).
+- [Debug ScriptHookDotNet Scripts](guides/debugging.md) pairs with [Native Calls](reference/concepts/native-calls.md) and [`GTA.Native.Function`](reference/api/GTA.Native/Function.md) when troubleshooting interop-heavy scripts.
+
 ### Examples
 
 [Examples](examples/README.md) turns the bundled projects and script samples into learning assets. Use it when you want to see how repository assets like `TestScriptCS/`, `TestScriptVB/`, and `GrabScript/` demonstrate real usage patterns.
+
+High-value example entry points:
+
+- [Sample Projects](examples/sample-projects.md) gives the repo-backed overview for [`World`](reference/api/GTA/World.md), [`Player`](reference/api/GTA/Player.md), [`Ped`](reference/api/GTA/Ped.md), and [`Vehicle`](reference/api/GTA/Vehicle.md) in context.
+- [Common Script Patterns](examples/common-patterns.md) is the fastest path from repo examples into [Script Lifecycle](reference/concepts/script-lifecycle.md), [Entity Model](reference/concepts/entity-model.md), and [Native Calls](reference/concepts/native-calls.md).
 
 ### Reference
 
 [Reference](reference/README.md) is the supported API-facing landing page. It points readers toward normalized lookup content instead of asking them to browse the raw namespace export directly.
 
+High-value reference entry points:
+
+- [Script Lifecycle](reference/concepts/script-lifecycle.md) and [`GTA.Script`](reference/api/GTA/Script.md)
+- [Entity Model](reference/concepts/entity-model.md) with [`World`](reference/api/GTA/World.md), [`Player`](reference/api/GTA/Player.md), [`Ped`](reference/api/GTA/Ped.md), and [`Vehicle`](reference/api/GTA/Vehicle.md)
+- [Native Calls](reference/concepts/native-calls.md) with [`GTA.Native.Function`](reference/api/GTA.Native/Function.md)
+- [Forms And UI](reference/concepts/forms-ui.md) for render hooks, drawing, and `GTA.Forms`
+
 ### Compatibility
 
 [Compatibility](compatibility/README.md) centralizes version ranges, runtime expectations, and other support boundaries that are scattered across the root readmes and legacy packaging notes today.
+
+Use [Version Matrix](compatibility/version-matrix.md) before relying on version-sensitive guidance from the concept and API pages above.
 
 ## Related Pages
 
@@ -64,3 +83,13 @@ Use `docs/md/` only when you need the raw namespace export, such as `docs/md/ind
 - [Examples](examples/README.md)
 - [Reference](reference/README.md)
 - [Compatibility](compatibility/README.md)
+- [Script Lifecycle](reference/concepts/script-lifecycle.md)
+- [Entity Model](reference/concepts/entity-model.md)
+- [Native Calls](reference/concepts/native-calls.md)
+- [Forms And UI](reference/concepts/forms-ui.md)
+- [`GTA.Script`](reference/api/GTA/Script.md)
+- [`GTA.World`](reference/api/GTA/World.md)
+- [`GTA.Player`](reference/api/GTA/Player.md)
+- [`GTA.Ped`](reference/api/GTA/Ped.md)
+- [`GTA.Vehicle`](reference/api/GTA/Vehicle.md)
+- [`GTA.Native.Function`](reference/api/GTA.Native/Function.md)

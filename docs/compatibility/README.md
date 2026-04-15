@@ -44,6 +44,15 @@ Most new readers should start at [ScriptHookDotNet Docs](../README.md), then mov
 
 If you already know your environment is in scope, continue into [Guides](../guides/README.md) or inspect [Examples](../examples/README.md) for practical usage patterns.
 
+## High-Value Docs To Revisit After Validation
+
+Once your environment assumptions are clear, use these pages as the main next hops:
+
+- [Write Your First Script](../guides/first-script.md) and [Sample Projects](../examples/sample-projects.md) for the repo-backed workflow.
+- [Script Lifecycle](../reference/concepts/script-lifecycle.md) with [`GTA.Script`](../reference/api/GTA/Script.md) for host and timing behavior.
+- [Entity Model](../reference/concepts/entity-model.md) with [`World`](../reference/api/GTA/World.md), [`Player`](../reference/api/GTA/Player.md), [`Ped`](../reference/api/GTA/Ped.md), and [`Vehicle`](../reference/api/GTA/Vehicle.md) for gameplay object questions.
+- [Native Calls](../reference/concepts/native-calls.md) with [`GTA.Native.Function`](../reference/api/GTA.Native/Function.md) when compatibility-sensitive behavior crosses into native interop.
+
 ## Related Pages
 
 - [ScriptHookDotNet Docs](../README.md)
@@ -52,3 +61,12 @@ If you already know your environment is in scope, continue into [Guides](../guid
 - [Reference](../reference/README.md)
 - [Version Matrix](version-matrix.md)
 - [Legacy CHM And Markdown Export](../reference/legacy-chm.md)
+- [Script Lifecycle](../reference/concepts/script-lifecycle.md)
+- [Entity Model](../reference/concepts/entity-model.md)
+- [Native Calls](../reference/concepts/native-calls.md)
+- [`GTA.Script`](../reference/api/GTA/Script.md)
+- [`GTA.World`](../reference/api/GTA/World.md)
+- [`GTA.Player`](../reference/api/GTA/Player.md)
+- [`GTA.Ped`](../reference/api/GTA/Ped.md)
+- [`GTA.Vehicle`](../reference/api/GTA/Vehicle.md)
+- [`GTA.Native.Function`](../reference/api/GTA.Native/Function.md)

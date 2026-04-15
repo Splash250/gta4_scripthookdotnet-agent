@@ -33,6 +33,15 @@ This landing page is the supported front door for the normalized API reference u
 - [UI And Forms](topics/ui-and-forms.md) for drawing, fonts, textures, and the higher-level `GTA.Forms` control model.
 - [Native Interop](topics/native-interop.md) for raw native invocation, pointer/parameter conversions, and lower-level handle contracts.
 
+## Concept Shortcuts
+
+Use these when you want the human-oriented explanation first and the generated member lists second:
+
+- [Script Lifecycle](../concepts/script-lifecycle.md) -> [`GTA.Script`](GTA/Script.md)
+- [Entity Model](../concepts/entity-model.md) -> [`GTA.World`](GTA/World.md), [`GTA.Player`](GTA/Player.md), [`GTA.Ped`](GTA/Ped.md), [`GTA.Vehicle`](GTA/Vehicle.md)
+- [Native Calls](../concepts/native-calls.md) -> [`GTA.Native.Function`](GTA.Native/Function.md)
+- [Forms And UI](../concepts/forms-ui.md) -> [`GTA.Graphics`](GTA/Graphics.md), [`GTA.Forms.Form`](GTA.Forms/Form.md), and [`Script.PerFrameDrawing`](GTA/Script.PerFrameDrawing.md)
+
 ## Legacy Navigation
 
 The generated [Table Of Contents](TOC.md) still exists for parity checks and migration tracing, but it is no longer the intended starting point for supported reference browsing.

@@ -82,6 +82,13 @@ This is the best project to inspect after you understand the basics from [Write 
 - Start with `TestScriptVB\` if your target language is Visual Basic and you want parity with the C# samples.
 - Move to `GrabScript\` when you need a more integrated example of state, helpers, and longer-lived script behavior.
 
+## Reference Pairings For These Samples
+
+- Use [Script Lifecycle](../reference/concepts/script-lifecycle.md) and [`GTA.Script`](../reference/api/GTA/Script.md) when comparing constructor, `Tick`, key-binding, or command-binding patterns across the samples.
+- Use [Entity Model](../reference/concepts/entity-model.md) with [`World`](../reference/api/GTA/World.md), [`Player`](../reference/api/GTA/Player.md), [`Ped`](../reference/api/GTA/Ped.md), and [`Vehicle`](../reference/api/GTA/Vehicle.md) when tracing bodyguard, taxi, teleport, or grab mechanics.
+- Use [Native Calls](../reference/concepts/native-calls.md) with [`GTA.Native.Function`](../reference/api/GTA.Native/Function.md) before copying the sample native-call code into a new script.
+- Use [Forms And UI](../reference/concepts/forms-ui.md) when inspecting `TextureDrawingExample` or `WindowExample`.
+
 ## Related Pages
 
 - [Examples](README.md)
@@ -90,3 +97,7 @@ This is the best project to inspect after you understand the basics from [Write 
 - [Install ScriptHookDotNet for GTA IV](../guides/installation.md)
 - [Debug ScriptHookDotNet Scripts](../guides/debugging.md)
 - [Reference](../reference/README.md)
+- [Script Lifecycle](../reference/concepts/script-lifecycle.md)
+- [Entity Model](../reference/concepts/entity-model.md)
+- [Native Calls](../reference/concepts/native-calls.md)
+- [Forms And UI](../reference/concepts/forms-ui.md)

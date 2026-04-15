@@ -87,7 +87,9 @@ For a compiled sample project, copy the built `.net` output into the GTA IV `scr
 Once the sample project is compiling, move between these docs layers:
 
 - [Examples](../examples/README.md) for project-by-project guidance.
-- [Reference](../reference/README.md) when you need member-level API detail.
+- [Script Lifecycle](../reference/concepts/script-lifecycle.md) and [`GTA.Script`](../reference/api/GTA/Script.md) when you need to reason about constructors, `Tick`, `Wait`, or input hooks.
+- [Entity Model](../reference/concepts/entity-model.md) with [`World`](../reference/api/GTA/World.md), [`Player`](../reference/api/GTA/Player.md), [`Ped`](../reference/api/GTA/Ped.md), and [`Vehicle`](../reference/api/GTA/Vehicle.md) when your first script starts touching gameplay objects.
+- [Reference](../reference/README.md) when you need broader member-level API detail.
 - `docs/md/index.md` when you need the archival namespace export behind the new docs surface.
 
 ## Related Pages
@@ -97,3 +99,7 @@ Once the sample project is compiling, move between these docs layers:
 - [Debug ScriptHookDotNet Scripts](debugging.md)
 - [Examples](../examples/README.md)
 - [Reference](../reference/README.md)
+- [Script Lifecycle](../reference/concepts/script-lifecycle.md)
+- [`GTA.Script`](../reference/api/GTA/Script.md)
+- [Entity Model](../reference/concepts/entity-model.md)
+- [`GTA.World`](../reference/api/GTA/World.md)
