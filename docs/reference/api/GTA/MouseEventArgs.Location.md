@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public ReadOnly Property Location As [System.Drawing.PointF](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingPointFClassTopic.asp)
+Public ReadOnly Property Location As [System.Drawing.PointF](https://learn.microsoft.com/dotnet/api/system.drawing.pointf)
 
 ## C#
 
-public [System.Drawing.PointF](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingPointFClassTopic.asp) Location {get;}
+public [System.Drawing.PointF](https://learn.microsoft.com/dotnet/api/system.drawing.pointf) Location {get;}
 
 #### See Also
 

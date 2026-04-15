@@ -5,15 +5,15 @@ Get the value with the given name from the settings file and convert it to a Vec
 ## Visual Basic
 
 Overloads Public Function GetValueVector3( \_
-   ByVal *OptionName* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
-   ByVal *Category* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
+   ByVal *OptionName* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
+   ByVal *Category* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
 ) As [GTA.Vector3](Vector3.md)
 
 ## C#
 
 public [GTA.Vector3](Vector3.md) GetValueVector3(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *OptionName*,
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Category*
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *OptionName*,
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Category*
 );
 
 #### Parameters

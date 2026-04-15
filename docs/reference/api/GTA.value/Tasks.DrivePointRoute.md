@@ -4,16 +4,16 @@
 
 Public Sub DrivePointRoute( \_
    ByVal *Vehicle* As [GTA.Vehicle](../GTA/Vehicle.md), \_
-   ByVal *Speed* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
+   ByVal *Speed* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
    ParamArray *RoutePoints* As [GTA.Vector3()](../GTA/Vector3.md) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) DrivePointRoute(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) DrivePointRoute(
    [GTA.Vehicle](../GTA/Vehicle.md) *Vehicle*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *Speed*,
-   params [GTA.Vector3[]](GTA.Vector3.md) *RoutePoints*
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *Speed*,
+   params GTA.Vector3[] *RoutePoints*
 );
 
 #### See Also

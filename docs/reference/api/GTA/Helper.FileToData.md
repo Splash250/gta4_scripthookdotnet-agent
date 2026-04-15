@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Public Shared Function FileToData( \_
-   ByVal *Filename* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
-) As [Byte()](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemByteClassTopic.asp)
+   ByVal *Filename* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
+) As [Byte()](https://learn.microsoft.com/dotnet/api/system.byte)
 
 ## C#
 
-public static [byte[]](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemByteClassTopic.asp) FileToData(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Filename*
+public static [byte[]](https://learn.microsoft.com/dotnet/api/system.byte) FileToData(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Filename*
 );
 
 #### See Also

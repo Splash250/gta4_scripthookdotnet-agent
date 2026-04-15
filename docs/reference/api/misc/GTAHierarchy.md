@@ -1,12 +1,12 @@
 # GTAHierarchy
 
-[System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+[System.Object](https://learn.microsoft.com/dotnet/api/system.object)
 
 [GTA.AnimationSet](../GTA/AnimationSet.md)
 
 |  |  |
 | --- | --- |
-| [GTA.base.BaseCollection<System.Object>](../GTA.base/BaseCollection[].md) ---- | [System.Collections.Generic.ICollection<System.Object>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericICollectionClassTopic.asp), [System.Collections.Generic.IEnumerable<System.Object>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIEnumerableClassTopic.asp), [System.Collections.Generic.IList<System.Object>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIListClassTopic.asp), [System.Collections.IEnumerable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsIEnumerableClassTopic.asp) |
+| [GTA.base.BaseCollection<System.Object>](../GTA.base/BaseCollection[].md) ---- | [System.Collections.Generic.ICollection<System.Object>](https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1), [System.Collections.Generic.IEnumerable<System.Object>](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1), [System.Collections.Generic.IList<System.Object>](https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist-1), [System.Collections.IEnumerable](https://learn.microsoft.com/dotnet/api/system.collections.ienumerable) |
 
 [GTA.base.ReadOnlyCollection<System.Object>](../GTA.base/ReadOnlyCollection[].md)
 
@@ -14,7 +14,7 @@
 
 |  |  |
 | --- | --- |
-| [GTA.base.BaseCollection<System.String>](../GTA.base/BaseCollection[].md) ---- | [System.Collections.Generic.ICollection<System.String>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericICollectionClassTopic.asp), [System.Collections.Generic.IEnumerable<System.String>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIEnumerableClassTopic.asp), [System.Collections.Generic.IList<System.String>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIListClassTopic.asp), [System.Collections.IEnumerable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsIEnumerableClassTopic.asp) |
+| [GTA.base.BaseCollection<System.String>](../GTA.base/BaseCollection[].md) ---- | [System.Collections.Generic.ICollection<System.String>](https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1), [System.Collections.Generic.IEnumerable<System.String>](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1), [System.Collections.Generic.IList<System.String>](https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist-1), [System.Collections.IEnumerable](https://learn.microsoft.com/dotnet/api/system.collections.ienumerable) |
 
 [GTA.base.ReadOnlyCollection<System.String>](../GTA.base/ReadOnlyCollection[].md)
 
@@ -26,7 +26,7 @@
 
 |  |  |
 | --- | --- |
-| [GTA.base.HandleObject](../GTA.base/HandleObject.md) ---- | [GTA.base.iHandleObject](../GTA.base/iHandleObject.md), [System.IEquatable<GTA.base.HandleObject>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIEquatableClassTopic.asp), [System.IEquatable<GTA.base.iHandleObject>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIEquatableClassTopic.asp) |
+| [GTA.base.HandleObject](../GTA.base/HandleObject.md) ---- | [GTA.base.iHandleObject](../GTA.base/iHandleObject.md), [System.IEquatable<GTA.base.HandleObject>](https://learn.microsoft.com/dotnet/api/system.iequatable-1), [System.IEquatable<GTA.base.iHandleObject>](https://learn.microsoft.com/dotnet/api/system.iequatable-1) |
 
 |  |  |
 | --- | --- |
@@ -38,11 +38,11 @@
 
 |  |  |
 | --- | --- |
-| [GTA.DecisionMaker](../GTA/DecisionMaker.md) ---- | [System.IDisposable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIDisposableClassTopic.asp) |
+| [GTA.DecisionMaker](../GTA/DecisionMaker.md) ---- | [System.IDisposable](https://learn.microsoft.com/dotnet/api/system.idisposable) |
 
 |  |  |
 | --- | --- |
-| [GTA.Group](../GTA/Group.md) ---- | [GTA.base.iDeletable](../GTA.base/iDeletable.md), [GTA.base.iGroup](../GTA.base/iGroup.md), [System.Collections.Generic.IEnumerable<GTA.Ped>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIEnumerableClassTopic.asp), [System.Collections.IEnumerable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsIEnumerableClassTopic.asp) |
+| [GTA.Group](../GTA/Group.md) ---- | [GTA.base.iDeletable](../GTA.base/iDeletable.md), [GTA.base.iGroup](../GTA.base/iGroup.md), [System.Collections.Generic.IEnumerable<GTA.Ped>](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1), [System.Collections.IEnumerable](https://learn.microsoft.com/dotnet/api/system.collections.ienumerable) |
 
 |  |  |
 | --- | --- |
@@ -74,7 +74,7 @@
 
 |  |  |
 | --- | --- |
-| [GTA.Font](../GTA/Font.md) ---- | [GTA.base.iD3DObject](../GTA.base/iD3DObject.md), [System.IDisposable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIDisposableClassTopic.asp) |
+| [GTA.Font](../GTA/Font.md) ---- | [GTA.base.iD3DObject](../GTA.base/iD3DObject.md), [System.IDisposable](https://learn.microsoft.com/dotnet/api/system.idisposable) |
 
 [GTA.Game](../GTA/Game.md)
 
@@ -88,39 +88,39 @@
 
 |  |  |
 | --- | --- |
-| [GTA.Script](../GTA/Script.md) ---- | [System.IDisposable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIDisposableClassTopic.asp) |
+| [GTA.Script](../GTA/Script.md) ---- | [System.IDisposable](https://learn.microsoft.com/dotnet/api/system.idisposable) |
 
 |  |  |
 | --- | --- |
-| [GTA.SettingsFile](../GTA/SettingsFile.md) ---- | [System.IDisposable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIDisposableClassTopic.asp) |
+| [GTA.SettingsFile](../GTA/SettingsFile.md) ---- | [System.IDisposable](https://learn.microsoft.com/dotnet/api/system.idisposable) |
 
 [GTA.SkinTemplate](../GTA/SkinTemplate.md)
 
 |  |  |
 | --- | --- |
-| [GTA.TaskSequence](../GTA/TaskSequence.md) ---- | [System.IDisposable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIDisposableClassTopic.asp) |
+| [GTA.TaskSequence](../GTA/TaskSequence.md) ---- | [System.IDisposable](https://learn.microsoft.com/dotnet/api/system.idisposable) |
 
 |  |  |
 | --- | --- |
-| [GTA.Texture](../GTA/Texture.md) ---- | [GTA.base.iD3DObject](../GTA.base/iD3DObject.md), [System.IDisposable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIDisposableClassTopic.asp) |
+| [GTA.Texture](../GTA/Texture.md) ---- | [GTA.base.iD3DObject](../GTA.base/iD3DObject.md), [System.IDisposable](https://learn.microsoft.com/dotnet/api/system.idisposable) |
 
 [GTA.World](../GTA/World.md)
 
-[System.Attribute](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemAttributeClassTopic.asp)
+[System.Attribute](https://learn.microsoft.com/dotnet/api/system.attribute)
 
 [GTA.ConfigItemAttribute](../GTA/ConfigItemAttribute.md)
 
 |  |  |
 | --- | --- |
-| [System.Collections.Generic.List<GTA.Ped>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericListClassTopic.asp) ---- | [System.Collections.Generic.ICollection<GTA.Ped>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericICollectionClassTopic.asp), [System.Collections.Generic.IEnumerable<GTA.Ped>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIEnumerableClassTopic.asp), [System.Collections.Generic.IList<GTA.Ped>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIListClassTopic.asp), [System.Collections.ICollection](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsICollectionClassTopic.asp), [System.Collections.IEnumerable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsIEnumerableClassTopic.asp), [System.Collections.IList](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsIListClassTopic.asp) |
+| [System.Collections.Generic.List<GTA.Ped>](https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1) ---- | [System.Collections.Generic.ICollection<GTA.Ped>](https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1), [System.Collections.Generic.IEnumerable<GTA.Ped>](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1), [System.Collections.Generic.IList<GTA.Ped>](https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist-1), [System.Collections.ICollection](https://learn.microsoft.com/dotnet/api/system.collections.icollection), [System.Collections.IEnumerable](https://learn.microsoft.com/dotnet/api/system.collections.ienumerable), [System.Collections.IList](https://learn.microsoft.com/dotnet/api/system.collections.ilist) |
 
 [GTA.PedCollection](../GTA/PedCollection.md)
 
 |  |  |
 | --- | --- |
-| [System.Delegate](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDelegateClassTopic.asp) ---- | [System.ICloneable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemICloneableClassTopic.asp), [System.Runtime.Serialization.ISerializable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemRuntimeSerializationISerializableClassTopic.asp) |
+| [System.Delegate](https://learn.microsoft.com/dotnet/api/system.delegate) ---- | [System.ICloneable](https://learn.microsoft.com/dotnet/api/system.icloneable), [System.Runtime.Serialization.ISerializable](https://learn.microsoft.com/dotnet/api/system.runtime.serialization.iserializable) |
 
-[System.MulticastDelegate](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemMulticastDelegateClassTopic.asp)
+[System.MulticastDelegate](https://learn.microsoft.com/dotnet/api/system.multicastdelegate)
 
 [GTA.ConsoleCommandDelegate](../GTA/ConsoleCommandDelegate.md)
 
@@ -146,7 +146,7 @@
 
 [GTA.SerializableEventHandler](../GTA/SerializableEventHandler.md)
 
-[System.EventArgs](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemEventArgsClassTopic.asp)
+[System.EventArgs](https://learn.microsoft.com/dotnet/api/system.eventargs)
 
 [GTA.SerializableEventArgs](../GTA/SerializableEventArgs.md)
 
@@ -166,25 +166,25 @@
 
 |  |  |
 | --- | --- |
-| [System.Exception](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemExceptionClassTopic.asp) ---- | [System.Runtime.Serialization.ISerializable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemRuntimeSerializationISerializableClassTopic.asp) |
+| [System.Exception](https://learn.microsoft.com/dotnet/api/system.exception) ---- | [System.Runtime.Serialization.ISerializable](https://learn.microsoft.com/dotnet/api/system.runtime.serialization.iserializable) |
 
 [GTA.NonExistingObjectException](../GTA/NonExistingObjectException.md)
 
-[System.MarshalByRefObject](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemMarshalByRefObjectClassTopic.asp)
+[System.MarshalByRefObject](https://learn.microsoft.com/dotnet/api/system.marshalbyrefobject)
 
 |  |  |
 | --- | --- |
-| [System.IO.Stream](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIOStreamClassTopic.asp) ---- | [System.IDisposable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIDisposableClassTopic.asp) |
+| [System.IO.Stream](https://learn.microsoft.com/dotnet/api/system.io.stream) ---- | [System.IDisposable](https://learn.microsoft.com/dotnet/api/system.idisposable) |
 
 [GTA.MemoryStream](../GTA/MemoryStream.md)
 
-[System.ValueType](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemValueTypeClassTopic.asp)
+[System.ValueType](https://learn.microsoft.com/dotnet/api/system.valuetype)
 
 [GTA.ColorIndex](../GTA/ColorIndex.md)
 
 |  |  |
 | --- | --- |
-| [GTA.Matrix](../GTA/Matrix.md) ---- | [System.IEquatable<GTA.Matrix>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIEquatableClassTopic.asp) |
+| [GTA.Matrix](../GTA/Matrix.md) ---- | [System.IEquatable<GTA.Matrix>](https://learn.microsoft.com/dotnet/api/system.iequatable-1) |
 
 [GTA.Model](../GTA/Model.md)
 
@@ -194,17 +194,17 @@
 
 |  |  |
 | --- | --- |
-| [GTA.Vector2](../GTA/Vector2.md) ---- | [System.IEquatable<GTA.Vector2>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIEquatableClassTopic.asp) |
+| [GTA.Vector2](../GTA/Vector2.md) ---- | [System.IEquatable<GTA.Vector2>](https://learn.microsoft.com/dotnet/api/system.iequatable-1) |
 
 [GTA.Vector3](../GTA/Vector3.md)
 
 |  |  |
 | --- | --- |
-| [GTA.Vector4](../GTA/Vector4.md) ---- | [System.IEquatable<GTA.Vector4>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIEquatableClassTopic.asp) |
+| [GTA.Vector4](../GTA/Vector4.md) ---- | [System.IEquatable<GTA.Vector4>](https://learn.microsoft.com/dotnet/api/system.iequatable-1) |
 
 |  |  |
 | --- | --- |
-| [System.Enum](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemEnumClassTopic.asp) ---- | [System.IComparable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIComparableClassTopic.asp), [System.IConvertible](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIConvertibleClassTopic.asp), [System.IFormattable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIFormattableClassTopic.asp) |
+| [System.Enum](https://learn.microsoft.com/dotnet/api/system.enum) ---- | [System.IComparable](https://learn.microsoft.com/dotnet/api/system.icomparable), [System.IConvertible](https://learn.microsoft.com/dotnet/api/system.iconvertible), [System.IFormattable](https://learn.microsoft.com/dotnet/api/system.iformattable) |
 
 [GTA.AnimationFlags](../GTA/AnimationFlags.md)
 

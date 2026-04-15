@@ -9,7 +9,7 @@ Sub ApplyForce( \_
 
 ## C#
 
-[void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) ApplyForce(
+[void](https://learn.microsoft.com/dotnet/api/system.void) ApplyForce(
    [GTA.Vector3](../GTA/Vector3.md) *Direction*,
    [GTA.Vector3](../GTA/Vector3.md) *Rotation*
 );

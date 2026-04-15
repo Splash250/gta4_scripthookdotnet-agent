@@ -6,7 +6,7 @@ Public Sub DropCurrentWeapon()
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) DropCurrentWeapon();
+public [void](https://learn.microsoft.com/dotnet/api/system.void) DropCurrentWeapon();
 
 #### See Also
 

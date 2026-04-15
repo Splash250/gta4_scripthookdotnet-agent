@@ -7,7 +7,7 @@ Performs a linear interpolation between two vectors.
 Public Shared Function Lerp( \_
    ByVal *start* As [GTA.Vector4](Vector4.md), \_
    ByVal *end* As [GTA.Vector4](Vector4.md), \_
-   ByVal *amount* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
+   ByVal *amount* As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
 ) As [GTA.Vector4](Vector4.md)
 
 ## C#
@@ -15,7 +15,7 @@ Public Shared Function Lerp( \_
 public static [GTA.Vector4](Vector4.md) Lerp(
    [GTA.Vector4](Vector4.md) *start*,
    [GTA.Vector4](Vector4.md) *end*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *amount*
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *amount*
 );
 
 #### Parameters

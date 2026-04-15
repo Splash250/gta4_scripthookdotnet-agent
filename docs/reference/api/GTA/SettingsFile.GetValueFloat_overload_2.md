@@ -5,17 +5,17 @@ Get a float value with the given name from the settings file.
 ## Visual Basic
 
 Overloads Public Function GetValueFloat( \_
-   ByVal *OptionName* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
-   ByVal *Category* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
-   ByVal *DefaultValue* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
-) As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+   ByVal *OptionName* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
+   ByVal *Category* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
+   ByVal *DefaultValue* As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
+) As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) GetValueFloat(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *OptionName*,
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Category*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *DefaultValue*
+public [float](https://learn.microsoft.com/dotnet/api/system.single) GetValueFloat(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *OptionName*,
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Category*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *DefaultValue*
 );
 
 #### Parameters

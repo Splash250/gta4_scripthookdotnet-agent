@@ -7,11 +7,11 @@ Calculates the distance between two vectors.
 Public Shared Function Distance( \_
    ByVal *value1* As [GTA.Vector4](Vector4.md), \_
    ByVal *value2* As [GTA.Vector4](Vector4.md) \_
-) As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+) As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public static [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) Distance(
+public static [float](https://learn.microsoft.com/dotnet/api/system.single) Distance(
    [GTA.Vector4](Vector4.md) *value1*,
    [GTA.Vector4](Vector4.md) *value2*
 );

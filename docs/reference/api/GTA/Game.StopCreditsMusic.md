@@ -6,7 +6,7 @@ Public Shared Sub StopCreditsMusic()
 
 ## C#
 
-public static [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) StopCreditsMusic();
+public static [void](https://learn.microsoft.com/dotnet/api/system.void) StopCreditsMusic();
 
 #### See Also
 

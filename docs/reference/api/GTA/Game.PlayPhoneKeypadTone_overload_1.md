@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overloads Public Shared Sub PlayPhoneKeypadTone( \_
-   ByVal *KeyNum* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *KeyNum* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 )
 
 ## C#
 
-public static [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) PlayPhoneKeypadTone(
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *KeyNum*
+public static [void](https://learn.microsoft.com/dotnet/api/system.void) PlayPhoneKeypadTone(
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *KeyNum*
 );
 
 #### See Also

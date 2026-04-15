@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Function GetD3DObjectID( \_
-   ByVal *retrieveNew* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
-) As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+   ByVal *retrieveNew* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
+) As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-[int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) GetD3DObjectID(
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *retrieveNew*
+[int](https://learn.microsoft.com/dotnet/api/system.int32) GetD3DObjectID(
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *retrieveNew*
 );
 
 #### See Also

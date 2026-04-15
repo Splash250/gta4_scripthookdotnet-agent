@@ -4,11 +4,11 @@ Gets the angle of the quaternion.
 
 ## Visual Basic
 
-Public ReadOnly Property Angle As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+Public ReadOnly Property Angle As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) Angle {get;}
+public [float](https://learn.microsoft.com/dotnet/api/system.single) Angle {get;}
 
 #### See Also
 

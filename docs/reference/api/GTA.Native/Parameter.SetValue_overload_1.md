@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overloads Public Sub SetValue( \_
-   ByVal *value* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *value* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) SetValue(
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *value*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) SetValue(
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *value*
 );
 
 #### See Also

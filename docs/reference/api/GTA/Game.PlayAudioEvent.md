@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Public Shared Sub PlayAudioEvent( \_
-   ByVal *EventName* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
+   ByVal *EventName* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
 )
 
 ## C#
 
-public static [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) PlayAudioEvent(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *EventName*
+public static [void](https://learn.microsoft.com/dotnet/api/system.void) PlayAudioEvent(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *EventName*
 );
 
 #### See Also

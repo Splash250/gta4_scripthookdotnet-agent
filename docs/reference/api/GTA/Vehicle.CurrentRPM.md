@@ -4,11 +4,11 @@ Returns a value between 0 and 1 that represents how far you push the RPM of the 
 
 ## Visual Basic
 
-Public ReadOnly Property CurrentRPM As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+Public ReadOnly Property CurrentRPM As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) CurrentRPM {get;}
+public [float](https://learn.microsoft.com/dotnet/api/system.single) CurrentRPM {get;}
 
 #### See Also
 

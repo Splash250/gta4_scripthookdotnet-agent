@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Shared Property CurrentDayTime As [System.TimeSpan](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemTimeSpanClassTopic.asp)
+Public Shared Property CurrentDayTime As [System.TimeSpan](https://learn.microsoft.com/dotnet/api/system.timespan)
 
 ## C#
 
-public static [System.TimeSpan](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemTimeSpanClassTopic.asp) CurrentDayTime {get; set;}
+public static [System.TimeSpan](https://learn.microsoft.com/dotnet/api/system.timespan) CurrentDayTime {get; set;}
 
 #### See Also
 

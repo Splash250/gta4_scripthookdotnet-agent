@@ -10,7 +10,7 @@ Overloads Public Shared Function GetAllVehicles( \_
 
 ## C#
 
-public static [GTA.Vehicle[]](GTA.Vehicle.md) GetAllVehicles(
+public static GTA.Vehicle[] GetAllVehicles(
    [GTA.Model](Model.md) *ofModel*
 );
 

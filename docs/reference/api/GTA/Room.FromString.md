@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Public Shared Function FromString( \_
-   ByVal *StringID* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
+   ByVal *StringID* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
 ) As [GTA.Room](Room.md)
 
 ## C#
 
 public static [GTA.Room](Room.md) FromString(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *StringID*
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *StringID*
 );
 
 #### See Also

@@ -3,15 +3,15 @@
 ## Visual Basic
 
 Public Shared Function StringToBoolean( \_
-   ByVal *Input* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
-   ByVal *DefaultValue* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+   ByVal *Input* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
+   ByVal *DefaultValue* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public static [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) StringToBoolean(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Input*,
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *DefaultValue*
+public static [bool](https://learn.microsoft.com/dotnet/api/system.boolean) StringToBoolean(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Input*,
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *DefaultValue*
 );
 
 #### See Also

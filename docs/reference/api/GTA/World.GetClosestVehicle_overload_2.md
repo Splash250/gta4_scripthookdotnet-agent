@@ -4,7 +4,7 @@
 
 Overloads Public Shared Function GetClosestVehicle( \_
    ByVal *Position* As [GTA.Vector3](Vector3.md), \_
-   ByVal *MaxRadius* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
+   ByVal *MaxRadius* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
    ByVal *ofModel* As [GTA.Model](Model.md) \_
 ) As [GTA.Vehicle](Vehicle.md)
 
@@ -12,7 +12,7 @@ Overloads Public Shared Function GetClosestVehicle( \_
 
 public static [GTA.Vehicle](Vehicle.md) GetClosestVehicle(
    [GTA.Vector3](Vector3.md) *Position*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *MaxRadius*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *MaxRadius*,
    [GTA.Model](Model.md) *ofModel*
 );
 

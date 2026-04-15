@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public ReadOnly Property isUpright As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+Public ReadOnly Property isUpright As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) isUpright {get;}
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) isUpright {get;}
 
 #### See Also
 

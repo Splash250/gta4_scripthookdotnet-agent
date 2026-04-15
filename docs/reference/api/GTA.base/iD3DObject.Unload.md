@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Sub Unload( \_
-   ByVal *permanent* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
+   ByVal *permanent* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
 )
 
 ## C#
 
-[void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) Unload(
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *permanent*
+[void](https://learn.microsoft.com/dotnet/api/system.void) Unload(
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *permanent*
 );
 
 #### See Also

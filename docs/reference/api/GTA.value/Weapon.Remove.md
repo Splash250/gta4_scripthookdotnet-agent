@@ -6,7 +6,7 @@ Public Sub Remove()
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) Remove();
+public [void](https://learn.microsoft.com/dotnet/api/system.void) Remove();
 
 #### See Also
 

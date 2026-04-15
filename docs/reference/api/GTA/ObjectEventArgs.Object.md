@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public ReadOnly Property Object As [Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+Public ReadOnly Property Object As [Object](https://learn.microsoft.com/dotnet/api/system.object)
 
 ## C#
 
-public [object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp) Object {get;}
+public [object](https://learn.microsoft.com/dotnet/api/system.object) Object {get;}
 
 #### See Also
 

@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overloads Public Sub New( \_
-   ByVal *Interval* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *Interval* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 )
 
 ## C#
 
 public Timer(
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *Interval*
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *Interval*
 );
 
 #### See Also

@@ -4,14 +4,14 @@
 
 Overloads Public Sub SetValue( \_
    ByVal *ValueID* As [GTA.Euphoria.nmString](nmString.md), \_
-   ByVal *Value* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
+   ByVal *Value* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) SetValue(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) SetValue(
    [GTA.Euphoria.nmString](nmString.md) *ValueID*,
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *Value*
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *Value*
 );
 
 #### See Also

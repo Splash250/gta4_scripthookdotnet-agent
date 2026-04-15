@@ -6,7 +6,7 @@ Public Sub RemoveFakeNetworkName()
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) RemoveFakeNetworkName();
+public [void](https://learn.microsoft.com/dotnet/api/system.void) RemoveFakeNetworkName();
 
 #### See Also
 

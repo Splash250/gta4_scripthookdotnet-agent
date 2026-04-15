@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Overrides Public Function ToString() As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp)
+Overrides Public Function ToString() As [String](https://learn.microsoft.com/dotnet/api/system.string)
 
 ## C#
 
-public override [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) ToString();
+public override [string](https://learn.microsoft.com/dotnet/api/system.string) ToString();
 
 #### See Also
 

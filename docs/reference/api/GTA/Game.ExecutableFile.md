@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Shared ReadOnly Property ExecutableFile As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp)
+Public Shared ReadOnly Property ExecutableFile As [String](https://learn.microsoft.com/dotnet/api/system.string)
 
 ## C#
 
-public static [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) ExecutableFile {get;}
+public static [string](https://learn.microsoft.com/dotnet/api/system.string) ExecutableFile {get;}
 
 #### See Also
 

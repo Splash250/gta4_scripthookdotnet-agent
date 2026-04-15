@@ -1,6 +1,6 @@
 # GTA.MultiplayerHierarchy
 
-[System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+[System.Object](https://learn.microsoft.com/dotnet/api/system.object)
 
 [GTA.Multiplayer.Host](Multiplayer.Host.md)
 

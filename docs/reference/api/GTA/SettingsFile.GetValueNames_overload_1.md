@@ -4,11 +4,11 @@ Get the names of all values in the default category.
 
 ## Visual Basic
 
-Overloads Public Function GetValueNames() As [String()](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp)
+Overloads Public Function GetValueNames() As [String()](https://learn.microsoft.com/dotnet/api/system.string)
 
 ## C#
 
-public [string[]](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) GetValueNames();
+public [string[]](https://learn.microsoft.com/dotnet/api/system.string) GetValueNames();
 
 #### See Also
 

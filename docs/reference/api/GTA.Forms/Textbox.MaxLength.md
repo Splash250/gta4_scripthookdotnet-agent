@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Property MaxLength As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+Public Property MaxLength As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-public [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) MaxLength {get; set;}
+public [int](https://learn.microsoft.com/dotnet/api/system.int32) MaxLength {get; set;}
 
 #### See Also
 

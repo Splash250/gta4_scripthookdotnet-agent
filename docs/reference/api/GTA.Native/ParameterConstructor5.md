@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overloads Public Sub New( \_
-   ByVal *value* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
+   ByVal *value* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
 )
 
 ## C#
 
 public Parameter(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *value*
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *value*
 );
 
 #### See Also

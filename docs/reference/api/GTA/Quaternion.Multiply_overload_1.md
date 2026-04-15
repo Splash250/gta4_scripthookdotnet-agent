@@ -6,14 +6,14 @@ Scales a quaternion by the given value.
 
 Overloads Public Shared Function Multiply( \_
    ByVal *quaternion* As [GTA.Quaternion](Quaternion.md), \_
-   ByVal *scale* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
+   ByVal *scale* As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
 ) As [GTA.Quaternion](Quaternion.md)
 
 ## C#
 
 public static [GTA.Quaternion](Quaternion.md) Multiply(
    [GTA.Quaternion](Quaternion.md) *quaternion*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *scale*
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *scale*
 );
 
 #### Parameters

@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Public Function ToArray( \_
-   ByVal *IncludingLeader* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
+   ByVal *IncludingLeader* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
 ) As [GTA.Ped()](Ped.md)
 
 ## C#
 
-public [GTA.Ped[]](GTA.Ped.md) ToArray(
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *IncludingLeader*
+public GTA.Ped[] ToArray(
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *IncludingLeader*
 );
 
 #### See Also

@@ -3,15 +3,15 @@
 ## Visual Basic
 
 Overloads Public Shared Sub DisplayText( \_
-   ByVal *Text* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
-   ByVal *Duration* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *Text* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
+   ByVal *Duration* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 )
 
 ## C#
 
-public static [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) DisplayText(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Text*,
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *Duration*
+public static [void](https://learn.microsoft.com/dotnet/api/system.void) DisplayText(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Text*,
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *Duration*
 );
 
 #### See Also

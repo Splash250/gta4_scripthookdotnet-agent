@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Property ForeColor As [System.Drawing.Color](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingColorClassTopic.asp)
+Public Property ForeColor As [System.Drawing.Color](https://learn.microsoft.com/dotnet/api/system.drawing.color)
 
 ## C#
 
-public [System.Drawing.Color](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingColorClassTopic.asp) ForeColor {get; set;}
+public [System.Drawing.Color](https://learn.microsoft.com/dotnet/api/system.drawing.color) ForeColor {get; set;}
 
 #### See Also
 

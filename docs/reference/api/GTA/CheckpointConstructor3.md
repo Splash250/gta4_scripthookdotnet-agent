@@ -4,16 +4,16 @@
 
 Overloads Public Sub New( \_
    ByVal *Position* As [GTA.Vector3](Vector3.md), \_
-   ByVal *Color* As [System.Drawing.Color](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingColorClassTopic.asp), \_
-   ByVal *Diameter* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
+   ByVal *Color* As [System.Drawing.Color](https://learn.microsoft.com/dotnet/api/system.drawing.color), \_
+   ByVal *Diameter* As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
 )
 
 ## C#
 
 public Checkpoint(
    [GTA.Vector3](Vector3.md) *Position*,
-   [System.Drawing.Color](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingColorClassTopic.asp) *Color*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *Diameter*
+   [System.Drawing.Color](https://learn.microsoft.com/dotnet/api/system.drawing.color) *Color*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *Diameter*
 );
 
 #### See Also

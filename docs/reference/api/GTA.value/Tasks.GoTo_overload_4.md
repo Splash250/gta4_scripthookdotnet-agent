@@ -4,16 +4,16 @@
 
 Overloads Public Sub GoTo( \_
    ByVal *TargetPed* As [GTA.Ped](../GTA/Ped.md), \_
-   ByVal *OffsetRight* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *OffsetFront* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
+   ByVal *OffsetRight* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *OffsetFront* As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) GoTo(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) GoTo(
    [GTA.Ped](../GTA/Ped.md) *TargetPed*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *OffsetRight*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *OffsetFront*
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *OffsetRight*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *OffsetFront*
 );
 
 #### See Also

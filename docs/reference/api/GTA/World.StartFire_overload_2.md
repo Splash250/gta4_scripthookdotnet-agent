@@ -4,16 +4,16 @@
 
 Overloads Public Shared Function StartFire( \_
    ByVal *Position* As [GTA.Vector3](Vector3.md), \_
-   ByVal *Unknown1* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp), \_
-   ByVal *Unknown2* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *Unknown1* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32), \_
+   ByVal *Unknown2* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 ) As [GTA.ScriptedFire](ScriptedFire.md)
 
 ## C#
 
 public static [GTA.ScriptedFire](ScriptedFire.md) StartFire(
    [GTA.Vector3](Vector3.md) *Position*,
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *Unknown1*,
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *Unknown2*
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *Unknown1*,
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *Unknown2*
 );
 
 #### See Also

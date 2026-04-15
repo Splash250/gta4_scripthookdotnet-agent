@@ -8,7 +8,7 @@ Overloads Public Sub Invert()
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) Invert();
+public [void](https://learn.microsoft.com/dotnet/api/system.void) Invert();
 
 #### See Also
 

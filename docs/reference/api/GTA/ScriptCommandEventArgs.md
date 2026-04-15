@@ -2,9 +2,9 @@
 
 For a list of all members of this type, see [ScriptCommandEventArgs Members](ScriptCommandEventArgsMembers.md).
 
-[System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+[System.Object](https://learn.microsoft.com/dotnet/api/system.object)
 
-   [System.EventArgs](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemEventArgsClassTopic.asp)
+   [System.EventArgs](https://learn.microsoft.com/dotnet/api/system.eventargs)
       [GTA.SerializableEventArgs](SerializableEventArgs.md)
          **GTA.ScriptCommandEventArgs**
 

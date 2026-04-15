@@ -8,7 +8,7 @@ Public Sub LeaveVehicleImmediately( \_
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) LeaveVehicleImmediately(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) LeaveVehicleImmediately(
    [GTA.Vehicle](../GTA/Vehicle.md) *vehicle*
 );
 

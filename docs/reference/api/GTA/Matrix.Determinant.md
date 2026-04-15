@@ -4,11 +4,11 @@ Calculates the determinant of the matrix.
 
 ## Visual Basic
 
-Public Function Determinant() As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+Public Function Determinant() As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) Determinant();
+public [float](https://learn.microsoft.com/dotnet/api/system.single) Determinant();
 
 #### Return Value
 

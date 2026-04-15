@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Protected Shared MAX\_DURATION As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+Protected Shared MAX\_DURATION As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-protected static [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) MAX\_DURATION;
+protected static [int](https://learn.microsoft.com/dotnet/api/system.int32) MAX\_DURATION;
 
 #### See Also
 

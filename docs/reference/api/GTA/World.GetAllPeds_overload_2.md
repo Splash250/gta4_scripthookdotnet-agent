@@ -10,7 +10,7 @@ Overloads Public Shared Function GetAllPeds( \_
 
 ## C#
 
-public static [GTA.Ped[]](GTA.Ped.md) GetAllPeds(
+public static GTA.Ped[] GetAllPeds(
    [GTA.Model](Model.md) *ofModel*
 );
 

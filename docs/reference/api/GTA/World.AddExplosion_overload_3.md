@@ -8,7 +8,7 @@ Overloads Public Shared Sub AddExplosion( \_
 
 ## C#
 
-public static [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) AddExplosion(
+public static [void](https://learn.microsoft.com/dotnet/api/system.void) AddExplosion(
    [GTA.Vector3](Vector3.md) *Position*
 );
 

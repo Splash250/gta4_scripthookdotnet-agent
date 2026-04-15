@@ -10,7 +10,7 @@ Overloads Public Shared Function GetAllObjects( \_
 
 ## C#
 
-public static [GTA.object[]](GTA.Object.md) GetAllObjects(
+public static GTA.object[] GetAllObjects(
    [GTA.Model](Model.md) *ofModel*
 );
 

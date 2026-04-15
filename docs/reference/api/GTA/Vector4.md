@@ -4,20 +4,20 @@ Defines a four component vector.
 
 For a list of all members of this type, see [Vector4 Members](Vector4Members.md).
 
-[System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+[System.Object](https://learn.microsoft.com/dotnet/api/system.object)
 
-   [System.ValueType](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemValueTypeClassTopic.asp)
+   [System.ValueType](https://learn.microsoft.com/dotnet/api/system.valuetype)
       **GTA.Vector4**
 
 ## Visual Basic
 
 Public Structure Vector4
 
-Implements [System.IEquatable(Of GTA.Vector4)](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIEquatableClassTopic.asp)
+Implements [System.IEquatable(Of GTA.Vector4)](https://learn.microsoft.com/dotnet/api/system.iequatable(of gta.vector)-4)
 
 ## C#
 
-public struct Vector4 **: [System.IEquatable<GTA.Vector4>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIEquatableClassTopic.asp)**
+public struct Vector4 **: [System.IEquatable<GTA.Vector4>](https://learn.microsoft.com/dotnet/api/system.iequatable-1)**
 
 #### Thread Safety
 

@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overloads Public Sub Remove( \_
-   ByVal *Value* As [Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp) \_
+   ByVal *Value* As [Object](https://learn.microsoft.com/dotnet/api/system.object) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) Remove(
-   [object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp) *Value*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) Remove(
+   [object](https://learn.microsoft.com/dotnet/api/system.object) *Value*
 );
 
 #### See Also

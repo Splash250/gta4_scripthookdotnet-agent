@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Event ValueChanged As [System.EventHandler](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemEventHandlerClassTopic.asp)
+Public Event ValueChanged As [System.EventHandler](https://learn.microsoft.com/dotnet/api/system.eventhandler)
 
 ## C#
 
-public event [System.EventHandler](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemEventHandlerClassTopic.asp) ValueChanged;
+public event [System.EventHandler](https://learn.microsoft.com/dotnet/api/system.eventhandler) ValueChanged;
 
 #### See Also
 

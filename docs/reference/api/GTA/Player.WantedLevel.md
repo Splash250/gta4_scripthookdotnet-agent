@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Property WantedLevel As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+Public Property WantedLevel As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-public [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) WantedLevel {get; set;}
+public [int](https://learn.microsoft.com/dotnet/api/system.int32) WantedLevel {get; set;}
 
 #### See Also
 

@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-MustOverride Public ReadOnly Property isActive As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+MustOverride Public ReadOnly Property isActive As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public abstract [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) isActive {get;}
+public abstract [bool](https://learn.microsoft.com/dotnet/api/system.boolean) isActive {get;}
 
 #### See Also
 

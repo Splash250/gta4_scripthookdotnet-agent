@@ -2,20 +2,20 @@
 
 For a list of all members of this type, see [DynamicMetadata Members](DynamicMetadataMembers.md).
 
-[System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+[System.Object](https://learn.microsoft.com/dotnet/api/system.object)
 
-   [System.Dynamic.DynamicObject](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDynamicDynamicObjectClassTopic.asp)
+   [System.Dynamic.DynamicObject](https://learn.microsoft.com/dotnet/api/system.dynamic.dynamicobject)
       **GTA.value.DynamicMetadata**
 
 ## Visual Basic
 
 NotInheritable Public Class DynamicMetadata
 
-Inherits [System.Dynamic.DynamicObject](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDynamicDynamicObjectClassTopic.asp)
+Inherits [System.Dynamic.DynamicObject](https://learn.microsoft.com/dotnet/api/system.dynamic.dynamicobject)
 
 ## C#
 
-public sealed class DynamicMetadata **: [DynamicObject](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDynamicDynamicObjectClassTopic.asp)**
+public sealed class DynamicMetadata **: [DynamicObject](https://learn.microsoft.com/dotnet/api/system.dynamic.dynamicobject)**
 
 #### Thread Safety
 

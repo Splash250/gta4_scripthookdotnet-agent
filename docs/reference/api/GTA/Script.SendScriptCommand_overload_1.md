@@ -3,17 +3,17 @@
 ## Visual Basic
 
 Overloads Protected Sub SendScriptCommand( \_
-   ByVal *TargetScriptGUID* As [System.Guid](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemGuidClassTopic.asp), \_
-   ByVal *Command* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
-   ParamArray *Parameter* As [Object()](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp) \_
+   ByVal *TargetScriptGUID* As [System.Guid](https://learn.microsoft.com/dotnet/api/system.guid), \_
+   ByVal *Command* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
+   ParamArray *Parameter* As [Object()](https://learn.microsoft.com/dotnet/api/system.object) \_
 )
 
 ## C#
 
-protected [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) SendScriptCommand(
-   [System.Guid](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemGuidClassTopic.asp) *TargetScriptGUID*,
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Command*,
-   params [object[]](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp) *Parameter*
+protected [void](https://learn.microsoft.com/dotnet/api/system.void) SendScriptCommand(
+   [System.Guid](https://learn.microsoft.com/dotnet/api/system.guid) *TargetScriptGUID*,
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Command*,
+   params [object[]](https://learn.microsoft.com/dotnet/api/system.object) *Parameter*
 );
 
 #### See Also

@@ -8,7 +8,7 @@ Overrides Protected Friend Sub OnDragRelease( \_
 
 ## C#
 
-protected internal override [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) OnDragRelease(
+protected internal override [void](https://learn.microsoft.com/dotnet/api/system.void) OnDragRelease(
    [GTA.MouseEventArgs](../GTA/MouseEventArgs.md) *e*
 );
 

@@ -3,13 +3,13 @@
 ## Visual Basic
 
 MustOverride Overloads Public Sub Open( \_
-   ByVal *DefaultInput* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
+   ByVal *DefaultInput* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
 )
 
 ## C#
 
-public abstract [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) Open(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *DefaultInput*
+public abstract [void](https://learn.microsoft.com/dotnet/api/system.void) Open(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *DefaultInput*
 );
 
 #### See Also

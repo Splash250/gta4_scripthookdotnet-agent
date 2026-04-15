@@ -3,15 +3,15 @@
 ## Visual Basic
 
 Overloads Public Function ToString( \_
-   ByVal *Seperator* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
-   ByVal *Digits* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
-) As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp)
+   ByVal *Seperator* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
+   ByVal *Digits* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
+) As [String](https://learn.microsoft.com/dotnet/api/system.string)
 
 ## C#
 
-public [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) ToString(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Seperator*,
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *Digits*
+public [string](https://learn.microsoft.com/dotnet/api/system.string) ToString(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Seperator*,
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *Digits*
 );
 
 #### See Also

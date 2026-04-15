@@ -6,14 +6,14 @@ Scales a matrix by the given value.
 
 Overloads Public Shared Function Multiply( \_
    ByVal *left* As [GTA.Matrix](Matrix.md), \_
-   ByVal *right* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
+   ByVal *right* As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
 ) As [GTA.Matrix](Matrix.md)
 
 ## C#
 
 public static [GTA.Matrix](Matrix.md) Multiply(
    [GTA.Matrix](Matrix.md) *left*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *right*
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *right*
 );
 
 #### Parameters

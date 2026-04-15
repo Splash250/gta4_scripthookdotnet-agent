@@ -3,15 +3,15 @@
 ## Visual Basic
 
 Overloads Public Sub FightAgainstHatedTargets( \_
-   ByVal *radius* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *duration* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *radius* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *duration* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) FightAgainstHatedTargets(
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *radius*,
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *duration*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) FightAgainstHatedTargets(
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *radius*,
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *duration*
 );
 
 #### See Also

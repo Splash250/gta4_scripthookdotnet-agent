@@ -4,14 +4,14 @@
 
 Public Shared Function DirectionToRotation( \_
    ByVal *dir* As [GTA.Vector3](Vector3.md), \_
-   ByVal *roll* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
+   ByVal *roll* As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
 ) As [GTA.Vector3](Vector3.md)
 
 ## C#
 
 public static [GTA.Vector3](Vector3.md) DirectionToRotation(
    [GTA.Vector3](Vector3.md) *dir*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *roll*
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *roll*
 );
 
 #### See Also

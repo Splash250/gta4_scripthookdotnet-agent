@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public WriteOnly Property ReachForWound As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+Public WriteOnly Property ReachForWound As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) ReachForWound {set;}
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) ReachForWound {set;}
 
 #### See Also
 

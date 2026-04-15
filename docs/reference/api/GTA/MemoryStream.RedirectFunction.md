@@ -3,15 +3,15 @@
 ## Visual Basic
 
 Public Sub RedirectFunction( \_
-   ByVal *FunctionAddress* As [Long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp), \_
-   ByVal *ReplacementFunctionAddress* As [Long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp) \_
+   ByVal *FunctionAddress* As [Long](https://learn.microsoft.com/dotnet/api/system.int64), \_
+   ByVal *ReplacementFunctionAddress* As [Long](https://learn.microsoft.com/dotnet/api/system.int64) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) RedirectFunction(
-   [long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp) *FunctionAddress*,
-   [long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp) *ReplacementFunctionAddress*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) RedirectFunction(
+   [long](https://learn.microsoft.com/dotnet/api/system.int64) *FunctionAddress*,
+   [long](https://learn.microsoft.com/dotnet/api/system.int64) *ReplacementFunctionAddress*
 );
 
 #### See Also

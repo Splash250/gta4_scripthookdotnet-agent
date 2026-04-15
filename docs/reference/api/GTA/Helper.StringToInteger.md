@@ -3,15 +3,15 @@
 ## Visual Basic
 
 Public Shared Function StringToInteger( \_
-   ByVal *Input* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
-   ByVal *DefaultValue* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
-) As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+   ByVal *Input* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
+   ByVal *DefaultValue* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
+) As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-public static [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) StringToInteger(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Input*,
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *DefaultValue*
+public static [int](https://learn.microsoft.com/dotnet/api/system.int32) StringToInteger(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Input*,
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *DefaultValue*
 );
 
 #### See Also

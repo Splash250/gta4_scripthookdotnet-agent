@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Function ToArray() As [GTA.base.T()](T.md)
+Public Function ToArray() As GTA.base.T()
 
 ## C#
 
-public [GTA.base.T[]](GTA.base.T.md) ToArray();
+public GTA.base.T[] ToArray();
 
 #### See Also
 

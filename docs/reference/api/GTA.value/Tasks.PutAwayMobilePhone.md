@@ -6,7 +6,7 @@ Public Sub PutAwayMobilePhone()
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) PutAwayMobilePhone();
+public [void](https://learn.microsoft.com/dotnet/api/system.void) PutAwayMobilePhone();
 
 #### See Also
 

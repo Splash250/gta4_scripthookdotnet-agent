@@ -4,14 +4,14 @@
 
 Public Function GetPedsCurrentAnimationTime( \_
    ByVal *ped* As [GTA.Ped](Ped.md), \_
-   ByVal *AnimationName* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
-) As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+   ByVal *AnimationName* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
+) As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) GetPedsCurrentAnimationTime(
+public [float](https://learn.microsoft.com/dotnet/api/system.single) GetPedsCurrentAnimationTime(
    [GTA.Ped](Ped.md) *ped*,
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *AnimationName*
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *AnimationName*
 );
 
 #### See Also

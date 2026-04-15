@@ -4,12 +4,12 @@ Scales a quaternion by the given value.
 
 ## Visual Basic
 
-Public Shared Operator \*(scale As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), quaternion As [GTA.Quaternion](Quaternion.md)) As [GTA.Quaternion](Quaternion.md)
+Public Shared Operator \*(scale As [Single](https://learn.microsoft.com/dotnet/api/system.single), quaternion As [GTA.Quaternion](Quaternion.md)) As [GTA.Quaternion](Quaternion.md)
 
 ## C#
 
 public static [GTA.Quaternion](Quaternion.md) operator \*(
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *scale*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *scale*,
    [GTA.Quaternion](Quaternion.md) *quaternion*
 );
 

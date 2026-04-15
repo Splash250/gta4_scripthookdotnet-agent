@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Public Sub SayAmbientSpeech( \_
-   ByVal *PhraseID* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
+   ByVal *PhraseID* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) SayAmbientSpeech(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *PhraseID*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) SayAmbientSpeech(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *PhraseID*
 );
 
 #### See Also

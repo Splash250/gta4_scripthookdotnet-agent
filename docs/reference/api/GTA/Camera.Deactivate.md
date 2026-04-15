@@ -6,7 +6,7 @@ Public Sub Deactivate()
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) Deactivate();
+public [void](https://learn.microsoft.com/dotnet/api/system.void) Deactivate();
 
 #### See Also
 

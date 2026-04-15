@@ -5,13 +5,13 @@ Returns a Texture contained as an embedded resource file in the script
 ## Visual Basic
 
 Public Function GetTexture( \_
-   ByVal *ResourceName* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
+   ByVal *ResourceName* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
 ) As [GTA.Texture](../GTA/Texture.md)
 
 ## C#
 
 public [GTA.Texture](../GTA/Texture.md) GetTexture(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *ResourceName*
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *ResourceName*
 );
 
 #### See Also

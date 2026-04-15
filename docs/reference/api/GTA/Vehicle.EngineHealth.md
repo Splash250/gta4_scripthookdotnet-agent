@@ -4,11 +4,11 @@ The current health of the car's engine. 1000 is maximum, 0 is broken, can go bel
 
 ## Visual Basic
 
-Public Property EngineHealth As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+Public Property EngineHealth As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) EngineHealth {get; set;}
+public [float](https://learn.microsoft.com/dotnet/api/system.single) EngineHealth {get; set;}
 
 #### See Also
 

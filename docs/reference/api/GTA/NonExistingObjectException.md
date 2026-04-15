@@ -2,20 +2,20 @@
 
 For a list of all members of this type, see [NonExistingObjectException Members](NonExistingObjectExceptionMembers.md).
 
-[System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+[System.Object](https://learn.microsoft.com/dotnet/api/system.object)
 
-   [System.Exception](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemExceptionClassTopic.asp)
+   [System.Exception](https://learn.microsoft.com/dotnet/api/system.exception)
       **GTA.NonExistingObjectException**
 
 ## Visual Basic
 
 Public Class NonExistingObjectException
 
-Inherits [System.Exception](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemExceptionClassTopic.asp)
+Inherits [System.Exception](https://learn.microsoft.com/dotnet/api/system.exception)
 
 ## C#
 
-public class NonExistingObjectException **: [Exception](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemExceptionClassTopic.asp)**
+public class NonExistingObjectException **: [Exception](https://learn.microsoft.com/dotnet/api/system.exception)**
 
 #### Thread Safety
 

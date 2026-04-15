@@ -3,15 +3,15 @@
 ## Visual Basic
 
 Public Shared Function ConvertY( \_
-   ByVal *value* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
+   ByVal *value* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
    ByVal *SourceScaling* As [GTA.FontScaling](FontScaling.md), \_
    ByVal *TargetScaling* As [GTA.FontScaling](FontScaling.md) \_
-) As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+) As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public static [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) ConvertY(
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *value*,
+public static [float](https://learn.microsoft.com/dotnet/api/system.single) ConvertY(
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *value*,
    [GTA.FontScaling](FontScaling.md) *SourceScaling*,
    [GTA.FontScaling](FontScaling.md) *TargetScaling*
 );

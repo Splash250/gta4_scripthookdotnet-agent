@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overloads Public Sub New( \_
-   ByVal *Objects* As [Object()](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp) \_
+   ByVal *Objects* As [Object()](https://learn.microsoft.com/dotnet/api/system.object) \_
 )
 
 ## C#
 
 public ObjectCollection(
-   [object[]](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp) *Objects*
+   [object[]](https://learn.microsoft.com/dotnet/api/system.object) *Objects*
 );
 
 #### See Also

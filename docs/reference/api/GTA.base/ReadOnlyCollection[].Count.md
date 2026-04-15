@@ -2,17 +2,17 @@
 
 ## Visual Basic
 
-Overrides Public ReadOnly Property Count As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+Overrides Public ReadOnly Property Count As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 
-Implements [ICollection`1.Count](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericClassICollectionTopic.asp)
+Implements [ICollection`1.Count](https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.count)
 
 ## C#
 
-public override [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) Count {get;}
+public override [int](https://learn.microsoft.com/dotnet/api/system.int32) Count {get;}
 
 #### Implements
 
-[ICollection`1.Count](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericClassICollectionTopic.asp)
+[ICollection`1.Count](https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.count)
 
 #### See Also
 

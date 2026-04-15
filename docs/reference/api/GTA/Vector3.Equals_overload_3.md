@@ -5,13 +5,13 @@ Returns a value that indicates whether the current instance is equal to a specif
 ## Visual Basic
 
 NotOverridable Overloads Public Function Equals( \_
-   ByVal *obj* As [Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+   ByVal *obj* As [Object](https://learn.microsoft.com/dotnet/api/system.object) \_
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) Equals(
-   [object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp) *obj*
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) Equals(
+   [object](https://learn.microsoft.com/dotnet/api/system.object) *obj*
 );
 
 #### Parameters

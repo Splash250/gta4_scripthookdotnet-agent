@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Property Metadata As [Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+Property Metadata As [Object](https://learn.microsoft.com/dotnet/api/system.object)
 
 ## C#
 
-[object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp) Metadata {get;}
+[object](https://learn.microsoft.com/dotnet/api/system.object) Metadata {get;}
 
 #### See Also
 

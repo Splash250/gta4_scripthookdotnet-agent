@@ -5,18 +5,18 @@ Creates a 2D affine transformation matrix.
 ## Visual Basic
 
 Public Shared Function AffineTransformation2D( \_
-   ByVal *scaling* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
+   ByVal *scaling* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
    ByVal *rotationCenter* As [GTA.Vector2](Vector2.md), \_
-   ByVal *rotation* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
+   ByVal *rotation* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
    ByVal *translation* As [GTA.Vector2](Vector2.md) \_
 ) As [GTA.Matrix](Matrix.md)
 
 ## C#
 
 public static [GTA.Matrix](Matrix.md) AffineTransformation2D(
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *scaling*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *scaling*,
    [GTA.Vector2](Vector2.md) *rotationCenter*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *rotation*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *rotation*,
    [GTA.Vector2](Vector2.md) *translation*
 );
 

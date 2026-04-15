@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Protected Sub UnbindScriptCommand( \_
-   ByVal *Command* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
+   ByVal *Command* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
 )
 
 ## C#
 
-protected [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) UnbindScriptCommand(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Command*
+protected [void](https://learn.microsoft.com/dotnet/api/system.void) UnbindScriptCommand(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Command*
 );
 
 #### See Also

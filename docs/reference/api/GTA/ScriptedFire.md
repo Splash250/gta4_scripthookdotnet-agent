@@ -2,7 +2,7 @@
 
 For a list of all members of this type, see [ScriptedFire Members](ScriptedFireMembers.md).
 
-[System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+[System.Object](https://learn.microsoft.com/dotnet/api/system.object)
 
    [GTA.base.Object](../GTA.base/Object.md)
       [GTA.base.HandleObject](../GTA.base/HandleObject.md)

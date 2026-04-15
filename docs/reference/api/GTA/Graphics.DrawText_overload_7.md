@@ -3,19 +3,19 @@
 ## Visual Basic
 
 Overloads Public Sub DrawText( \_
-   ByVal *Text* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
-   ByVal *X* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *Y* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *Color* As [System.Drawing.Color](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingColorClassTopic.asp) \_
+   ByVal *Text* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
+   ByVal *X* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *Y* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *Color* As [System.Drawing.Color](https://learn.microsoft.com/dotnet/api/system.drawing.color) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) DrawText(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Text*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *X*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *Y*,
-   [System.Drawing.Color](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingColorClassTopic.asp) *Color*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) DrawText(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Text*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *X*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *Y*,
+   [System.Drawing.Color](https://learn.microsoft.com/dotnet/api/system.drawing.color) *Color*
 );
 
 #### See Also

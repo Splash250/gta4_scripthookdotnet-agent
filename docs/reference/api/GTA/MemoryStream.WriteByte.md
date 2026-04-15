@@ -3,15 +3,15 @@
 ## Visual Basic
 
 Public Sub WriteByte( \_
-   ByVal *value* As [Byte](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemByteClassTopic.asp), \_
-   ByVal *offset* As [Long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp) \_
+   ByVal *value* As [Byte](https://learn.microsoft.com/dotnet/api/system.byte), \_
+   ByVal *offset* As [Long](https://learn.microsoft.com/dotnet/api/system.int64) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) WriteByte(
-   [byte](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemByteClassTopic.asp) *value*,
-   [long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp) *offset*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) WriteByte(
+   [byte](https://learn.microsoft.com/dotnet/api/system.byte) *value*,
+   [long](https://learn.microsoft.com/dotnet/api/system.int64) *offset*
 );
 
 #### See Also

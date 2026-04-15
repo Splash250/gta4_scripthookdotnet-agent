@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overrides Public Sub Add( \_
-   ByVal *item* As [GTA.base.T](T.md) \_
+   ByVal *item* As GTA.base.T \_
 )
 
 ## C#
 
-public override [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) Add(
-   [GTA.base.T](T.md) *item*
+public override [void](https://learn.microsoft.com/dotnet/api/system.void) Add(
+   GTA.base.T *item*
 );
 
 #### See Also

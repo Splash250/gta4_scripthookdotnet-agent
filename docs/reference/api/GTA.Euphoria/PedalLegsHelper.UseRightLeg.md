@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public WriteOnly Property UseRightLeg As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+Public WriteOnly Property UseRightLeg As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) UseRightLeg {set;}
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) UseRightLeg {set;}
 
 #### See Also
 

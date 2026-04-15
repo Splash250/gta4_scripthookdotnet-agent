@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public ReadOnly Property isUpsideDown As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+Public ReadOnly Property isUpsideDown As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) isUpsideDown {get;}
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) isUpsideDown {get;}
 
 #### See Also
 

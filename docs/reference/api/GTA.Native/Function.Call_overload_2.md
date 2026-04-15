@@ -3,15 +3,15 @@
 ## Visual Basic
 
 Overloads Public Shared Function Call( \_
-   ByVal *Name* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
+   ByVal *Name* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
    ParamArray *Arguments* As [GTA.Native.Parameter()](Parameter.md) \_
-) As [GTA.Native.ReturnType](ReturnType.md)
+) As GTA.Native.ReturnType
 
 ## C#
 
-public static [GTA.Native.ReturnType](ReturnType.md) Call(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Name*,
-   params [GTA.Native.Parameter[]](GTA.Native.Parameter.md) *Arguments*
+public static GTA.Native.ReturnType Call(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Name*,
+   params GTA.Native.Parameter[] *Arguments*
 );
 
 #### See Also

@@ -3,17 +3,17 @@
 ## Visual Basic
 
 Public Shared Function StringToFile( \_
-   ByVal *Filename* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
-   ByVal *Data* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
-   ByVal *Encoding* As [System.Text.Encoding](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemTextEncodingClassTopic.asp) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+   ByVal *Filename* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
+   ByVal *Data* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
+   ByVal *Encoding* As [System.Text.Encoding](https://learn.microsoft.com/dotnet/api/system.text.encoding) \_
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public static [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) StringToFile(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Filename*,
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Data*,
-   [System.Text.Encoding](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemTextEncodingClassTopic.asp) *Encoding*
+public static [bool](https://learn.microsoft.com/dotnet/api/system.boolean) StringToFile(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Filename*,
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Data*,
+   [System.Text.Encoding](https://learn.microsoft.com/dotnet/api/system.text.encoding) *Encoding*
 );
 
 #### See Also

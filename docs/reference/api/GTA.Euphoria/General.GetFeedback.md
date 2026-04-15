@@ -5,15 +5,15 @@
 Public Shared Function GetFeedback( \_
    ByVal *TargetPed* As [GTA.Ped](../GTA/Ped.md), \_
    ByVal *FeedbackID* As [GTA.Euphoria.nmString](nmString.md), \_
-   ByVal *FeedbackNum* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+   ByVal *FeedbackNum* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public static [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) GetFeedback(
+public static [bool](https://learn.microsoft.com/dotnet/api/system.boolean) GetFeedback(
    [GTA.Ped](../GTA/Ped.md) *TargetPed*,
    [GTA.Euphoria.nmString](nmString.md) *FeedbackID*,
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *FeedbackNum*
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *FeedbackNum*
 );
 
 #### See Also

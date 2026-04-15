@@ -6,16 +6,16 @@ Initializes a new instance of the [Vector4](Vector4.md) class.
 
 Overloads Public Sub New( \_
    ByVal *value* As [GTA.Vector2](Vector2.md), \_
-   ByVal *z* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *w* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
+   ByVal *z* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *w* As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
 )
 
 ## C#
 
 public Vector4(
    [GTA.Vector2](Vector2.md) *value*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *z*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *w*
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *z*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *w*
 );
 
 #### Parameters

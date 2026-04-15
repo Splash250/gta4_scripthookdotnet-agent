@@ -3,13 +3,13 @@
 ## Visual Basic
 
 MustOverride Public Function isButtonDown( \_
-   ByVal *Button* As [System.Windows.Forms.MouseButtons](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemWindowsFormsMouseButtonsClassTopic.asp) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+   ByVal *Button* As [System.Windows.Forms.MouseButtons](https://learn.microsoft.com/dotnet/api/system.windows.forms.mousebuttons) \_
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public abstract [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) isButtonDown(
-   [System.Windows.Forms.MouseButtons](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemWindowsFormsMouseButtonsClassTopic.asp) *Button*
+public abstract [bool](https://learn.microsoft.com/dotnet/api/system.boolean) isButtonDown(
+   [System.Windows.Forms.MouseButtons](https://learn.microsoft.com/dotnet/api/system.windows.forms.mousebuttons) *Button*
 );
 
 #### See Also

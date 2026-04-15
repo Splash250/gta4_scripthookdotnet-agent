@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Shared Widening Operator CType(source As [GTA.Native.Pointer](Pointer.md)) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+Public Shared Widening Operator CType(source As [GTA.Native.Pointer](Pointer.md)) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public static implicit operator [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)(
+public static implicit operator [bool](https://learn.microsoft.com/dotnet/api/system.boolean)(
    [GTA.Native.Pointer](Pointer.md) *source*
 );
 

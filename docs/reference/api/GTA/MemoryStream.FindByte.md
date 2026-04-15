@@ -3,15 +3,15 @@
 ## Visual Basic
 
 Public Function FindByte( \_
-   ByVal *value* As [Byte](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemByteClassTopic.asp), \_
-   ByVal *offset* As [Long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp) \_
-) As [Long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp)
+   ByVal *value* As [Byte](https://learn.microsoft.com/dotnet/api/system.byte), \_
+   ByVal *offset* As [Long](https://learn.microsoft.com/dotnet/api/system.int64) \_
+) As [Long](https://learn.microsoft.com/dotnet/api/system.int64)
 
 ## C#
 
-public [long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp) FindByte(
-   [byte](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemByteClassTopic.asp) *value*,
-   [long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp) *offset*
+public [long](https://learn.microsoft.com/dotnet/api/system.int64) FindByte(
+   [byte](https://learn.microsoft.com/dotnet/api/system.byte) *value*,
+   [long](https://learn.microsoft.com/dotnet/api/system.int64) *offset*
 );
 
 #### See Also

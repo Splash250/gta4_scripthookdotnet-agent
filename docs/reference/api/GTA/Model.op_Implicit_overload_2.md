@@ -2,12 +2,12 @@
 
 ## Visual Basic
 
-Public Shared Widening Operator CType(source As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)) As [GTA.Model](Model.md)
+Public Shared Widening Operator CType(source As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)) As [GTA.Model](Model.md)
 
 ## C#
 
 public static implicit operator [GTA.Model](Model.md)(
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *source*
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *source*
 );
 
 #### See Also

@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public ReadOnly Property FrameTime As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+Public ReadOnly Property FrameTime As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) FrameTime {get;}
+public [float](https://learn.microsoft.com/dotnet/api/system.single) FrameTime {get;}
 
 #### See Also
 

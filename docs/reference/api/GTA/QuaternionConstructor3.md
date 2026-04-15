@@ -5,19 +5,19 @@ Initializes a new instance of the [Quaternion](Quaternion.md) structure.
 ## Visual Basic
 
 Overloads Public Sub New( \_
-   ByVal *x* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *y* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *z* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *w* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
+   ByVal *x* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *y* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *z* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *w* As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
 )
 
 ## C#
 
 public Quaternion(
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *x*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *y*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *z*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *w*
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *x*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *y*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *z*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *w*
 );
 
 #### Parameters

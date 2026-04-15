@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overloads Protected Sub UnbindKey( \_
-   ByVal *Key* As [System.Windows.Forms.Keys](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemWindowsFormsKeysClassTopic.asp) \_
+   ByVal *Key* As [System.Windows.Forms.Keys](https://learn.microsoft.com/dotnet/api/system.windows.forms.keys) \_
 )
 
 ## C#
 
-protected [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) UnbindKey(
-   [System.Windows.Forms.Keys](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemWindowsFormsKeysClassTopic.asp) *Key*
+protected [void](https://learn.microsoft.com/dotnet/api/system.void) UnbindKey(
+   [System.Windows.Forms.Keys](https://learn.microsoft.com/dotnet/api/system.windows.forms.keys) *Key*
 );
 
 #### See Also

@@ -6,9 +6,9 @@ The fields of the **Vector3** structure are listed below. For a complete list of
 
 |  |  |
 | --- | --- |
-| [X](Vector3.X.md) | Gets or sets the X component of the vector. |
-| [Y](Vector3.Y.md) | Gets or sets the Y component of the vector. |
-| [Z](Vector3.Z.md) | Gets or sets the Z component of the vector. |
+| X | Gets or sets the X component of the vector. |
+| Y | Gets or sets the Y component of the vector. |
+| Z | Gets or sets the Z component of the vector. |
 
 #### See Also
 

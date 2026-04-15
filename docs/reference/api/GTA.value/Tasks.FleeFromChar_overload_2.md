@@ -4,14 +4,14 @@
 
 Overloads Public Sub FleeFromChar( \_
    ByVal *target* As [GTA.Ped](../GTA/Ped.md), \_
-   ByVal *onPavements* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
+   ByVal *onPavements* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) FleeFromChar(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) FleeFromChar(
    [GTA.Ped](../GTA/Ped.md) *target*,
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *onPavements*
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *onPavements*
 );
 
 #### See Also

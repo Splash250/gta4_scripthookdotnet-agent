@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overloads Public Shared Sub FadeScreenOut( \_
-   ByVal *time* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *time* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 )
 
 ## C#
 
-public static [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) FadeScreenOut(
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *time*
+public static [void](https://learn.microsoft.com/dotnet/api/system.void) FadeScreenOut(
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *time*
 );
 
 #### See Also

@@ -4,16 +4,16 @@
 
 Public Sub SetComponent( \_
    ByVal *component* As [GTA.PedComponent](PedComponent.md), \_
-   ByVal *model* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp), \_
-   ByVal *texture* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *model* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32), \_
+   ByVal *texture* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) SetComponent(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) SetComponent(
    [GTA.PedComponent](PedComponent.md) *component*,
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *model*,
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *texture*
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *model*,
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *texture*
 );
 
 #### See Also

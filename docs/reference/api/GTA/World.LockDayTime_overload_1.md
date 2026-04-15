@@ -6,7 +6,7 @@ Overloads Public Shared Sub LockDayTime()
 
 ## C#
 
-public static [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) LockDayTime();
+public static [void](https://learn.microsoft.com/dotnet/api/system.void) LockDayTime();
 
 #### See Also
 

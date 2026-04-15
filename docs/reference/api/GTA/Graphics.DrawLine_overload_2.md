@@ -5,23 +5,23 @@ Draws a colored line.
 ## Visual Basic
 
 Overloads Public Sub DrawLine( \_
-   ByVal *X1* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *Y1* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *X2* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *Y2* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *Width* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *Color* As [System.Drawing.Color](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingColorClassTopic.asp) \_
+   ByVal *X1* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *Y1* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *X2* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *Y2* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *Width* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *Color* As [System.Drawing.Color](https://learn.microsoft.com/dotnet/api/system.drawing.color) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) DrawLine(
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *X1*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *Y1*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *X2*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *Y2*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *Width*,
-   [System.Drawing.Color](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingColorClassTopic.asp) *Color*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) DrawLine(
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *X1*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *Y1*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *X2*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *Y2*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *Width*,
+   [System.Drawing.Color](https://learn.microsoft.com/dotnet/api/system.drawing.color) *Color*
 );
 
 #### See Also

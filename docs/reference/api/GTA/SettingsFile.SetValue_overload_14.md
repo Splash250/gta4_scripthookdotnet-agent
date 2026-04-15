@@ -3,16 +3,16 @@
 ## Visual Basic
 
 Overloads Public Sub SetValue( \_
-   ByVal *OptionName* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
-   ByVal *Category* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
+   ByVal *OptionName* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
+   ByVal *Category* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
    ByVal *Value* As [GTA.Vector3](Vector3.md) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) SetValue(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *OptionName*,
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Category*,
+public [void](https://learn.microsoft.com/dotnet/api/system.void) SetValue(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *OptionName*,
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Category*,
    [GTA.Vector3](Vector3.md) *Value*
 );
 

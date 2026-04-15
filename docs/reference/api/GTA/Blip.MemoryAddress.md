@@ -2,13 +2,13 @@
 
 ## Visual Basic
 
-Overridable Public ReadOnly Property MemoryAddress As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+Overridable Public ReadOnly Property MemoryAddress As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 
 Implements [iAddressableObject.MemoryAddress](../GTA.base/iAddressableObject.MemoryAddress.md)
 
 ## C#
 
-public virtual [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) MemoryAddress {get;}
+public virtual [int](https://learn.microsoft.com/dotnet/api/system.int32) MemoryAddress {get;}
 
 #### Implements
 

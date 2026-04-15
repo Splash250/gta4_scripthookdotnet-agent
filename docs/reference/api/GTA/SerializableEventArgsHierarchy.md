@@ -1,8 +1,8 @@
 # GTA.SerializableEventArgsHierarchy
 
-[System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+[System.Object](https://learn.microsoft.com/dotnet/api/system.object)
 
-   [EventArgs](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemEventArgsClassTopic.asp)
+   [EventArgs](https://learn.microsoft.com/dotnet/api/system.eventargs)
       **SerializableEventArgs**
          [ConsoleEventArgs](ConsoleEventArgs.md)
          [GraphicsEventArgs](GraphicsEventArgs.md)

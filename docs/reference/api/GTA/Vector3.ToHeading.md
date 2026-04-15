@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Function ToHeading() As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+Public Function ToHeading() As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) ToHeading();
+public [float](https://learn.microsoft.com/dotnet/api/system.single) ToHeading();
 
 #### See Also
 

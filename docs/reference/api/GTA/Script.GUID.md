@@ -4,11 +4,11 @@ The GUID is used to uniquely idetify your script. With it you are able to commun
 
 ## Visual Basic
 
-Public Property GUID As [System.Guid](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemGuidClassTopic.asp)
+Public Property GUID As [System.Guid](https://learn.microsoft.com/dotnet/api/system.guid)
 
 ## C#
 
-public [System.Guid](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemGuidClassTopic.asp) GUID {get; set;}
+public [System.Guid](https://learn.microsoft.com/dotnet/api/system.guid) GUID {get; set;}
 
 #### See Also
 

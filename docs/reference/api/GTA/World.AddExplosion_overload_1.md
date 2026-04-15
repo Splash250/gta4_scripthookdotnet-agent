@@ -5,15 +5,15 @@
 Overloads Public Shared Sub AddExplosion( \_
    ByVal *Position* As [GTA.Vector3](Vector3.md), \_
    ByVal *Type* As [GTA.ExplosionType](ExplosionType.md), \_
-   ByVal *Power* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
+   ByVal *Power* As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
 )
 
 ## C#
 
-public static [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) AddExplosion(
+public static [void](https://learn.microsoft.com/dotnet/api/system.void) AddExplosion(
    [GTA.Vector3](Vector3.md) *Position*,
    [GTA.ExplosionType](ExplosionType.md) *Type*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *Power*
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *Power*
 );
 
 #### See Also

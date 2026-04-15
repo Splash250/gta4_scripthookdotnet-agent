@@ -8,7 +8,7 @@ Sub ApplyForceRelative( \_
 
 ## C#
 
-[void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) ApplyForceRelative(
+[void](https://learn.microsoft.com/dotnet/api/system.void) ApplyForceRelative(
    [GTA.Vector3](../GTA/Vector3.md) *Direction*
 );
 

@@ -10,7 +10,7 @@ Overloads Public Sub SendTo( \_
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) SendTo(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) SendTo(
    [GTA.Ped](../GTA/Ped.md) *TargetPed*
 );
 

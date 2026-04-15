@@ -10,8 +10,8 @@ The properties of the **MouseEventArgs** class are listed below. For a complete 
 | [isMouseVisible](MouseEventArgs.isMouseVisible.md) |  |
 | [Location](MouseEventArgs.Location.md) |  |
 | [PixelLocation](MouseEventArgs.PixelLocation.md) |  |
-| [X](MouseEventArgs.X.md) |  |
-| [Y](MouseEventArgs.Y.md) |  |
+| X |  |
+| Y |  |
 
 #### See Also
 

@@ -8,7 +8,7 @@ Public Sub GiveToPed( \_
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) GiveToPed(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) GiveToPed(
    [GTA.Ped](Ped.md) *ped*
 );
 

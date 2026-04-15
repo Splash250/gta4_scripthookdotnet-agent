@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public WriteOnly Property Amount As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+Public WriteOnly Property Amount As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) Amount {set;}
+public [float](https://learn.microsoft.com/dotnet/api/system.single) Amount {set;}
 
 #### See Also
 

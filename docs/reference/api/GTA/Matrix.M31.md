@@ -4,11 +4,11 @@ Gets or sets the element of the matrix that exists in the third row and first co
 
 ## Visual Basic
 
-Public M31 As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+Public M31 As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) M31;
+public [float](https://learn.microsoft.com/dotnet/api/system.single) M31;
 
 #### See Also
 

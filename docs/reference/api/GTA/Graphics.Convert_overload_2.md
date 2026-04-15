@@ -3,15 +3,15 @@
 ## Visual Basic
 
 Overloads Public Shared Function Convert( \_
-   ByVal *pt* As [System.Drawing.PointF](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingPointFClassTopic.asp), \_
+   ByVal *pt* As [System.Drawing.PointF](https://learn.microsoft.com/dotnet/api/system.drawing.pointf), \_
    ByVal *SourceScaling* As [GTA.FontScaling](FontScaling.md), \_
    ByVal *TargetScaling* As [GTA.FontScaling](FontScaling.md) \_
-) As [System.Drawing.PointF](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingPointFClassTopic.asp)
+) As [System.Drawing.PointF](https://learn.microsoft.com/dotnet/api/system.drawing.pointf)
 
 ## C#
 
-public static [System.Drawing.PointF](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingPointFClassTopic.asp) Convert(
-   [System.Drawing.PointF](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingPointFClassTopic.asp) *pt*,
+public static [System.Drawing.PointF](https://learn.microsoft.com/dotnet/api/system.drawing.pointf) Convert(
+   [System.Drawing.PointF](https://learn.microsoft.com/dotnet/api/system.drawing.pointf) *pt*,
    [GTA.FontScaling](FontScaling.md) *SourceScaling*,
    [GTA.FontScaling](FontScaling.md) *TargetScaling*
 );

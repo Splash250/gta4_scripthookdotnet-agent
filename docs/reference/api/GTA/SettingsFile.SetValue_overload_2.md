@@ -3,15 +3,15 @@
 ## Visual Basic
 
 Overloads Public Sub SetValue( \_
-   ByVal *OptionName* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
-   ByVal *Value* As [System.Windows.Forms.Keys](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemWindowsFormsKeysClassTopic.asp) \_
+   ByVal *OptionName* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
+   ByVal *Value* As [System.Windows.Forms.Keys](https://learn.microsoft.com/dotnet/api/system.windows.forms.keys) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) SetValue(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *OptionName*,
-   [System.Windows.Forms.Keys](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemWindowsFormsKeysClassTopic.asp) *Value*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) SetValue(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *OptionName*,
+   [System.Windows.Forms.Keys](https://learn.microsoft.com/dotnet/api/system.windows.forms.keys) *Value*
 );
 
 #### See Also

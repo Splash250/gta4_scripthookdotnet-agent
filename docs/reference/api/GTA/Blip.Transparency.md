@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public WriteOnly Property Transparency As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+Public WriteOnly Property Transparency As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) Transparency {set;}
+public [float](https://learn.microsoft.com/dotnet/api/system.single) Transparency {set;}
 
 #### See Also
 

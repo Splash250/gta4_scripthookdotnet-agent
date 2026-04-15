@@ -8,7 +8,7 @@ Overloads Public Sub RemoveMember( \_
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) RemoveMember(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) RemoveMember(
    [GTA.Ped](Ped.md) *ped*
 );
 

@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Protected Sub UnbindPhoneNumber( \_
-   ByVal *PhoneNumber* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
+   ByVal *PhoneNumber* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
 )
 
 ## C#
 
-protected [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) UnbindPhoneNumber(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *PhoneNumber*
+protected [void](https://learn.microsoft.com/dotnet/api/system.void) UnbindPhoneNumber(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *PhoneNumber*
 );
 
 #### See Also

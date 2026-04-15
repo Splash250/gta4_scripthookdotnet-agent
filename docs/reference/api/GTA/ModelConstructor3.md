@@ -9,7 +9,7 @@ Overloads Public Sub New( \_
 ## C#
 
 public Model(
-   [uint](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemUInt32ClassTopic.asp) *Hash*
+   [uint](https://learn.microsoft.com/dotnet/api/system.uint32) *Hash*
 );
 
 #### See Also

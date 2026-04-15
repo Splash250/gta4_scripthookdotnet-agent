@@ -3,15 +3,15 @@
 ## Visual Basic
 
 Public Function isPointInside( \_
-   ByVal *ScreenPoint* As [System.Drawing.Point](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingPointClassTopic.asp), \_
-   ByVal *NotWhenInSubcontrol* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+   ByVal *ScreenPoint* As [System.Drawing.Point](https://learn.microsoft.com/dotnet/api/system.drawing.point), \_
+   ByVal *NotWhenInSubcontrol* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) isPointInside(
-   [System.Drawing.Point](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingPointClassTopic.asp) *ScreenPoint*,
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *NotWhenInSubcontrol*
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) isPointInside(
+   [System.Drawing.Point](https://learn.microsoft.com/dotnet/api/system.drawing.point) *ScreenPoint*,
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *NotWhenInSubcontrol*
 );
 
 #### See Also

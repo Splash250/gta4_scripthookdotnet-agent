@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overloads Public Sub New( \_
-   ByVal *message* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
+   ByVal *message* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
 )
 
 ## C#
 
 public NonExistingObjectException(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *message*
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *message*
 );
 
 #### See Also

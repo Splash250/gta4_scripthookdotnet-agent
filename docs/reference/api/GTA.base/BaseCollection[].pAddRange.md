@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overridable Protected Sub pAddRange( \_
-   ByVal *collection* As [System.Collections.Generic.IEnumerable(Of )](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIEnumerableClassTopic.asp) \_
+   ByVal *collection* As [System.Collections.Generic.IEnumerable(Of )](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable(of )) \_
 )
 
 ## C#
 
-protected virtual [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) pAddRange(
-   [System.Collections.Generic.IEnumerable<>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIEnumerableClassTopic.asp) *collection*
+protected virtual [void](https://learn.microsoft.com/dotnet/api/system.void) pAddRange(
+   [System.Collections.Generic.IEnumerable<>](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable<>) *collection*
 );
 
 #### See Also

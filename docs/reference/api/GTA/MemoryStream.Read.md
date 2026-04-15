@@ -3,17 +3,17 @@
 ## Visual Basic
 
 Overrides Public Function Read( \_
-   ByVal *buffer* As [Byte()](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemByteClassTopic.asp), \_
-   ByVal *offset* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp), \_
-   ByVal *count* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
-) As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+   ByVal *buffer* As [Byte()](https://learn.microsoft.com/dotnet/api/system.byte), \_
+   ByVal *offset* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32), \_
+   ByVal *count* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
+) As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-public override [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) Read(
-   [byte[]](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemByteClassTopic.asp) *buffer*,
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *offset*,
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *count*
+public override [int](https://learn.microsoft.com/dotnet/api/system.int32) Read(
+   [byte[]](https://learn.microsoft.com/dotnet/api/system.byte) *buffer*,
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *offset*,
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *count*
 );
 
 #### See Also

@@ -3,20 +3,20 @@
 ## Visual Basic
 
 MustOverride Protected Sub pAdd( \_
-   ByVal *item* As [GTA.base.T](T.md) \_
+   ByVal *item* As GTA.base.T \_
 ) \_
 
-Implements [ICollection`1.Add](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericClassICollectionTopic.asp)
+Implements [ICollection`1.Add](https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.add)
 
 ## C#
 
-protected abstract [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) pAdd(
-   [GTA.base.T](T.md) *item*
+protected abstract [void](https://learn.microsoft.com/dotnet/api/system.void) pAdd(
+   GTA.base.T *item*
 );
 
 #### Implements
 
-[ICollection`1.Add](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericClassICollectionTopic.asp)
+[ICollection`1.Add](https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.add)
 
 #### See Also
 

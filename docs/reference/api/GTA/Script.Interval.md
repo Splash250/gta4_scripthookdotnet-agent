@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Protected Property Interval As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+Protected Property Interval As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-protected [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) Interval {get; set;}
+protected [int](https://learn.microsoft.com/dotnet/api/system.int32) Interval {get; set;}
 
 #### See Also
 

@@ -10,7 +10,7 @@ Public Sub AttachToVehicle( \_
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) AttachToVehicle(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) AttachToVehicle(
    [GTA.Vehicle](Vehicle.md) *Vehicle*,
    [GTA.Vector3](Vector3.md) *PositionOffset*,
    [GTA.Vector3](Vector3.md) *Rotation*

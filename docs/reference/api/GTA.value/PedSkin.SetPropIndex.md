@@ -4,14 +4,14 @@
 
 Public Sub SetPropIndex( \_
    ByVal *proptype* As [GTA.PedProp](../GTA/PedProp.md), \_
-   ByVal *index* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *index* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) SetPropIndex(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) SetPropIndex(
    [GTA.PedProp](../GTA/PedProp.md) *proptype*,
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *index*
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *index*
 );
 
 #### See Also

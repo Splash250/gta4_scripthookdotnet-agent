@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Property Size As [System.Drawing.Size](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingSizeClassTopic.asp)
+Public Property Size As [System.Drawing.Size](https://learn.microsoft.com/dotnet/api/system.drawing.size)
 
 ## C#
 
-public [System.Drawing.Size](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingSizeClassTopic.asp) Size {get; set;}
+public [System.Drawing.Size](https://learn.microsoft.com/dotnet/api/system.drawing.size) Size {get; set;}
 
 #### See Also
 

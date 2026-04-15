@@ -3,15 +3,15 @@
 ## Visual Basic
 
 Overloads Public Shared Sub PlayPhoneKeypadTone( \_
-   ByVal *KeyNum* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp), \_
-   ByVal *ShortDialTone* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
+   ByVal *KeyNum* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32), \_
+   ByVal *ShortDialTone* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
 )
 
 ## C#
 
-public static [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) PlayPhoneKeypadTone(
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *KeyNum*,
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *ShortDialTone*
+public static [void](https://learn.microsoft.com/dotnet/api/system.void) PlayPhoneKeypadTone(
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *KeyNum*,
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *ShortDialTone*
 );
 
 #### See Also

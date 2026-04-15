@@ -4,14 +4,14 @@
 
 Overloads Public Sub SetValue( \_
    ByVal *ValueID* As [GTA.Euphoria.nmString](nmString.md), \_
-   ByVal *Value* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *Value* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) SetValue(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) SetValue(
    [GTA.Euphoria.nmString](nmString.md) *ValueID*,
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *Value*
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *Value*
 );
 
 #### See Also

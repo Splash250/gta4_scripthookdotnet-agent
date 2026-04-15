@@ -3,20 +3,20 @@
 ## Visual Basic
 
 MustOverride Protected Sub pRemoveAt( \_
-   ByVal *index* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *index* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 ) \_
 
-Implements [IList`1.RemoveAt](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericClassIListTopic.asp)
+Implements [IList`1.RemoveAt](https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist-1.removeat)
 
 ## C#
 
-protected abstract [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) pRemoveAt(
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *index*
+protected abstract [void](https://learn.microsoft.com/dotnet/api/system.void) pRemoveAt(
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *index*
 );
 
 #### Implements
 
-[IList`1.RemoveAt](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericClassIListTopic.asp)
+[IList`1.RemoveAt](https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist-1.removeat)
 
 #### See Also
 

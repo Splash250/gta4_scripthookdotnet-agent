@@ -5,15 +5,15 @@ Returns the text of an embedded resource file included in the script
 ## Visual Basic
 
 Overloads Public Function GetText( \_
-   ByVal *ResourceName* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
-   ByVal *Encoding* As [System.Text.Encoding](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemTextEncodingClassTopic.asp) \_
-) As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp)
+   ByVal *ResourceName* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
+   ByVal *Encoding* As [System.Text.Encoding](https://learn.microsoft.com/dotnet/api/system.text.encoding) \_
+) As [String](https://learn.microsoft.com/dotnet/api/system.string)
 
 ## C#
 
-public [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) GetText(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *ResourceName*,
-   [System.Text.Encoding](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemTextEncodingClassTopic.asp) *Encoding*
+public [string](https://learn.microsoft.com/dotnet/api/system.string) GetText(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *ResourceName*,
+   [System.Text.Encoding](https://learn.microsoft.com/dotnet/api/system.text.encoding) *Encoding*
 );
 
 #### See Also

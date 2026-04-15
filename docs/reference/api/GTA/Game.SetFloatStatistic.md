@@ -4,14 +4,14 @@
 
 Public Shared Sub SetFloatStatistic( \_
    ByVal *stat* As [GTA.FloatStatistic](FloatStatistic.md), \_
-   ByVal *value* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
+   ByVal *value* As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
 )
 
 ## C#
 
-public static [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) SetFloatStatistic(
+public static [void](https://learn.microsoft.com/dotnet/api/system.void) SetFloatStatistic(
    [GTA.FloatStatistic](FloatStatistic.md) *stat*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *value*
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *value*
 );
 
 #### See Also

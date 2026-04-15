@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Property EngineRunning As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+Public Property EngineRunning As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) EngineRunning {get; set;}
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) EngineRunning {get; set;}
 
 #### See Also
 

@@ -4,11 +4,11 @@
 
 Public Function DistanceTo( \_
    ByVal *Position* As [GTA.Vector3](Vector3.md) \_
-) As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+) As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) DistanceTo(
+public [float](https://learn.microsoft.com/dotnet/api/system.single) DistanceTo(
    [GTA.Vector3](Vector3.md) *Position*
 );
 

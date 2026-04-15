@@ -3,17 +3,17 @@
 ## Visual Basic
 
 Overloads Public Sub New( \_
-   ByVal *Color* As [System.Drawing.Color](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingColorClassTopic.asp), \_
-   ByVal *Range* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *Intensity* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
+   ByVal *Color* As [System.Drawing.Color](https://learn.microsoft.com/dotnet/api/system.drawing.color), \_
+   ByVal *Range* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *Intensity* As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
 )
 
 ## C#
 
 public Light(
-   [System.Drawing.Color](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingColorClassTopic.asp) *Color*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *Range*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *Intensity*
+   [System.Drawing.Color](https://learn.microsoft.com/dotnet/api/system.drawing.color) *Color*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *Range*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *Intensity*
 );
 
 #### See Also

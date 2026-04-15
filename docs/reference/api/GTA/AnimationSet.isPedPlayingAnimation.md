@@ -4,14 +4,14 @@
 
 Public Function isPedPlayingAnimation( \_
    ByVal *ped* As [GTA.Ped](Ped.md), \_
-   ByVal *AnimationName* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+   ByVal *AnimationName* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) isPedPlayingAnimation(
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) isPedPlayingAnimation(
    [GTA.Ped](Ped.md) *ped*,
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *AnimationName*
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *AnimationName*
 );
 
 #### See Also

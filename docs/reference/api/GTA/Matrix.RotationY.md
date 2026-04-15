@@ -5,13 +5,13 @@ Creates a matrix that rotates around the y-axis.
 ## Visual Basic
 
 Public Shared Function RotationY( \_
-   ByVal *angle* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
+   ByVal *angle* As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
 ) As [GTA.Matrix](Matrix.md)
 
 ## C#
 
 public static [GTA.Matrix](Matrix.md) RotationY(
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *angle*
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *angle*
 );
 
 #### Parameters

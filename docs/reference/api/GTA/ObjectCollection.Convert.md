@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Public Function Convert( \_
-   ByVal *index* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
-) As [GTA.T](T.md)
+   ByVal *index* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
+) As GTA.T
 
 ## C#
 
-public [GTA.T](T.md) Convert(
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *index*
+public GTA.T Convert(
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *index*
 );
 
 #### See Also

@@ -8,7 +8,7 @@ Public Sub OrderByDistanceTo( \_
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) OrderByDistanceTo(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) OrderByDistanceTo(
    [GTA.Vector3](Vector3.md) *Position*
 );
 

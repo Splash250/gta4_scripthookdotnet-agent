@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Property SirenActive As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+Public Property SirenActive As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) SirenActive {get; set;}
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) SirenActive {get; set;}
 
 #### See Also
 

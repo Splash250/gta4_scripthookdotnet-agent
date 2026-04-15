@@ -3,14 +3,14 @@
 ## Visual Basic
 
 Public Sub Insert( \_
-   ByVal *index* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp), \_
+   ByVal *index* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32), \_
    ByVal *item* As [GTA.Forms.Control](Control.md) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) Insert(
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *index*,
+public [void](https://learn.microsoft.com/dotnet/api/system.void) Insert(
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *index*,
    [GTA.Forms.Control](Control.md) *item*
 );
 

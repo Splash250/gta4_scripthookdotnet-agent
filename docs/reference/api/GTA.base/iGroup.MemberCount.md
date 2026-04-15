@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Property MemberCount As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+Property MemberCount As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-[int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) MemberCount {get;}
+[int](https://learn.microsoft.com/dotnet/api/system.int32) MemberCount {get;}
 
 #### See Also
 

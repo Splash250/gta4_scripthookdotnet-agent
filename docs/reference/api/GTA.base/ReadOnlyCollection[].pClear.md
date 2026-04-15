@@ -4,15 +4,15 @@
 
 Overrides Protected Sub pClear() \_
 
-Implements [ICollection`1.Clear](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericClassICollectionTopic.asp)
+Implements [ICollection`1.Clear](https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.clear)
 
 ## C#
 
-protected override [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) pClear();
+protected override [void](https://learn.microsoft.com/dotnet/api/system.void) pClear();
 
 #### Implements
 
-[ICollection`1.Clear](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericClassICollectionTopic.asp)
+[ICollection`1.Clear](https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.clear)
 
 #### See Also
 

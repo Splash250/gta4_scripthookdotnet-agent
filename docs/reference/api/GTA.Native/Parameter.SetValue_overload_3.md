@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overloads Public Sub SetValue( \_
-   ByVal *value* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
+   ByVal *value* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) SetValue(
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *value*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) SetValue(
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *value*
 );
 
 #### See Also

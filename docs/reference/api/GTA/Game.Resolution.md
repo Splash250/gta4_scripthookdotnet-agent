@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Shared ReadOnly Property Resolution As [System.Drawing.Size](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingSizeClassTopic.asp)
+Public Shared ReadOnly Property Resolution As [System.Drawing.Size](https://learn.microsoft.com/dotnet/api/system.drawing.size)
 
 ## C#
 
-public static [System.Drawing.Size](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingSizeClassTopic.asp) Resolution {get;}
+public static [System.Drawing.Size](https://learn.microsoft.com/dotnet/api/system.drawing.size) Resolution {get;}
 
 #### See Also
 

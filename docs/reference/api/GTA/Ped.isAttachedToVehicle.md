@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Function isAttachedToVehicle() As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+Public Function isAttachedToVehicle() As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) isAttachedToVehicle();
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) isAttachedToVehicle();
 
 #### See Also
 

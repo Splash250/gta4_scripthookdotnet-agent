@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Public Function ReadInt16( \_
-   ByVal *offset* As [Long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp) \_
-) As [Short](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt16ClassTopic.asp)
+   ByVal *offset* As [Long](https://learn.microsoft.com/dotnet/api/system.int64) \_
+) As [Short](https://learn.microsoft.com/dotnet/api/system.int16)
 
 ## C#
 
-public [short](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt16ClassTopic.asp) ReadInt16(
-   [long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp) *offset*
+public [short](https://learn.microsoft.com/dotnet/api/system.int16) ReadInt16(
+   [long](https://learn.microsoft.com/dotnet/api/system.int64) *offset*
 );
 
 #### See Also

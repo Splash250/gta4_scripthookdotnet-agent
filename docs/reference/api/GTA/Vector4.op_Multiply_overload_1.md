@@ -4,12 +4,12 @@ Scales a vector by the given value.
 
 ## Visual Basic
 
-Public Shared Operator \*(scale As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), vector As [GTA.Vector4](Vector4.md)) As [GTA.Vector4](Vector4.md)
+Public Shared Operator \*(scale As [Single](https://learn.microsoft.com/dotnet/api/system.single), vector As [GTA.Vector4](Vector4.md)) As [GTA.Vector4](Vector4.md)
 
 ## C#
 
 public static [GTA.Vector4](Vector4.md) operator \*(
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *scale*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *scale*,
    [GTA.Vector4](Vector4.md) *vector*
 );
 

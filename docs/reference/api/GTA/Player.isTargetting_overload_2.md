@@ -4,11 +4,11 @@
 
 Overloads Public Function isTargetting( \_
    ByVal *object* As [GTA.Object](Object.md) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) isTargetting(
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) isTargetting(
    [GTA.object](Object.md) *object*
 );
 

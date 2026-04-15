@@ -3,14 +3,14 @@
 ## Visual Basic
 
 Public Sub StartScenario( \_
-   ByVal *ScenarioName* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
+   ByVal *ScenarioName* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
    ByVal *Position* As [GTA.Vector3](../GTA/Vector3.md) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) StartScenario(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *ScenarioName*,
+public [void](https://learn.microsoft.com/dotnet/api/system.void) StartScenario(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *ScenarioName*,
    [GTA.Vector3](../GTA/Vector3.md) *Position*
 );
 

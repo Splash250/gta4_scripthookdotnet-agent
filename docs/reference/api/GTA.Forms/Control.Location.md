@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Property Location As [System.Drawing.Point](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingPointClassTopic.asp)
+Public Property Location As [System.Drawing.Point](https://learn.microsoft.com/dotnet/api/system.drawing.point)
 
 ## C#
 
-public [System.Drawing.Point](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingPointClassTopic.asp) Location {get; set;}
+public [System.Drawing.Point](https://learn.microsoft.com/dotnet/api/system.drawing.point) Location {get; set;}
 
 #### See Also
 

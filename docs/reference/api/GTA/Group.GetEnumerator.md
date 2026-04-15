@@ -2,17 +2,17 @@
 
 ## Visual Basic
 
-NotOverridable Public Function GetEnumerator() As [System.Collections.Generic.IEnumerator(Of GTA.Ped)](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIEnumeratorClassTopic.asp) \_
+NotOverridable Public Function GetEnumerator() As [System.Collections.Generic.IEnumerator(Of GTA.Ped)](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerator(of gta.ped)) \_
 
-Implements [IEnumerable`1.GetEnumerator](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericClassIEnumerableTopic.asp)
+Implements [IEnumerable`1.GetEnumerator](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1.getenumerator)
 
 ## C#
 
-public [System.Collections.Generic.IEnumerator<GTA.Ped>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIEnumeratorClassTopic.asp) GetEnumerator();
+public [System.Collections.Generic.IEnumerator<GTA.Ped>](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerator-1) GetEnumerator();
 
 #### Implements
 
-[IEnumerable`1.GetEnumerator](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericClassIEnumerableTopic.asp)
+[IEnumerable`1.GetEnumerator](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1.getenumerator)
 
 #### See Also
 

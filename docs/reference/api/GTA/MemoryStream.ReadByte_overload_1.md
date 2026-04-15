@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overloads Public Function ReadByte( \_
-   ByVal *offset* As [Long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp) \_
-) As [Byte](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemByteClassTopic.asp)
+   ByVal *offset* As [Long](https://learn.microsoft.com/dotnet/api/system.int64) \_
+) As [Byte](https://learn.microsoft.com/dotnet/api/system.byte)
 
 ## C#
 
-public [byte](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemByteClassTopic.asp) ReadByte(
-   [long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp) *offset*
+public [byte](https://learn.microsoft.com/dotnet/api/system.byte) ReadByte(
+   [long](https://learn.microsoft.com/dotnet/api/system.int64) *offset*
 );
 
 #### See Also

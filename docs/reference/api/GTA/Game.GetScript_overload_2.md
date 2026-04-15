@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overloads Public Shared Function GetScript( \_
-   ByVal *GUID* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
+   ByVal *GUID* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
 ) As [GTA.Script](Script.md)
 
 ## C#
 
 public static [GTA.Script](Script.md) GetScript(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *GUID*
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *GUID*
 );
 
 #### See Also

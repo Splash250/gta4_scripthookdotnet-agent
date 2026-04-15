@@ -5,15 +5,15 @@ Get an integer value with the given name from the settings file.
 ## Visual Basic
 
 Overloads Public Function GetValueInteger( \_
-   ByVal *OptionName* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
-   ByVal *DefaultValue* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
-) As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+   ByVal *OptionName* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
+   ByVal *DefaultValue* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
+) As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-public [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) GetValueInteger(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *OptionName*,
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *DefaultValue*
+public [int](https://learn.microsoft.com/dotnet/api/system.int32) GetValueInteger(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *OptionName*,
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *DefaultValue*
 );
 
 #### Parameters

@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Public Function GetMember( \_
-   ByVal *Index* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *Index* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 ) As [GTA.Ped](Ped.md)
 
 ## C#
 
 public [GTA.Ped](Ped.md) GetMember(
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *Index*
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *Index*
 );
 
 #### See Also

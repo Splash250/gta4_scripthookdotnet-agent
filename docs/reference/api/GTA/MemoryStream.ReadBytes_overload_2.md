@@ -3,15 +3,15 @@
 ## Visual Basic
 
 Overloads Public Function ReadBytes( \_
-   ByVal *Length* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp), \_
-   ByVal *offset* As [Long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp) \_
-) As [Byte()](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemByteClassTopic.asp)
+   ByVal *Length* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32), \_
+   ByVal *offset* As [Long](https://learn.microsoft.com/dotnet/api/system.int64) \_
+) As [Byte()](https://learn.microsoft.com/dotnet/api/system.byte)
 
 ## C#
 
-public [byte[]](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemByteClassTopic.asp) ReadBytes(
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *Length*,
-   [long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp) *offset*
+public [byte[]](https://learn.microsoft.com/dotnet/api/system.byte) ReadBytes(
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *Length*,
+   [long](https://learn.microsoft.com/dotnet/api/system.int64) *offset*
 );
 
 #### See Also

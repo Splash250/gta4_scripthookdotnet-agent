@@ -1,6 +1,6 @@
 # AnimationFlags Enumeration
 
-This enumeration has a [FlagsAttribute](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemFlagsAttributeClassTopic.asp)
+This enumeration has a [FlagsAttribute](https://learn.microsoft.com/dotnet/api/system.flagsattribute)
 attribute that allows a bitwise combination of its member values.
 
 ## Visual Basic

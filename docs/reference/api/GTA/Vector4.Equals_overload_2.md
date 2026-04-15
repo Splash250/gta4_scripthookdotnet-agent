@@ -6,13 +6,13 @@ Returns a value that indicates whether the current instance is equal to the spec
 
 NotOverridable Overloads Public Function Equals( \_
    ByVal *other* As [GTA.Vector4](Vector4.md) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
 
-Implements [IEquatable`1.Equals](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemClassIEquatableTopic.asp)
+Implements [IEquatable`1.Equals](https://learn.microsoft.com/dotnet/api/system.iequatable-1.equals)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) Equals(
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) Equals(
    [GTA.Vector4](Vector4.md) *other*
 );
 
@@ -27,7 +27,7 @@ public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/c
 
 #### Implements
 
-[IEquatable`1.Equals](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemClassIEquatableTopic.asp)
+[IEquatable`1.Equals](https://learn.microsoft.com/dotnet/api/system.iequatable-1.equals)
 
 #### See Also
 

@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public ReadOnly Property isGettingIntoAVehicle As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+Public ReadOnly Property isGettingIntoAVehicle As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) isGettingIntoAVehicle {get;}
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) isGettingIntoAVehicle {get;}
 
 #### See Also
 

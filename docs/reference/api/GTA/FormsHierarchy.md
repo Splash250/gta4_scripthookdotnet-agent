@@ -1,10 +1,10 @@
 # GTA.FormsHierarchy
 
-[System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+[System.Object](https://learn.microsoft.com/dotnet/api/system.object)
 
 |  |  |
 | --- | --- |
-| [GTA.base.BaseCollection<GTA.Forms.Control>](../GTA.base/BaseCollection[].md) ---- | [System.Collections.Generic.ICollection<GTA.Forms.Control>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericICollectionClassTopic.asp), [System.Collections.Generic.IEnumerable<GTA.Forms.Control>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIEnumerableClassTopic.asp), [System.Collections.Generic.IList<GTA.Forms.Control>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIListClassTopic.asp), [System.Collections.IEnumerable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsIEnumerableClassTopic.asp) |
+| [GTA.base.BaseCollection<GTA.Forms.Control>](../GTA.base/BaseCollection[].md) ---- | [System.Collections.Generic.ICollection<GTA.Forms.Control>](https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1), [System.Collections.Generic.IEnumerable<GTA.Forms.Control>](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1), [System.Collections.Generic.IList<GTA.Forms.Control>](https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist-1), [System.Collections.IEnumerable](https://learn.microsoft.com/dotnet/api/system.collections.ienumerable) |
 
 [GTA.base.ReadOnlyCollection<GTA.Forms.Control>](../GTA.base/ReadOnlyCollection[].md)
 
@@ -12,7 +12,7 @@
 
 |  |  |
 | --- | --- |
-| [GTA.base.BaseCollection<GTA.Forms.ListboxItem>](../GTA.base/BaseCollection[].md) ---- | [System.Collections.Generic.ICollection<GTA.Forms.ListboxItem>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericICollectionClassTopic.asp), [System.Collections.Generic.IEnumerable<GTA.Forms.ListboxItem>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIEnumerableClassTopic.asp), [System.Collections.Generic.IList<GTA.Forms.ListboxItem>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIListClassTopic.asp), [System.Collections.IEnumerable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsIEnumerableClassTopic.asp) |
+| [GTA.base.BaseCollection<GTA.Forms.ListboxItem>](../GTA.base/BaseCollection[].md) ---- | [System.Collections.Generic.ICollection<GTA.Forms.ListboxItem>](https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1), [System.Collections.Generic.IEnumerable<GTA.Forms.ListboxItem>](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1), [System.Collections.Generic.IList<GTA.Forms.ListboxItem>](https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist-1), [System.Collections.IEnumerable](https://learn.microsoft.com/dotnet/api/system.collections.ienumerable) |
 
 [GTA.base.ReadOnlyCollection<GTA.Forms.ListboxItem>](../GTA.base/ReadOnlyCollection[].md)
 
@@ -20,11 +20,11 @@
 
 [GTA.Forms.Listbox.ItemCollection](../GTA.Forms/Listbox.ItemCollection.md)
 
-[System.MarshalByRefObject](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemMarshalByRefObjectClassTopic.asp)
+[System.MarshalByRefObject](https://learn.microsoft.com/dotnet/api/system.marshalbyrefobject)
 
 |  |  |
 | --- | --- |
-| [System.ComponentModel.Component](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemComponentModelComponentClassTopic.asp) ---- | [System.ComponentModel.IComponent](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemComponentModelIComponentClassTopic.asp), [System.IDisposable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIDisposableClassTopic.asp) |
+| [System.ComponentModel.Component](https://learn.microsoft.com/dotnet/api/system.componentmodel.component) ---- | [System.ComponentModel.IComponent](https://learn.microsoft.com/dotnet/api/system.componentmodel.icomponent), [System.IDisposable](https://learn.microsoft.com/dotnet/api/system.idisposable) |
 
 [GTA.Forms.Control](../GTA.Forms/Control.md)
 
@@ -48,11 +48,11 @@
 
 [GTA.Forms.Textbox](../GTA.Forms/Textbox.md)
 
-[System.ValueType](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemValueTypeClassTopic.asp)
+[System.ValueType](https://learn.microsoft.com/dotnet/api/system.valuetype)
 
 |  |  |
 | --- | --- |
-| [GTA.Forms.ListboxItem](../GTA.Forms/ListboxItem.md) ---- | [System.IEquatable<GTA.Forms.ListboxItem>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIEquatableClassTopic.asp) |
+| [GTA.Forms.ListboxItem](../GTA.Forms/ListboxItem.md) ---- | [System.IEquatable<GTA.Forms.ListboxItem>](https://learn.microsoft.com/dotnet/api/system.iequatable-1) |
 
 #### See Also
 

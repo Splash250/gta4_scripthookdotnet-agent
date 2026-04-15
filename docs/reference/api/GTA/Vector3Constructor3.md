@@ -6,14 +6,14 @@ Initializes a new instance of the [Vector3](Vector3.md) class.
 
 Overloads Public Sub New( \_
    ByVal *value* As [GTA.Vector2](Vector2.md), \_
-   ByVal *z* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
+   ByVal *z* As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
 )
 
 ## C#
 
 public Vector3(
    [GTA.Vector2](Vector2.md) *value*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *z*
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *z*
 );
 
 #### Parameters

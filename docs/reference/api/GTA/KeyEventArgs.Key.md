@@ -4,11 +4,11 @@ Returns the key without any modifier information.
 
 ## Visual Basic
 
-Public ReadOnly Property Key As [System.Windows.Forms.Keys](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemWindowsFormsKeysClassTopic.asp)
+Public ReadOnly Property Key As [System.Windows.Forms.Keys](https://learn.microsoft.com/dotnet/api/system.windows.forms.keys)
 
 ## C#
 
-public [System.Windows.Forms.Keys](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemWindowsFormsKeysClassTopic.asp) Key {get;}
+public [System.Windows.Forms.Keys](https://learn.microsoft.com/dotnet/api/system.windows.forms.keys) Key {get;}
 
 #### See Also
 

@@ -1,6 +1,6 @@
 # GTA.EuphoriaHierarchy
 
-[System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+[System.Object](https://learn.microsoft.com/dotnet/api/system.object)
 
 [GTA.Euphoria.BaseMessage](../GTA.Euphoria/BaseMessage.md)
 
@@ -24,11 +24,11 @@
 
 [GTA.Euphoria.General](../GTA.Euphoria/General.md)
 
-[System.ValueType](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemValueTypeClassTopic.asp)
+[System.ValueType](https://learn.microsoft.com/dotnet/api/system.valuetype)
 
 |  |  |
 | --- | --- |
-| [System.Enum](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemEnumClassTopic.asp) ---- | [System.IComparable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIComparableClassTopic.asp), [System.IConvertible](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIConvertibleClassTopic.asp), [System.IFormattable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIFormattableClassTopic.asp) |
+| [System.Enum](https://learn.microsoft.com/dotnet/api/system.enum) ---- | [System.IComparable](https://learn.microsoft.com/dotnet/api/system.icomparable), [System.IConvertible](https://learn.microsoft.com/dotnet/api/system.iconvertible), [System.IFormattable](https://learn.microsoft.com/dotnet/api/system.iformattable) |
 
 [GTA.Euphoria.GrabMethod](../GTA.Euphoria/GrabMethod.md)
 

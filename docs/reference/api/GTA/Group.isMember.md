@@ -4,11 +4,11 @@
 
 Public Function isMember( \_
    ByVal *ped* As [GTA.Ped](Ped.md) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) isMember(
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) isMember(
    [GTA.Ped](Ped.md) *ped*
 );
 

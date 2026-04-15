@@ -4,11 +4,11 @@ Gets or sets the current health of the ped. 1 to 100 is the normal range. Can be
 
 ## Visual Basic
 
-Public Property Health As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+Public Property Health As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-public [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) Health {get; set;}
+public [int](https://learn.microsoft.com/dotnet/api/system.int32) Health {get; set;}
 
 #### See Also
 

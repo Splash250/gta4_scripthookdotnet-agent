@@ -5,16 +5,16 @@ Get a value with the given name from the settings file and convert is to a model
 ## Visual Basic
 
 Overloads Public Function GetValueModel( \_
-   ByVal *OptionName* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
-   ByVal *Category* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
+   ByVal *OptionName* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
+   ByVal *Category* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
    ByVal *DefaultValue* As [GTA.Model](Model.md) \_
 ) As [GTA.Model](Model.md)
 
 ## C#
 
 public [GTA.Model](Model.md) GetValueModel(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *OptionName*,
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Category*,
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *OptionName*,
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Category*,
    [GTA.Model](Model.md) *DefaultValue*
 );
 

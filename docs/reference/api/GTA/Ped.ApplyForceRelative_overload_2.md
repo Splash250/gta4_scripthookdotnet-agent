@@ -13,7 +13,7 @@ Implements [iForce.ApplyForceRelative](../GTA.base/iForce.ApplyForceRelative_ove
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) ApplyForceRelative(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) ApplyForceRelative(
    [GTA.Vector3](Vector3.md) *Direction*,
    [GTA.Vector3](Vector3.md) *Rotation*
 );

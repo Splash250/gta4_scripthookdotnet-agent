@@ -2,7 +2,7 @@
 
 For a list of all members of this type, see [Group Members](GroupMembers.md).
 
-[System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+[System.Object](https://learn.microsoft.com/dotnet/api/system.object)
 
    [GTA.base.Object](../GTA.base/Object.md)
       [GTA.base.HandleObject](../GTA.base/HandleObject.md)
@@ -14,11 +14,11 @@ NotInheritable Public Class Group
 
 Inherits [GTA.base.HandleObject](../GTA.base/HandleObject.md)
 
-Implements [GTA.base.iGroup](../GTA.base/iGroup.md), [System.Collections.Generic.IEnumerable(Of GTA.Ped)](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIEnumerableClassTopic.asp), [System.Collections.IEnumerable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsIEnumerableClassTopic.asp), [GTA.base.iDeletable](../GTA.base/iDeletable.md)
+Implements [GTA.base.iGroup](../GTA.base/iGroup.md), [System.Collections.Generic.IEnumerable(Of GTA.Ped)](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable(of gta.ped)), [System.Collections.IEnumerable](https://learn.microsoft.com/dotnet/api/system.collections.ienumerable), [GTA.base.iDeletable](../GTA.base/iDeletable.md)
 
 ## C#
 
-public sealed class Group **: [HandleObject](../GTA.base/HandleObject.md), [GTA.base.iGroup](../GTA.base/iGroup.md), [System.Collections.Generic.IEnumerable<GTA.Ped>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIEnumerableClassTopic.asp), [System.Collections.IEnumerable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsIEnumerableClassTopic.asp), [GTA.base.iDeletable](../GTA.base/iDeletable.md)**
+public sealed class Group **: [HandleObject](../GTA.base/HandleObject.md), [GTA.base.iGroup](../GTA.base/iGroup.md), [System.Collections.Generic.IEnumerable<GTA.Ped>](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1), [System.Collections.IEnumerable](https://learn.microsoft.com/dotnet/api/system.collections.ienumerable), [GTA.base.iDeletable](../GTA.base/iDeletable.md)**
 
 #### Thread Safety
 

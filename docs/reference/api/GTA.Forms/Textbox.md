@@ -2,10 +2,10 @@
 
 For a list of all members of this type, see [Textbox Members](TextboxMembers.md).
 
-[System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+[System.Object](https://learn.microsoft.com/dotnet/api/system.object)
 
-   [System.MarshalByRefObject](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemMarshalByRefObjectClassTopic.asp)
-      [System.ComponentModel.Component](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemComponentModelComponentClassTopic.asp)
+   [System.MarshalByRefObject](https://learn.microsoft.com/dotnet/api/system.marshalbyrefobject)
+      [System.ComponentModel.Component](https://learn.microsoft.com/dotnet/api/system.componentmodel.component)
          [GTA.Forms.Control](Control.md)
             **GTA.Forms.Textbox**
 

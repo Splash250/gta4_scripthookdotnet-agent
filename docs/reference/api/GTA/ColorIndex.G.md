@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public ReadOnly Property G As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+Public ReadOnly Property G As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-public [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) G {get;}
+public [int](https://learn.microsoft.com/dotnet/api/system.int32) G {get;}
 
 #### See Also
 

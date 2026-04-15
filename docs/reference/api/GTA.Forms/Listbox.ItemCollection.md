@@ -2,7 +2,7 @@
 
 For a list of all members of this type, see [Listbox.ItemCollection Members](Listbox.ItemCollectionMembers.md).
 
-[System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+[System.Object](https://learn.microsoft.com/dotnet/api/system.object)
 
    GTA.base.BaseCollection<GTA.Forms.ListboxItem>
       GTA.base.ReadOnlyCollection<GTA.Forms.ListboxItem>

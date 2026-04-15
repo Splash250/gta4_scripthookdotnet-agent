@@ -8,7 +8,7 @@ Public Sub TargetPed( \_
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) TargetPed(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) TargetPed(
    [GTA.Ped](Ped.md) *ped*
 );
 

@@ -6,7 +6,7 @@ Public Sub LeaveVehicle()
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) LeaveVehicle();
+public [void](https://learn.microsoft.com/dotnet/api/system.void) LeaveVehicle();
 
 #### See Also
 

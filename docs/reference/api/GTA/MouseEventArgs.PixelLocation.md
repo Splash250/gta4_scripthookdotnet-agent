@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public ReadOnly Property PixelLocation As [System.Drawing.Point](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingPointClassTopic.asp)
+Public ReadOnly Property PixelLocation As [System.Drawing.Point](https://learn.microsoft.com/dotnet/api/system.drawing.point)
 
 ## C#
 
-public [System.Drawing.Point](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingPointClassTopic.asp) PixelLocation {get;}
+public [System.Drawing.Point](https://learn.microsoft.com/dotnet/api/system.drawing.point) PixelLocation {get;}
 
 #### See Also
 

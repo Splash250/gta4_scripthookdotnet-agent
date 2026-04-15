@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Public Sub Wait( \_
-   ByVal *duration* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *duration* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) Wait(
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *duration*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) Wait(
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *duration*
 );
 
 #### See Also

@@ -4,11 +4,11 @@
 
 Public Shared Function isGameKeyPressed( \_
    ByVal *Key* As [GTA.GameKey](GameKey.md) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public static [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) isGameKeyPressed(
+public static [bool](https://learn.microsoft.com/dotnet/api/system.boolean) isGameKeyPressed(
    [GTA.GameKey](GameKey.md) *Key*
 );
 

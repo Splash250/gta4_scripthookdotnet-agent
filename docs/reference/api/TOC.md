@@ -97,7 +97,7 @@
 - [ArcticWhite Property](GTA/ColorIndex.ArcticWhite.md)
 - [AscotGray Property](GTA/ColorIndex.AscotGray.md)
 - [AstraSilverPoly Property](GTA/ColorIndex.AstraSilverPoly.md)
-- [B Property](GTA/ColorIndex.B.md)
+- B Property
 - [BisqueFrostPoly Property](GTA/ColorIndex.BisqueFrostPoly.md)
 - [BistonBrownPoly Property](GTA/ColorIndex.BistonBrownPoly.md)
 - [Black Property](GTA/ColorIndex.Black.md)
@@ -135,7 +135,7 @@
 - [Flax Property](GTA/ColorIndex.Flax.md)
 - [FormulaRed Property](GTA/ColorIndex.FormulaRed.md)
 - [FrostWhite Property](GTA/ColorIndex.FrostWhite.md)
-- [G Property](GTA/ColorIndex.G.md)
+- G Property
 - [GarnetRedPoly Property](GTA/ColorIndex.GarnetRedPoly.md)
 - [GracefulRedMica Property](GTA/ColorIndex.GracefulRedMica.md)
 - [GrayPoly Property](GTA/ColorIndex.GrayPoly.md)
@@ -186,7 +186,7 @@
 - [PoliceWhite Property](GTA/ColorIndex.PoliceWhite.md)
 - [PorcelainSilverPoly Property](GTA/ColorIndex.PorcelainSilverPoly.md)
 - [PuebloBeige Property](GTA/ColorIndex.PuebloBeige.md)
-- [R Property](GTA/ColorIndex.R.md)
+- R Property
 - [RaceYellowSolid Property](GTA/ColorIndex.RaceYellowSolid.md)
 - [RioRed Property](GTA/ColorIndex.RioRed.md)
 - [SandalwoodFrostPoly Property](GTA/ColorIndex.SandalwoodFrostPoly.md)
@@ -709,8 +709,8 @@
 - [isMouseVisible Property](GTA/MouseEventArgs.isMouseVisible.md)
 - [Location Property](GTA/MouseEventArgs.Location.md)
 - [PixelLocation Property](GTA/MouseEventArgs.PixelLocation.md)
-- [X Property](GTA/MouseEventArgs.X.md)
-- [Y Property](GTA/MouseEventArgs.Y.md)
+- X Property
+- Y Property
 - [MouseEventHandler Delegate](GTA/MouseEventHandler.md)
 - [NetworkMode Enumeration](GTA/NetworkMode.md)
 - [NonExistingObjectException Class](GTA/NonExistingObjectException.md)
@@ -975,10 +975,10 @@
 - [Quaternion Constructor (Vector3, Single)](GTA/QuaternionConstructor2.md)
 - [Quaternion Constructor (Single, Single, Single, Single)](GTA/QuaternionConstructor3.md)
 - [Fields](GTA/QuaternionFields.md)
-- [W Field](GTA/Quaternion.W.md)
-- [X Field](GTA/Quaternion.X.md)
-- [Y Field](GTA/Quaternion.Y.md)
-- [Z Field](GTA/Quaternion.Z.md)
+- W Field
+- X Field
+- Y Field
+- Z Field
 - [Properties](GTA/QuaternionProperties.md)
 - [Angle Property](GTA/Quaternion.Angle.md)
 - [Axis Property](GTA/Quaternion.Axis.md)
@@ -1224,8 +1224,8 @@
 - [Vector2 Members](GTA/Vector2Members.md)
 - [Vector2 Constructor](GTA/Vector2Constructor1.md)
 - [Fields](GTA/Vector2Fields.md)
-- [X Field](GTA/Vector2.X.md)
-- [Y Field](GTA/Vector2.Y.md)
+- X Field
+- Y Field
 - [Methods](GTA/Vector2Methods.md)
 - [Add Method](GTA/Vector2.Add.md)
 - [Clamp Method](GTA/Vector2.Clamp.md)
@@ -1270,9 +1270,9 @@
 - [Vector3 Constructor (Single, Single, Single)](GTA/Vector3Constructor2.md)
 - [Vector3 Constructor (Vector2, Single)](GTA/Vector3Constructor3.md)
 - [Fields](GTA/Vector3Fields.md)
-- [X Field](GTA/Vector3.X.md)
-- [Y Field](GTA/Vector3.Y.md)
-- [Z Field](GTA/Vector3.Z.md)
+- X Field
+- Y Field
+- Z Field
 - [Properties](GTA/Vector3Properties.md)
 - [RelativeBack Property](GTA/Vector3.RelativeBack.md)
 - [RelativeBottom Property](GTA/Vector3.RelativeBottom.md)
@@ -1344,10 +1344,10 @@
 - [Vector4 Constructor (Vector3, Single)](GTA/Vector4Constructor3.md)
 - [Vector4 Constructor (Vector2, Single, Single)](GTA/Vector4Constructor4.md)
 - [Fields](GTA/Vector4Fields.md)
-- [W Field](GTA/Vector4.W.md)
-- [X Field](GTA/Vector4.X.md)
-- [Y Field](GTA/Vector4.Y.md)
-- [Z Field](GTA/Vector4.Z.md)
+- W Field
+- X Field
+- Y Field
+- Z Field
 - [Methods](GTA/Vector4Methods.md)
 - [Add Method](GTA/Vector4.Add.md)
 - [Clamp Method](GTA/Vector4.Clamp.md)

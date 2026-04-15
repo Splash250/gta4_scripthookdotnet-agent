@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Public Shared Sub PreviewRingtone( \_
-   ByVal *RingtoneID* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *RingtoneID* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 )
 
 ## C#
 
-public static [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) PreviewRingtone(
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *RingtoneID*
+public static [void](https://learn.microsoft.com/dotnet/api/system.void) PreviewRingtone(
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *RingtoneID*
 );
 
 #### See Also

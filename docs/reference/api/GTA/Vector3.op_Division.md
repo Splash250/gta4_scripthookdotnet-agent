@@ -4,13 +4,13 @@ Scales a vector by the given value.
 
 ## Visual Basic
 
-Public Shared Operator /(vector As [GTA.Vector3](Vector3.md), scale As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)) As [GTA.Vector3](Vector3.md)
+Public Shared Operator /(vector As [GTA.Vector3](Vector3.md), scale As [Single](https://learn.microsoft.com/dotnet/api/system.single)) As [GTA.Vector3](Vector3.md)
 
 ## C#
 
 public static [GTA.Vector3](Vector3.md) operator /(
    [GTA.Vector3](Vector3.md) *vector*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *scale*
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *scale*
 );
 
 #### Parameters

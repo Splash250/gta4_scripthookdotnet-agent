@@ -3,17 +3,17 @@
 ## Visual Basic
 
 Overloads Public Sub New( \_
-   ByVal *Name* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
-   ByVal *ReturnType* As [System.Type](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemTypeClassTopic.asp), \_
+   ByVal *Name* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
+   ByVal *ReturnType* As [System.Type](https://learn.microsoft.com/dotnet/api/system.type), \_
    ParamArray *Arguments* As [GTA.Native.Parameter()](Parameter.md) \_
 )
 
 ## C#
 
 public Template(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Name*,
-   [System.Type](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemTypeClassTopic.asp) *ReturnType*,
-   params [GTA.Native.Parameter[]](GTA.Native.Parameter.md) *Arguments*
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Name*,
+   [System.Type](https://learn.microsoft.com/dotnet/api/system.type) *ReturnType*,
+   params GTA.Native.Parameter[] *Arguments*
 );
 
 #### See Also

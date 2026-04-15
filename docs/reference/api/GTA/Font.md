@@ -2,7 +2,7 @@
 
 For a list of all members of this type, see [Font Members](FontMembers.md).
 
-[System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+[System.Object](https://learn.microsoft.com/dotnet/api/system.object)
 
    **GTA.Font**
 
@@ -10,11 +10,11 @@ For a list of all members of this type, see [Font Members](FontMembers.md).
 
 NotInheritable Public Class Font
 
-Implements [GTA.base.iD3DObject](../GTA.base/iD3DObject.md), [System.IDisposable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIDisposableClassTopic.asp)
+Implements [GTA.base.iD3DObject](../GTA.base/iD3DObject.md), [System.IDisposable](https://learn.microsoft.com/dotnet/api/system.idisposable)
 
 ## C#
 
-public sealed class Font **: [GTA.base.iD3DObject](../GTA.base/iD3DObject.md), [System.IDisposable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIDisposableClassTopic.asp)**
+public sealed class Font **: [GTA.base.iD3DObject](../GTA.base/iD3DObject.md), [System.IDisposable](https://learn.microsoft.com/dotnet/api/system.idisposable)**
 
 #### Thread Safety
 

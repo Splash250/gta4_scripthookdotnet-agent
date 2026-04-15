@@ -4,16 +4,16 @@
 
 Public Sub EnterVehicle( \_
    ByVal *Vehicle* As [GTA.Vehicle](Vehicle.md), \_
-   ByVal *WithLeader* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp), \_
-   ByVal *KeepCurrentDriver* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
+   ByVal *WithLeader* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean), \_
+   ByVal *KeepCurrentDriver* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) EnterVehicle(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) EnterVehicle(
    [GTA.Vehicle](Vehicle.md) *Vehicle*,
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *WithLeader*,
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *KeepCurrentDriver*
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *WithLeader*,
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *KeepCurrentDriver*
 );
 
 #### See Also

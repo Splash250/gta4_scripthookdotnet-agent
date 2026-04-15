@@ -6,7 +6,7 @@ Public Sub DisposeFromMemoryNow()
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) DisposeFromMemoryNow();
+public [void](https://learn.microsoft.com/dotnet/api/system.void) DisposeFromMemoryNow();
 
 #### See Also
 

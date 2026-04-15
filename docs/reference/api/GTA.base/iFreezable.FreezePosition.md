@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Property FreezePosition As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+Property FreezePosition As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-[bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) FreezePosition {set;}
+[bool](https://learn.microsoft.com/dotnet/api/system.boolean) FreezePosition {set;}
 
 #### See Also
 

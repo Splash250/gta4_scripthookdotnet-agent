@@ -4,11 +4,11 @@ Weapon accuracy. Overrides Ped.Accuracy
 
 ## Visual Basic
 
-Public WriteOnly Property WeaponAccuracy As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+Public WriteOnly Property WeaponAccuracy As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-public [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) WeaponAccuracy {set;}
+public [int](https://learn.microsoft.com/dotnet/api/system.int32) WeaponAccuracy {set;}
 
 #### See Also
 

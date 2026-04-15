@@ -3,17 +3,17 @@
 ## Visual Basic
 
 Overloads Public Sub Write( \_
-   ByVal *index* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp), \_
-   ByVal *value* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
-   ByVal *MaxLength* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *index* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32), \_
+   ByVal *value* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
+   ByVal *MaxLength* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) Write(
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *index*,
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *value*,
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *MaxLength*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) Write(
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *index*,
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *value*,
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *MaxLength*
 );
 
 #### See Also

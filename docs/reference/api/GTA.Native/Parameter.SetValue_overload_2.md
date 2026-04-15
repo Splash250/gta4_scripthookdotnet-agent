@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overloads Public Sub SetValue( \_
-   ByVal *value* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
+   ByVal *value* As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) SetValue(
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *value*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) SetValue(
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *value*
 );
 
 #### See Also

@@ -3,15 +3,15 @@
 ## Visual Basic
 
 Overloads Public Shared Function FloatToString( \_
-   ByVal *Input* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *Digits* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
-) As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp)
+   ByVal *Input* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *Digits* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
+) As [String](https://learn.microsoft.com/dotnet/api/system.string)
 
 ## C#
 
-public static [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) FloatToString(
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *Input*,
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *Digits*
+public static [string](https://learn.microsoft.com/dotnet/api/system.string) FloatToString(
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *Input*,
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *Digits*
 );
 
 #### See Also

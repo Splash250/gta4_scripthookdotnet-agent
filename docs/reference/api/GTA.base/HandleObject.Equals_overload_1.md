@@ -4,19 +4,19 @@
 
 Overridable Overloads Public Function Equals( \_
    ByVal *obj* As [GTA.base.iHandleObject](iHandleObject.md) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
 
-Implements [IEquatable`1.Equals](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemClassIEquatableTopic.asp)
+Implements [IEquatable`1.Equals](https://learn.microsoft.com/dotnet/api/system.iequatable-1.equals)
 
 ## C#
 
-public virtual [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) Equals(
+public virtual [bool](https://learn.microsoft.com/dotnet/api/system.boolean) Equals(
    [GTA.base.iHandleObject](iHandleObject.md) *obj*
 );
 
 #### Implements
 
-[IEquatable`1.Equals](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemClassIEquatableTopic.asp)
+[IEquatable`1.Equals](https://learn.microsoft.com/dotnet/api/system.iequatable-1.equals)
 
 #### See Also
 

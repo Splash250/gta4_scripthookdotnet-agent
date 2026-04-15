@@ -8,7 +8,7 @@ Overrides Protected Friend Sub OnKeyUp( \_
 
 ## C#
 
-protected internal override [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) OnKeyUp(
+protected internal override [void](https://learn.microsoft.com/dotnet/api/system.void) OnKeyUp(
    [GTA.KeyEventArgs](../GTA/KeyEventArgs.md) *e*
 );
 

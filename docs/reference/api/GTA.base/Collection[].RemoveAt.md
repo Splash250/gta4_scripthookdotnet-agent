@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overrides Public Sub RemoveAt( \_
-   ByVal *index* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *index* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 )
 
 ## C#
 
-public override [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) RemoveAt(
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *index*
+public override [void](https://learn.microsoft.com/dotnet/api/system.void) RemoveAt(
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *index*
 );
 
 #### See Also

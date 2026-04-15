@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Property SelectedKey As [System.Windows.Forms.Keys](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemWindowsFormsKeysClassTopic.asp)
+Public Property SelectedKey As [System.Windows.Forms.Keys](https://learn.microsoft.com/dotnet/api/system.windows.forms.keys)
 
 ## C#
 
-public [System.Windows.Forms.Keys](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemWindowsFormsKeysClassTopic.asp) SelectedKey {get; set;}
+public [System.Windows.Forms.Keys](https://learn.microsoft.com/dotnet/api/system.windows.forms.keys) SelectedKey {get; set;}
 
 #### See Also
 

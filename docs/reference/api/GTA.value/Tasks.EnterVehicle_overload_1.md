@@ -9,7 +9,7 @@ Overloads Public Sub EnterVehicle( \_
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) EnterVehicle(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) EnterVehicle(
    [GTA.Vehicle](../GTA/Vehicle.md) *Vehicle*,
    [GTA.VehicleSeat](../GTA/VehicleSeat.md) *Seat*
 );

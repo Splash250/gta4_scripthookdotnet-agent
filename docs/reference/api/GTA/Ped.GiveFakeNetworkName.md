@@ -3,15 +3,15 @@
 ## Visual Basic
 
 Public Sub GiveFakeNetworkName( \_
-   ByVal *Name* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
-   ByVal *Color* As [System.Drawing.Color](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingColorClassTopic.asp) \_
+   ByVal *Name* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
+   ByVal *Color* As [System.Drawing.Color](https://learn.microsoft.com/dotnet/api/system.drawing.color) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) GiveFakeNetworkName(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Name*,
-   [System.Drawing.Color](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingColorClassTopic.asp) *Color*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) GiveFakeNetworkName(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Name*,
+   [System.Drawing.Color](https://learn.microsoft.com/dotnet/api/system.drawing.color) *Color*
 );
 
 #### See Also

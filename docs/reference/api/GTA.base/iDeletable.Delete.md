@@ -6,7 +6,7 @@ Sub Delete()
 
 ## C#
 
-[void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) Delete();
+[void](https://learn.microsoft.com/dotnet/api/system.void) Delete();
 
 #### See Also
 

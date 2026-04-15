@@ -6,7 +6,7 @@ Public Shared ReadOnly Property PlayerList As [GTA.Player()](Player.md)
 
 ## C#
 
-public static [Player[]](GTA.Player.md) PlayerList {get;}
+public static Player[] PlayerList {get;}
 
 #### See Also
 

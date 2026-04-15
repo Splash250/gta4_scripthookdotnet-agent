@@ -8,7 +8,7 @@ Public Sub FixTire( \_
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) FixTire(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) FixTire(
    [GTA.VehicleWheel](VehicleWheel.md) *wheel*
 );
 

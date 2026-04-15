@@ -22,7 +22,7 @@
 
 For a list of all members of this type, see [Function Members](FunctionMembers.md).
 
-[System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+[System.Object](https://learn.microsoft.com/dotnet/api/system.object)
 
    **GTA.Native.Function**
 
@@ -30,11 +30,11 @@ For a list of all members of this type, see [Function Members](FunctionMembers.m
 
 NotInheritable Public Class Function
 
-Implements [System.IDisposable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIDisposableClassTopic.asp)
+Implements [System.IDisposable](https://learn.microsoft.com/dotnet/api/system.idisposable)
 
 ## C#
 
-public sealed class Function **: [System.IDisposable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIDisposableClassTopic.asp)**
+public sealed class Function **: [System.IDisposable](https://learn.microsoft.com/dotnet/api/system.idisposable)**
 
 #### Thread Safety
 

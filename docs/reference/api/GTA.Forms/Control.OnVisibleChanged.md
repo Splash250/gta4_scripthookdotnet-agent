@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overridable Protected Sub OnVisibleChanged( \_
-   ByVal *e* As [System.EventArgs](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemEventArgsClassTopic.asp) \_
+   ByVal *e* As [System.EventArgs](https://learn.microsoft.com/dotnet/api/system.eventargs) \_
 )
 
 ## C#
 
-protected virtual [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) OnVisibleChanged(
-   [System.EventArgs](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemEventArgsClassTopic.asp) *e*
+protected virtual [void](https://learn.microsoft.com/dotnet/api/system.void) OnVisibleChanged(
+   [System.EventArgs](https://learn.microsoft.com/dotnet/api/system.eventargs) *e*
 );
 
 #### See Also

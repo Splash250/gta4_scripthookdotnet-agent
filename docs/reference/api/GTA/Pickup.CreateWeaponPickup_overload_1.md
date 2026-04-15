@@ -5,7 +5,7 @@
 Overloads Public Shared Function CreateWeaponPickup( \_
    ByVal *Position* As [GTA.Vector3](Vector3.md), \_
    ByVal *Weapon* As [GTA.Weapon](Weapon.md), \_
-   ByVal *Ammo* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *Ammo* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 ) As [GTA.Pickup](Pickup.md)
 
 ## C#
@@ -13,7 +13,7 @@ Overloads Public Shared Function CreateWeaponPickup( \_
 public static [GTA.Pickup](Pickup.md) CreateWeaponPickup(
    [GTA.Vector3](Vector3.md) *Position*,
    [GTA.Weapon](Weapon.md) *Weapon*,
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *Ammo*
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *Ammo*
 );
 
 #### See Also

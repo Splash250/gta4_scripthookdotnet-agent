@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overloads Public Sub New( \_
-   ByVal *ModelName* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
+   ByVal *ModelName* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
 )
 
 ## C#
 
 public Model(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *ModelName*
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *ModelName*
 );
 
 #### See Also

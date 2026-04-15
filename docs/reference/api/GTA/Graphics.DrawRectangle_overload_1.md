@@ -5,21 +5,21 @@ Draws a colored Rectangle.
 ## Visual Basic
 
 Overloads Public Sub DrawRectangle( \_
-   ByVal *CenterX* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *CenterY* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *Width* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *Height* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *Color* As [System.Drawing.Color](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingColorClassTopic.asp) \_
+   ByVal *CenterX* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *CenterY* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *Width* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *Height* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *Color* As [System.Drawing.Color](https://learn.microsoft.com/dotnet/api/system.drawing.color) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) DrawRectangle(
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *CenterX*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *CenterY*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *Width*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *Height*,
-   [System.Drawing.Color](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingColorClassTopic.asp) *Color*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) DrawRectangle(
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *CenterX*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *CenterY*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *Width*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *Height*,
+   [System.Drawing.Color](https://learn.microsoft.com/dotnet/api/system.drawing.color) *Color*
 );
 
 #### See Also

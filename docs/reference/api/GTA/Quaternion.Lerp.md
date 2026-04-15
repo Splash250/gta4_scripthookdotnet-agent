@@ -7,7 +7,7 @@ Performs a linear interpolation between two quaternion.
 Public Shared Function Lerp( \_
    ByVal *start* As [GTA.Quaternion](Quaternion.md), \_
    ByVal *end* As [GTA.Quaternion](Quaternion.md), \_
-   ByVal *amount* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
+   ByVal *amount* As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
 ) As [GTA.Quaternion](Quaternion.md)
 
 ## C#
@@ -15,7 +15,7 @@ Public Shared Function Lerp( \_
 public static [GTA.Quaternion](Quaternion.md) Lerp(
    [GTA.Quaternion](Quaternion.md) *start*,
    [GTA.Quaternion](Quaternion.md) *end*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *amount*
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *amount*
 );
 
 #### Parameters

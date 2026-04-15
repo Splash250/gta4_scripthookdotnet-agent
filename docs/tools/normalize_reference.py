@@ -11,7 +11,7 @@ from urllib.parse import parse_qs, urlparse
 
 
 SOURCE_PAGE_PATTERN = re.compile(r"^Source page:\s+`[^`]+`$")
-MARKDOWN_LINK_PATTERN = re.compile(r"\[([^\]]+)\]\(([^)]+)\)")
+MARKDOWN_LINK_PATTERN = re.compile(r"\[(.+?)\]\(([^)]+)\)")
 LANGUAGE_HEADINGS = {
     "[Visual Basic]": "## Visual Basic",
     "[C#]": "## C#",
@@ -25,6 +25,7 @@ DOTNET_PRIMITIVE_ALIASES = {
     "boolean": "System.Boolean",
     "byte": "System.Byte",
     "double": "System.Double",
+    "date": "System.DateTime",
     "float": "System.Single",
     "int": "System.Int32",
     "integer": "System.Int32",
@@ -40,14 +41,27 @@ DOTNET_PRIMITIVE_ALIASES = {
     "void": "System.Void",
     "idisposable": "System.IDisposable",
     "icomparable": "System.IComparable",
+    "iequatable": "System.IEquatable",
+    "iequatable1": "System.IEquatable",
     "iconvertible": "System.IConvertible",
     "icloneable": "System.ICloneable",
+    "attribute": "System.Attribute",
+    "component": "System.ComponentModel.Component",
     "eventargs": "System.EventArgs",
     "eventhandler": "System.EventHandler",
+    "dynamicobject": "System.Dynamic.DynamicObject",
+    "exception": "System.Exception",
     "flagsattribute": "System.FlagsAttribute",
+    "guid": "System.Guid",
+    "icollection": "System.Collections.Generic.ICollection",
     "icollection1": "System.Collections.Generic.ICollection",
+    "ienumerable": "System.Collections.Generic.IEnumerable",
     "ienumerable1": "System.Collections.Generic.IEnumerable",
+    "ilist": "System.Collections.Generic.IList",
     "ilist1": "System.Collections.Generic.IList",
+    "keys": "System.Windows.Forms.Keys",
+    "marshalbyrefobject": "System.MarshalByRefObject",
+    "stream": "System.IO.Stream",
 }
 
 
@@ -98,11 +112,16 @@ def count_generic_arguments(type_name: str) -> int:
 
 def canonicalize_dotnet_label(label: str) -> str | None:
     cleaned = label.strip().strip("*").replace("`", "")
+    cleaned = re.sub(r"\[\[.*\]\]|\(\(.*\)\)", "", cleaned)
     cleaned = cleaned.replace("()", "[]")
     if cleaned in {"", "T"}:
         return None
 
     generic_arity = count_generic_arguments(cleaned)
+    arity_match = re.search(r"(\d+)", cleaned)
+    if generic_arity == 0 and arity_match:
+        generic_arity = int(arity_match.group(1))
+    cleaned = re.sub(r"\d+", "", cleaned)
     cleaned = re.sub(r"<.+>", "", cleaned)
     cleaned = cleaned.rstrip("[]")
 

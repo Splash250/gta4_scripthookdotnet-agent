@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Shared Widening Operator CType(source As [GTA.Native.Pointer](Pointer.md)) As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp)
+Public Shared Widening Operator CType(source As [GTA.Native.Pointer](Pointer.md)) As [String](https://learn.microsoft.com/dotnet/api/system.string)
 
 ## C#
 
-public static implicit operator [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp)(
+public static implicit operator [string](https://learn.microsoft.com/dotnet/api/system.string)(
    [GTA.Native.Pointer](Pointer.md) *source*
 );
 

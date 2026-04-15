@@ -5,19 +5,19 @@ Creates a right-handed, orthographic projection matrix.
 ## Visual Basic
 
 Public Shared Function OrthoRH( \_
-   ByVal *width* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *height* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *znear* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *zfar* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
+   ByVal *width* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *height* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *znear* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *zfar* As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
 ) As [GTA.Matrix](Matrix.md)
 
 ## C#
 
 public static [GTA.Matrix](Matrix.md) OrthoRH(
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *width*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *height*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *znear*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *zfar*
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *width*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *height*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *znear*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *zfar*
 );
 
 #### Parameters

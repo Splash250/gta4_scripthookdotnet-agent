@@ -6,11 +6,11 @@ Returns all peds in the given area. Slow, but very reliable! Also includes playe
 
 Returns all peds in the given area. Slow, but very reliable! Also includes players, mission peds and vehicle passengers!
 
-> [public static GTA.Ped[] GetPeds(GTA.Vector3,float);](GTA.World.GetPeds_overload_1.md)
+> public static GTA.Ped[] GetPeds(GTA.Vector3,float);
 
 Returns all peds in the given area. Slow, but very reliable! Also includes players, mission peds and vehicle passengers!
 
-> [public static GTA.Ped[] GetPeds(GTA.Vector3,float,int);](GTA.World.GetPeds_overload_2.md)
+> public static GTA.Ped[] GetPeds(GTA.Vector3,float,int);
 
 #### See Also
 

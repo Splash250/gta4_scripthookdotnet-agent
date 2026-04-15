@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Public Shared Sub PlayFrontendSound( \_
-   ByVal *SoundName* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
+   ByVal *SoundName* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
 )
 
 ## C#
 
-public static [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) PlayFrontendSound(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *SoundName*
+public static [void](https://learn.microsoft.com/dotnet/api/system.void) PlayFrontendSound(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *SoundName*
 );
 
 #### See Also

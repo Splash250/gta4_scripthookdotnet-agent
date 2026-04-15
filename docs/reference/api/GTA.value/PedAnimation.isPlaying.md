@@ -4,14 +4,14 @@
 
 Public Function isPlaying( \_
    ByVal *AnimationSet* As [GTA.AnimationSet](../GTA/AnimationSet.md), \_
-   ByVal *AnimationName* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+   ByVal *AnimationName* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) isPlaying(
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) isPlaying(
    [GTA.AnimationSet](../GTA/AnimationSet.md) *AnimationSet*,
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *AnimationName*
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *AnimationName*
 );
 
 #### See Also

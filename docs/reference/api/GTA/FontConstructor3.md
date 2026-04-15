@@ -3,14 +3,14 @@
 ## Visual Basic
 
 Overloads Public Sub New( \_
-   ByVal *Height* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
+   ByVal *Height* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
    ByVal *Scaling* As [GTA.FontScaling](FontScaling.md) \_
 )
 
 ## C#
 
 public Font(
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *Height*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *Height*,
    [GTA.FontScaling](FontScaling.md) *Scaling*
 );
 

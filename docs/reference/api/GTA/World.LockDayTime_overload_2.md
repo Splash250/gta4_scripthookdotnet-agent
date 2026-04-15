@@ -3,15 +3,15 @@
 ## Visual Basic
 
 Overloads Public Shared Sub LockDayTime( \_
-   ByVal *Hour* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp), \_
-   ByVal *Minute* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *Hour* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32), \_
+   ByVal *Minute* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 )
 
 ## C#
 
-public static [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) LockDayTime(
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *Hour*,
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *Minute*
+public static [void](https://learn.microsoft.com/dotnet/api/system.void) LockDayTime(
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *Hour*,
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *Minute*
 );
 
 #### See Also

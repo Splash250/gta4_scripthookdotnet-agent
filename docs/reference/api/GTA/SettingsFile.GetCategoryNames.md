@@ -4,11 +4,11 @@ Get the names of all categories.
 
 ## Visual Basic
 
-Public Function GetCategoryNames() As [String()](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp)
+Public Function GetCategoryNames() As [String()](https://learn.microsoft.com/dotnet/api/system.string)
 
 ## C#
 
-public [string[]](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) GetCategoryNames();
+public [string[]](https://learn.microsoft.com/dotnet/api/system.string) GetCategoryNames();
 
 #### See Also
 

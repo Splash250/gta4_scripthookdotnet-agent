@@ -5,13 +5,13 @@ Start the Euphoria animation. Maximum duration is 65.535 milliseconds. Calling t
 ## Visual Basic
 
 Overloads Public Sub Start( \_
-   ByVal *Duration* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *Duration* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) Start(
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *Duration*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) Start(
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *Duration*
 );
 
 #### See Also

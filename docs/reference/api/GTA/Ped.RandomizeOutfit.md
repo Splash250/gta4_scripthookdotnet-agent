@@ -6,7 +6,7 @@ Public Sub RandomizeOutfit()
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) RandomizeOutfit();
+public [void](https://learn.microsoft.com/dotnet/api/system.void) RandomizeOutfit();
 
 #### See Also
 

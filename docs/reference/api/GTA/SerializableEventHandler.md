@@ -3,14 +3,14 @@
 ## Visual Basic
 
 Public Delegate Sub SerializableEventHandler( \_
-   ByVal *sender* As [Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp), \_
+   ByVal *sender* As [Object](https://learn.microsoft.com/dotnet/api/system.object), \_
    ByVal *e* As [GTA.SerializableEventArgs](SerializableEventArgs.md) \_
 )
 
 ## C#
 
 public delegate void SerializableEventHandler(
-   [object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp) *sender*,
+   [object](https://learn.microsoft.com/dotnet/api/system.object) *sender*,
    [GTA.SerializableEventArgs](SerializableEventArgs.md) *e*
 );
 

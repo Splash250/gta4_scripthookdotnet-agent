@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public ReadOnly Property MaxAmmoInClip As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+Public ReadOnly Property MaxAmmoInClip As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-public [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) MaxAmmoInClip {get;}
+public [int](https://learn.microsoft.com/dotnet/api/system.int32) MaxAmmoInClip {get;}
 
 #### See Also
 

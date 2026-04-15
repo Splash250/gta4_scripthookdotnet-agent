@@ -7,7 +7,7 @@ Public Shared Widening Operator CType(source As [UInteger](http://msdn.microsoft
 ## C#
 
 public static implicit operator [GTA.Model](Model.md)(
-   [uint](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemUInt32ClassTopic.asp) *source*
+   [uint](https://learn.microsoft.com/dotnet/api/system.uint32) *source*
 );
 
 #### See Also

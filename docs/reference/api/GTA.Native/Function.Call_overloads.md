@@ -2,9 +2,9 @@
 
 #### Overload List
 
-> [public static GTA.Native.ReturnType Call(string,params GTA.Native.Parameter[]);](GTA.Native.Function.Call_overload_1.md)
+> public static GTA.Native.ReturnType Call(string,params GTA.Native.Parameter[]);
 
-> [public static void Call(string,params GTA.Native.Parameter[]);](GTA.Native.Function.Call_overload_2.md)
+> public static void Call(string,params GTA.Native.Parameter[]);
 
 #### See Also
 

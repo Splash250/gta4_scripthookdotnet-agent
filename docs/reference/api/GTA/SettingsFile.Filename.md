@@ -4,11 +4,11 @@ The setting file has the same filename as the script, just with an 'ini' extensi
 
 ## Visual Basic
 
-Public ReadOnly Property Filename As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp)
+Public ReadOnly Property Filename As [String](https://learn.microsoft.com/dotnet/api/system.string)
 
 ## C#
 
-public [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) Filename {get;}
+public [string](https://learn.microsoft.com/dotnet/api/system.string) Filename {get;}
 
 #### See Also
 

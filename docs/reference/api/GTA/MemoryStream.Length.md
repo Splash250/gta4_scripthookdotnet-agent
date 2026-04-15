@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Overrides Public ReadOnly Property Length As [Long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp)
+Overrides Public ReadOnly Property Length As [Long](https://learn.microsoft.com/dotnet/api/system.int64)
 
 ## C#
 
-public override [long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp) Length {get;}
+public override [long](https://learn.microsoft.com/dotnet/api/system.int64) Length {get;}
 
 #### See Also
 

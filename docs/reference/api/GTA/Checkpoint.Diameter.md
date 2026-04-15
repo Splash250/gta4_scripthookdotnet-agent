@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Property Diameter As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+Public Property Diameter As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) Diameter {get; set;}
+public [float](https://learn.microsoft.com/dotnet/api/system.single) Diameter {get; set;}
 
 #### See Also
 

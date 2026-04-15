@@ -44,10 +44,10 @@
 
 |  |  |
 | --- | --- |
-| [W](Vector4.W.md) | Gets or sets the W component of the vector. |
-| [X](Vector4.X.md) | Gets or sets the X component of the vector. |
-| [Y](Vector4.Y.md) | Gets or sets the Y component of the vector. |
-| [Z](Vector4.Z.md) | Gets or sets the Z component of the vector. |
+| W | Gets or sets the W component of the vector. |
+| X | Gets or sets the X component of the vector. |
+| Y | Gets or sets the Y component of the vector. |
+| Z | Gets or sets the Z component of the vector. |
 
 #### Public Instance Methods
 

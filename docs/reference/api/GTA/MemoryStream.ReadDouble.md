@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Public Function ReadDouble( \_
-   ByVal *offset* As [Long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp) \_
-) As [Double](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDoubleClassTopic.asp)
+   ByVal *offset* As [Long](https://learn.microsoft.com/dotnet/api/system.int64) \_
+) As [Double](https://learn.microsoft.com/dotnet/api/system.double)
 
 ## C#
 
-public [double](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDoubleClassTopic.asp) ReadDouble(
-   [long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp) *offset*
+public [double](https://learn.microsoft.com/dotnet/api/system.double) ReadDouble(
+   [long](https://learn.microsoft.com/dotnet/api/system.int64) *offset*
 );
 
 #### See Also

@@ -9,7 +9,7 @@ Overloads Public Sub ShootAt( \_
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) ShootAt(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) ShootAt(
    [GTA.Ped](../GTA/Ped.md) *target*,
    [GTA.ShootMode](../GTA/ShootMode.md) *mode*
 );

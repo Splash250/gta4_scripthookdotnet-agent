@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public ReadOnly Property DisplayText As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp)
+Public ReadOnly Property DisplayText As [String](https://learn.microsoft.com/dotnet/api/system.string)
 
 ## C#
 
-public [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) DisplayText {get;}
+public [string](https://learn.microsoft.com/dotnet/api/system.string) DisplayText {get;}
 
 #### See Also
 

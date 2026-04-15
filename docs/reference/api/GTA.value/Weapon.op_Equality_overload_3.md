@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Shared Operator =(left As [GTA.value.Weapon](Weapon.md), right As [GTA.value.Weapon](Weapon.md)) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+Public Shared Operator =(left As [GTA.value.Weapon](Weapon.md), right As [GTA.value.Weapon](Weapon.md)) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public static [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) operator ==(
+public static [bool](https://learn.microsoft.com/dotnet/api/system.boolean) operator ==(
    [GTA.value.Weapon](Weapon.md) *left*,
    [GTA.value.Weapon](Weapon.md) *right*
 );

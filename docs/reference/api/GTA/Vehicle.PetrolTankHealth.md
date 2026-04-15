@@ -4,11 +4,11 @@ The current health of the car's petrol tank. 1000 is maximum, 0 is broken, can g
 
 ## Visual Basic
 
-Public Property PetrolTankHealth As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+Public Property PetrolTankHealth As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) PetrolTankHealth {get; set;}
+public [float](https://learn.microsoft.com/dotnet/api/system.single) PetrolTankHealth {get; set;}
 
 #### See Also
 

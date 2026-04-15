@@ -8,7 +8,7 @@ Public Shared Function GetAllBlipsOfType( \_
 
 ## C#
 
-public static [GTA.Blip[]](GTA.Blip.md) GetAllBlipsOfType(
+public static GTA.Blip[] GetAllBlipsOfType(
    [GTA.BlipType](BlipType.md) *type*
 );
 

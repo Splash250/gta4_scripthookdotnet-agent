@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Public Shared Function GenerateHash( \_
-   ByVal *input* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
-) As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+   ByVal *input* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
+) As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-public static [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) GenerateHash(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *input*
+public static [int](https://learn.microsoft.com/dotnet/api/system.int32) GenerateHash(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *input*
 );
 
 #### See Also

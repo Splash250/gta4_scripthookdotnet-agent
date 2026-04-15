@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public ReadOnly Property Color As [System.Drawing.Color](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingColorClassTopic.asp)
+Public ReadOnly Property Color As [System.Drawing.Color](https://learn.microsoft.com/dotnet/api/system.drawing.color)
 
 ## C#
 
-public [System.Drawing.Color](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingColorClassTopic.asp) Color {get;}
+public [System.Drawing.Color](https://learn.microsoft.com/dotnet/api/system.drawing.color) Color {get;}
 
 #### See Also
 

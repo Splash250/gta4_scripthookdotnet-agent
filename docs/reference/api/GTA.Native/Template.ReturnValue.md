@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public ReadOnly Property ReturnValue As [Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+Public ReadOnly Property ReturnValue As [Object](https://learn.microsoft.com/dotnet/api/system.object)
 
 ## C#
 
-public [object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp) ReturnValue {get;}
+public [object](https://learn.microsoft.com/dotnet/api/system.object) ReturnValue {get;}
 
 #### See Also
 

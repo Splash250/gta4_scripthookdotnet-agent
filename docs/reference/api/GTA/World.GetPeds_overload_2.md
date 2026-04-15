@@ -6,16 +6,16 @@ Returns all peds in the given area. Slow, but very reliable! Also includes playe
 
 Overloads Public Shared Function GetPeds( \_
    ByVal *Position* As [GTA.Vector3](Vector3.md), \_
-   ByVal *Radius* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *MaxAmount* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *Radius* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *MaxAmount* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 ) As [GTA.Ped()](Ped.md)
 
 ## C#
 
-public static [GTA.Ped[]](GTA.Ped.md) GetPeds(
+public static GTA.Ped[] GetPeds(
    [GTA.Vector3](Vector3.md) *Position*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *Radius*,
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *MaxAmount*
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *Radius*,
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *MaxAmount*
 );
 
 #### See Also

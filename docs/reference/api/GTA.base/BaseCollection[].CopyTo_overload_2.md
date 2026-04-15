@@ -3,22 +3,22 @@
 ## Visual Basic
 
 NotOverridable Overloads Public Sub CopyTo( \_
-   ByVal *Array* As [GTA.base.T()](T.md), \_
-   ByVal *ArrayIndex* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *Array* As GTA.base.T(), \_
+   ByVal *ArrayIndex* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 ) \_
 
-Implements [ICollection`1.CopyTo](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericClassICollectionTopic.asp)
+Implements [ICollection`1.CopyTo](https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.copyto)
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) CopyTo(
-   [GTA.base.T[]](GTA.base.T.md) *Array*,
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *ArrayIndex*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) CopyTo(
+   GTA.base.T[] *Array*,
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *ArrayIndex*
 );
 
 #### Implements
 
-[ICollection`1.CopyTo](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericClassICollectionTopic.asp)
+[ICollection`1.CopyTo](https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.copyto)
 
 #### See Also
 

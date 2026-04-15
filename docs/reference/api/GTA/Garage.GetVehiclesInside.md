@@ -8,7 +8,7 @@ Public Function GetVehiclesInside() As [GTA.Vehicle()](Vehicle.md)
 
 ## C#
 
-public [GTA.Vehicle[]](GTA.Vehicle.md) GetVehiclesInside();
+public GTA.Vehicle[] GetVehiclesInside();
 
 #### See Also
 

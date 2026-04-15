@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public ReadOnly Property ID As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+Public ReadOnly Property ID As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-public [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) ID {get;}
+public [int](https://learn.microsoft.com/dotnet/api/system.int32) ID {get;}
 
 #### See Also
 

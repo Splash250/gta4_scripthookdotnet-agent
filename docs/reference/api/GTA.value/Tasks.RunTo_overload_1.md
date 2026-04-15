@@ -8,7 +8,7 @@ Overloads Public Sub RunTo( \_
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) RunTo(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) RunTo(
    [GTA.Vector3](../GTA/Vector3.md) *Position*
 );
 

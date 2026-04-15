@@ -2,13 +2,13 @@
 
 ## Visual Basic
 
-Overridable Public Property isOnFire As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
+Overridable Public Property isOnFire As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
 
 Implements [iBurnable.isOnFire](../GTA.base/iBurnable.isOnFire.md)
 
 ## C#
 
-public virtual [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) isOnFire {get; set;}
+public virtual [bool](https://learn.microsoft.com/dotnet/api/system.boolean) isOnFire {get; set;}
 
 #### Implements
 

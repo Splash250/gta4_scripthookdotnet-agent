@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Protected Friend Sub Wait( \_
-   ByVal *ms* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *ms* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 )
 
 ## C#
 
-protected internal [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) Wait(
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *ms*
+protected internal [void](https://learn.microsoft.com/dotnet/api/system.void) Wait(
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *ms*
 );
 
 #### See Also

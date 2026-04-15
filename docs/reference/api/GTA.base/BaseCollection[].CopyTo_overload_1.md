@@ -3,19 +3,19 @@
 ## Visual Basic
 
 MustOverride Overloads Public Sub CopyTo( \_
-   ByVal *Index* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp), \_
-   ByVal *TargetArray* As [GTA.base.T()](T.md), \_
-   ByVal *TargetIndex* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp), \_
-   ByVal *Count* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *Index* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32), \_
+   ByVal *TargetArray* As GTA.base.T(), \_
+   ByVal *TargetIndex* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32), \_
+   ByVal *Count* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 )
 
 ## C#
 
-public abstract [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) CopyTo(
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *Index*,
-   [GTA.base.T[]](GTA.base.T.md) *TargetArray*,
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *TargetIndex*,
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *Count*
+public abstract [void](https://learn.microsoft.com/dotnet/api/system.void) CopyTo(
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *Index*,
+   GTA.base.T[] *TargetArray*,
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *TargetIndex*,
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *Count*
 );
 
 #### See Also

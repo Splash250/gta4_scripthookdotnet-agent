@@ -3,15 +3,15 @@
 ## Visual Basic
 
 Public Shared Function DataToFile( \_
-   ByVal *Filename* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
-   ByVal *Data* As [Byte()](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemByteClassTopic.asp) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+   ByVal *Filename* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
+   ByVal *Data* As [Byte()](https://learn.microsoft.com/dotnet/api/system.byte) \_
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public static [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) DataToFile(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Filename*,
-   [byte[]](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemByteClassTopic.asp) *Data*
+public static [bool](https://learn.microsoft.com/dotnet/api/system.boolean) DataToFile(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Filename*,
+   [byte[]](https://learn.microsoft.com/dotnet/api/system.byte) *Data*
 );
 
 #### See Also

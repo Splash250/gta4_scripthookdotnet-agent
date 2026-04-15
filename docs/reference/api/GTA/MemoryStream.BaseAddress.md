@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public ReadOnly Property BaseAddress As [Long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp)
+Public ReadOnly Property BaseAddress As [Long](https://learn.microsoft.com/dotnet/api/system.int64)
 
 ## C#
 
-public [long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp) BaseAddress {get;}
+public [long](https://learn.microsoft.com/dotnet/api/system.int64) BaseAddress {get;}
 
 #### See Also
 

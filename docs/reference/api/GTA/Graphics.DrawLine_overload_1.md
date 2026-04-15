@@ -5,19 +5,19 @@ Draws a colored line.
 ## Visual Basic
 
 Overloads Public Sub DrawLine( \_
-   ByVal *Point1* As [System.Drawing.PointF](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingPointFClassTopic.asp), \_
-   ByVal *Point2* As [System.Drawing.PointF](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingPointFClassTopic.asp), \_
-   ByVal *Width* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *Color* As [System.Drawing.Color](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingColorClassTopic.asp) \_
+   ByVal *Point1* As [System.Drawing.PointF](https://learn.microsoft.com/dotnet/api/system.drawing.pointf), \_
+   ByVal *Point2* As [System.Drawing.PointF](https://learn.microsoft.com/dotnet/api/system.drawing.pointf), \_
+   ByVal *Width* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *Color* As [System.Drawing.Color](https://learn.microsoft.com/dotnet/api/system.drawing.color) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) DrawLine(
-   [System.Drawing.PointF](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingPointFClassTopic.asp) *Point1*,
-   [System.Drawing.PointF](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingPointFClassTopic.asp) *Point2*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *Width*,
-   [System.Drawing.Color](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingColorClassTopic.asp) *Color*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) DrawLine(
+   [System.Drawing.PointF](https://learn.microsoft.com/dotnet/api/system.drawing.pointf) *Point1*,
+   [System.Drawing.PointF](https://learn.microsoft.com/dotnet/api/system.drawing.pointf) *Point2*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *Width*,
+   [System.Drawing.Color](https://learn.microsoft.com/dotnet/api/system.drawing.color) *Color*
 );
 
 #### See Also

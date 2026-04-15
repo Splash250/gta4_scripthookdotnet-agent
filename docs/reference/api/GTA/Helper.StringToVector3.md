@@ -3,14 +3,14 @@
 ## Visual Basic
 
 Public Shared Function StringToVector3( \_
-   ByVal *Input* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
+   ByVal *Input* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
    ByVal *DefaultValue* As [GTA.Vector3](Vector3.md) \_
 ) As [GTA.Vector3](Vector3.md)
 
 ## C#
 
 public static [GTA.Vector3](Vector3.md) StringToVector3(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Input*,
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Input*,
    [GTA.Vector3](Vector3.md) *DefaultValue*
 );
 

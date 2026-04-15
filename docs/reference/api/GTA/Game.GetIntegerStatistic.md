@@ -4,11 +4,11 @@
 
 Public Shared Function GetIntegerStatistic( \_
    ByVal *stat* As [GTA.IntegerStatistic](IntegerStatistic.md) \_
-) As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+) As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-public static [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) GetIntegerStatistic(
+public static [int](https://learn.microsoft.com/dotnet/api/system.int32) GetIntegerStatistic(
    [GTA.IntegerStatistic](IntegerStatistic.md) *stat*
 );
 

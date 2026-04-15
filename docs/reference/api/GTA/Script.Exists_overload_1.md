@@ -4,11 +4,11 @@
 
 Overloads Protected Function Exists( \_
    ByVal *GtaObject* As [GTA.base.Object](../GTA.base/Object.md) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-protected [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) Exists(
+protected [bool](https://learn.microsoft.com/dotnet/api/system.boolean) Exists(
    [GTA.base.object](../GTA.base/Object.md) *GtaObject*
 );
 

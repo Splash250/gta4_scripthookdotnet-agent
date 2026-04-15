@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Overridable Public ReadOnly Property ClientRectangle As [System.Drawing.Rectangle](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingRectangleClassTopic.asp)
+Overridable Public ReadOnly Property ClientRectangle As [System.Drawing.Rectangle](https://learn.microsoft.com/dotnet/api/system.drawing.rectangle)
 
 ## C#
 
-public virtual [System.Drawing.Rectangle](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingRectangleClassTopic.asp) ClientRectangle {get;}
+public virtual [System.Drawing.Rectangle](https://learn.microsoft.com/dotnet/api/system.drawing.rectangle) ClientRectangle {get;}
 
 #### See Also
 

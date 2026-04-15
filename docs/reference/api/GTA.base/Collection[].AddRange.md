@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Public Sub AddRange( \_
-   ByVal *collection* As [System.Collections.Generic.IEnumerable(Of )](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIEnumerableClassTopic.asp) \_
+   ByVal *collection* As [System.Collections.Generic.IEnumerable(Of )](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable(of )) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) AddRange(
-   [System.Collections.Generic.IEnumerable<>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIEnumerableClassTopic.asp) *collection*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) AddRange(
+   [System.Collections.Generic.IEnumerable<>](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable<>) *collection*
 );
 
 #### See Also

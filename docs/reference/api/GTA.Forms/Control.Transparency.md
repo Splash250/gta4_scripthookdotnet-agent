@@ -4,11 +4,11 @@ Gets or sets the Alpha value of the BackColor property. Range from 0.0 (opaque) 
 
 ## Visual Basic
 
-Public Property Transparency As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+Public Property Transparency As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) Transparency {get; set;}
+public [float](https://learn.microsoft.com/dotnet/api/system.single) Transparency {get; set;}
 
 #### See Also
 

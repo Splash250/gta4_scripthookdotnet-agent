@@ -2,17 +2,17 @@
 
 ## Visual Basic
 
-Overrides Public Function GetEnumerator() As [System.Collections.Generic.IEnumerator(Of )](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIEnumeratorClassTopic.asp) \_
+Overrides Public Function GetEnumerator() As [System.Collections.Generic.IEnumerator(Of )](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerator(of )) \_
 
-Implements [IEnumerable`1.GetEnumerator](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericClassIEnumerableTopic.asp)
+Implements [IEnumerable`1.GetEnumerator](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1.getenumerator)
 
 ## C#
 
-public override [System.Collections.Generic.IEnumerator<>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIEnumeratorClassTopic.asp) GetEnumerator();
+public override [System.Collections.Generic.IEnumerator<>](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerator<>) GetEnumerator();
 
 #### Implements
 
-[IEnumerable`1.GetEnumerator](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericClassIEnumerableTopic.asp)
+[IEnumerable`1.GetEnumerator](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1.getenumerator)
 
 #### See Also
 

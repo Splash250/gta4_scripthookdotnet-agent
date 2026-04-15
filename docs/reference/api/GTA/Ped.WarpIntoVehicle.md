@@ -9,7 +9,7 @@ Public Sub WarpIntoVehicle( \_
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) WarpIntoVehicle(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) WarpIntoVehicle(
    [GTA.Vehicle](Vehicle.md) *Vehicle*,
    [GTA.VehicleSeat](VehicleSeat.md) *Seat*
 );

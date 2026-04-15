@@ -7,17 +7,17 @@ Sets the state of the closest door with the given model.
 Public Shared Sub SetDoorState( \_
    ByVal *DoorModel* As [GTA.Model](Model.md), \_
    ByVal *NearbyPosition* As [GTA.Vector3](Vector3.md), \_
-   ByVal *Locked* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp), \_
-   ByVal *Angle* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
+   ByVal *Locked* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean), \_
+   ByVal *Angle* As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
 )
 
 ## C#
 
-public static [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) SetDoorState(
+public static [void](https://learn.microsoft.com/dotnet/api/system.void) SetDoorState(
    [GTA.Model](Model.md) *DoorModel*,
    [GTA.Vector3](Vector3.md) *NearbyPosition*,
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *Locked*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *Angle*
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *Locked*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *Angle*
 );
 
 #### Parameters

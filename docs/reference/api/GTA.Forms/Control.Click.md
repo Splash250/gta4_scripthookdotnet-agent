@@ -18,8 +18,8 @@ The event handler receives an argument of type [MouseEventArgs](../GTA/MouseEven
 | [isMouseVisible](../GTA/MouseEventArgs.isMouseVisible.md) |  |
 | [Location](../GTA/MouseEventArgs.Location.md) |  |
 | [PixelLocation](../GTA/MouseEventArgs.PixelLocation.md) |  |
-| [X](../GTA/MouseEventArgs.X.md) |  |
-| [Y](../GTA/MouseEventArgs.Y.md) |  |
+| X |  |
+| Y |  |
 
 #### See Also
 

@@ -6,7 +6,7 @@ Public Shared Sub OneDayForward()
 
 ## C#
 
-public static [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) OneDayForward();
+public static [void](https://learn.microsoft.com/dotnet/api/system.void) OneDayForward();
 
 #### See Also
 

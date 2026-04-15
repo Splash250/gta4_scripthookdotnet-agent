@@ -9,7 +9,7 @@ Overloads Public Sub DrawSprite( \_
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) DrawSprite(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) DrawSprite(
    [GTA.Texture](Texture.md) *Texture*,
    [GTA.Matrix](Matrix.md) *Matrix*
 );

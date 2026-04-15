@@ -4,11 +4,11 @@
 
 Public Function Remove( \_
    ByVal *item* As [GTA.Forms.Control](Control.md) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) Remove(
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) Remove(
    [GTA.Forms.Control](Control.md) *item*
 );
 

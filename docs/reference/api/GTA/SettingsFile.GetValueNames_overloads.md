@@ -6,11 +6,11 @@ Get the names of all values in the default category.
 
 Get the names of all values in the default category.
 
-> [public string[] GetValueNames();](GTA.SettingsFile.GetValueNames_overload_1.md)
+> public string[] GetValueNames();
 
 Get the names of all values in this category.
 
-> [public string[] GetValueNames(string);](GTA.SettingsFile.GetValueNames_overload_2.md)
+> public string[] GetValueNames(string);
 
 #### See Also
 

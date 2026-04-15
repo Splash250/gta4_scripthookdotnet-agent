@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Public Function Contains( \_
-   ByVal *MetadataName* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+   ByVal *MetadataName* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) Contains(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *MetadataName*
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) Contains(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *MetadataName*
 );
 
 #### See Also

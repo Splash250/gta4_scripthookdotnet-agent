@@ -5,13 +5,13 @@ Get the names of all values in this category.
 ## Visual Basic
 
 Overloads Public Function GetValueNames( \_
-   ByVal *Category* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
-) As [String()](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp)
+   ByVal *Category* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
+) As [String()](https://learn.microsoft.com/dotnet/api/system.string)
 
 ## C#
 
-public [string[]](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) GetValueNames(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Category*
+public [string[]](https://learn.microsoft.com/dotnet/api/system.string) GetValueNames(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Category*
 );
 
 #### See Also

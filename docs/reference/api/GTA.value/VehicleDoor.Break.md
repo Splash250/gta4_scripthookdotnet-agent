@@ -6,7 +6,7 @@ Public Sub Break()
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) Break();
+public [void](https://learn.microsoft.com/dotnet/api/system.void) Break();
 
 #### See Also
 

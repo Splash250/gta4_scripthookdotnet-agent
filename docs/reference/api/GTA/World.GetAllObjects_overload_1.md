@@ -8,7 +8,7 @@ Overloads Public Shared Function GetAllObjects() As [GTA.Object()](Object.md)
 
 ## C#
 
-public static [GTA.object[]](GTA.Object.md) GetAllObjects();
+public static GTA.object[] GetAllObjects();
 
 #### See Also
 

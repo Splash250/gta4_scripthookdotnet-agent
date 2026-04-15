@@ -5,13 +5,13 @@ Returns the data of an embedded resource file included in the script
 ## Visual Basic
 
 Public Function GetData( \_
-   ByVal *ResourceName* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
-) As [Byte()](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemByteClassTopic.asp)
+   ByVal *ResourceName* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
+) As [Byte()](https://learn.microsoft.com/dotnet/api/system.byte)
 
 ## C#
 
-public [byte[]](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemByteClassTopic.asp) GetData(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *ResourceName*
+public [byte[]](https://learn.microsoft.com/dotnet/api/system.byte) GetData(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *ResourceName*
 );
 
 #### See Also

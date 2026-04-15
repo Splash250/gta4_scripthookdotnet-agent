@@ -2,7 +2,7 @@
 
 For a list of all members of this type, see [Parameter Members](ParameterMembers.md).
 
-[System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+[System.Object](https://learn.microsoft.com/dotnet/api/system.object)
 
    **GTA.Native.Parameter**
       [GTA.Native.Pointer](Pointer.md)
@@ -11,11 +11,11 @@ For a list of all members of this type, see [Parameter Members](ParameterMembers
 
 Public Class Parameter
 
-Implements [System.IDisposable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIDisposableClassTopic.asp)
+Implements [System.IDisposable](https://learn.microsoft.com/dotnet/api/system.idisposable)
 
 ## C#
 
-public class Parameter **: [System.IDisposable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIDisposableClassTopic.asp)**
+public class Parameter **: [System.IDisposable](https://learn.microsoft.com/dotnet/api/system.idisposable)**
 
 #### Thread Safety
 

@@ -4,11 +4,11 @@ Sets the car density. 1.0 is default, 2.0 is twice as much as normal, etc.
 
 ## Visual Basic
 
-Public Shared WriteOnly Property CarDensity As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+Public Shared WriteOnly Property CarDensity As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public static [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) CarDensity {set;}
+public static [float](https://learn.microsoft.com/dotnet/api/system.single) CarDensity {set;}
 
 #### See Also
 

@@ -8,7 +8,7 @@ Overloads Public Shared Function GetAllPeds() As [GTA.Ped()](Ped.md)
 
 ## C#
 
-public static [GTA.Ped[]](GTA.Ped.md) GetAllPeds();
+public static GTA.Ped[] GetAllPeds();
 
 #### See Also
 

@@ -46,8 +46,8 @@
 
 |  |  |
 | --- | --- |
-| [X](Vector2.X.md) | Gets or sets the X component of the vector. |
-| [Y](Vector2.Y.md) | Gets or sets the Y component of the vector. |
+| X | Gets or sets the X component of the vector. |
+| Y | Gets or sets the Y component of the vector. |
 
 #### Public Instance Methods
 

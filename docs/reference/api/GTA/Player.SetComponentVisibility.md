@@ -4,14 +4,14 @@
 
 Public Sub SetComponentVisibility( \_
    ByVal *Component* As [GTA.PedComponent](PedComponent.md), \_
-   ByVal *Visible* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
+   ByVal *Visible* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) SetComponentVisibility(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) SetComponentVisibility(
    [GTA.PedComponent](PedComponent.md) *Component*,
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *Visible*
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *Visible*
 );
 
 #### See Also

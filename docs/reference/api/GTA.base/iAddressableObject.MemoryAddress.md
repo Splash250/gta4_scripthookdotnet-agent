@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Property MemoryAddress As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+Property MemoryAddress As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-[int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) MemoryAddress {get;}
+[int](https://learn.microsoft.com/dotnet/api/system.int32) MemoryAddress {get;}
 
 #### See Also
 

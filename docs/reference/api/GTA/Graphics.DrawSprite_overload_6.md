@@ -5,15 +5,15 @@
 Overloads Public Sub DrawSprite( \_
    ByVal *Texture* As [GTA.Texture](Texture.md), \_
    ByVal *Matrix* As [GTA.Matrix](Matrix.md), \_
-   ByVal *Color* As [System.Drawing.Color](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingColorClassTopic.asp) \_
+   ByVal *Color* As [System.Drawing.Color](https://learn.microsoft.com/dotnet/api/system.drawing.color) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) DrawSprite(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) DrawSprite(
    [GTA.Texture](Texture.md) *Texture*,
    [GTA.Matrix](Matrix.md) *Matrix*,
-   [System.Drawing.Color](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingColorClassTopic.asp) *Color*
+   [System.Drawing.Color](https://learn.microsoft.com/dotnet/api/system.drawing.color) *Color*
 );
 
 #### See Also

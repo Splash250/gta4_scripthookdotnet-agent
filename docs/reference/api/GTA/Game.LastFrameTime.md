@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Shared ReadOnly Property LastFrameTime As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+Public Shared ReadOnly Property LastFrameTime As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public static [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) LastFrameTime {get;}
+public static [float](https://learn.microsoft.com/dotnet/api/system.single) LastFrameTime {get;}
 
 #### See Also
 

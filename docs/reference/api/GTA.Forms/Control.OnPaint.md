@@ -8,7 +8,7 @@ Overridable Protected Sub OnPaint( \_
 
 ## C#
 
-protected virtual [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) OnPaint(
+protected virtual [void](https://learn.microsoft.com/dotnet/api/system.void) OnPaint(
    [GTA.GraphicsEventArgs](../GTA/GraphicsEventArgs.md) *e*
 );
 

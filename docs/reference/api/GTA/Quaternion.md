@@ -2,9 +2,9 @@
 
 For a list of all members of this type, see [Quaternion Members](QuaternionMembers.md).
 
-[System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+[System.Object](https://learn.microsoft.com/dotnet/api/system.object)
 
-   [System.ValueType](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemValueTypeClassTopic.asp)
+   [System.ValueType](https://learn.microsoft.com/dotnet/api/system.valuetype)
       **GTA.Quaternion**
 
 ## Visual Basic

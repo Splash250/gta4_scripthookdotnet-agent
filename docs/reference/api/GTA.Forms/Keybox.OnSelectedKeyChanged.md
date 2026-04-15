@@ -8,7 +8,7 @@ Overridable Protected Sub OnSelectedKeyChanged( \_
 
 ## C#
 
-protected virtual [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) OnSelectedKeyChanged(
+protected virtual [void](https://learn.microsoft.com/dotnet/api/system.void) OnSelectedKeyChanged(
    [GTA.KeyEventArgs](../GTA/KeyEventArgs.md) *e*
 );
 

@@ -2,12 +2,12 @@
 
 ## Visual Basic
 
-Public Shared Widening Operator CType(source As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp)) As [GTA.Native.Parameter](Parameter.md)
+Public Shared Widening Operator CType(source As [String](https://learn.microsoft.com/dotnet/api/system.string)) As [GTA.Native.Parameter](Parameter.md)
 
 ## C#
 
 public static implicit operator [GTA.Native.Parameter](Parameter.md)(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *source*
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *source*
 );
 
 #### See Also

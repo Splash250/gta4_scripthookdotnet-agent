@@ -5,17 +5,17 @@ Creates a matrix that scales along the x-axis, y-axis, and y-axis.
 ## Visual Basic
 
 Overloads Public Shared Function Scaling( \_
-   ByVal *x* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *y* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *z* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
+   ByVal *x* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *y* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *z* As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
 ) As [GTA.Matrix](Matrix.md)
 
 ## C#
 
 public static [GTA.Matrix](Matrix.md) Scaling(
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *x*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *y*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *z*
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *x*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *y*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *z*
 );
 
 #### Parameters

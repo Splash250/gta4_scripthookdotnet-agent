@@ -4,14 +4,14 @@
 
 Public Sub WaitUntilFinished( \_
    ByVal *AnimationSet* As [GTA.AnimationSet](../GTA/AnimationSet.md), \_
-   ByVal *AnimationName* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
+   ByVal *AnimationName* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) WaitUntilFinished(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) WaitUntilFinished(
    [GTA.AnimationSet](../GTA/AnimationSet.md) *AnimationSet*,
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *AnimationName*
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *AnimationName*
 );
 
 #### See Also

@@ -4,11 +4,11 @@
 
 Function AddMember( \_
    ByVal *ped* As [GTA.Ped](../GTA/Ped.md) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-[bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) AddMember(
+[bool](https://learn.microsoft.com/dotnet/api/system.boolean) AddMember(
    [GTA.Ped](../GTA/Ped.md) *ped*
 );
 

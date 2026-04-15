@@ -2,21 +2,21 @@
 
 For a list of all members of this type, see [MemoryStream Members](MemoryStreamMembers.md).
 
-[System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+[System.Object](https://learn.microsoft.com/dotnet/api/system.object)
 
-   [System.MarshalByRefObject](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemMarshalByRefObjectClassTopic.asp)
-      [System.IO.Stream](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIOStreamClassTopic.asp)
+   [System.MarshalByRefObject](https://learn.microsoft.com/dotnet/api/system.marshalbyrefobject)
+      [System.IO.Stream](https://learn.microsoft.com/dotnet/api/system.io.stream)
          **GTA.MemoryStream**
 
 ## Visual Basic
 
 Public Class MemoryStream
 
-Inherits [System.IO.Stream](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIOStreamClassTopic.asp)
+Inherits [System.IO.Stream](https://learn.microsoft.com/dotnet/api/system.io.stream)
 
 ## C#
 
-public class MemoryStream **: [Stream](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIOStreamClassTopic.asp)**
+public class MemoryStream **: [Stream](https://learn.microsoft.com/dotnet/api/system.io.stream)**
 
 #### Thread Safety
 

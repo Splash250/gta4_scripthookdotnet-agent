@@ -4,11 +4,11 @@ The general info is shown by the 'ScriptHelp' console command, together with all
 
 ## Visual Basic
 
-Public Property GeneralInfo As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp)
+Public Property GeneralInfo As [String](https://learn.microsoft.com/dotnet/api/system.string)
 
 ## C#
 
-public [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) GeneralInfo {get; set;}
+public [string](https://learn.microsoft.com/dotnet/api/system.string) GeneralInfo {get; set;}
 
 #### See Also
 

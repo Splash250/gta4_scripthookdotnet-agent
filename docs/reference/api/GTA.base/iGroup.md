@@ -6,11 +6,11 @@ For a list of all members of this type, see [iGroup Members](iGroupMembers.md).
 
 Public Interface iGroup
 
-Implements [System.Collections.Generic.IEnumerable`1((GTA.Ped, ScriptHookDotNet, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null))](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIEnumerable`1ClassTopic.asp), [System.Collections.IEnumerable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsIEnumerableClassTopic.asp)
+Implements [System.Collections.Generic.IEnumerable`1((GTA.Ped, ScriptHookDotNet, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null))](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1), [System.Collections.IEnumerable](https://learn.microsoft.com/dotnet/api/system.collections.ienumerable)
 
 ## C#
 
-public interface iGroup **: [System.Collections.Generic.IEnumerable`1[[GTA.Ped, ScriptHookDotNet, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIEnumerable`1ClassTopic.asp), [System.Collections.IEnumerable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsIEnumerableClassTopic.asp)**
+public interface iGroup **: [System.Collections.Generic.IEnumerable`1[[GTA.Ped, ScriptHookDotNet, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1), [System.Collections.IEnumerable](https://learn.microsoft.com/dotnet/api/system.collections.ienumerable)**
 
 #### Types that implement iGroup
 

@@ -6,7 +6,7 @@ Sub Reload()
 
 ## C#
 
-[void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) Reload();
+[void](https://learn.microsoft.com/dotnet/api/system.void) Reload();
 
 #### See Also
 

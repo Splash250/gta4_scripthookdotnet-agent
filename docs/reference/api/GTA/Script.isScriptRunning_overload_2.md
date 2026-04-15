@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overloads Protected Function isScriptRunning( \_
-   ByVal *GUID* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+   ByVal *GUID* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-protected [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) isScriptRunning(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *GUID*
+protected [bool](https://learn.microsoft.com/dotnet/api/system.boolean) isScriptRunning(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *GUID*
 );
 
 #### See Also

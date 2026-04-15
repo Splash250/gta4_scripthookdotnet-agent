@@ -2,7 +2,7 @@
 
 For a list of all members of this type, see [BaseCollection<> Members](BaseCollection[]Members.md).
 
-[System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+[System.Object](https://learn.microsoft.com/dotnet/api/system.object)
 
    **GTA.base.BaseCollection<>**
       [GTA.base.ReadOnlyCollection<>](ReadOnlyCollection[].md)
@@ -11,11 +11,11 @@ For a list of all members of this type, see [BaseCollection<> Members](BaseColle
 
 MustInherit Public Class BaseCollection<>
 
-Implements [System.Collections.Generic.IList(Of )](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIListClassTopic.asp), [System.Collections.Generic.ICollection(Of )](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericICollectionClassTopic.asp), [System.Collections.Generic.IEnumerable(Of )](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIEnumerableClassTopic.asp), [System.Collections.IEnumerable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsIEnumerableClassTopic.asp)
+Implements [System.Collections.Generic.IList(Of )](https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist(of )), [System.Collections.Generic.ICollection(Of )](https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection(of )), [System.Collections.Generic.IEnumerable(Of )](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable(of )), [System.Collections.IEnumerable](https://learn.microsoft.com/dotnet/api/system.collections.ienumerable)
 
 ## C#
 
-public abstract class BaseCollection<> **: [System.Collections.Generic.IList<>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIListClassTopic.asp), [System.Collections.Generic.ICollection<>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericICollectionClassTopic.asp), [System.Collections.Generic.IEnumerable<>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIEnumerableClassTopic.asp), [System.Collections.IEnumerable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsIEnumerableClassTopic.asp)**
+public abstract class BaseCollection<> **: [System.Collections.Generic.IList<>](https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist<>), [System.Collections.Generic.ICollection<>](https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection<>), [System.Collections.Generic.IEnumerable<>](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable<>), [System.Collections.IEnumerable](https://learn.microsoft.com/dotnet/api/system.collections.ienumerable)**
 
 #### Thread Safety
 

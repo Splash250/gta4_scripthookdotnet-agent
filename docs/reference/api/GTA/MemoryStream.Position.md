@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Overrides Public Property Position As [Long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp)
+Overrides Public Property Position As [Long](https://learn.microsoft.com/dotnet/api/system.int64)
 
 ## C#
 
-public override [long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp) Position {get; set;}
+public override [long](https://learn.microsoft.com/dotnet/api/system.int64) Position {get; set;}
 
 #### See Also
 

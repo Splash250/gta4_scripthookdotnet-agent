@@ -4,15 +4,15 @@
 
 NotOverridable Overloads Public Sub Dispose() \_
 
-Implements [IDisposable.Dispose](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIDisposableClassDisposeTopic.asp)
+Implements [IDisposable.Dispose](https://learn.microsoft.com/dotnet/api/system.idisposable.dispose)
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) Dispose();
+public [void](https://learn.microsoft.com/dotnet/api/system.void) Dispose();
 
 #### Implements
 
-[IDisposable.Dispose](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIDisposableClassDisposeTopic.asp)
+[IDisposable.Dispose](https://learn.microsoft.com/dotnet/api/system.idisposable.dispose)
 
 #### See Also
 

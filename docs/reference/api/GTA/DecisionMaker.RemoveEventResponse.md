@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Public Sub RemoveEventResponse( \_
-   ByVal *EventID* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *EventID* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) RemoveEventResponse(
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *EventID*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) RemoveEventResponse(
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *EventID*
 );
 
 #### See Also

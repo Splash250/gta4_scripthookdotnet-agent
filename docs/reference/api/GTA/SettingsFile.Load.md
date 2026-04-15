@@ -8,7 +8,7 @@ Public Sub Load()
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) Load();
+public [void](https://learn.microsoft.com/dotnet/api/system.void) Load();
 
 #### See Also
 

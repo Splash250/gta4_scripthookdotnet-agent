@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Property Dirtyness As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+Public Property Dirtyness As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) Dirtyness {get; set;}
+public [float](https://learn.microsoft.com/dotnet/api/system.single) Dirtyness {get; set;}
 
 #### See Also
 

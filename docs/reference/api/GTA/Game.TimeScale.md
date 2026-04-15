@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Shared WriteOnly Property TimeScale As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+Public Shared WriteOnly Property TimeScale As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public static [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) TimeScale {set;}
+public static [float](https://learn.microsoft.com/dotnet/api/system.single) TimeScale {set;}
 
 #### See Also
 

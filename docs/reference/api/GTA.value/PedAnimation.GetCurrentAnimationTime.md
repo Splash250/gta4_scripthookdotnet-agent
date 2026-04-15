@@ -4,14 +4,14 @@
 
 Public Function GetCurrentAnimationTime( \_
    ByVal *AnimationSet* As [GTA.AnimationSet](../GTA/AnimationSet.md), \_
-   ByVal *AnimationName* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
-) As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+   ByVal *AnimationName* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
+) As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) GetCurrentAnimationTime(
+public [float](https://learn.microsoft.com/dotnet/api/system.single) GetCurrentAnimationTime(
    [GTA.AnimationSet](../GTA/AnimationSet.md) *AnimationSet*,
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *AnimationName*
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *AnimationName*
 );
 
 #### See Also

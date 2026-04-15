@@ -3,15 +3,15 @@
 ## Visual Basic
 
 Overloads Public Sub Write( \_
-   ByVal *index* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp), \_
-   ByVal *value* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *index* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32), \_
+   ByVal *value* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) Write(
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *index*,
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *value*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) Write(
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *index*,
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *value*
 );
 
 #### See Also

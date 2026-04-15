@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Public Sub AddRange( \_
-   ByVal *collection* As [System.Collections.Generic.IEnumerable(Of GTA.Forms.Control)](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIEnumerableClassTopic.asp) \_
+   ByVal *collection* As [System.Collections.Generic.IEnumerable(Of GTA.Forms.Control)](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable(of gta.forms.control)) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) AddRange(
-   [System.Collections.Generic.IEnumerable<GTA.Forms.Control>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericIEnumerableClassTopic.asp) *collection*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) AddRange(
+   [System.Collections.Generic.IEnumerable<GTA.Forms.Control>](https://learn.microsoft.com/dotnet/api/system.collections.generic.ienumerable-1) *collection*
 );
 
 #### See Also

@@ -4,13 +4,13 @@ Allows you to store Metadata on an object. Metadata can be read back as long as 
 
 ## Visual Basic
 
-Overridable Public ReadOnly Property Metadata As [Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp) \_
+Overridable Public ReadOnly Property Metadata As [Object](https://learn.microsoft.com/dotnet/api/system.object) \_
 
 Implements [iHandleObject.Metadata](iHandleObject.Metadata.md)
 
 ## C#
 
-public virtual [object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp) Metadata {get;}
+public virtual [object](https://learn.microsoft.com/dotnet/api/system.object) Metadata {get;}
 
 #### Parameters
 

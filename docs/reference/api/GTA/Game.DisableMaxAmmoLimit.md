@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Shared WriteOnly Property DisableMaxAmmoLimit As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+Public Shared WriteOnly Property DisableMaxAmmoLimit As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public static [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) DisableMaxAmmoLimit {set;}
+public static [bool](https://learn.microsoft.com/dotnet/api/system.boolean) DisableMaxAmmoLimit {set;}
 
 #### See Also
 

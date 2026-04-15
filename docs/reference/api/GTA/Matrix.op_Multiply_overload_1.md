@@ -4,12 +4,12 @@ Scales a matrix by a given value.
 
 ## Visual Basic
 
-Public Shared Operator \*(left As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), right As [GTA.Matrix](Matrix.md)) As [GTA.Matrix](Matrix.md)
+Public Shared Operator \*(left As [Single](https://learn.microsoft.com/dotnet/api/system.single), right As [GTA.Matrix](Matrix.md)) As [GTA.Matrix](Matrix.md)
 
 ## C#
 
 public static [GTA.Matrix](Matrix.md) operator \*(
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *left*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *left*,
    [GTA.Matrix](Matrix.md) *right*
 );
 

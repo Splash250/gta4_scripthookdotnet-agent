@@ -1,6 +1,6 @@
 # GTA.valueHierarchy
 
-[System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+[System.Object](https://learn.microsoft.com/dotnet/api/system.object)
 
 [GTA.value.Euphoria](../GTA.value/Euphoria.md)
 
@@ -32,7 +32,7 @@
 
 |  |  |
 | --- | --- |
-| [System.Dynamic.DynamicObject](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDynamicDynamicObjectClassTopic.asp) ---- | [System.Dynamic.IDynamicMetaObjectProvider](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDynamicIDynamicMetaObjectProviderClassTopic.asp) |
+| [System.Dynamic.DynamicObject](https://learn.microsoft.com/dotnet/api/system.dynamic.dynamicobject) ---- | [System.Dynamic.IDynamicMetaObjectProvider](https://learn.microsoft.com/dotnet/api/system.dynamic.idynamicmetaobjectprovider) |
 
 [GTA.value.DynamicMetadata](../GTA.value/DynamicMetadata.md)
 

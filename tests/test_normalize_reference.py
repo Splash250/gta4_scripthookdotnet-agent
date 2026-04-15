@@ -76,6 +76,28 @@ class NormalizeReferenceCliTests(unittest.TestCase):
             ),
             encoding="utf-8",
         )
+        (self.source_root / "GTA.base" / "AdvancedLinks.md").write_text(
+            textwrap.dedent(
+                """\
+                # Advanced Links
+
+                [C#]
+
+                public class Sample **: [Attribute](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemAttributeClassTopic.asp)**
+
+                public [byte[]](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemByteClassTopic.asp) Load(
+                   [Date](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDateTimeClassTopic.asp) *when*
+                )
+
+                Implements [IEquatable`1.Equals](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemClassIEquatableTopic.asp)
+
+                public abstract [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) CopyTo(
+                   [GTA.base.T[]](GTA.base.T.md) *TargetArray*
+                )
+                """
+            ),
+            encoding="utf-8",
+        )
 
     def tearDown(self) -> None:
         shutil.rmtree(self.temp_dir)
@@ -109,7 +131,7 @@ class NormalizeReferenceCliTests(unittest.TestCase):
         self.assertNotIn("[Visual Basic]", normalized)
         self.assertNotIn("[C#]", normalized)
 
-        self.assertIn("Processed 6 Markdown pages", result.stdout)
+        self.assertIn("Processed 7 Markdown pages", result.stdout)
         self.assertIn("Namespaces: GTA, GTA.base", result.stdout)
 
     def test_cli_rewrites_legacy_links_and_reports_legacy_summary(self) -> None:
@@ -148,8 +170,48 @@ class NormalizeReferenceCliTests(unittest.TestCase):
         self.assertNotIn("(GTA.base.T.md)", normalized)
         self.assertNotIn("(GTA.md)", normalized)
 
-        self.assertIn("Legacy MSDN links rewritten: 2", result.stdout)
-        self.assertIn("Legacy export-era links removed: 3", result.stdout)
+        self.assertIn("Legacy MSDN links rewritten: 7", result.stdout)
+        self.assertIn("Legacy export-era links removed: 4", result.stdout)
+
+    def test_cli_rewrites_complex_msdn_labels_and_removes_generic_placeholder_links(self) -> None:
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(SCRIPT_PATH),
+                "--source",
+                str(self.source_root),
+                "--output",
+                str(self.output_root),
+            ],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+        )
+
+        self.assertEqual(result.returncode, 0, msg=result.stderr or result.stdout)
+
+        output_file = self.output_root / "GTA.base" / "AdvancedLinks.md"
+        self.assertTrue(output_file.exists())
+
+        normalized = output_file.read_text(encoding="utf-8")
+        self.assertIn(
+            "[Attribute](https://learn.microsoft.com/dotnet/api/system.attribute)",
+            normalized,
+        )
+        self.assertIn(
+            "[byte[]](https://learn.microsoft.com/dotnet/api/system.byte)",
+            normalized,
+        )
+        self.assertIn(
+            "[Date](https://learn.microsoft.com/dotnet/api/system.datetime)",
+            normalized,
+        )
+        self.assertIn(
+            "[IEquatable`1.Equals](https://learn.microsoft.com/dotnet/api/system.iequatable-1.equals)",
+            normalized,
+        )
+        self.assertIn("GTA.base.T[]", normalized)
+        self.assertNotIn("(GTA.base.T.md)", normalized)
 
 
 if __name__ == "__main__":

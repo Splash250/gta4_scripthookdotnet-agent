@@ -6,7 +6,7 @@ Overloads Public Sub EnterVehicle()
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) EnterVehicle();
+public [void](https://learn.microsoft.com/dotnet/api/system.void) EnterVehicle();
 
 #### See Also
 

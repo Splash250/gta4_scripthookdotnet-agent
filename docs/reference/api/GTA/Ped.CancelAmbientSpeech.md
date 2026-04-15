@@ -6,7 +6,7 @@ Public Sub CancelAmbientSpeech()
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) CancelAmbientSpeech();
+public [void](https://learn.microsoft.com/dotnet/api/system.void) CancelAmbientSpeech();
 
 #### See Also
 

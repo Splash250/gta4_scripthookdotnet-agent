@@ -4,14 +4,14 @@
 
 Overloads Public Sub SetValue( \_
    ByVal *ValueID* As [GTA.Euphoria.nmString](nmString.md), \_
-   ByVal *Value* As [Double](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDoubleClassTopic.asp) \_
+   ByVal *Value* As [Double](https://learn.microsoft.com/dotnet/api/system.double) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) SetValue(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) SetValue(
    [GTA.Euphoria.nmString](nmString.md) *ValueID*,
-   [double](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDoubleClassTopic.asp) *Value*
+   [double](https://learn.microsoft.com/dotnet/api/system.double) *Value*
 );
 
 #### See Also

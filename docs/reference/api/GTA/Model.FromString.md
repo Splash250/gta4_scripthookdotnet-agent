@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Public Shared Function FromString( \_
-   ByVal *string* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
+   ByVal *string* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
 ) As [GTA.Model](Model.md)
 
 ## C#
 
 public static [GTA.Model](Model.md) FromString(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *string*
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *string*
 );
 
 #### See Also

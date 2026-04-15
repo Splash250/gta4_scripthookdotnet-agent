@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Shared ReadOnly Property isHost As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+Public Shared ReadOnly Property isHost As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public static [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) isHost {get;}
+public static [bool](https://learn.microsoft.com/dotnet/api/system.boolean) isHost {get;}
 
 #### See Also
 

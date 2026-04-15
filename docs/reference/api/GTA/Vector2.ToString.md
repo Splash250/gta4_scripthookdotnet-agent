@@ -4,11 +4,11 @@ Converts the value of the object to its equivalent string representation.
 
 ## Visual Basic
 
-NotOverridable Public Function ToString() As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp)
+NotOverridable Public Function ToString() As [String](https://learn.microsoft.com/dotnet/api/system.string)
 
 ## C#
 
-public [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) ToString();
+public [string](https://learn.microsoft.com/dotnet/api/system.string) ToString();
 
 #### Return Value
 

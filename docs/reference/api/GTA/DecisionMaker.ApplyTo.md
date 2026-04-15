@@ -8,7 +8,7 @@ Public Sub ApplyTo( \_
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) ApplyTo(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) ApplyTo(
    [GTA.Ped](Ped.md) *Ped*
 );
 

@@ -1,9 +1,9 @@
 # GTA.Forms.ControlHierarchy
 
-[System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+[System.Object](https://learn.microsoft.com/dotnet/api/system.object)
 
-   [MarshalByRefObject](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemMarshalByRefObjectClassTopic.asp)
-      [Component](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemComponentModelComponentClassTopic.asp)
+   [MarshalByRefObject](https://learn.microsoft.com/dotnet/api/system.marshalbyrefobject)
+      [Component](https://learn.microsoft.com/dotnet/api/system.componentmodel.component)
          **Control**
             [Button](Button.md)
             [Checkbox](Checkbox.md)

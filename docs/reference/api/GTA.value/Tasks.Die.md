@@ -6,7 +6,7 @@ Public Sub Die()
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) Die();
+public [void](https://learn.microsoft.com/dotnet/api/system.void) Die();
 
 #### See Also
 

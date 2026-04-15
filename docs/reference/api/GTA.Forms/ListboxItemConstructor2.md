@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overloads Public Sub New( \_
-   ByVal *Value* As [Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp) \_
+   ByVal *Value* As [Object](https://learn.microsoft.com/dotnet/api/system.object) \_
 )
 
 ## C#
 
 public ListboxItem(
-   [object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp) *Value*
+   [object](https://learn.microsoft.com/dotnet/api/system.object) *Value*
 );
 
 #### See Also

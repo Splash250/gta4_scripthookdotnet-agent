@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Overridable Protected ReadOnly Property DefaultSize As [System.Drawing.Size](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingSizeClassTopic.asp)
+Overridable Protected ReadOnly Property DefaultSize As [System.Drawing.Size](https://learn.microsoft.com/dotnet/api/system.drawing.size)
 
 ## C#
 
-protected virtual [System.Drawing.Size](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingSizeClassTopic.asp) DefaultSize {get;}
+protected virtual [System.Drawing.Size](https://learn.microsoft.com/dotnet/api/system.drawing.size) DefaultSize {get;}
 
 #### See Also
 

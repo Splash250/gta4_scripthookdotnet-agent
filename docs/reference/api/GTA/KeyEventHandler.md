@@ -3,14 +3,14 @@
 ## Visual Basic
 
 Public Delegate Sub KeyEventHandler( \_
-   ByVal *sender* As [Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp), \_
+   ByVal *sender* As [Object](https://learn.microsoft.com/dotnet/api/system.object), \_
    ByVal *e* As [GTA.KeyEventArgs](KeyEventArgs.md) \_
 )
 
 ## C#
 
 public delegate void KeyEventHandler(
-   [object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp) *sender*,
+   [object](https://learn.microsoft.com/dotnet/api/system.object) *sender*,
    [GTA.KeyEventArgs](KeyEventArgs.md) *e*
 );
 

@@ -10,11 +10,11 @@ For a list of all members of this type, see [iHandleObject Members](iHandleObjec
 
 Public Interface iHandleObject
 
-Implements [System.IEquatable`1((GTA.base.iHandleObject, ScriptHookDotNet, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null))](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIEquatable`1ClassTopic.asp), [GTA.base.iBaseObject](iBaseObject.md)
+Implements [System.IEquatable`1((GTA.base.iHandleObject, ScriptHookDotNet, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null))](https://learn.microsoft.com/dotnet/api/system.iequatable-1), [GTA.base.iBaseObject](iBaseObject.md)
 
 ## C#
 
-public interface iHandleObject **: [System.IEquatable`1[[GTA.base.iHandleObject, ScriptHookDotNet, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIEquatable`1ClassTopic.asp), [GTA.base.iBaseObject](iBaseObject.md)**
+public interface iHandleObject **: [System.IEquatable`1[[GTA.base.iHandleObject, ScriptHookDotNet, Version=0.0.0.0, Culture=neutral, PublicKeyToken=null]]](https://learn.microsoft.com/dotnet/api/system.iequatable-1), [GTA.base.iBaseObject](iBaseObject.md)**
 
 #### Types that implement iHandleObject
 

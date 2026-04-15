@@ -8,7 +8,7 @@ Overloads Public Sub Start()
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) Start();
+public [void](https://learn.microsoft.com/dotnet/api/system.void) Start();
 
 #### See Also
 

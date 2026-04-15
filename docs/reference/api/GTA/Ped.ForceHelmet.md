@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Public Sub ForceHelmet( \_
-   ByVal *enable* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
+   ByVal *enable* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) ForceHelmet(
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *enable*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) ForceHelmet(
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *enable*
 );
 
 #### See Also

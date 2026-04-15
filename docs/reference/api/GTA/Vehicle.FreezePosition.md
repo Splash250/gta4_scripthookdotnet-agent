@@ -2,13 +2,13 @@
 
 ## Visual Basic
 
-Overridable Public WriteOnly Property FreezePosition As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
+Overridable Public WriteOnly Property FreezePosition As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
 
 Implements [iFreezable.FreezePosition](../GTA.base/iFreezable.FreezePosition.md)
 
 ## C#
 
-public virtual [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) FreezePosition {set;}
+public virtual [bool](https://learn.microsoft.com/dotnet/api/system.boolean) FreezePosition {set;}
 
 #### Implements
 

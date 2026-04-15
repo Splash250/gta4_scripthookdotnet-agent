@@ -4,7 +4,7 @@ TaskSequences are used to arrange several Tasks into a sequence.
 
 For a list of all members of this type, see [TaskSequence Members](TaskSequenceMembers.md).
 
-[System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+[System.Object](https://learn.microsoft.com/dotnet/api/system.object)
 
    **GTA.TaskSequence**
 
@@ -12,11 +12,11 @@ For a list of all members of this type, see [TaskSequence Members](TaskSequenceM
 
 NotInheritable Public Class TaskSequence
 
-Implements [System.IDisposable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIDisposableClassTopic.asp)
+Implements [System.IDisposable](https://learn.microsoft.com/dotnet/api/system.idisposable)
 
 ## C#
 
-public sealed class TaskSequence **: [System.IDisposable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIDisposableClassTopic.asp)**
+public sealed class TaskSequence **: [System.IDisposable](https://learn.microsoft.com/dotnet/api/system.idisposable)**
 
 #### Thread Safety
 

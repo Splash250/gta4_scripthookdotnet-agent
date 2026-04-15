@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Property Text As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp)
+Public Property Text As [String](https://learn.microsoft.com/dotnet/api/system.string)
 
 ## C#
 
-public [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) Text {get; set;}
+public [string](https://learn.microsoft.com/dotnet/api/system.string) Text {get; set;}
 
 #### See Also
 

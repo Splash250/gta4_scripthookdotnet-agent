@@ -4,13 +4,13 @@ Returns whether the object still exists in game. Other calls to non-existing obj
 
 ## Visual Basic
 
-NotOverridable Public Function Exists() As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
+NotOverridable Public Function Exists() As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
 
 Implements [iBaseObject.Exists](iBaseObject.Exists.md)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) Exists();
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) Exists();
 
 #### Implements
 

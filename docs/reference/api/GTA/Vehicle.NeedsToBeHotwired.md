@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public WriteOnly Property NeedsToBeHotwired As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+Public WriteOnly Property NeedsToBeHotwired As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) NeedsToBeHotwired {set;}
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) NeedsToBeHotwired {set;}
 
 #### See Also
 

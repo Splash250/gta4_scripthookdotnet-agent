@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overloads Public Shared Sub DisplayText( \_
-   ByVal *Text* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
+   ByVal *Text* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
 )
 
 ## C#
 
-public static [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) DisplayText(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Text*
+public static [void](https://learn.microsoft.com/dotnet/api/system.void) DisplayText(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Text*
 );
 
 #### See Also

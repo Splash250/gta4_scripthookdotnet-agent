@@ -6,7 +6,7 @@ Public Sub Abort()
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) Abort();
+public [void](https://learn.microsoft.com/dotnet/api/system.void) Abort();
 
 #### See Also
 

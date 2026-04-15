@@ -3,13 +3,13 @@
 ## Visual Basic
 
 MustOverride Public Sub Print( \_
-   ByVal *Text* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
+   ByVal *Text* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
 )
 
 ## C#
 
-public abstract [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) Print(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Text*
+public abstract [void](https://learn.microsoft.com/dotnet/api/system.void) Print(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Text*
 );
 
 #### See Also

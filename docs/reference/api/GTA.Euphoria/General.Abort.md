@@ -9,7 +9,7 @@ Public Shared Sub Abort( \_
 
 ## C#
 
-public static [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) Abort(
+public static [void](https://learn.microsoft.com/dotnet/api/system.void) Abort(
    [GTA.Ped](../GTA/Ped.md) *TargetPed*,
    [GTA.Euphoria.nmMessageID](nmMessageID.md) *MessageID*
 );

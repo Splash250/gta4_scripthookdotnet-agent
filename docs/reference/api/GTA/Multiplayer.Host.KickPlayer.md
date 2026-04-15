@@ -8,7 +8,7 @@ Public Shared Sub KickPlayer( \_
 
 ## C#
 
-public static [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) KickPlayer(
+public static [void](https://learn.microsoft.com/dotnet/api/system.void) KickPlayer(
    [GTA.Player](Player.md) *Player*
 );
 

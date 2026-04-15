@@ -4,14 +4,14 @@
 
 Public Sub CantBeDamagedByRelationshipGroup( \_
    ByVal *group* As [GTA.RelationshipGroup](RelationshipGroup.md), \_
-   ByVal *value* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
+   ByVal *value* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) CantBeDamagedByRelationshipGroup(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) CantBeDamagedByRelationshipGroup(
    [GTA.RelationshipGroup](RelationshipGroup.md) *group*,
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *value*
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *value*
 );
 
 #### See Also

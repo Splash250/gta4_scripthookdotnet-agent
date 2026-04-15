@@ -4,14 +4,14 @@
 
 Protected Function GetFeedback( \_
    ByVal *FeedbackID* As [GTA.Euphoria.nmString](nmString.md), \_
-   ByVal *FeedbackNum* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+   ByVal *FeedbackNum* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-protected [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) GetFeedback(
+protected [bool](https://learn.microsoft.com/dotnet/api/system.boolean) GetFeedback(
    [GTA.Euphoria.nmString](nmString.md) *FeedbackID*,
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *FeedbackNum*
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *FeedbackNum*
 );
 
 #### See Also

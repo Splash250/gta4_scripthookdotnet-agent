@@ -8,7 +8,7 @@ Overloads Public Sub FightAgainst( \_
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) FightAgainst(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) FightAgainst(
    [GTA.Ped](../GTA/Ped.md) *target*
 );
 

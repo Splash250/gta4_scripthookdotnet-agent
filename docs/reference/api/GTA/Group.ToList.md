@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Public Function ToList( \_
-   ByVal *IncludingLeader* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
+   ByVal *IncludingLeader* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
 ) As [GTA.PedCollection](PedCollection.md)
 
 ## C#
 
 public [GTA.PedCollection](PedCollection.md) ToList(
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *IncludingLeader*
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *IncludingLeader*
 );
 
 #### See Also

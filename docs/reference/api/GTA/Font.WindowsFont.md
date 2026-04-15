@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public ReadOnly Property WindowsFont As [System.Drawing.Font](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingFontClassTopic.asp)
+Public ReadOnly Property WindowsFont As [System.Drawing.Font](https://learn.microsoft.com/dotnet/api/system.drawing.font)
 
 ## C#
 
-public [System.Drawing.Font](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingFontClassTopic.asp) WindowsFont {get;}
+public [System.Drawing.Font](https://learn.microsoft.com/dotnet/api/system.drawing.font) WindowsFont {get;}
 
 #### See Also
 

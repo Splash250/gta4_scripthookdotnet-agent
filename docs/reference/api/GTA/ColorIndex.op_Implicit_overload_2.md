@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Shared Widening Operator CType(source As [GTA.ColorIndex](ColorIndex.md)) As [System.Drawing.Color](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingColorClassTopic.asp)
+Public Shared Widening Operator CType(source As [GTA.ColorIndex](ColorIndex.md)) As [System.Drawing.Color](https://learn.microsoft.com/dotnet/api/system.drawing.color)
 
 ## C#
 
-public static implicit operator [System.Drawing.Color](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingColorClassTopic.asp)(
+public static implicit operator [System.Drawing.Color](https://learn.microsoft.com/dotnet/api/system.drawing.color)(
    [GTA.ColorIndex](ColorIndex.md) *source*
 );
 

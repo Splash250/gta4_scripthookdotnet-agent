@@ -4,11 +4,11 @@ Sets whether permanent events - like responding to an aggressor - that may abort
 
 ## Visual Basic
 
-Public WriteOnly Property BlockPermanentEvents As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+Public WriteOnly Property BlockPermanentEvents As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) BlockPermanentEvents {set;}
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) BlockPermanentEvents {set;}
 
 #### See Also
 

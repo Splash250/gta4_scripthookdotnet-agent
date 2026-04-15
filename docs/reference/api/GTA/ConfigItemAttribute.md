@@ -2,20 +2,20 @@
 
 For a list of all members of this type, see [ConfigItemAttribute Members](ConfigItemAttributeMembers.md).
 
-[System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+[System.Object](https://learn.microsoft.com/dotnet/api/system.object)
 
-   [System.Attribute](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemAttributeClassTopic.asp)
+   [System.Attribute](https://learn.microsoft.com/dotnet/api/system.attribute)
       **GTA.ConfigItemAttribute**
 
 ## Visual Basic
 
 Public Class ConfigItemAttribute
 
-Inherits [System.Attribute](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemAttributeClassTopic.asp)
+Inherits [System.Attribute](https://learn.microsoft.com/dotnet/api/system.attribute)
 
 ## C#
 
-public class ConfigItemAttribute **: [Attribute](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemAttributeClassTopic.asp)**
+public class ConfigItemAttribute **: [Attribute](https://learn.microsoft.com/dotnet/api/system.attribute)**
 
 #### Thread Safety
 

@@ -3,17 +3,17 @@
 ## Visual Basic
 
 Public Sub SetPathfinding( \_
-   ByVal *AllowClimbovers* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp), \_
-   ByVal *AllowLadders* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp), \_
-   ByVal *AllowDropFromHeight* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
+   ByVal *AllowClimbovers* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean), \_
+   ByVal *AllowLadders* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean), \_
+   ByVal *AllowDropFromHeight* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) SetPathfinding(
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *AllowClimbovers*,
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *AllowLadders*,
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *AllowDropFromHeight*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) SetPathfinding(
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *AllowClimbovers*,
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *AllowLadders*,
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *AllowDropFromHeight*
 );
 
 #### See Also

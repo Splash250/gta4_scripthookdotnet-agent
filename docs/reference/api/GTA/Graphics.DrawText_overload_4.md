@@ -3,17 +3,17 @@
 ## Visual Basic
 
 Overloads Public Sub DrawText( \_
-   ByVal *Text* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
-   ByVal *Area* As [System.Drawing.RectangleF](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingRectangleFClassTopic.asp), \_
+   ByVal *Text* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
+   ByVal *Area* As [System.Drawing.RectangleF](https://learn.microsoft.com/dotnet/api/system.drawing.rectanglef), \_
    ByVal *Alignment* As [GTA.TextAlignment](TextAlignment.md), \_
    ByVal *Font* As [GTA.Font](Font.md) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) DrawText(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Text*,
-   [System.Drawing.RectangleF](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingRectangleFClassTopic.asp) *Area*,
+public [void](https://learn.microsoft.com/dotnet/api/system.void) DrawText(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Text*,
+   [System.Drawing.RectangleF](https://learn.microsoft.com/dotnet/api/system.drawing.rectanglef) *Area*,
    [GTA.TextAlignment](TextAlignment.md) *Alignment*,
    [GTA.Font](Font.md) *Font*
 );

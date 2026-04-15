@@ -7,11 +7,11 @@ Determines whether the specified object instances are considered equal.
 Overloads Public Shared Function Equals( \_
    ByRef *value1* As [GTA.Vector2](Vector2.md), \_
    ByRef *value2* As [GTA.Vector2](Vector2.md) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public static [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) Equals(
+public static [bool](https://learn.microsoft.com/dotnet/api/system.boolean) Equals(
    ref [GTA.Vector2](Vector2.md) *value1*,
    ref [GTA.Vector2](Vector2.md) *value2*
 );

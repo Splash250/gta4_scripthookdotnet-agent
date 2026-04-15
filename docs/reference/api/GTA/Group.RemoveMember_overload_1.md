@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overloads Public Sub RemoveMember( \_
-   ByVal *Index* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *Index* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) RemoveMember(
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *Index*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) RemoveMember(
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *Index*
 );
 
 #### See Also

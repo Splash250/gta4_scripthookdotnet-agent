@@ -3,22 +3,22 @@
 ## Visual Basic
 
 MustOverride Protected Sub pInsert( \_
-   ByVal *index* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp), \_
-   ByVal *item* As [GTA.base.T](T.md) \_
+   ByVal *index* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32), \_
+   ByVal *item* As GTA.base.T \_
 ) \_
 
-Implements [IList`1.Insert](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericClassIListTopic.asp)
+Implements [IList`1.Insert](https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist-1.insert)
 
 ## C#
 
-protected abstract [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) pInsert(
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *index*,
-   [GTA.base.T](T.md) *item*
+protected abstract [void](https://learn.microsoft.com/dotnet/api/system.void) pInsert(
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *index*,
+   GTA.base.T *item*
 );
 
 #### Implements
 
-[IList`1.Insert](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericClassIListTopic.asp)
+[IList`1.Insert](https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist-1.insert)
 
 #### See Also
 

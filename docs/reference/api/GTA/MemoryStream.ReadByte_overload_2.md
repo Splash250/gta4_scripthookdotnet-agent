@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Overrides Overloads Public Function ReadByte() As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+Overrides Overloads Public Function ReadByte() As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-public override [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) ReadByte();
+public override [int](https://learn.microsoft.com/dotnet/api/system.int32) ReadByte();
 
 #### See Also
 

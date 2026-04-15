@@ -4,11 +4,11 @@
 
 Public Function IsTireBurst( \_
    ByVal *wheel* As [GTA.VehicleWheel](VehicleWheel.md) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) IsTireBurst(
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) IsTireBurst(
    [GTA.VehicleWheel](VehicleWheel.md) *wheel*
 );
 

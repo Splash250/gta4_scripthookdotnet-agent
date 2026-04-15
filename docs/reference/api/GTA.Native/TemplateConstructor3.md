@@ -3,15 +3,15 @@
 ## Visual Basic
 
 Overloads Public Sub New( \_
-   ByVal *Name* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
+   ByVal *Name* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
    ParamArray *Arguments* As [GTA.Native.Parameter()](Parameter.md) \_
 )
 
 ## C#
 
 public Template(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Name*,
-   params [GTA.Native.Parameter[]](GTA.Native.Parameter.md) *Arguments*
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Name*,
+   params GTA.Native.Parameter[] *Arguments*
 );
 
 #### See Also

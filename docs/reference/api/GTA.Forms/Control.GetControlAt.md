@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Public Function GetControlAt( \_
-   ByVal *ScreenPoint* As [System.Drawing.Point](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingPointClassTopic.asp) \_
+   ByVal *ScreenPoint* As [System.Drawing.Point](https://learn.microsoft.com/dotnet/api/system.drawing.point) \_
 ) As [GTA.Forms.Control](Control.md)
 
 ## C#
 
 public [GTA.Forms.Control](Control.md) GetControlAt(
-   [System.Drawing.Point](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingPointClassTopic.asp) *ScreenPoint*
+   [System.Drawing.Point](https://learn.microsoft.com/dotnet/api/system.drawing.point) *ScreenPoint*
 );
 
 #### See Also

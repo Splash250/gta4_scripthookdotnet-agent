@@ -3,20 +3,20 @@
 ## Visual Basic
 
 MustOverride Public Function IndexOf( \_
-   ByVal *item* As [GTA.base.T](T.md) \_
-) As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *item* As GTA.base.T \_
+) As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 
-Implements [IList`1.IndexOf](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericClassIListTopic.asp)
+Implements [IList`1.IndexOf](https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist-1.indexof)
 
 ## C#
 
-public abstract [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) IndexOf(
-   [GTA.base.T](T.md) *item*
+public abstract [int](https://learn.microsoft.com/dotnet/api/system.int32) IndexOf(
+   GTA.base.T *item*
 );
 
 #### Implements
 
-[IList`1.IndexOf](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericClassIListTopic.asp)
+[IList`1.IndexOf](https://learn.microsoft.com/dotnet/api/system.collections.generic.ilist-1.indexof)
 
 #### See Also
 

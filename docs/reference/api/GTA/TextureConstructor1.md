@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overloads Public Sub New( \_
-   ByVal *ImageData* As [Byte()](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemByteClassTopic.asp) \_
+   ByVal *ImageData* As [Byte()](https://learn.microsoft.com/dotnet/api/system.byte) \_
 )
 
 ## C#
 
 public Texture(
-   [byte[]](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemByteClassTopic.asp) *ImageData*
+   [byte[]](https://learn.microsoft.com/dotnet/api/system.byte) *ImageData*
 );
 
 #### See Also

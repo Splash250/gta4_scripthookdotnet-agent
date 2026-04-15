@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Public Shared Function FromString( \_
-   ByVal *input* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
+   ByVal *input* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
 ) As [GTA.SkinTemplate](SkinTemplate.md)
 
 ## C#
 
 public static [GTA.SkinTemplate](SkinTemplate.md) FromString(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *input*
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *input*
 );
 
 #### See Also

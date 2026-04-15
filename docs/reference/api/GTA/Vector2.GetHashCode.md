@@ -4,11 +4,11 @@ Returns the hash code for this instance.
 
 ## Visual Basic
 
-NotOverridable Public Function GetHashCode() As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+NotOverridable Public Function GetHashCode() As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-public [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) GetHashCode();
+public [int](https://learn.microsoft.com/dotnet/api/system.int32) GetHashCode();
 
 #### Return Value
 

@@ -4,7 +4,7 @@
 
 Inherited from [Collection<GTA.Forms.ListboxItem>](../GTA.base/Collection[].md).
 
-> [public override void Add(GTA.Forms.ListboxItem);](../GTA.base/Collection[].Add_overloads.md)
+> public override void Add(GTA.Forms.ListboxItem);
 
 > [public void Add(object);](Listbox.ItemCollection.Add_overload_1.md)
 

@@ -3,20 +3,20 @@
 ## Visual Basic
 
 Overloads Protected Sub BindKey( \_
-   ByVal *Key* As [System.Windows.Forms.Keys](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemWindowsFormsKeysClassTopic.asp), \_
-   ByVal *Shift* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp), \_
-   ByVal *Ctrl* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp), \_
-   ByVal *Alt* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp), \_
+   ByVal *Key* As [System.Windows.Forms.Keys](https://learn.microsoft.com/dotnet/api/system.windows.forms.keys), \_
+   ByVal *Shift* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean), \_
+   ByVal *Ctrl* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean), \_
+   ByVal *Alt* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean), \_
    ByVal *MethodToBindTo* As [GTA.KeyPressDelegate](KeyPressDelegate.md) \_
 )
 
 ## C#
 
-protected [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) BindKey(
-   [System.Windows.Forms.Keys](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemWindowsFormsKeysClassTopic.asp) *Key*,
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *Shift*,
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *Ctrl*,
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *Alt*,
+protected [void](https://learn.microsoft.com/dotnet/api/system.void) BindKey(
+   [System.Windows.Forms.Keys](https://learn.microsoft.com/dotnet/api/system.windows.forms.keys) *Key*,
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *Shift*,
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *Ctrl*,
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *Alt*,
    [GTA.KeyPressDelegate](KeyPressDelegate.md) *MethodToBindTo*
 );
 

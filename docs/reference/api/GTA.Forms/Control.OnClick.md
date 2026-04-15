@@ -8,7 +8,7 @@ Overridable Protected Friend Sub OnClick( \_
 
 ## C#
 
-protected internal virtual [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) OnClick(
+protected internal virtual [void](https://learn.microsoft.com/dotnet/api/system.void) OnClick(
    [GTA.MouseEventArgs](../GTA/MouseEventArgs.md) *e*
 );
 

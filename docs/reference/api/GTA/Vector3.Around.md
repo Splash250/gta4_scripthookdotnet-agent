@@ -5,13 +5,13 @@ Returns a random location somewhere around this position.
 ## Visual Basic
 
 Public Function Around( \_
-   ByVal *Distance* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
+   ByVal *Distance* As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
 ) As [GTA.Vector3](Vector3.md)
 
 ## C#
 
 public [GTA.Vector3](Vector3.md) Around(
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *Distance*
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *Distance*
 );
 
 #### See Also

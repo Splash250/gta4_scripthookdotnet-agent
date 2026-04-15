@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overloads Public Shared Function isScriptRunning( \_
-   ByVal *ScriptName* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+   ByVal *ScriptName* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public static [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) isScriptRunning(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *ScriptName*
+public static [bool](https://learn.microsoft.com/dotnet/api/system.boolean) isScriptRunning(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *ScriptName*
 );
 
 #### See Also

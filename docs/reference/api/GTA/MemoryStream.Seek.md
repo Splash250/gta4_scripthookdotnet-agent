@@ -3,15 +3,15 @@
 ## Visual Basic
 
 Overrides Public Function Seek( \_
-   ByVal *offset* As [Long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp), \_
-   ByVal *origin* As [System.IO.SeekOrigin](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIOSeekOriginClassTopic.asp) \_
-) As [Long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp)
+   ByVal *offset* As [Long](https://learn.microsoft.com/dotnet/api/system.int64), \_
+   ByVal *origin* As [System.IO.SeekOrigin](https://learn.microsoft.com/dotnet/api/system.io.seekorigin) \_
+) As [Long](https://learn.microsoft.com/dotnet/api/system.int64)
 
 ## C#
 
-public override [long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp) Seek(
-   [long](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt64ClassTopic.asp) *offset*,
-   [System.IO.SeekOrigin](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIOSeekOriginClassTopic.asp) *origin*
+public override [long](https://learn.microsoft.com/dotnet/api/system.int64) Seek(
+   [long](https://learn.microsoft.com/dotnet/api/system.int64) *offset*,
+   [System.IO.SeekOrigin](https://learn.microsoft.com/dotnet/api/system.io.seekorigin) *origin*
 );
 
 #### See Also

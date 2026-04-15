@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Property SelectedIndex As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+Public Property SelectedIndex As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-public [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) SelectedIndex {get; set;}
+public [int](https://learn.microsoft.com/dotnet/api/system.int32) SelectedIndex {get; set;}
 
 #### See Also
 

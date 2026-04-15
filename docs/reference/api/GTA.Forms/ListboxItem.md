@@ -2,20 +2,20 @@
 
 For a list of all members of this type, see [ListboxItem Members](ListboxItemMembers.md).
 
-[System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+[System.Object](https://learn.microsoft.com/dotnet/api/system.object)
 
-   [System.ValueType](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemValueTypeClassTopic.asp)
+   [System.ValueType](https://learn.microsoft.com/dotnet/api/system.valuetype)
       **GTA.Forms.ListboxItem**
 
 ## Visual Basic
 
 Public Structure ListboxItem
 
-Implements [System.IEquatable(Of GTA.Forms.ListboxItem)](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIEquatableClassTopic.asp)
+Implements [System.IEquatable(Of GTA.Forms.ListboxItem)](https://learn.microsoft.com/dotnet/api/system.iequatable(of gta.forms.listboxitem))
 
 ## C#
 
-public struct ListboxItem **: [System.IEquatable<GTA.Forms.ListboxItem>](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIEquatableClassTopic.asp)**
+public struct ListboxItem **: [System.IEquatable<GTA.Forms.ListboxItem>](https://learn.microsoft.com/dotnet/api/system.iequatable-1)**
 
 #### Thread Safety
 

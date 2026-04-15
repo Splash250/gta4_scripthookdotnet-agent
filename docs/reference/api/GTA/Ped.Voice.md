@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public WriteOnly Property Voice As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp)
+Public WriteOnly Property Voice As [String](https://learn.microsoft.com/dotnet/api/system.string)
 
 ## C#
 
-public [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) Voice {set;}
+public [string](https://learn.microsoft.com/dotnet/api/system.string) Voice {set;}
 
 #### See Also
 

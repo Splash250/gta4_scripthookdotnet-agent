@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overridable Overloads Protected Sub Dispose( \_
-   ByVal  As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
+   ByVal  As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
 )
 
 ## C#
 
-protected virtual [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) Dispose(
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+protected virtual [void](https://learn.microsoft.com/dotnet/api/system.void) Dispose(
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean)
 );
 
 #### See Also

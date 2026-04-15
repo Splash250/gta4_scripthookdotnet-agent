@@ -4,11 +4,11 @@
 
 Public Shared Function GetFloatStatistic( \_
    ByVal *stat* As [GTA.FloatStatistic](FloatStatistic.md) \_
-) As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+) As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public static [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) GetFloatStatistic(
+public static [float](https://learn.microsoft.com/dotnet/api/system.single) GetFloatStatistic(
    [GTA.FloatStatistic](FloatStatistic.md) *stat*
 );
 

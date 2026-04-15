@@ -2,7 +2,7 @@
 
 For a list of all members of this type, see [Texture Members](TextureMembers.md).
 
-[System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+[System.Object](https://learn.microsoft.com/dotnet/api/system.object)
 
    **GTA.Texture**
 
@@ -10,11 +10,11 @@ For a list of all members of this type, see [Texture Members](TextureMembers.md)
 
 NotInheritable Public Class Texture
 
-Implements [GTA.base.iD3DObject](../GTA.base/iD3DObject.md), [System.IDisposable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIDisposableClassTopic.asp)
+Implements [GTA.base.iD3DObject](../GTA.base/iD3DObject.md), [System.IDisposable](https://learn.microsoft.com/dotnet/api/system.idisposable)
 
 ## C#
 
-public sealed class Texture **: [GTA.base.iD3DObject](../GTA.base/iD3DObject.md), [System.IDisposable](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemIDisposableClassTopic.asp)**
+public sealed class Texture **: [GTA.base.iD3DObject](../GTA.base/iD3DObject.md), [System.IDisposable](https://learn.microsoft.com/dotnet/api/system.idisposable)**
 
 #### Thread Safety
 

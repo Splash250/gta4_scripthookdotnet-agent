@@ -5,13 +5,13 @@ Returns the text of an embedded resource file included in the script
 ## Visual Basic
 
 Overloads Public Function GetText( \_
-   ByVal *ResourceName* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
-) As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp)
+   ByVal *ResourceName* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
+) As [String](https://learn.microsoft.com/dotnet/api/system.string)
 
 ## C#
 
-public [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) GetText(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *ResourceName*
+public [string](https://learn.microsoft.com/dotnet/api/system.string) GetText(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *ResourceName*
 );
 
 #### See Also

@@ -4,11 +4,11 @@
 
 Public Shared Function GetZoneName( \_
    ByVal *Position* As [GTA.Vector3](Vector3.md) \_
-) As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp)
+) As [String](https://learn.microsoft.com/dotnet/api/system.string)
 
 ## C#
 
-public static [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) GetZoneName(
+public static [string](https://learn.microsoft.com/dotnet/api/system.string) GetZoneName(
    [GTA.Vector3](Vector3.md) *Position*
 );
 

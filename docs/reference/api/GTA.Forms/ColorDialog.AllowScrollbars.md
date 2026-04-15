@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Property AllowScrollbars As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+Public Property AllowScrollbars As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) AllowScrollbars {get; set;}
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) AllowScrollbars {get; set;}
 
 #### See Also
 

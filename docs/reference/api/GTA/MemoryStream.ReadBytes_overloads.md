@@ -2,9 +2,9 @@
 
 #### Overload List
 
-> [public byte[] ReadBytes(int,long);](GTA.MemoryStream.ReadBytes_overload_2.md)
+> public byte[] ReadBytes(int,long);
 
-> [public void ReadBytes(int,long,byte[],int);](GTA.MemoryStream.ReadBytes_overload_1.md)
+> public void ReadBytes(int,long,byte[],int);
 
 #### See Also
 

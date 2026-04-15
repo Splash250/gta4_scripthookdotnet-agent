@@ -3,15 +3,15 @@
 ## Visual Basic
 
 Public Sub ForceRagdoll( \_
-   ByVal *Duration* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp), \_
-   ByVal *TryToStayUpright* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
+   ByVal *Duration* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32), \_
+   ByVal *TryToStayUpright* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) ForceRagdoll(
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *Duration*,
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *TryToStayUpright*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) ForceRagdoll(
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *Duration*,
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *TryToStayUpright*
 );
 
 #### See Also

@@ -4,16 +4,16 @@
 
 Public Sub CruiseWithVehicle( \_
    ByVal *Vehicle* As [GTA.Vehicle](../GTA/Vehicle.md), \_
-   ByVal *SpeedMph* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *ObeyTrafficLaws* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
+   ByVal *SpeedMph* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *ObeyTrafficLaws* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) CruiseWithVehicle(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) CruiseWithVehicle(
    [GTA.Vehicle](../GTA/Vehicle.md) *Vehicle*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *SpeedMph*,
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *ObeyTrafficLaws*
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *SpeedMph*,
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *ObeyTrafficLaws*
 );
 
 #### See Also

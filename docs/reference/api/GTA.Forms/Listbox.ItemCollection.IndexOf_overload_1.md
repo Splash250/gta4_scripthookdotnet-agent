@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overloads Public Function IndexOf( \_
-   ByVal *Value* As [Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp) \_
-) As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+   ByVal *Value* As [Object](https://learn.microsoft.com/dotnet/api/system.object) \_
+) As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-public [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) IndexOf(
-   [object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp) *Value*
+public [int](https://learn.microsoft.com/dotnet/api/system.int32) IndexOf(
+   [object](https://learn.microsoft.com/dotnet/api/system.object) *Value*
 );
 
 #### See Also

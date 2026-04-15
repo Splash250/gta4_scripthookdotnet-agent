@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public WriteOnly Property AlwaysKeepTask As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+Public WriteOnly Property AlwaysKeepTask As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) AlwaysKeepTask {set;}
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) AlwaysKeepTask {set;}
 
 #### See Also
 

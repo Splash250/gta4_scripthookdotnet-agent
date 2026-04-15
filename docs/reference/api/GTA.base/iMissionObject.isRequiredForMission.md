@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Property isRequiredForMission As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+Property isRequiredForMission As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-[bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) isRequiredForMission {get; set;}
+[bool](https://learn.microsoft.com/dotnet/api/system.boolean) isRequiredForMission {get; set;}
 
 #### See Also
 

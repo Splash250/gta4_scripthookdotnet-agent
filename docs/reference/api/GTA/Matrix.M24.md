@@ -4,11 +4,11 @@ Gets or sets the element of the matrix that exists in the second row and fourth 
 
 ## Visual Basic
 
-Public M24 As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+Public M24 As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) M24;
+public [float](https://learn.microsoft.com/dotnet/api/system.single) M24;
 
 #### See Also
 

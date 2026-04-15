@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Property Angle As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+Public Property Angle As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) Angle {get; set;}
+public [float](https://learn.microsoft.com/dotnet/api/system.single) Angle {get; set;}
 
 #### See Also
 

@@ -4,24 +4,24 @@
 
 Overloads Public Sub DrawSprite( \_
    ByVal *Texture* As [GTA.Texture](Texture.md), \_
-   ByVal *CenterX* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *CenterY* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *Width* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *Height* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *Rotation* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *Color* As [System.Drawing.Color](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingColorClassTopic.asp) \_
+   ByVal *CenterX* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *CenterY* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *Width* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *Height* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *Rotation* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *Color* As [System.Drawing.Color](https://learn.microsoft.com/dotnet/api/system.drawing.color) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) DrawSprite(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) DrawSprite(
    [GTA.Texture](Texture.md) *Texture*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *CenterX*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *CenterY*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *Width*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *Height*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *Rotation*,
-   [System.Drawing.Color](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingColorClassTopic.asp) *Color*
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *CenterX*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *CenterY*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *Width*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *Height*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *Rotation*,
+   [System.Drawing.Color](https://learn.microsoft.com/dotnet/api/system.drawing.color) *Color*
 );
 
 #### See Also

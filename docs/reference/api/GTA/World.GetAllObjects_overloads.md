@@ -6,11 +6,11 @@ Returns all currently existing objects. VERY SLOW! Also includes mission objects
 
 Returns all currently existing objects. VERY SLOW! Also includes mission objects! Make sure to check every returned Object with Exists() before using it!
 
-> [public static GTA.object[] GetAllObjects();](GTA.World.GetAllObjects_overload_1.md)
+> public static GTA.object[] GetAllObjects();
 
 Returns all currently existing objects of one model. VERY SLOW! Also includes mission objects! Make sure to check every returned Object with Exists() before using it!
 
-> [public static GTA.object[] GetAllObjects(GTA.Model);](GTA.World.GetAllObjects_overload_2.md)
+> public static GTA.object[] GetAllObjects(GTA.Model);
 
 #### See Also
 

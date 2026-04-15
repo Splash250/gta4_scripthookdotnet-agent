@@ -6,7 +6,7 @@ Public Sub WanderAround()
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) WanderAround();
+public [void](https://learn.microsoft.com/dotnet/api/system.void) WanderAround();
 
 #### See Also
 

@@ -5,13 +5,13 @@ Converts the parameter at the given index into a model. It takes names, integers
 ## Visual Basic
 
 Public Function ToModel( \_
-   ByVal *index* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *index* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 ) As [GTA.Model](Model.md)
 
 ## C#
 
 public [GTA.Model](Model.md) ToModel(
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *index*
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *index*
 );
 
 #### See Also

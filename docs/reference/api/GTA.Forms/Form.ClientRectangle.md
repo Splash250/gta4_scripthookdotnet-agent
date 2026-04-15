@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Overrides Public ReadOnly Property ClientRectangle As [System.Drawing.Rectangle](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingRectangleClassTopic.asp)
+Overrides Public ReadOnly Property ClientRectangle As [System.Drawing.Rectangle](https://learn.microsoft.com/dotnet/api/system.drawing.rectangle)
 
 ## C#
 
-public override [System.Drawing.Rectangle](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingRectangleClassTopic.asp) ClientRectangle {get;}
+public override [System.Drawing.Rectangle](https://learn.microsoft.com/dotnet/api/system.drawing.rectangle) ClientRectangle {get;}
 
 #### See Also
 

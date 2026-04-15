@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Property Visible As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+Property Visible As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-[bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) Visible {set;}
+[bool](https://learn.microsoft.com/dotnet/api/system.boolean) Visible {set;}
 
 #### See Also
 

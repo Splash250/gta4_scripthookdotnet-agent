@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Public Function PointToClient( \_
-   ByVal *ScreenPoint* As [System.Drawing.Point](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingPointClassTopic.asp) \_
-) As [System.Drawing.Point](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingPointClassTopic.asp)
+   ByVal *ScreenPoint* As [System.Drawing.Point](https://learn.microsoft.com/dotnet/api/system.drawing.point) \_
+) As [System.Drawing.Point](https://learn.microsoft.com/dotnet/api/system.drawing.point)
 
 ## C#
 
-public [System.Drawing.Point](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingPointClassTopic.asp) PointToClient(
-   [System.Drawing.Point](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingPointClassTopic.asp) *ScreenPoint*
+public [System.Drawing.Point](https://learn.microsoft.com/dotnet/api/system.drawing.point) PointToClient(
+   [System.Drawing.Point](https://learn.microsoft.com/dotnet/api/system.drawing.point) *ScreenPoint*
 );
 
 #### See Also

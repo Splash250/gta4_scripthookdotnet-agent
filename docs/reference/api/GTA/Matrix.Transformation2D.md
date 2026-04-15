@@ -6,10 +6,10 @@ Creates a 2D transformation matrix.
 
 Public Shared Function Transformation2D( \_
    ByVal *scalingCenter* As [GTA.Vector2](Vector2.md), \_
-   ByVal *scalingRotation* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
+   ByVal *scalingRotation* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
    ByVal *scaling* As [GTA.Vector2](Vector2.md), \_
    ByVal *rotationCenter* As [GTA.Vector2](Vector2.md), \_
-   ByVal *rotation* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
+   ByVal *rotation* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
    ByVal *translation* As [GTA.Vector2](Vector2.md) \_
 ) As [GTA.Matrix](Matrix.md)
 
@@ -17,10 +17,10 @@ Public Shared Function Transformation2D( \_
 
 public static [GTA.Matrix](Matrix.md) Transformation2D(
    [GTA.Vector2](Vector2.md) *scalingCenter*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *scalingRotation*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *scalingRotation*,
    [GTA.Vector2](Vector2.md) *scaling*,
    [GTA.Vector2](Vector2.md) *rotationCenter*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *rotation*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *rotation*,
    [GTA.Vector2](Vector2.md) *translation*
 );
 

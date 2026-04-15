@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-MustOverride Public ReadOnly Property Movement As [System.Drawing.PointF](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingPointFClassTopic.asp)
+MustOverride Public ReadOnly Property Movement As [System.Drawing.PointF](https://learn.microsoft.com/dotnet/api/system.drawing.pointf)
 
 ## C#
 
-public abstract [System.Drawing.PointF](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingPointFClassTopic.asp) Movement {get;}
+public abstract [System.Drawing.PointF](https://learn.microsoft.com/dotnet/api/system.drawing.pointf) Movement {get;}
 
 #### See Also
 

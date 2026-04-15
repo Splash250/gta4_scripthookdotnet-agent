@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public ReadOnly Property Global As [Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+Public ReadOnly Property Global As [Object](https://learn.microsoft.com/dotnet/api/system.object)
 
 ## C#
 
-public [object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp) Global {get;}
+public [object](https://learn.microsoft.com/dotnet/api/system.object) Global {get;}
 
 #### See Also
 

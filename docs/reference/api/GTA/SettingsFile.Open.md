@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Public Shared Function Open( \_
-   ByVal *Filename* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) \_
+   ByVal *Filename* As [String](https://learn.microsoft.com/dotnet/api/system.string) \_
 ) As [GTA.SettingsFile](SettingsFile.md)
 
 ## C#
 
 public static [GTA.SettingsFile](SettingsFile.md) Open(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Filename*
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Filename*
 );
 
 #### See Also

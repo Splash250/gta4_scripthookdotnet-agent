@@ -2,13 +2,13 @@
 
 ## Visual Basic
 
-Overridable Public Property Heading As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
+Overridable Public Property Heading As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
 
 Implements [iRotatable.Heading](../GTA.base/iRotatable.Heading.md)
 
 ## C#
 
-public virtual [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) Heading {get; set;}
+public virtual [float](https://learn.microsoft.com/dotnet/api/system.single) Heading {get; set;}
 
 #### Implements
 

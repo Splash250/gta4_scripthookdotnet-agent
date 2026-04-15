@@ -4,11 +4,11 @@ The interval (in Milliseconds) at which the Tick event will be fired. The Tick e
 
 ## Visual Basic
 
-Public Property Interval As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+Public Property Interval As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-public [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) Interval {get; set;}
+public [int](https://learn.microsoft.com/dotnet/api/system.int32) Interval {get; set;}
 
 #### See Also
 

@@ -8,7 +8,7 @@ Overloads Public Shared Function GetAllVehicles() As [GTA.Vehicle()](Vehicle.md)
 
 ## C#
 
-public static [GTA.Vehicle[]](GTA.Vehicle.md) GetAllVehicles();
+public static GTA.Vehicle[] GetAllVehicles();
 
 #### See Also
 

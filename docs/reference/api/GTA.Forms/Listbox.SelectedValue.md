@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Property SelectedValue As [Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+Public Property SelectedValue As [Object](https://learn.microsoft.com/dotnet/api/system.object)
 
 ## C#
 
-public [object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp) SelectedValue {get; set;}
+public [object](https://learn.microsoft.com/dotnet/api/system.object) SelectedValue {get; set;}
 
 #### See Also
 

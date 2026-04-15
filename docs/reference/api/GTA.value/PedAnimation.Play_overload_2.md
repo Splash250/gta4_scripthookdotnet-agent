@@ -4,17 +4,17 @@
 
 Overloads Public Sub Play( \_
    ByVal *AnimationSet* As [GTA.AnimationSet](../GTA/AnimationSet.md), \_
-   ByVal *AnimationName* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
-   ByVal *Speed* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
+   ByVal *AnimationName* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
+   ByVal *Speed* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
    ByVal *Flags* As [GTA.AnimationFlags](../GTA/AnimationFlags.md) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) Play(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) Play(
    [GTA.AnimationSet](../GTA/AnimationSet.md) *AnimationSet*,
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *AnimationName*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *Speed*,
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *AnimationName*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *Speed*,
    [GTA.AnimationFlags](../GTA/AnimationFlags.md) *Flags*
 );
 

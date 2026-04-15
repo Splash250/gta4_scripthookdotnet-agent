@@ -4,11 +4,11 @@
 
 Public Function GetLineHeight( \_
    ByVal *Scaling* As [GTA.FontScaling](FontScaling.md) \_
-) As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+) As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) GetLineHeight(
+public [float](https://learn.microsoft.com/dotnet/api/system.single) GetLineHeight(
    [GTA.FontScaling](FontScaling.md) *Scaling*
 );
 

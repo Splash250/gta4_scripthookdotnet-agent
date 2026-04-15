@@ -8,7 +8,7 @@ Public Sub Select( \_
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) Select(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) Select(
    [GTA.Weapon](../GTA/Weapon.md) *weapon*
 );
 

@@ -6,14 +6,14 @@ Scales a vector by the given value.
 
 Public Shared Function Multiply( \_
    ByVal *value* As [GTA.Vector4](Vector4.md), \_
-   ByVal *scale* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
+   ByVal *scale* As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
 ) As [GTA.Vector4](Vector4.md)
 
 ## C#
 
 public static [GTA.Vector4](Vector4.md) Multiply(
    [GTA.Vector4](Vector4.md) *value*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *scale*
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *scale*
 );
 
 #### Parameters

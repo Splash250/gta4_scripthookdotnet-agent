@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overloads Public Sub FightAgainstHatedTargets( \_
-   ByVal *radius* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
+   ByVal *radius* As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) FightAgainstHatedTargets(
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *radius*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) FightAgainstHatedTargets(
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *radius*
 );
 
 #### See Also

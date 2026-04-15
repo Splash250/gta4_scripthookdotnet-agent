@@ -4,14 +4,14 @@
 
 Overloads Public Sub LeaveVehicle( \_
    ByVal *vehicle* As [GTA.Vehicle](../GTA/Vehicle.md), \_
-   ByVal *CloseDoor* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
+   ByVal *CloseDoor* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) LeaveVehicle(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) LeaveVehicle(
    [GTA.Vehicle](../GTA/Vehicle.md) *vehicle*,
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *CloseDoor*
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *CloseDoor*
 );
 
 #### See Also

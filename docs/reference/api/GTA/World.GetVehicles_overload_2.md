@@ -6,15 +6,15 @@ Returns all vehicles of one model in the given area. Slow, but very reliable! Al
 
 Overloads Public Shared Function GetVehicles( \_
    ByVal *Position* As [GTA.Vector3](Vector3.md), \_
-   ByVal *Radius* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
+   ByVal *Radius* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
    ByVal *ofModel* As [GTA.Model](Model.md) \_
 ) As [GTA.Vehicle()](Vehicle.md)
 
 ## C#
 
-public static [GTA.Vehicle[]](GTA.Vehicle.md) GetVehicles(
+public static GTA.Vehicle[] GetVehicles(
    [GTA.Vector3](Vector3.md) *Position*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *Radius*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *Radius*,
    [GTA.Model](Model.md) *ofModel*
 );
 

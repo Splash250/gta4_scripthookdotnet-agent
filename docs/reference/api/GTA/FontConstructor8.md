@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overloads Public Sub New( \_
-   ByVal *WindowsFont* As [System.Drawing.Font](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingFontClassTopic.asp) \_
+   ByVal *WindowsFont* As [System.Drawing.Font](https://learn.microsoft.com/dotnet/api/system.drawing.font) \_
 )
 
 ## C#
 
 public Font(
-   [System.Drawing.Font](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDrawingFontClassTopic.asp) *WindowsFont*
+   [System.Drawing.Font](https://learn.microsoft.com/dotnet/api/system.drawing.font) *WindowsFont*
 );
 
 #### See Also

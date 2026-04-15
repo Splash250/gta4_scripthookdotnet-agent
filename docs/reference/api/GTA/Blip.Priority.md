@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public WriteOnly Property Priority As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+Public WriteOnly Property Priority As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-public [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) Priority {set;}
+public [int](https://learn.microsoft.com/dotnet/api/system.int32) Priority {set;}
 
 #### See Also
 

@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Public Shared Function DegreeToRadian( \_
-   ByVal *degrees* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
-) As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+   ByVal *degrees* As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
+) As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public static [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) DegreeToRadian(
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *degrees*
+public static [float](https://learn.microsoft.com/dotnet/api/system.single) DegreeToRadian(
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *degrees*
 );
 
 #### See Also

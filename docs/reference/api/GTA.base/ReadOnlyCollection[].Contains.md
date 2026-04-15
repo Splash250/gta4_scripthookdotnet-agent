@@ -3,20 +3,20 @@
 ## Visual Basic
 
 Overrides Public Function Contains( \_
-   ByVal *item* As [GTA.base.T](T.md) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
+   ByVal *item* As GTA.base.T \_
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
 
-Implements [ICollection`1.Contains](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericClassICollectionTopic.asp)
+Implements [ICollection`1.Contains](https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.contains)
 
 ## C#
 
-public override [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) Contains(
-   [GTA.base.T](T.md) *item*
+public override [bool](https://learn.microsoft.com/dotnet/api/system.boolean) Contains(
+   GTA.base.T *item*
 );
 
 #### Implements
 
-[ICollection`1.Contains](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericClassICollectionTopic.asp)
+[ICollection`1.Contains](https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.contains)
 
 #### See Also
 

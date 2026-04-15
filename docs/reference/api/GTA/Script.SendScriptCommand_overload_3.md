@@ -4,16 +4,16 @@
 
 Overloads Protected Sub SendScriptCommand( \_
    ByVal *TargetScript* As [GTA.Script](Script.md), \_
-   ByVal *Command* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
-   ParamArray *Parameter* As [Object()](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp) \_
+   ByVal *Command* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
+   ParamArray *Parameter* As [Object()](https://learn.microsoft.com/dotnet/api/system.object) \_
 )
 
 ## C#
 
-protected [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) SendScriptCommand(
+protected [void](https://learn.microsoft.com/dotnet/api/system.void) SendScriptCommand(
    [GTA.Script](Script.md) *TargetScript*,
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Command*,
-   params [object[]](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp) *Parameter*
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Command*,
+   params [object[]](https://learn.microsoft.com/dotnet/api/system.object) *Parameter*
 );
 
 #### See Also

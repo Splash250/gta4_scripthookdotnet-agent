@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Property AllowAlpha As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+Public Property AllowAlpha As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) AllowAlpha {get; set;}
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) AllowAlpha {get; set;}
 
 #### See Also
 

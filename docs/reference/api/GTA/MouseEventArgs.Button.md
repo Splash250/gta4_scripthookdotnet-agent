@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public ReadOnly Property Button As [System.Windows.Forms.MouseButtons](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemWindowsFormsMouseButtonsClassTopic.asp)
+Public ReadOnly Property Button As [System.Windows.Forms.MouseButtons](https://learn.microsoft.com/dotnet/api/system.windows.forms.mousebuttons)
 
 ## C#
 
-public [System.Windows.Forms.MouseButtons](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemWindowsFormsMouseButtonsClassTopic.asp) Button {get;}
+public [System.Windows.Forms.MouseButtons](https://learn.microsoft.com/dotnet/api/system.windows.forms.mousebuttons) Button {get;}
 
 #### See Also
 

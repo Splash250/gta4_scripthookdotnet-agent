@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Shared WriteOnly Property RadarZoom As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+Public Shared WriteOnly Property RadarZoom As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public static [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) RadarZoom {set;}
+public static [float](https://learn.microsoft.com/dotnet/api/system.single) RadarZoom {set;}
 
 #### See Also
 

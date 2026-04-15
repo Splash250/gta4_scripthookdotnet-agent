@@ -4,18 +4,18 @@
 
 Overloads Public Sub DriveTo( \_
    ByVal *Target* As [GTA.Vector3](../GTA/Vector3.md), \_
-   ByVal *SpeedMph* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *ObeyTrafficLaws* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp), \_
-   ByVal *AllowToDriveRoadsWrongWay* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
+   ByVal *SpeedMph* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *ObeyTrafficLaws* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean), \_
+   ByVal *AllowToDriveRoadsWrongWay* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) DriveTo(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) DriveTo(
    [GTA.Vector3](../GTA/Vector3.md) *Target*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *SpeedMph*,
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *ObeyTrafficLaws*,
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *AllowToDriveRoadsWrongWay*
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *SpeedMph*,
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *ObeyTrafficLaws*,
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *AllowToDriveRoadsWrongWay*
 );
 
 #### See Also

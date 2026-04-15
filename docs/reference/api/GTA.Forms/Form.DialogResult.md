@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Property DialogResult As [System.Windows.Forms.DialogResult](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemWindowsFormsDialogResultClassTopic.asp)
+Public Property DialogResult As [System.Windows.Forms.DialogResult](https://learn.microsoft.com/dotnet/api/system.windows.forms.dialogresult)
 
 ## C#
 
-public [System.Windows.Forms.DialogResult](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemWindowsFormsDialogResultClassTopic.asp) DialogResult {get; set;}
+public [System.Windows.Forms.DialogResult](https://learn.microsoft.com/dotnet/api/system.windows.forms.dialogresult) DialogResult {get; set;}
 
 #### See Also
 

@@ -4,11 +4,11 @@ Returns the number of available textures for the currently selected component mo
 
 ## Visual Basic
 
-Public ReadOnly Property AvailableTextures As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+Public ReadOnly Property AvailableTextures As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-public [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) AvailableTextures {get;}
+public [int](https://learn.microsoft.com/dotnet/api/system.int32) AvailableTextures {get;}
 
 #### See Also
 

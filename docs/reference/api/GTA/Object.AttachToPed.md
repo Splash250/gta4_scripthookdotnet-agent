@@ -11,7 +11,7 @@ Public Sub AttachToPed( \_
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) AttachToPed(
+public [void](https://learn.microsoft.com/dotnet/api/system.void) AttachToPed(
    [GTA.Ped](Ped.md) *Ped*,
    [GTA.Bone](Bone.md) *Bone*,
    [GTA.Vector3](Vector3.md) *PositionOffset*,

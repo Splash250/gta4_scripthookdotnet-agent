@@ -6,11 +6,11 @@ Returns a value that indicates whether the current instance is equal to the spec
 
 NotOverridable Overloads Public Function Equals( \_
    ByVal *other* As [GTA.Quaternion](Quaternion.md) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) Equals(
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) Equals(
    [GTA.Quaternion](Quaternion.md) *other*
 );
 

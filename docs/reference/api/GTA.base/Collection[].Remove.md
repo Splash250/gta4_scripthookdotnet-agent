@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overrides Public Function Remove( \_
-   ByVal *item* As [GTA.base.T](T.md) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+   ByVal *item* As GTA.base.T \_
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public override [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) Remove(
-   [GTA.base.T](T.md) *item*
+public override [bool](https://learn.microsoft.com/dotnet/api/system.boolean) Remove(
+   GTA.base.T *item*
 );
 
 #### See Also

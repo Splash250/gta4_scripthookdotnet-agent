@@ -4,11 +4,11 @@
 
 Public Function GetComponentTexture( \_
    ByVal *component* As [GTA.PedComponent](PedComponent.md) \_
-) As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+) As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-public [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) GetComponentTexture(
+public [int](https://learn.microsoft.com/dotnet/api/system.int32) GetComponentTexture(
    [GTA.PedComponent](PedComponent.md) *component*
 );
 

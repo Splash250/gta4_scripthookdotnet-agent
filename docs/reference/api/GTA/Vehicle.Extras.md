@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Public Function Extras( \_
-   ByVal *ExtraID* As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) \_
+   ByVal *ExtraID* As [Integer](https://learn.microsoft.com/dotnet/api/system.int32) \_
 ) As [GTA.value.VehicleExtra](../GTA.value/VehicleExtra.md)
 
 ## C#
 
 public [GTA.value.VehicleExtra](../GTA.value/VehicleExtra.md) Extras(
-   [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) *ExtraID*
+   [int](https://learn.microsoft.com/dotnet/api/system.int32) *ExtraID*
 );
 
 #### See Also

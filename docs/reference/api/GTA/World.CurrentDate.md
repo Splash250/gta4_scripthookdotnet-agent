@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public Shared ReadOnly Property CurrentDate As [Date](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDateTimeClassTopic.asp)
+Public Shared ReadOnly Property CurrentDate As [Date](https://learn.microsoft.com/dotnet/api/system.datetime)
 
 ## C#
 
-public static [System.DateTime](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDateTimeClassTopic.asp) CurrentDate {get;}
+public static [System.DateTime](https://learn.microsoft.com/dotnet/api/system.datetime) CurrentDate {get;}
 
 #### See Also
 

@@ -4,11 +4,11 @@ Time before the ped will reach for the wound, given in seconds.
 
 ## Visual Basic
 
-Public WriteOnly Property TimeBeforeReachForWound As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+Public WriteOnly Property TimeBeforeReachForWound As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) TimeBeforeReachForWound {set;}
+public [float](https://learn.microsoft.com/dotnet/api/system.single) TimeBeforeReachForWound {set;}
 
 #### See Also
 

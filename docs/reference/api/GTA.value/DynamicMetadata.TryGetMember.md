@@ -3,15 +3,15 @@
 ## Visual Basic
 
 NotOverridable Public Function TryGetMember( \_
-   ByVal *binder* As [System.Dynamic.GetMemberBinder](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDynamicGetMemberBinderClassTopic.asp), \_
-   ByRef *result* As [Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+   ByVal *binder* As [System.Dynamic.GetMemberBinder](https://learn.microsoft.com/dotnet/api/system.dynamic.getmemberbinder), \_
+   ByRef *result* As [Object](https://learn.microsoft.com/dotnet/api/system.object) \_
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) TryGetMember(
-   [System.Dynamic.GetMemberBinder](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemDynamicGetMemberBinderClassTopic.asp) *binder*,
-   out [object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp) *result*
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) TryGetMember(
+   [System.Dynamic.GetMemberBinder](https://learn.microsoft.com/dotnet/api/system.dynamic.getmemberbinder) *binder*,
+   out [object](https://learn.microsoft.com/dotnet/api/system.object) *result*
 );
 
 #### See Also

@@ -4,11 +4,11 @@ Gets or sets the index of the texture for the currently selected component model
 
 ## Visual Basic
 
-Public Property TextureIndex As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+Public Property TextureIndex As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-public [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) TextureIndex {get; set;}
+public [int](https://learn.microsoft.com/dotnet/api/system.int32) TextureIndex {get; set;}
 
 #### See Also
 

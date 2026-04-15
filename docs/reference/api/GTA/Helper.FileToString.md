@@ -3,15 +3,15 @@
 ## Visual Basic
 
 Public Shared Function FileToString( \_
-   ByVal *Filename* As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp), \_
-   ByVal *Encoding* As [System.Text.Encoding](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemTextEncodingClassTopic.asp) \_
-) As [String](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp)
+   ByVal *Filename* As [String](https://learn.microsoft.com/dotnet/api/system.string), \_
+   ByVal *Encoding* As [System.Text.Encoding](https://learn.microsoft.com/dotnet/api/system.text.encoding) \_
+) As [String](https://learn.microsoft.com/dotnet/api/system.string)
 
 ## C#
 
-public static [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) FileToString(
-   [string](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemStringClassTopic.asp) *Filename*,
-   [System.Text.Encoding](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemTextEncodingClassTopic.asp) *Encoding*
+public static [string](https://learn.microsoft.com/dotnet/api/system.string) FileToString(
+   [string](https://learn.microsoft.com/dotnet/api/system.string) *Filename*,
+   [System.Text.Encoding](https://learn.microsoft.com/dotnet/api/system.text.encoding) *Encoding*
 );
 
 #### See Also

@@ -4,11 +4,11 @@ Time elapsed since the last Start. Does not increase when the Timer is stopped.
 
 ## Visual Basic
 
-Public ReadOnly Property ElapsedTime As [Integer](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp)
+Public ReadOnly Property ElapsedTime As [Integer](https://learn.microsoft.com/dotnet/api/system.int32)
 
 ## C#
 
-public [int](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemInt32ClassTopic.asp) ElapsedTime {get;}
+public [int](https://learn.microsoft.com/dotnet/api/system.int32) ElapsedTime {get;}
 
 #### See Also
 

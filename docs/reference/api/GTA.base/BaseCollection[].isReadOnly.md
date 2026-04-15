@@ -2,17 +2,17 @@
 
 ## Visual Basic
 
-Overridable Protected Function isReadOnly() As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
+Overridable Protected Function isReadOnly() As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
 
-Implements [ICollection`1.get\_IsReadOnly](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericClassICollectionTopic.asp)
+Implements [ICollection`1.get\_IsReadOnly](https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.get\_isreadonly)
 
 ## C#
 
-protected virtual [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) isReadOnly();
+protected virtual [bool](https://learn.microsoft.com/dotnet/api/system.boolean) isReadOnly();
 
 #### Implements
 
-[ICollection`1.get\_IsReadOnly](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericClassICollectionTopic.asp)
+[ICollection`1.get\_IsReadOnly](https://learn.microsoft.com/dotnet/api/system.collections.generic.icollection-1.get\_isreadonly)
 
 #### See Also
 

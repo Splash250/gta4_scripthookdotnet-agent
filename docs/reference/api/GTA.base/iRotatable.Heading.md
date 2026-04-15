@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Property Heading As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+Property Heading As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-[float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) Heading {get; set;}
+[float](https://learn.microsoft.com/dotnet/api/system.single) Heading {get; set;}
 
 #### See Also
 

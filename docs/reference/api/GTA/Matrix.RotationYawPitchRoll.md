@@ -5,17 +5,17 @@ Creates a rotation matrix with a specified yaw, pitch, and roll.
 ## Visual Basic
 
 Public Shared Function RotationYawPitchRoll( \_
-   ByVal *yaw* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *pitch* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *roll* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
+   ByVal *yaw* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *pitch* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *roll* As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
 ) As [GTA.Matrix](Matrix.md)
 
 ## C#
 
 public static [GTA.Matrix](Matrix.md) RotationYawPitchRoll(
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *yaw*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *pitch*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *roll*
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *yaw*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *pitch*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *roll*
 );
 
 #### Parameters

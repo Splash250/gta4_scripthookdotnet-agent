@@ -6,11 +6,11 @@ Returns whether the given object still exists in game.
 
 Public Shared Function Exists( \_
    ByVal *o* As [GTA.base.Object](../GTA.base/Object.md) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public static [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) Exists(
+public static [bool](https://learn.microsoft.com/dotnet/api/system.boolean) Exists(
    [GTA.base.object](../GTA.base/Object.md) *o*
 );
 

@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Public WriteOnly Property ApplyAsForce As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+Public WriteOnly Property ApplyAsForce As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) ApplyAsForce {set;}
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) ApplyAsForce {set;}
 
 #### See Also
 

@@ -4,11 +4,11 @@ The distance at which members leave the group automatically (in meters/yard). De
 
 ## Visual Basic
 
-Public WriteOnly Property SeparationRange As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+Public WriteOnly Property SeparationRange As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) SeparationRange {set;}
+public [float](https://learn.microsoft.com/dotnet/api/system.single) SeparationRange {set;}
 
 #### See Also
 

@@ -4,11 +4,11 @@ Gets or sets the element of the matrix that exists in the second row and third c
 
 ## Visual Basic
 
-Public M23 As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+Public M23 As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) M23;
+public [float](https://learn.microsoft.com/dotnet/api/system.single) M23;
 
 #### See Also
 

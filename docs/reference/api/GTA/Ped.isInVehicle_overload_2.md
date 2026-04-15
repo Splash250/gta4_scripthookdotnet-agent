@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Overloads Public Function isInVehicle() As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+Overloads Public Function isInVehicle() As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) isInVehicle();
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) isInVehicle();
 
 #### See Also
 

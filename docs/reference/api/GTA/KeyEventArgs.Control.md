@@ -4,11 +4,11 @@ Returns if the key was pressed in combination with Control.
 
 ## Visual Basic
 
-Public ReadOnly Property Control As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+Public ReadOnly Property Control As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) Control {get;}
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) Control {get;}
 
 #### See Also
 

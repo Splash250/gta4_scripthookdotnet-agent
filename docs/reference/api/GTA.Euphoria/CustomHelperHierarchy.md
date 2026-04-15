@@ -1,6 +1,6 @@
 # GTA.Euphoria.CustomHelperHierarchy
 
-[System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)
+[System.Object](https://learn.microsoft.com/dotnet/api/system.object)
 
    [BaseMessage](BaseMessage.md)
       [BaseHelper](BaseHelper.md)

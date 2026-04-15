@@ -4,11 +4,11 @@
 
 Overloads Public Shared Function GetGroundZ( \_
    ByVal *Position* As [GTA.Vector3](Vector3.md) \_
-) As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+) As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public static [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) GetGroundZ(
+public static [float](https://learn.microsoft.com/dotnet/api/system.single) GetGroundZ(
    [GTA.Vector3](Vector3.md) *Position*
 );
 

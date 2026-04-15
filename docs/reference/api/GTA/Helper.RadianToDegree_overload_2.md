@@ -3,13 +3,13 @@
 ## Visual Basic
 
 Overloads Public Shared Function RadianToDegree( \_
-   ByVal *radians* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
-) As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp)
+   ByVal *radians* As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
+) As [Single](https://learn.microsoft.com/dotnet/api/system.single)
 
 ## C#
 
-public static [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) RadianToDegree(
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *radians*
+public static [float](https://learn.microsoft.com/dotnet/api/system.single) RadianToDegree(
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *radians*
 );
 
 #### See Also

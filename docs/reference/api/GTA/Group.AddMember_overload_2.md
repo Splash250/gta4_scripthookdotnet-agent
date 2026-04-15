@@ -4,14 +4,14 @@
 
 Overloads Public Function AddMember( \_
    ByVal *ped* As [GTA.Ped](Ped.md), \_
-   ByVal *NeverLeave* As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) \_
-) As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+   ByVal *NeverLeave* As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean) \_
+) As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-public [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) AddMember(
+public [bool](https://learn.microsoft.com/dotnet/api/system.boolean) AddMember(
    [GTA.Ped](Ped.md) *ped*,
-   [bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) *NeverLeave*
+   [bool](https://learn.microsoft.com/dotnet/api/system.boolean) *NeverLeave*
 );
 
 #### See Also

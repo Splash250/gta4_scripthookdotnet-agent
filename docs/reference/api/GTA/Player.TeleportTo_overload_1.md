@@ -3,15 +3,15 @@
 ## Visual Basic
 
 Overloads Public Sub TeleportTo( \_
-   ByVal *X* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp), \_
-   ByVal *Y* As [Single](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) \_
+   ByVal *X* As [Single](https://learn.microsoft.com/dotnet/api/system.single), \_
+   ByVal *Y* As [Single](https://learn.microsoft.com/dotnet/api/system.single) \_
 )
 
 ## C#
 
-public [void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) TeleportTo(
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *X*,
-   [float](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemSingleClassTopic.asp) *Y*
+public [void](https://learn.microsoft.com/dotnet/api/system.void) TeleportTo(
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *X*,
+   [float](https://learn.microsoft.com/dotnet/api/system.single) *Y*
 );
 
 #### See Also

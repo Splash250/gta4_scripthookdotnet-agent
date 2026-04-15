@@ -2,11 +2,11 @@
 
 ## Visual Basic
 
-Function Exists() As [Boolean](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp)
+Function Exists() As [Boolean](https://learn.microsoft.com/dotnet/api/system.boolean)
 
 ## C#
 
-[bool](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemBooleanClassTopic.asp) Exists();
+[bool](https://learn.microsoft.com/dotnet/api/system.boolean) Exists();
 
 #### See Also
 

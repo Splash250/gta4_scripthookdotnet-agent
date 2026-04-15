@@ -145,11 +145,11 @@ The properties of the **ColorIndex** structure are listed below. For a complete 
 
 |  |  |
 | --- | --- |
-| [B](ColorIndex.B.md) |  |
-| [G](ColorIndex.G.md) |  |
+| B |  |
+| G |  |
 | [Index](ColorIndex.Index.md) |  |
 | [Name](ColorIndex.Name.md) |  |
-| [R](ColorIndex.R.md) |  |
+| R |  |
 
 #### See Also
 
