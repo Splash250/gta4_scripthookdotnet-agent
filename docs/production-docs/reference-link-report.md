@@ -17,7 +17,7 @@ Validated root: `D:/Games/GTAIV_Modding/gta4_scripthookdotnet-agent/docs/referen
 
 ## Summary
 
-- files_scanned: 2460
+- files_scanned: 2464
 - critical_broken_local_links: 0
 - malformed_anchors: 0
 - unresolved_legacy_references: 13988

@@ -1,0 +1,154 @@
+import shutil
+import subprocess
+import tempfile
+import textwrap
+import unittest
+from pathlib import Path
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+SCRIPT_PATH = REPO_ROOT / "docs" / "tools" / "build_docs.ps1"
+
+
+class BuildDocsPowerShellTests(unittest.TestCase):
+    def setUp(self) -> None:
+        self.temp_dir = Path(tempfile.mkdtemp(prefix="build-docs-"))
+        self.repo_root = self.temp_dir / "repo"
+        self.docs_root = self.repo_root / "docs"
+        self.tools_root = self.docs_root / "tools"
+        self.production_root = self.docs_root / "production-docs"
+        self.reference_root = self.docs_root / "reference"
+        self.normalize_output_root = self.reference_root / "api"
+        self.source_root = self.docs_root / "md"
+        self.tools_root.mkdir(parents=True)
+        self.production_root.mkdir(parents=True)
+        self.normalize_output_root.mkdir(parents=True)
+        self.source_root.mkdir(parents=True)
+
+        self.log_path = self.temp_dir / "invocations.log"
+        self.normalize_script = self.tools_root / "normalize_stub.py"
+        self.validate_script = self.tools_root / "validate_stub.py"
+
+        self.normalize_script.write_text(
+            textwrap.dedent(
+                f"""\
+                from pathlib import Path
+                import argparse
+
+                parser = argparse.ArgumentParser()
+                parser.add_argument("--source", required=True)
+                parser.add_argument("--output", required=True)
+                args = parser.parse_args()
+
+                source = Path(args.source)
+                output = Path(args.output)
+                output.mkdir(parents=True, exist_ok=True)
+                (output / "normalized.txt").write_text("normalized\\n", encoding="utf-8")
+                (output / "index.md").write_text("# generated index\\n", encoding="utf-8")
+                with Path(r"{self.log_path}").open("a", encoding="utf-8") as handle:
+                    handle.write(f"normalize|{{source}}|{{output}}\\n")
+                """
+            ),
+            encoding="utf-8",
+        )
+        self.validate_script.write_text(
+            textwrap.dedent(
+                f"""\
+                from pathlib import Path
+                import argparse
+
+                parser = argparse.ArgumentParser()
+                parser.add_argument("--root", required=True)
+                parser.add_argument("--report", required=True)
+                parser.add_argument("--fail", action="store_true")
+                args = parser.parse_args()
+
+                root = Path(args.root)
+                report = Path(args.report)
+                report.parent.mkdir(parents=True, exist_ok=True)
+                report.write_text("# stub report\\n", encoding="utf-8")
+                with Path(r"{self.log_path}").open("a", encoding="utf-8") as handle:
+                    handle.write(f"validate|{{root}}|{{report}}|fail={{args.fail}}\\n")
+
+                raise SystemExit(1 if args.fail else 0)
+                """
+            ),
+            encoding="utf-8",
+        )
+        self.curated_index_bytes = b"---\r\ncurated: true\r\n---\r\n# Curated API Index\r\n"
+        (self.normalize_output_root / "index.md").write_bytes(self.curated_index_bytes)
+
+    def tearDown(self) -> None:
+        shutil.rmtree(self.temp_dir)
+
+    def run_build_docs(self, extra_args: list[str] | None = None) -> subprocess.CompletedProcess[str]:
+        command = [
+            "powershell",
+            "-NoProfile",
+            "-ExecutionPolicy",
+            "Bypass",
+            "-File",
+            str(SCRIPT_PATH),
+            "-RepoRoot",
+            str(self.repo_root),
+            "-PythonExecutable",
+            "python",
+            "-NormalizeScript",
+            str(self.normalize_script),
+            "-ValidateScript",
+            str(self.validate_script),
+            "-SourceRoot",
+            str(self.source_root),
+            "-NormalizeOutputRoot",
+            str(self.normalize_output_root),
+            "-ValidationRoot",
+            str(self.reference_root),
+            "-ReportPath",
+            str(self.production_root / "reference-link-report.md"),
+        ]
+        if extra_args:
+            command.extend(extra_args)
+        return subprocess.run(
+            command,
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+        )
+
+    def test_build_docs_runs_normalize_then_validate(self) -> None:
+        result = self.run_build_docs()
+
+        self.assertEqual(result.returncode, 0, msg=result.stdout + result.stderr)
+        self.assertTrue((self.normalize_output_root / "normalized.txt").exists())
+        self.assertTrue((self.production_root / "reference-link-report.md").exists())
+        self.assertEqual(
+            (self.normalize_output_root / "index.md").read_bytes(),
+            self.curated_index_bytes,
+        )
+
+        self.assertEqual(
+            self.log_path.read_text(encoding="utf-8").splitlines(),
+            [
+                f"normalize|{self.source_root}|{self.normalize_output_root}",
+                (
+                    "validate|"
+                    f"{self.reference_root}|"
+                    f"{self.production_root / 'reference-link-report.md'}|"
+                    "fail=False"
+                ),
+            ],
+        )
+        self.assertIn("Running normalize_reference.py", result.stdout)
+        self.assertIn("Running validate_reference_links.py", result.stdout)
+
+    def test_build_docs_returns_nonzero_when_validation_fails(self) -> None:
+        result = self.run_build_docs(["-ValidationArgs", "--fail"])
+
+        self.assertEqual(result.returncode, 1, msg=result.stdout + result.stderr)
+        self.assertTrue((self.normalize_output_root / "normalized.txt").exists())
+        self.assertTrue((self.production_root / "reference-link-report.md").exists())
+        self.assertIn("validate_reference_links.py failed", result.stderr)
+
+
+if __name__ == "__main__":
+    unittest.main()
