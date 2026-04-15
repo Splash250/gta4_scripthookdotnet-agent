@@ -1,0 +1,17 @@
+# ApplyForceRelative Method (Vector3)
+
+## Visual Basic
+
+Sub ApplyForceRelative( \_
+   ByVal *Direction* As [GTA.Vector3](../GTA/Vector3.md) \_
+)
+
+## C#
+
+[void](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemVoidClassTopic.asp) ApplyForceRelative(
+   [GTA.Vector3](../GTA/Vector3.md) *Direction*
+);
+
+#### See Also
+
+[iForce Interface](iForce.md) | [GTA.base Namespace](index.md) | [iForce.ApplyForceRelative Overload List](iForce.ApplyForceRelative_overloads.md)

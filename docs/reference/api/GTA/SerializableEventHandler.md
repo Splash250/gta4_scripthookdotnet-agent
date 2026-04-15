@@ -1,0 +1,26 @@
+# SerializableEventHandler Delegate
+
+## Visual Basic
+
+Public Delegate Sub SerializableEventHandler( \_
+   ByVal *sender* As [Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp), \_
+   ByVal *e* As [GTA.SerializableEventArgs](SerializableEventArgs.md) \_
+)
+
+## C#
+
+public delegate void SerializableEventHandler(
+   [object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp) *sender*,
+   [GTA.SerializableEventArgs](SerializableEventArgs.md) *e*
+);
+
+#### Requirements
+
+**Namespace:**
+[GTA](index.md)
+
+**Assembly:** ScriptHookDotNet (in ScriptHookDotNet.dll)
+
+#### See Also
+
+[GTA Namespace](index.md)
