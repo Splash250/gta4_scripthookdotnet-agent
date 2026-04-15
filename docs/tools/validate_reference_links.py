@@ -17,6 +17,12 @@ HTML_ID_PATTERN = re.compile(r'<a\s+id="([^"]+)"\s*>\s*</a>', re.IGNORECASE)
 STRIP_TAGS_PATTERN = re.compile(r"<[^>]+>")
 PUNCTUATION_PATTERN = re.compile(r"[^\w\- ]+")
 GENERIC_TYPE_LINK_PATTERN = re.compile(r"^[A-Z]$")
+ALLOWED_LEGACY_REFERENCE_SOURCES = frozenset(
+    {
+        Path("archive/legacy-export-toc.md"),
+        Path("archive/legacy-single-file-export.md"),
+    }
+)
 
 
 @dataclass(frozen=True)
@@ -180,6 +186,23 @@ def is_supported_reference_page(root: Path, path: Path) -> bool:
     return is_explicitly_supported_api_page(root, path)
 
 
+def is_allowlisted_legacy_reference_source(root: Path, path: Path) -> bool:
+    return path.relative_to(root) in ALLOWED_LEGACY_REFERENCE_SOURCES
+
+
+def classify_legacy_reference_issue(
+    root: Path,
+    path: Path,
+    issue: LinkIssue,
+    disallowed_legacy_references: list[LinkIssue],
+    allowed_legacy_references: list[LinkIssue],
+) -> None:
+    if is_allowlisted_legacy_reference_source(root, path):
+        allowed_legacy_references.append(issue)
+    else:
+        disallowed_legacy_references.append(issue)
+
+
 def scan_links(root: Path) -> ValidationSummary:
     markdown_files = collect_markdown_files(root)
     anchors_by_file = {path.resolve(): collect_anchor_ids(path) for path in markdown_files}
@@ -205,21 +228,28 @@ def scan_links(root: Path) -> ValidationSummary:
                 target_path_text, anchor = split_target(target)
 
                 if is_legacy_reference(path, target_path_text):
+                    allowlisted_legacy_source = is_allowlisted_legacy_reference_source(root, path)
                     legacy_issue = LinkIssue(
                         source=path.relative_to(root),
                         line_number=line_number,
                         text=line.strip(),
                         target=target,
                         detail=(
+                            "Allowlisted archive page intentionally preserves a legacy docs/md export link."
+                            if allowlisted_legacy_source
+                            else
                             "Supported reference page still points to the legacy docs/md export."
                             if supported_page
                             else "Archive or non-supported page still points to the legacy docs/md export."
                         )
                     )
-                    if supported_page:
-                        disallowed_legacy_references.append(legacy_issue)
-                    else:
-                        allowed_legacy_references.append(legacy_issue)
+                    classify_legacy_reference_issue(
+                        root,
+                        path,
+                        legacy_issue,
+                        disallowed_legacy_references,
+                        allowed_legacy_references,
+                    )
                     continue
 
                 if target_path_text == "":
@@ -244,10 +274,13 @@ def scan_links(root: Path) -> ValidationSummary:
                         if curated_page:
                             broken_links.append(issue)
                         else:
-                            if supported_page:
-                                disallowed_legacy_references.append(issue)
-                            else:
-                                allowed_legacy_references.append(issue)
+                            classify_legacy_reference_issue(
+                                root,
+                                path,
+                                issue,
+                                disallowed_legacy_references,
+                                allowed_legacy_references,
+                            )
                         continue
 
                 if anchor:

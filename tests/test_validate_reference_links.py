@@ -150,6 +150,16 @@ class ValidateReferenceLinksCliTests(unittest.TestCase):
             ),
             encoding="utf-8",
         )
+        (self.reference_root / "archive" / "legacy-single-file-export.md").write_text(
+            textwrap.dedent(
+                """\
+                # Legacy Single-File Export
+
+                - [Legacy Export](../../md/GTA IV ScriptHook.Net Single File Documentation.md)
+                """
+            ),
+            encoding="utf-8",
+        )
 
         result = subprocess.run(
             [
@@ -170,14 +180,73 @@ class ValidateReferenceLinksCliTests(unittest.TestCase):
         report = self.output_path.read_text(encoding="utf-8")
         self.assertIn("critical_broken_local_links: 0", report)
         self.assertIn("malformed_anchors: 0", report)
-        self.assertIn("disallowed_legacy_references: 1", report)
+        self.assertIn("disallowed_legacy_references: 2", report)
         self.assertIn("allowed_legacy_references: 1", report)
         self.assertIn("concepts/script-lifecycle.md:3", report)
         self.assertIn("../../md/T.md", report)
         self.assertIn("archive/carry-over.md:3", report)
         self.assertIn("../../md/TOC.md", report)
-        self.assertIn("Disallowed legacy references found: 1", result.stdout)
+        self.assertIn("archive/legacy-single-file-export.md:3", report)
+        self.assertIn(
+            "../../md/GTA IV ScriptHook.Net Single File Documentation.md",
+            report,
+        )
+        self.assertIn("Disallowed legacy references found: 2", result.stdout)
         self.assertIn("Allowed legacy references found: 1", result.stdout)
+
+    def test_cli_disallows_missing_legacy_targets_outside_allowlisted_archive_pages(self) -> None:
+        (self.reference_root / "README.md").write_text(
+            "# Reference\n",
+            encoding="utf-8",
+        )
+        (self.reference_root / "api").mkdir(parents=True, exist_ok=True)
+        (self.reference_root / "archive").mkdir(parents=True, exist_ok=True)
+        (self.reference_root / "api" / "GTA IV ScriptHook.Net Single File Documentation.md").write_text(
+            textwrap.dedent(
+                """\
+                # Legacy Monolith
+
+                - [Missing Legacy Namespace](GTA.md)
+                """
+            ),
+            encoding="utf-8",
+        )
+        (self.reference_root / "archive" / "legacy-single-file-export.md").write_text(
+            textwrap.dedent(
+                """\
+                # Legacy Single-File Export
+
+                - [Allowed Legacy Export](../../md/GTA IV ScriptHook.Net Single File Documentation.md)
+                """
+            ),
+            encoding="utf-8",
+        )
+
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(SCRIPT_PATH),
+                "--root",
+                str(self.reference_root),
+                "--report",
+                str(self.output_path),
+            ],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+        )
+
+        self.assertEqual(result.returncode, 1, msg=result.stdout + result.stderr)
+
+        report = self.output_path.read_text(encoding="utf-8")
+        self.assertIn("disallowed_legacy_references: 1", report)
+        self.assertIn("allowed_legacy_references: 1", report)
+        self.assertIn(
+            "api/GTA IV ScriptHook.Net Single File Documentation.md:3",
+            report,
+        )
+        self.assertIn("GTA.md", report)
+        self.assertIn("archive/legacy-single-file-export.md:3", report)
 
 
 if __name__ == "__main__":
