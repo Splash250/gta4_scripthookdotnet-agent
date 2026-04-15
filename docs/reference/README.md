@@ -36,6 +36,7 @@ The `docs/md/` tree is the archive of the original exported documentation, inclu
 This section exists so readers can start from supported reference navigation instead:
 
 - begin at [ScriptHookDotNet Docs](../README.md) if you are still choosing a path
+- begin at [API Reference](api/index.md) if you already know you need the normalized reference tree
 - use [Compatibility](../compatibility/README.md) for support boundaries before trusting a version-sensitive API detail
 
 ## Where New Readers Should Start
@@ -46,6 +47,7 @@ Use this section first only when you are already asking a reference-shaped quest
 
 ## Related Pages
 
+- [API Reference](api/index.md)
 - [ScriptHookDotNet Docs](../README.md)
 - [Guides](../guides/README.md)
 - [Examples](../examples/README.md)

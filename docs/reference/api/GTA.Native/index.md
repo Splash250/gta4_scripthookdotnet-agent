@@ -1,116 +1,30 @@
+---
+type: reference
+title: GTA.Native Namespace Index
+created: 2026-04-15
+tags:
+  - docs
+  - reference
+  - native
+related:
+  - '[[API Reference Navigation]]'
+---
+
 # GTA.Native
 
-## Pages
+`GTA.Native` exposes the low-level native call layer for cases where the managed wrappers in `GTA` do not cover the engine feature you need.
 
-- [Argument Method](Template.Argument.md)
-- [ArgumentCount Property](Template.ArgumentCount.md)
-- [Call Method](Function.Call_overloads.md)
-- [Call Method (String, Parameter[], String, Parameter[])](Function.Call_overload_1.md)
-- [Call Method (String, Parameter[], String, Parameter[])](Function.Call_overload_2.md)
-- [Dispose Method](Function.Dispose.md)
-- [Dispose Method](Parameter.Dispose_overloads.md)
-- [Dispose Method ()](Parameter.Dispose_overload_2.md)
-- [Dispose Method (Boolean)](Parameter.Dispose_overload_1.md)
-- [Function Class](Function.md)
-- [Function Members](FunctionMembers.md)
-- [Implicit Blip to Parameter Conversion](Parameter.op_Implicit_overload_2.md)
-- [Implicit Blip to Pointer Conversion](Pointer.op_Implicit_overload_4.md)
-- [Implicit Boolean to Parameter Conversion](Parameter.op_Implicit_overload_11.md)
-- [Implicit Boolean to Pointer Conversion](Pointer.op_Implicit_overload_13.md)
-- [Implicit Camera to Parameter Conversion](Parameter.op_Implicit_overload_1.md)
-- [Implicit Camera to Pointer Conversion](Pointer.op_Implicit_overload_3.md)
-- [Implicit Double to Parameter Conversion](Parameter.op_Implicit_overload_12.md)
-- [Implicit Double to Pointer Conversion](Pointer.op_Implicit_overload_14.md)
-- [Implicit Group to Parameter Conversion](Parameter.op_Implicit_overload_5.md)
-- [Implicit Group to Pointer Conversion](Pointer.op_Implicit_overload_7.md)
-- [Implicit Int32 to Parameter Conversion](Parameter.op_Implicit_overload_14.md)
-- [Implicit Int32 to Pointer Conversion](Pointer.op_Implicit_overload_16.md)
-- [Implicit Model to Parameter Conversion](Parameter.op_Implicit_overload_7.md)
-- [Implicit Model to Pointer Conversion](Pointer.op_Implicit_overload_9.md)
-- [Implicit Object to Parameter Conversion](Parameter.op_Implicit_overload_4.md)
-- [Implicit Object to Pointer Conversion](Pointer.op_Implicit_overload_6.md)
-- [Implicit Ped to Parameter Conversion](Parameter.op_Implicit_overload_9.md)
-- [Implicit Ped to Pointer Conversion](Pointer.op_Implicit_overload_11.md)
-- [Implicit Pickup to Parameter Conversion](Parameter.op_Implicit_overload_3.md)
-- [Implicit Pickup to Pointer Conversion](Pointer.op_Implicit_overload_5.md)
-- [Implicit Player to Parameter Conversion](Parameter.op_Implicit_overload_6.md)
-- [Implicit Player to Pointer Conversion](Pointer.op_Implicit_overload_8.md)
-- [Implicit Pointer to Blip Conversion](Pointer.op_Implicit_overload_28.md)
-- [Implicit Pointer to Boolean Conversion](Pointer.op_Implicit_overload_20.md)
-- [Implicit Pointer to Camera Conversion](Pointer.op_Implicit_overload_29.md)
-- [Implicit Pointer to Double Conversion](Pointer.op_Implicit_overload_19.md)
-- [Implicit Pointer to Group Conversion](Pointer.op_Implicit_overload_25.md)
-- [Implicit Pointer to Int32 Conversion](Pointer.op_Implicit_overload_17.md)
-- [Implicit Pointer to Model Conversion](Pointer.op_Implicit_overload_24.md)
-- [Implicit Pointer to Object Conversion](Pointer.op_Implicit_overload_26.md)
-- [Implicit Pointer to Ped Conversion](Pointer.op_Implicit_overload_22.md)
-- [Implicit Pointer to Pickup Conversion](Pointer.op_Implicit_overload_27.md)
-- [Implicit Pointer to Single Conversion](Pointer.op_Implicit_overload_18.md)
-- [Implicit Pointer to String Conversion](Pointer.op_Implicit_overload_21.md)
-- [Implicit Pointer to Vector3 Conversion](Pointer.op_Implicit_overload_30.md)
-- [Implicit Pointer to Vehicle Conversion](Pointer.op_Implicit_overload_23.md)
-- [Implicit Single to Parameter Conversion](Parameter.op_Implicit_overload_13.md)
-- [Implicit Single to Pointer Conversion](Pointer.op_Implicit_overload_15.md)
-- [Implicit String to Parameter Conversion](Parameter.op_Implicit_overload_10.md)
-- [Implicit String to Pointer Conversion](Pointer.op_Implicit_overload_12.md)
-- [Implicit Type to Pointer Conversion](Pointer.op_Implicit_overload_1.md)
-- [Implicit Vector3 to Pointer Conversion](Pointer.op_Implicit_overload_2.md)
-- [Implicit Vehicle to Parameter Conversion](Parameter.op_Implicit_overload_8.md)
-- [Implicit Vehicle to Pointer Conversion](Pointer.op_Implicit_overload_10.md)
-- [Invoke Method](Template.Invoke.md)
-- [Methods](FunctionMethods.md)
-- [Methods](ParameterMethods.md)
-- [Methods](PointerMethods.md)
-- [Methods](TemplateMethods.md)
-- [Name Property](Template.Name.md)
-- [Parameter Class](Parameter.md)
-- [Parameter Constructor](ParameterConstructor.md)
-- [Parameter Constructor (Blip)](ParameterConstructor13.md)
-- [Parameter Constructor (Boolean)](ParameterConstructor4.md)
-- [Parameter Constructor (Camera)](ParameterConstructor14.md)
-- [Parameter Constructor (Group)](ParameterConstructor10.md)
-- [Parameter Constructor (Int32)](ParameterConstructor2.md)
-- [Parameter Constructor (Model)](ParameterConstructor8.md)
-- [Parameter Constructor (Object)](ParameterConstructor11.md)
-- [Parameter Constructor (Object)](ParameterConstructor16.md)
-- [Parameter Constructor (Parameter)](ParameterConstructor15.md)
-- [Parameter Constructor (Ped)](ParameterConstructor6.md)
-- [Parameter Constructor (Pickup)](ParameterConstructor12.md)
-- [Parameter Constructor (Player)](ParameterConstructor9.md)
-- [Parameter Constructor (Single)](ParameterConstructor3.md)
-- [Parameter Constructor (String)](ParameterConstructor5.md)
-- [Parameter Constructor (Vehicle)](ParameterConstructor7.md)
-- [Parameter Members](ParameterMembers.md)
-- [Pointer Class](Pointer.md)
-- [Pointer Constructor](PointerConstructor2.md)
-- [Pointer Members](PointerMembers.md)
-- [Properties](ParameterProperties.md)
-- [Properties](TemplateProperties.md)
-- [ReturnValue Property](Template.ReturnValue.md)
-- [SetValue Method](Parameter.SetValue_overloads.md)
-- [SetValue Method (Blip)](Parameter.SetValue_overload_12.md)
-- [SetValue Method (Boolean)](Parameter.SetValue_overload_3.md)
-- [SetValue Method (Camera)](Parameter.SetValue_overload_13.md)
-- [SetValue Method (Group)](Parameter.SetValue_overload_9.md)
-- [SetValue Method (Int32)](Parameter.SetValue_overload_1.md)
-- [SetValue Method (Model)](Parameter.SetValue_overload_7.md)
-- [SetValue Method (Object)](Parameter.SetValue_overload_10.md)
-- [SetValue Method (Object)](Parameter.SetValue_overload_15.md)
-- [SetValue Method (Parameter)](Parameter.SetValue_overload_14.md)
-- [SetValue Method (Ped)](Parameter.SetValue_overload_5.md)
-- [SetValue Method (Pickup)](Parameter.SetValue_overload_11.md)
-- [SetValue Method (Player)](Parameter.SetValue_overload_8.md)
-- [SetValue Method (Single)](Parameter.SetValue_overload_2.md)
-- [SetValue Method (String)](Parameter.SetValue_overload_4.md)
-- [SetValue Method (Vehicle)](Parameter.SetValue_overload_6.md)
-- [Template Class](Template.md)
-- [Template Constructor](TemplateConstructor.md)
-- [Template Constructor (String, Parameter[])](TemplateConstructor3.md)
-- [Template Constructor (String, Type, Parameter[])](TemplateConstructor2.md)
-- [Template Members](TemplateMembers.md)
-- [ToInputParameter Method](Pointer.ToInputParameter.md)
-- [ToString Method](Parameter.ToString.md)
-- [Type Conversions](ParameterOperators.md)
-- [Type Conversions](PointerOperators.md)
-- [Value Property](Parameter.Value.md)
-- [wasInvoked Property](Template.wasInvoked.md)
+## Invocation Types
+
+- [Function](Function.md) for direct native lookup and invocation.
+- [Template](Template.md) for reusable native-call definitions with explicit argument and return metadata.
+
+## Marshaling Types
+
+- [Parameter](Parameter.md) for converting managed values into native arguments and return buffers.
+- [Pointer](Pointer.md) for pointer-backed native interop and output parameters.
+
+## Related Paths
+
+- [Native Interop](../topics/native-interop.md) for the curated overview of when to use these types.
+- [GTA.base](../GTA.base/index.md) for the shared handle and object contracts often involved in low-level work.
