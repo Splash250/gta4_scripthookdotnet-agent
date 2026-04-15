@@ -21,6 +21,7 @@ param(
         'docs/reference/api/GTA.base/index.md',
         'docs/reference/api/GTA.value/index.md',
         'docs/reference/api/GTA.Forms/index.md',
+        'docs/reference/api/GTA.Forms/Form.md',
         'docs/reference/api/GTA.Euphoria/index.md',
         'docs/reference/api/misc/index.md'
     ),

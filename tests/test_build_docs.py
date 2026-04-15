@@ -43,8 +43,10 @@ class BuildDocsPowerShellTests(unittest.TestCase):
                 source = Path(args.source)
                 output = Path(args.output)
                 output.mkdir(parents=True, exist_ok=True)
+                (output / "GTA.Forms").mkdir(parents=True, exist_ok=True)
                 (output / "normalized.txt").write_text("normalized\\n", encoding="utf-8")
                 (output / "index.md").write_text("# generated index\\n", encoding="utf-8")
+                (output / "GTA.Forms" / "Form.md").write_text("# generated form\\n", encoding="utf-8")
                 with Path(r"{self.log_path}").open("a", encoding="utf-8") as handle:
                     handle.write(f"normalize|{{source}}|{{output}}\\n")
                 """
@@ -77,6 +79,12 @@ class BuildDocsPowerShellTests(unittest.TestCase):
         )
         self.curated_index_bytes = b"---\r\ncurated: true\r\n---\r\n# Curated API Index\r\n"
         (self.normalize_output_root / "index.md").write_bytes(self.curated_index_bytes)
+        (self.normalize_output_root / "GTA.Forms").mkdir(parents=True, exist_ok=True)
+        self.curated_form_text = "# Curated Form Page\nShow\nClose\nVisible\n"
+        (self.normalize_output_root / "GTA.Forms" / "Form.md").write_text(
+            self.curated_form_text,
+            encoding="utf-8",
+        )
 
     def tearDown(self) -> None:
         shutil.rmtree(self.temp_dir)
@@ -124,6 +132,10 @@ class BuildDocsPowerShellTests(unittest.TestCase):
         self.assertEqual(
             (self.normalize_output_root / "index.md").read_bytes(),
             self.curated_index_bytes,
+        )
+        self.assertEqual(
+            (self.normalize_output_root / "GTA.Forms" / "Form.md").read_text(encoding="utf-8"),
+            self.curated_form_text,
         )
 
         self.assertEqual(

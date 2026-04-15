@@ -127,6 +127,94 @@ class CompareChmToDocsTests(unittest.TestCase):
         self.assertIn("- title_parity_mismatches: 0", report)
         self.assertIn("Report written to", result.stdout)
 
+    def test_compare_chm_to_docs_uses_normalized_api_fallback_for_missing_target_paths(self) -> None:
+        self.page_map_path.write_text(
+            "\n".join(
+                [
+                    '"source_path","doc_kind","namespace_or_section","target_path","notes"',
+                    '"docs/md/GTA/Player.md","type-page","GTA","docs/reference/gta/player.md","Legacy folded path retained in inventory."',
+                    '"docs/md/GTA/Ped.md","type-page","GTA","docs/reference/gta/ped.md","Legacy folded path retained in inventory."',
+                    '"docs/md/GTA/Vehicle.md","type-page","GTA","docs/reference/gta/vehicle.md","Legacy folded path retained in inventory."',
+                    '"docs/md/GTA.Forms/Form.md","type-page","GTA.Forms","docs/reference/gta-forms/form.md","Legacy folded path retained in inventory."',
+                ]
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+
+        self.write_html(
+            "GTA.Player.html",
+            "Player Class",
+            "Character Model CanControlCharacter money",
+        )
+        self.write_html(
+            "GTA.Ped.html",
+            "Ped Class",
+            "Task Weapons isAlive actor",
+        )
+        self.write_html(
+            "GTA.Vehicle.html",
+            "Vehicle Class",
+            "PassengerSeats GetPedOnSeat SirenActive transport",
+        )
+        self.write_html(
+            "GTA.Forms.Form.html",
+            "Form Class",
+            "Show Close Visible window",
+        )
+
+        self.write_markdown(
+            "docs/reference/api/GTA/Player.md",
+            "# Player Class\n\nCharacter\n\nModel\n\nCanControlCharacter\n",
+        )
+        self.write_markdown(
+            "docs/reference/api/GTA/Ped.md",
+            "# Ped Class\n\nTask\n\nWeapons\n\nisAlive\n",
+        )
+        self.write_markdown(
+            "docs/reference/api/GTA/Vehicle.md",
+            "# Vehicle Class\n\nPassengerSeats\n\nGetPedOnSeat\n\nSirenActive\n",
+        )
+        self.write_markdown(
+            "docs/reference/api/GTA.Forms/Form.md",
+            "# Form Class\n\nShow\n\nClose\n\nVisible\n",
+        )
+
+        result = self.run_script()
+
+        self.assertEqual(result.returncode, 0, msg=result.stdout + result.stderr)
+        report = self.report_path.read_text(encoding="utf-8")
+        self.assertIn("- mapped_target_pages_missing: 0", report)
+        self.assertIn("- high_value_marker_failures: 0", report)
+        self.assertIn("## Mismatched Mappings\n\n- None", report)
+        self.assertIn("## Unresolved Review Items\n\n- None", report)
+
+    def test_compare_chm_to_docs_does_not_flag_missing_source_markers_as_target_failures(self) -> None:
+        self.page_map_path.write_text(
+            "\n".join(
+                [
+                    '"source_path","doc_kind","namespace_or_section","target_path","notes"',
+                    '"docs/md/GTA/Script.md","type-page","GTA","docs/reference/api/GTA/Script.md","Keep the Script type page."',
+                ]
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+
+        self.write_html("GTA.Script.html", "Script Class", "Legacy summary without sampled members")
+        self.write_markdown(
+            "docs/reference/api/GTA/Script.md",
+            "# Script Class\n\nBindKey\n\nBindConsoleCommand\n\nBindPhoneNumber\n",
+        )
+
+        result = self.run_script()
+
+        self.assertEqual(result.returncode, 0, msg=result.stdout + result.stderr)
+        report = self.report_path.read_text(encoding="utf-8")
+        self.assertIn("- high_value_marker_checks: 1", report)
+        self.assertIn("- high_value_marker_failures: 0", report)
+        self.assertNotIn("marker `BindKey` was not found in the CHM body sample.", report)
+
     def test_compare_chm_to_docs_fails_when_no_html_pages_exist(self) -> None:
         self.page_map_path.write_text(
             '"source_path","doc_kind","namespace_or_section","target_path","notes"\n',

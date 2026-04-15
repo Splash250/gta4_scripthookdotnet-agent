@@ -1,5 +1,24 @@
 # Form Class
 
+## Curated Summary
+
+`GTA.Forms.Form` is the top-level in-game window surface for ScriptHookDotNet UI. Use it when a script needs to show an interactive overlay, host child controls, and coordinate keyboard or controller-driven menu flow without leaving the game process.
+
+## Common Use Notes
+
+- Call `Show()` when the form should become visible and start participating in the UI update loop.
+- Call `Close()` when the UI should tear down cleanly and release focus back to the rest of the script.
+- Use the `Visible` property when you need to gate updates or toggle presentation state without fully destroying the form instance.
+
+## Notes And Warnings
+
+> Treat forms as in-process overlays. Keep their update work short and close them explicitly when the gameplay flow no longer needs the window.
+
+## Related Guides And Examples
+
+- [UI And Forms](../topics/ui-and-forms.md)
+- [Sample Projects](../../../examples/sample-projects.md)
+
 For a list of all members of this type, see [Form Members](FormMembers.md).
 
 [System.Object](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemObjectClassTopic.asp)

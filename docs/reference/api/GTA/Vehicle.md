@@ -7,6 +7,7 @@
 ## Common Use Notes
 
 - Use `Vehicle` when you need seat management, movement state, door and wheel behavior, damage inspection, or model-specific logic after a spawn or world query.
+- `Vehicle.PassengerSeats`, `Vehicle.GetPedOnSeat`, and `Vehicle.SirenActive` are the first members to reach for when you need seat-aware spawning, taxi logic, or emergency-vehicle control.
 - The repo examples use it both for simple spawning and for more stateful behaviors such as taxi routing, window/form controls tied to the current vehicle, and the larger `GrabScript` mechanic.
 - Combine this page with [World And Entity APIs](../topics/world-and-entities.md) and [Sample Projects](../../../examples/sample-projects.md) when tracing how vehicles are created, owned, and released in practice.
 

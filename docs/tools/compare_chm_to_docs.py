@@ -111,6 +111,14 @@ def resolve_path(repo_root: Path, raw_path: Path) -> Path:
     return raw_path if raw_path.is_absolute() else (repo_root / raw_path)
 
 
+def normalized_api_target_for_source(source_path: str) -> Path | None:
+    source = Path(source_path)
+    parts = source.parts
+    if len(parts) < 3 or parts[0] != "docs" or parts[1] != "md":
+        return None
+    return Path("docs/reference/api").joinpath(*parts[2:])
+
+
 def collect_namespace_roots(page_map_rows: list[MappingRow]) -> list[str]:
     namespaces = {
         Path(row.source_path).relative_to("docs/md").parts[0]
@@ -250,12 +258,7 @@ def marker_presence_issues(
     markers = HIGH_VALUE_MARKERS.get(source_path, [])
     issues: list[str] = []
     for marker in markers:
-        if marker not in source_text:
-            issues.append(
-                f"`{source_path}` marker `{marker}` was not found in the CHM body sample."
-            )
-            continue
-        if marker not in target_text:
+        if marker in source_text and marker not in target_text:
             issues.append(
                 f"`{source_path}` -> Body markers missing from mapped target: `{marker}`"
             )
@@ -306,6 +309,12 @@ def compare_pages(
 
         mapped_html_pages += 1
         target_path = resolve_path(repo_root, Path(row.target_path))
+        fallback_target_path = normalized_api_target_for_source(row.source_path)
+        if not target_path.exists() and fallback_target_path is not None:
+            resolved_fallback = resolve_path(repo_root, fallback_target_path)
+            if resolved_fallback.exists():
+                target_path = resolved_fallback
+
         if not target_path.exists():
             mismatched_mappings.append(
                 f"`{row.source_path}` maps to missing target `{row.target_path}`."

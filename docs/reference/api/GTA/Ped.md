@@ -8,6 +8,7 @@
 
 - Use `Ped` when you need to inspect or change an actor's weapons, health, tasks, animations, Euphoria state, relationship behavior, or position in the world.
 - Expect to move between `Ped` and related helper surfaces such as `Ped.Task`, `Ped.Weapons`, `Ped.Euphoria`, and `Ped.Animation` rather than doing everything on the root type.
+- Gate long-lived ped logic on `Ped.isAlive` and existence checks before queueing more tasks or weapon changes.
 - [Sample Projects](../../../examples/sample-projects.md) includes bodyguard, zombie, taxi, and grab-style examples that all treat `Ped` as a long-lived gameplay actor.
 
 ## Notes And Warnings

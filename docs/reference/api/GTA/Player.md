@@ -8,6 +8,7 @@
 
 - Reach for `Player` when your script changes player-owned state like money, health ceilings, wanted level, skins, or group membership.
 - Reach for `Player.Character` when the operation is really about the in-world ped, such as tasks, weapons, movement, animation, or position.
+- Use `Player.Model` and `Player.CanControlCharacter` when your script needs to swap the player archetype or temporarily hand control back to a cutscene-like sequence.
 - The repo examples in [Sample Projects](../../../examples/sample-projects.md) use both layers together: `Player` for ownership and profile state, `Player.Character` for direct gameplay interaction.
 
 ## Notes And Warnings
