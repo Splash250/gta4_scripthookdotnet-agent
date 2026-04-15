@@ -123,6 +123,62 @@ class ValidateReferenceLinksCliTests(unittest.TestCase):
         self.assertIn("unresolved_legacy_references: 0", report)
         self.assertIn("Critical broken local links found: 0", result.stdout)
 
+    def test_cli_fails_for_legacy_references_in_supported_pages_but_reports_allowed_legacy_pages(self) -> None:
+        (self.reference_root / "README.md").write_text(
+            "# Reference\n",
+            encoding="utf-8",
+        )
+        (self.reference_root / "concepts").mkdir(parents=True, exist_ok=True)
+        (self.reference_root / "archive").mkdir(parents=True, exist_ok=True)
+        (self.reference_root / "concepts" / "script-lifecycle.md").write_text(
+            textwrap.dedent(
+                """\
+                # Script Lifecycle
+
+                - [Legacy Type](../../md/T.md)
+                """
+            ),
+            encoding="utf-8",
+        )
+        (self.reference_root / "archive" / "carry-over.md").write_text(
+            textwrap.dedent(
+                """\
+                # Carry Over
+
+                - [Legacy Export](../../md/TOC.md)
+                """
+            ),
+            encoding="utf-8",
+        )
+
+        result = subprocess.run(
+            [
+                sys.executable,
+                str(SCRIPT_PATH),
+                "--root",
+                str(self.reference_root),
+                "--report",
+                str(self.output_path),
+            ],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+        )
+
+        self.assertEqual(result.returncode, 1, msg=result.stdout + result.stderr)
+
+        report = self.output_path.read_text(encoding="utf-8")
+        self.assertIn("critical_broken_local_links: 0", report)
+        self.assertIn("malformed_anchors: 0", report)
+        self.assertIn("disallowed_legacy_references: 1", report)
+        self.assertIn("allowed_legacy_references: 1", report)
+        self.assertIn("concepts/script-lifecycle.md:3", report)
+        self.assertIn("../../md/T.md", report)
+        self.assertIn("archive/carry-over.md:3", report)
+        self.assertIn("../../md/TOC.md", report)
+        self.assertIn("Disallowed legacy references found: 1", result.stdout)
+        self.assertIn("Allowed legacy references found: 1", result.stdout)
+
 
 if __name__ == "__main__":
     unittest.main()

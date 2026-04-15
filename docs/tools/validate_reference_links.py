@@ -33,7 +33,15 @@ class ValidationSummary:
     files_scanned: int
     critical_broken_local_links: list[LinkIssue]
     malformed_anchors: list[LinkIssue]
-    unresolved_legacy_references: list[LinkIssue]
+    disallowed_legacy_references: list[LinkIssue]
+    allowed_legacy_references: list[LinkIssue]
+
+    @property
+    def unresolved_legacy_references(self) -> list[LinkIssue]:
+        return [
+            *self.disallowed_legacy_references,
+            *self.allowed_legacy_references,
+        ]
 
 
 def parse_args() -> argparse.Namespace:
@@ -145,17 +153,46 @@ def is_curated_reference_page(root: Path, path: Path) -> bool:
     return False
 
 
+def is_explicitly_supported_api_page(root: Path, path: Path) -> bool:
+    relative = path.relative_to(root)
+    if len(relative.parts) < 2 or relative.parts[0] != "api":
+        return False
+    if relative.name == "index.md":
+        return False
+
+    return "## Curated Summary" in path.read_text(encoding="utf-8")
+
+
+def is_supported_reference_page(root: Path, path: Path) -> bool:
+    relative = path.relative_to(root)
+
+    if relative == Path("README.md"):
+        return True
+    if relative.parts[:1] == ("concepts",):
+        return True
+    if relative == Path("api/index.md"):
+        return True
+    if len(relative.parts) == 3 and relative.parts[0] == "api" and relative.parts[2] == "index.md":
+        return True
+    if len(relative.parts) == 3 and relative.parts[0] == "api" and relative.parts[1] == "topics":
+        return True
+
+    return is_explicitly_supported_api_page(root, path)
+
+
 def scan_links(root: Path) -> ValidationSummary:
     markdown_files = collect_markdown_files(root)
     anchors_by_file = {path.resolve(): collect_anchor_ids(path) for path in markdown_files}
 
     broken_links: list[LinkIssue] = []
     malformed_anchors: list[LinkIssue] = []
-    legacy_references: list[LinkIssue] = []
+    disallowed_legacy_references: list[LinkIssue] = []
+    allowed_legacy_references: list[LinkIssue] = []
 
     for path in markdown_files:
         resolved_path = path.resolve()
         curated_page = is_curated_reference_page(root, path)
+        supported_page = is_supported_reference_page(root, path)
         for line_number, line in enumerate(
             path.read_text(encoding="utf-8").splitlines(),
             start=1,
@@ -168,15 +205,21 @@ def scan_links(root: Path) -> ValidationSummary:
                 target_path_text, anchor = split_target(target)
 
                 if is_legacy_reference(path, target_path_text):
-                    legacy_references.append(
-                        LinkIssue(
-                            source=path.relative_to(root),
-                            line_number=line_number,
-                            text=line.strip(),
-                            target=target,
-                            detail="Link still points to the legacy docs/md export.",
+                    legacy_issue = LinkIssue(
+                        source=path.relative_to(root),
+                        line_number=line_number,
+                        text=line.strip(),
+                        target=target,
+                        detail=(
+                            "Supported reference page still points to the legacy docs/md export."
+                            if supported_page
+                            else "Archive or non-supported page still points to the legacy docs/md export."
                         )
                     )
+                    if supported_page:
+                        disallowed_legacy_references.append(legacy_issue)
+                    else:
+                        allowed_legacy_references.append(legacy_issue)
                     continue
 
                 if target_path_text == "":
@@ -201,7 +244,10 @@ def scan_links(root: Path) -> ValidationSummary:
                         if curated_page:
                             broken_links.append(issue)
                         else:
-                            legacy_references.append(issue)
+                            if supported_page:
+                                disallowed_legacy_references.append(issue)
+                            else:
+                                allowed_legacy_references.append(issue)
                         continue
 
                 if anchor:
@@ -223,7 +269,8 @@ def scan_links(root: Path) -> ValidationSummary:
         files_scanned=len(markdown_files),
         critical_broken_local_links=broken_links,
         malformed_anchors=malformed_anchors,
-        unresolved_legacy_references=legacy_references,
+        disallowed_legacy_references=disallowed_legacy_references,
+        allowed_legacy_references=allowed_legacy_references,
     )
 
 
@@ -234,7 +281,7 @@ def render_issue_list(issues: list[LinkIssue]) -> str:
     lines: list[str] = []
     for issue in issues:
         lines.append(
-            f"- `{issue.source}:{issue.line_number}` -> `{issue.target}`"
+            f"- `{issue.source.as_posix()}:{issue.line_number}` -> `{issue.target}`"
         )
         lines.append(f"  {issue.detail}")
     return "\n".join(lines) + "\n"
@@ -261,12 +308,18 @@ def render_report(summary: ValidationSummary, root: Path) -> str:
         f"- files_scanned: {summary.files_scanned}\n"
         f"- critical_broken_local_links: {len(summary.critical_broken_local_links)}\n"
         f"- malformed_anchors: {len(summary.malformed_anchors)}\n"
+        f"- disallowed_legacy_references: {len(summary.disallowed_legacy_references)}\n"
+        f"- allowed_legacy_references: {len(summary.allowed_legacy_references)}\n"
         f"- unresolved_legacy_references: {len(summary.unresolved_legacy_references)}\n\n"
         "## Critical Broken Local Links\n\n"
         f"{render_issue_list(summary.critical_broken_local_links)}\n"
         "## Malformed Anchors\n\n"
         f"{render_issue_list(summary.malformed_anchors)}\n"
-        "## Unresolved Legacy References\n\n"
+        "## Disallowed Legacy References\n\n"
+        f"{render_issue_list(summary.disallowed_legacy_references)}\n"
+        "## Allowed Legacy References\n\n"
+        f"{render_issue_list(summary.allowed_legacy_references)}\n"
+        "## All Unresolved Legacy References\n\n"
         f"{render_issue_list(summary.unresolved_legacy_references)}"
     )
 
@@ -290,11 +343,22 @@ def main() -> int:
     )
     print(f"Malformed anchors found: {len(summary.malformed_anchors)}")
     print(
+        "Disallowed legacy references found: "
+        f"{len(summary.disallowed_legacy_references)}"
+    )
+    print(
+        "Allowed legacy references found: "
+        f"{len(summary.allowed_legacy_references)}"
+    )
+    print(
         "Unresolved legacy references found: "
         f"{len(summary.unresolved_legacy_references)}"
     )
 
-    return 1 if summary.critical_broken_local_links else 0
+    return 1 if (
+        summary.critical_broken_local_links
+        or summary.disallowed_legacy_references
+    ) else 0
 
 
 if __name__ == "__main__":
