@@ -28,6 +28,26 @@ class BuildDocsPowerShellTests(unittest.TestCase):
         self.log_path = self.temp_dir / "invocations.log"
         self.normalize_script = self.tools_root / "normalize_stub.py"
         self.validate_script = self.tools_root / "validate_stub.py"
+        self.report_template_path = self.temp_dir / "validation-report-template.md"
+        self.validation_report_body = (
+            "---\n"
+            "type: report\n"
+            "title: Reference Link Validation Report\n"
+            "created: 2026-04-16\n"
+            "tags:\n"
+            "  - docs\n"
+            "related:\n"
+            "  - '[[Reference Landing Page]]'\n"
+            "---\n\n"
+            "# Reference Link Validation Report\n\n"
+            "## Summary\n\n"
+            "- files_scanned: 2\n"
+            "- critical_broken_local_links: 0\n"
+            "- malformed_anchors: 0\n"
+            "- disallowed_legacy_references: 0\n"
+            "- allowed_legacy_references: 0\n"
+            "- unresolved_legacy_references: 0\n"
+        )
 
         self.normalize_script.write_text(
             textwrap.dedent(
@@ -68,7 +88,11 @@ class BuildDocsPowerShellTests(unittest.TestCase):
                 root = Path(args.root)
                 report = Path(args.report)
                 report.parent.mkdir(parents=True, exist_ok=True)
-                report.write_text("# stub report\\n", encoding="utf-8")
+                report_template = Path(r"{self.report_template_path}")
+                if report_template.exists():
+                    report.write_text(report_template.read_text(encoding="utf-8"), encoding="utf-8")
+                else:
+                    report.write_text("# stub report\\n", encoding="utf-8")
                 with Path(r"{self.log_path}").open("a", encoding="utf-8") as handle:
                     handle.write(f"validate|{{root}}|{{report}}|fail={{args.fail}}\\n")
 
@@ -85,6 +109,7 @@ class BuildDocsPowerShellTests(unittest.TestCase):
             self.curated_form_text,
             encoding="utf-8",
         )
+        self.report_template_path.write_text(self.validation_report_body, encoding="utf-8")
 
     def tearDown(self) -> None:
         shutil.rmtree(self.temp_dir)
@@ -160,6 +185,42 @@ class BuildDocsPowerShellTests(unittest.TestCase):
         self.assertTrue((self.normalize_output_root / "normalized.txt").exists())
         self.assertTrue((self.production_root / "reference-link-report.md").exists())
         self.assertIn("validate_reference_links.py failed", result.stderr)
+
+    def test_build_docs_returns_nonzero_when_report_has_disallowed_legacy_references(self) -> None:
+        self.report_template_path.write_text(
+            self.validation_report_body.replace(
+                "- disallowed_legacy_references: 0\n",
+                "- disallowed_legacy_references: 3\n",
+            ).replace(
+                "- unresolved_legacy_references: 0\n",
+                "- unresolved_legacy_references: 3\n",
+            ),
+            encoding="utf-8",
+        )
+
+        result = self.run_build_docs(
+            []
+        )
+
+        self.assertEqual(result.returncode, 1, msg=result.stdout + result.stderr)
+        self.assertIn("disallowed_legacy_references=3", result.stderr)
+        self.assertIn("unresolved_legacy_references=3", result.stderr)
+
+    def test_build_docs_returns_nonzero_when_report_has_malformed_anchors(self) -> None:
+        self.report_template_path.write_text(
+            self.validation_report_body.replace(
+                "- malformed_anchors: 0\n",
+                "- malformed_anchors: 2\n",
+            ),
+            encoding="utf-8",
+        )
+
+        result = self.run_build_docs(
+            []
+        )
+
+        self.assertEqual(result.returncode, 1, msg=result.stdout + result.stderr)
+        self.assertIn("malformed_anchors=2", result.stderr)
 
 
 if __name__ == "__main__":

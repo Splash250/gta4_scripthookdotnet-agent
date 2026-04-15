@@ -104,6 +104,64 @@ function Restore-PreservedFiles {
     }
 }
 
+function Get-ValidationSummaryCounts {
+    param(
+        [Parameter(Mandatory = $true)]
+        [string]$ReportFile
+    )
+
+    if (-not (Test-Path -LiteralPath $ReportFile)) {
+        throw "Validation report was not generated: $ReportFile"
+    }
+
+    $summaryKeys = @(
+        'critical_broken_local_links',
+        'malformed_anchors',
+        'disallowed_legacy_references',
+        'allowed_legacy_references',
+        'unresolved_legacy_references'
+    )
+    $counts = @{}
+    $reportContent = Get-Content -LiteralPath $ReportFile
+
+    foreach ($key in $summaryKeys) {
+        $pattern = '^- ' + [regex]::Escape($key) + ': (?<count>\d+)$'
+        $line = $reportContent | Where-Object { $_ -match $pattern } | Select-Object -First 1
+        if (-not $line) {
+            throw "Validation report is missing summary count '$key': $ReportFile"
+        }
+
+        $counts[$key] = [int]$Matches['count']
+    }
+
+    return $counts
+}
+
+function Assert-ValidationSummaryClean {
+    param(
+        [Parameter(Mandatory = $true)]
+        [hashtable]$Counts
+    )
+
+    $summaryLine = "Validation summary counts: critical_broken_local_links=$($Counts['critical_broken_local_links']), malformed_anchors=$($Counts['malformed_anchors']), disallowed_legacy_references=$($Counts['disallowed_legacy_references']), allowed_legacy_references=$($Counts['allowed_legacy_references']), unresolved_legacy_references=$($Counts['unresolved_legacy_references'])"
+    Write-Host $summaryLine
+
+    $failingCounts = @()
+    foreach ($key in @(
+        'critical_broken_local_links',
+        'malformed_anchors',
+        'disallowed_legacy_references'
+    )) {
+        if ($Counts[$key] -gt 0) {
+            $failingCounts += "${key}=$($Counts[$key])"
+        }
+    }
+
+    if ($failingCounts.Count -gt 0) {
+        throw "Validation report contains build-failing issues: $($failingCounts -join ', '). unresolved_legacy_references=$($Counts['unresolved_legacy_references'])."
+    }
+}
+
 $resolvedRepoRoot = (Resolve-Path $RepoRoot).Path
 $resolvedNormalizeScript = (Resolve-Path $NormalizeScript).Path
 $resolvedValidateScript = (Resolve-Path $ValidateScript).Path
@@ -139,6 +197,9 @@ try {
         -StepName 'validate_reference_links.py' `
         -ScriptPath $resolvedValidateScript `
         -Arguments $validationStepArgs
+
+    $validationSummaryCounts = Get-ValidationSummaryCounts -ReportFile $resolvedReportPath
+    Assert-ValidationSummaryClean -Counts $validationSummaryCounts
 
     Write-Host 'Docs build completed.'
 }
