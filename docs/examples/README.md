@@ -26,6 +26,8 @@ Example pages belong here when they answer questions like:
 - how do the sample projects differ by language or purpose
 - which project should I copy when starting a new script
 
+The first project-oriented guide in this section is [Sample Projects](sample-projects.md), which compares the bundled C#, VB, and GrabScript solutions and points back to the script-authoring workflow in `docs/guides/`.
+
 ## How It Relates To `docs/md`
 
 The `docs/md/` export is useful when you already know which namespace or type to inspect. It does not show readers how the repository's own sample code fits together.
@@ -43,6 +45,7 @@ If you are already comfortable with the runtime setup, use [ScriptHookDotNet Doc
 
 ## Related Pages
 
+- [Sample Projects](sample-projects.md)
 - [ScriptHookDotNet Docs](../README.md)
 - [Guides](../guides/README.md)
 - [Reference](../reference/README.md)
