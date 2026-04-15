@@ -35,6 +35,13 @@ HIGH_VALUE_MARKERS: dict[str, list[str]] = {
     "docs/md/GTA.Forms/Form.md": ["Show", "Close", "Visible"],
 }
 
+INTENTIONAL_CURATION_SOURCES = {
+    "docs/md/GTA IV ScriptHook.Net Single File Documentation.md",
+    "docs/md/index.md",
+    "docs/md/misc/index.md",
+    "docs/md/TOC.md",
+}
+
 
 @dataclass(frozen=True)
 class HtmlPage:
@@ -68,6 +75,8 @@ class ComparisonSummary:
     root_indexes_missing: int
     high_value_marker_checks: int
     high_value_marker_failures: int
+    resolved_findings: list[str]
+    intentional_curation_differences: list[str]
     missing_pages: list[str]
     mismatched_mappings: list[str]
     unresolved_review_items: list[str]
@@ -265,6 +274,10 @@ def marker_presence_issues(
     return issues
 
 
+def is_intentional_curation_difference(row: MappingRow) -> bool:
+    return row.source_path in INTENTIONAL_CURATION_SOURCES
+
+
 def compare_pages(
     repo_root: Path,
     page_map_rows: list[MappingRow],
@@ -280,6 +293,7 @@ def compare_pages(
 
     mismatched_mappings: list[str] = []
     unresolved_review_items: list[str] = []
+    intentional_curation_differences: list[str] = []
 
     mapped_html_pages = 0
     mapped_target_pages_present = 0
@@ -296,6 +310,11 @@ def compare_pages(
     for row in page_map_rows:
         page = html_by_source.get(row.source_path)
         if page is None:
+            if is_intentional_curation_difference(row):
+                intentional_curation_differences.append(
+                    f"`{row.source_path}` remains mapped to `{row.target_path}` as an intentional curated difference: {row.notes}"
+                )
+                continue
             mismatched_mappings.append(
                 f"`{row.source_path}` is mapped to `{row.target_path}` but no matching decompiled HTML page was found."
             )
@@ -372,6 +391,19 @@ def compare_pages(
         for source_path in missing_pages
     )
 
+    resolved_findings = [
+        f"`{label}` is `0` in this rerun."
+        for label, value in (
+            ("unmapped_html_pages", len(missing_pages)),
+            ("mapped_target_pages_missing", mapped_target_pages_missing),
+            ("title_parity_mismatches", title_parity_mismatches),
+            ("namespace_indexes_missing", namespace_indexes_missing),
+            ("root_indexes_missing", root_indexes_missing),
+            ("high_value_marker_failures", high_value_marker_failures),
+        )
+        if value == 0
+    ]
+
     return ComparisonSummary(
         total_decompiled_html_pages=len(html_pages),
         mapped_html_pages=mapped_html_pages,
@@ -386,6 +418,8 @@ def compare_pages(
         root_indexes_missing=root_indexes_missing,
         high_value_marker_checks=high_value_marker_checks,
         high_value_marker_failures=high_value_marker_failures,
+        resolved_findings=resolved_findings,
+        intentional_curation_differences=intentional_curation_differences,
         missing_pages=missing_pages,
         mismatched_mappings=mismatched_mappings,
         unresolved_review_items=unresolved_review_items,
@@ -441,6 +475,10 @@ def render_report(
         "Namespace and root landing pages are checked separately because they anchor the supported navigation model.\n\n"
         "## High-Value Marker Checks\n\n"
         "Marker checks sample a small set of high-value pages and verify a few legacy body markers still appear in the mapped target docs.\n\n"
+        "## Resolved Findings\n\n"
+        f"{render_list(summary.resolved_findings)}\n"
+        "## Intentional Curation Differences\n\n"
+        f"{render_list(summary.intentional_curation_differences)}\n"
         "## Missing Pages\n\n"
         f"{render_list([f'`{item}`' for item in summary.missing_pages])}\n"
         "## Mismatched Mappings\n\n"

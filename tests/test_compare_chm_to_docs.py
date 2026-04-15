@@ -215,6 +215,51 @@ class CompareChmToDocsTests(unittest.TestCase):
         self.assertIn("- high_value_marker_failures: 0", report)
         self.assertNotIn("marker `BindKey` was not found in the CHM body sample.", report)
 
+    def test_compare_chm_to_docs_reports_intentional_curation_separately(self) -> None:
+        self.page_map_path.write_text(
+            "\n".join(
+                [
+                    '"source_path","doc_kind","namespace_or_section","target_path","notes"',
+                    '"docs/md/GTA/Player.md","type-page","GTA","docs/reference/api/GTA/Player.md","Keep the Player type page."',
+                    '"docs/md/GTA IV ScriptHook.Net Single File Documentation.md","legacy-monolith","archive","docs/reference/archive/legacy-single-file-export.md","Archive the monolithic export for parity checks only; do not treat it as supported public documentation."',
+                    '"docs/md/index.md","root-index","reference-root","docs/README.md","Promote the export landing page into the curated docs root overview."',
+                    '"docs/md/misc/index.md","namespace-index","misc","docs/reference/misc/index.md","Namespace landing page retained as the entry point for generated API reference."',
+                    '"docs/md/TOC.md","legacy-toc","archive","docs/reference/archive/legacy-export-toc.md","Keep as an archival navigation aid instead of a primary entry page."',
+                ]
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+
+        self.write_html(
+            "GTA.Player.html",
+            "Player Class",
+            "Character Model CanControlCharacter money",
+        )
+        self.write_markdown(
+            "docs/reference/api/GTA/Player.md",
+            "# Player Class\n\nCharacter\n\nModel\n\nCanControlCharacter\n",
+        )
+
+        result = self.run_script()
+
+        self.assertEqual(result.returncode, 0, msg=result.stdout + result.stderr)
+        report = self.report_path.read_text(encoding="utf-8")
+        self.assertIn("## Resolved Findings", report)
+        self.assertIn("- `unmapped_html_pages` is `0` in this rerun.", report)
+        self.assertIn("## Intentional Curation Differences", report)
+        self.assertIn(
+            "`docs/md/GTA IV ScriptHook.Net Single File Documentation.md` remains mapped to",
+            report,
+        )
+        self.assertIn("curated docs root overview", report)
+        self.assertIn("entry point for generated API reference", report)
+        self.assertIn("archival navigation aid", report)
+        self.assertIn("## Mismatched Mappings\n\n- None", report)
+        self.assertIn("## Unresolved Review Items\n\n- None", report)
+        self.assertIn("- root_indexes_missing: 0", report)
+        self.assertIn("- namespace_indexes_missing: 0", report)
+
     def test_compare_chm_to_docs_fails_when_no_html_pages_exist(self) -> None:
         self.page_map_path.write_text(
             '"source_path","doc_kind","namespace_or_section","target_path","notes"\n',
