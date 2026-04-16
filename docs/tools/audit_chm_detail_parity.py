@@ -48,14 +48,18 @@ MARKDOWN_CSHARP_PATTERN = re.compile(
     re.MULTILINE | re.DOTALL,
 )
 HTML_VISUAL_BASIC_PATTERN = re.compile(
-    r"<div class=['\"]syntax['\"]>\s*<span class=['\"]lang['\"]>\[Visual(?:&nbsp;|\s+)Basic\]</span>(?P<body>.*?)</div>",
+    r"<div\b[^>]*class=['\"][^'\"]*\bsyntax\b[^'\"]*['\"][^>]*>(?P<body>.*?)(?=(<div\b[^>]*class=['\"][^'\"]*\bsyntax\b[^'\"]*['\"][^>]*>|<h[1-6]\b|<hr\b|</div>\s*</body>|$))",
     re.IGNORECASE | re.DOTALL,
 )
 HTML_CSHARP_PATTERN = re.compile(
-    r"<div class=['\"]syntax['\"]>\s*<span class=['\"]lang['\"]>\[C#\]</span>(?P<body>.*?)</div>",
+    r"<div\b[^>]*class=['\"][^'\"]*\bsyntax\b[^'\"]*['\"][^>]*>(?P<body>.*?)(?=(<div\b[^>]*class=['\"][^'\"]*\bsyntax\b[^'\"]*['\"][^>]*>|<h[1-6]\b|<hr\b|</div>\s*</body>|$))",
     re.IGNORECASE | re.DOTALL,
 )
 HTML_DT_PATTERN = re.compile(r"<dt\b[^>]*>(.*?)</dt>", re.IGNORECASE | re.DOTALL)
+HTML_LANG_LABEL_PATTERN = re.compile(
+    r"<span\b[^>]*class=['\"][^'\"]*\blang\b[^'\"]*['\"][^>]*>\s*\[(?P<label>.*?)\]\s*</span>",
+    re.IGNORECASE | re.DOTALL,
+)
 MARKDOWN_PARAMETER_PATTERN = re.compile(r"^(?<!\*)\*([^*\n]+)\*(?!\*)\s*$", re.MULTILINE)
 HTML_LINK_PATTERN = re.compile(r"<a\b[^>]*href=['\"](.*?)['\"]", re.IGNORECASE)
 MARKDOWN_LINK_PATTERN = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
@@ -71,7 +75,10 @@ HTML_LIST_PATTERN = re.compile(r"<(?:ul|ol|dl|blockquote)\b", re.IGNORECASE)
 HTML_TABLE_PATTERN = re.compile(r"<table\b", re.IGNORECASE)
 MARKDOWN_TABLE_PATTERN = re.compile(r"^\|.*\|\s*$", re.MULTILINE)
 HTML_CODE_PATTERN = re.compile(r"<(?:pre|code)\b", re.IGNORECASE)
-HTML_SIGNATURE_BLOCK_PATTERN = re.compile(r"<div class=['\"]syntax['\"]", re.IGNORECASE)
+HTML_SIGNATURE_BLOCK_PATTERN = re.compile(
+    r"<div\b[^>]*class=['\"][^'\"]*\bsyntax\b[^'\"]*['\"][^>]*>",
+    re.IGNORECASE,
+)
 MARKDOWN_INDENTED_CODE_PATTERN = re.compile(r"(?m)(?:^(?: {4}|\t).+\n?)+")
 INHERITANCE_MARKERS = ("Derived types", "Inherits", "Inheritance Hierarchy")
 MEMBERS_MARKERS = ("#### Members", "dtH4'>Members", 'dtH4">Members')
@@ -262,10 +269,17 @@ def html_body(raw_html: str) -> str:
 
 
 def html_sections(raw_html: str) -> dict[str, str]:
+    return {
+        heading: normalize_text(strip_html(section_body))
+        for heading, section_body in html_section_bodies(raw_html).items()
+    }
+
+
+def html_section_bodies(raw_html: str) -> dict[str, str]:
     sections: dict[str, str] = {}
-    for match in HTML_H4_SECTION_PATTERN.finditer(raw_html):
+    for match in HTML_H4_SECTION_PATTERN.finditer(html_body(raw_html)):
         heading = strip_html(match.group("heading")).casefold()
-        sections[heading] = normalize_text(strip_html(match.group("body")))
+        sections[heading] = match.group("body")
     return sections
 
 
@@ -308,11 +322,19 @@ def extract_markdown_signature(markdown_text: str, language: str) -> str:
 
 
 def extract_html_signature(raw_html: str, language: str) -> str:
+    label_fragment = "visual basic" if language == "visual_basic" else "c#"
     pattern = HTML_VISUAL_BASIC_PATTERN if language == "visual_basic" else HTML_CSHARP_PATTERN
-    match = pattern.search(raw_html)
-    if not match:
-        return ""
-    return normalize_text(strip_html(match.group("body")))
+    for match in pattern.finditer(html_body(raw_html)):
+        syntax_body = match.group("body")
+        label_match = HTML_LANG_LABEL_PATTERN.search(syntax_body)
+        if not label_match:
+            continue
+        normalized_label = normalize_text(html.unescape(label_match.group("label")).replace("\xa0", " ")).casefold()
+        if normalized_label != label_fragment:
+            continue
+        without_label = HTML_LANG_LABEL_PATTERN.sub(" ", syntax_body, count=1)
+        return normalize_text(strip_html(without_label))
+    return ""
 
 
 def extract_markdown_parameter_names(markdown_text: str) -> list[str]:
@@ -329,16 +351,12 @@ def extract_markdown_parameter_names(markdown_text: str) -> list[str]:
 
 
 def extract_html_parameter_names(raw_html: str) -> list[str]:
-    section_match = re.search(
-        r"<h4\b[^>]*>\s*Parameters\s*</h4>(?P<body>.*?)(?=(<h4\b|<hr\b|</div>\s*</body>|$))",
-        raw_html,
-        re.IGNORECASE | re.DOTALL,
-    )
-    if not section_match:
+    section_body = html_section_bodies(raw_html).get("parameters")
+    if not section_body:
         return []
     return [
         normalize_text(strip_html(match)).casefold()
-        for match in HTML_DT_PATTERN.findall(section_match.group("body"))
+        for match in HTML_DT_PATTERN.findall(section_body)
         if normalize_text(strip_html(match))
     ]
 
@@ -351,7 +369,7 @@ def extract_links(raw_text: str, *, is_html: bool) -> list[str]:
 def count_external_links(raw_text: str, *, is_html: bool) -> int:
     return sum(
         1
-        for link in extract_links(raw_text, is_html=is_html)
+        for link in extract_links(html_body(raw_text) if is_html else raw_text, is_html=is_html)
         if link.startswith(("http://", "https://"))
     )
 
@@ -365,7 +383,7 @@ def count_markdown_links(markdown_text: str) -> int:
 
 
 def count_html_heading_tags(raw_html: str) -> int:
-    return len(re.findall(r"<h[1-6]\b", raw_html, re.IGNORECASE))
+    return len(re.findall(r"<h[1-6]\b", html_body(raw_html), re.IGNORECASE))
 
 
 def count_markdown_heading_lines(markdown_text: str) -> int:
@@ -373,7 +391,7 @@ def count_markdown_heading_lines(markdown_text: str) -> int:
 
 
 def count_html_bullet_lists(raw_html: str) -> int:
-    return len(HTML_LIST_PATTERN.findall(raw_html))
+    return len(HTML_LIST_PATTERN.findall(html_body(raw_html)))
 
 
 def count_markdown_bullet_lists(markdown_text: str) -> int:
@@ -385,7 +403,7 @@ def count_markdown_bullet_lists(markdown_text: str) -> int:
 
 
 def count_html_tables(raw_html: str) -> int:
-    return len(HTML_TABLE_PATTERN.findall(raw_html))
+    return len(HTML_TABLE_PATTERN.findall(html_body(raw_html)))
 
 
 def count_markdown_tables(markdown_text: str) -> int:
@@ -393,7 +411,8 @@ def count_markdown_tables(markdown_text: str) -> int:
 
 
 def count_html_code_or_signature_blocks(raw_html: str) -> int:
-    return len(HTML_CODE_PATTERN.findall(raw_html)) + len(HTML_SIGNATURE_BLOCK_PATTERN.findall(raw_html))
+    body = html_body(raw_html)
+    return len(HTML_CODE_PATTERN.findall(body)) + len(HTML_SIGNATURE_BLOCK_PATTERN.findall(body))
 
 
 def count_markdown_fenced_code_blocks(markdown_text: str) -> int:
@@ -408,6 +427,7 @@ def extract_fields(raw_html: str, markdown_text: str) -> tuple[dict[str, object]
     html_section_map = html_sections(raw_html)
     markdown_section_map = markdown_sections(markdown_text)
     html_text = strip_html(raw_html)
+    html_text = strip_html(html_body(raw_html))
     markdown_text_only = strip_markdown(markdown_text)
 
     html_fields = {
@@ -498,7 +518,7 @@ def compare_field_presence(
 
 
 def count_html_code_blocks(raw_html: str) -> int:
-    return len(HTML_CODE_PATTERN.findall(raw_html))
+    return len(HTML_CODE_PATTERN.findall(html_body(raw_html)))
 
 
 def count_markdown_code_blocks(markdown_text: str) -> int:

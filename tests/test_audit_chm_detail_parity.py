@@ -520,6 +520,69 @@ class AuditChmDetailParityTests(unittest.TestCase):
         self.assertTrue(enum_markdown_fields["member_inventory"])
         self.assertFalse(enum_field_presence["inheritance_or_enum_members"]["missing_in_markdown"])
 
+    def test_extract_fields_handles_chm_markup_noise_in_html(self) -> None:
+        raw_html = """
+        <html>
+          <head>
+            <title>Matrix.Lerp Method</title>
+            <style>.hidden { display: none; }</style>
+            <script>window.ignored = true;</script>
+            <link rel="help" href="https://example.invalid/head-only" />
+          </head>
+          <body>
+            <div id="TitleRow"><h1 class="dtH1">Matrix.Lerp Method</h1></div>
+            <div id="nstext">
+              <p>Performs a linear interpolation between two matrices.</p>
+              <div class="syntax js" data-role="signature">
+                <span class="lang token" data-lang="vb">[Visual&nbsp;Basic]</span>
+                <br />
+                Public Shared Function Lerp(ByVal start As Matrix, ByVal [end] As Matrix, ByVal amount As Single) As Matrix
+              </div>
+              <div data-role="signature" class="syntax">
+                <span data-lang="csharp" class="lang code">[C#]</span>
+                <div>public static Matrix Lerp(Matrix start, Matrix end, float amount)</div>
+              </div>
+              <h4 class="dtH4"><span>Parameters</span></h4>
+              <dl>
+                <dt><i>start</i></dt><dd>Start matrix.</dd>
+                <dt><i>end</i></dt><dd>End matrix.</dd>
+                <dt><i>amount</i></dt><dd>Interpolation amount.</dd>
+              </dl>
+              <h4 class="dtH4"><span>Return Value</span></h4>
+              <p>The interpolated matrix.</p>
+              <h4 class="dtH4"><span>Examples</span></h4>
+              <pre class="code">var value = Matrix.Lerp(start, end, 0.5f);</pre>
+              <p><a href="https://learn.microsoft.com/dotnet/api/system.single">Single</a></p>
+            </div>
+          </body>
+        </html>
+        """
+
+        html_fields, _ = self.audit.extract_fields(raw_html, "# Placeholder\n")
+
+        self.assertEqual(html_fields["title"], "Matrix.Lerp Method")
+        self.assertEqual(
+            html_fields["summary_text"],
+            "Performs a linear interpolation between two matrices.",
+        )
+        self.assertEqual(
+            html_fields["visual_basic_signature"],
+            "Public Shared Function Lerp(ByVal start As Matrix, ByVal [end] As Matrix, ByVal amount As Single) As Matrix",
+        )
+        self.assertEqual(
+            html_fields["csharp_signature"],
+            "public static Matrix Lerp(Matrix start, Matrix end, float amount)",
+        )
+        self.assertEqual(html_fields["parameter_names"], ["start", "end", "amount"])
+        self.assertEqual(html_fields["return_value"], "The interpolated matrix.")
+        self.assertTrue(html_fields["examples"])
+        self.assertTrue(html_fields["external_reference_links"])
+        self.assertNotIn("example.invalid", html_fields["text"])
+        self.assertNotIn("Matrix.Lerp Method Matrix.Lerp Method", html_fields["text"])
+        self.assertEqual(self.audit.count_html_heading_tags(raw_html), 4)
+        self.assertEqual(self.audit.count_html_code_or_signature_blocks(raw_html), 3)
+        self.assertEqual(self.audit.count_external_links(raw_html, is_html=True), 1)
+
     def test_assign_severity_is_major_when_density_falls_materially_below_html(self) -> None:
         row = self.audit.MappingRow(
             source_path="docs/md/GTA/Matrix.Lerp.md",
