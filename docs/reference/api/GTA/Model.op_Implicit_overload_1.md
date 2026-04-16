@@ -2,7 +2,7 @@
 
 ## Visual Basic
 
-Public Shared Widening Operator CType(source As [UInteger](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemUInt32ClassTopic.asp)) As [GTA.Model](Model.md)
+Public Shared Widening Operator CType(source As [UInteger](https://learn.microsoft.com/dotnet/api/system.uint32)) As [GTA.Model](Model.md)
 
 ## C#
 

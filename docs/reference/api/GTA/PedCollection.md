@@ -15,7 +15,7 @@ Inherits [System.Collections.Generic.List(Of GTA.Ped)](https://learn.microsoft.c
 
 ## C#
 
-public class PedCollection **: [List`1](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericListClassTopic.asp)**
+public class PedCollection **: [List`1](https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1)**
 
 #### Thread Safety
 

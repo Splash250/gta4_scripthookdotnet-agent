@@ -27,7 +27,7 @@ The current, reader-facing docs structure is the top-level `docs/` tree introduc
 - `docs\reference\` is the supported home for curated API lookup pages.
 - `docs\compatibility\` is where support boundaries and version assumptions should now live.
 
-When you are writing or updating docs, add or revise pages in that top-level structure first.
+When you are writing or updating docs, add or revise pages in that top-level structure first. Treat that top-level tree as the maintained public documentation surface.
 
 ## What Is Legacy
 
@@ -64,6 +64,12 @@ It is legacy because:
 - many pages are namespace or member fragments without reader-oriented context
 - it should inform the supported docs, not replace them
 
+Operationally, this means:
+
+- do not route new readers into `docs\md\` from supported landing pages except when archival traceability is the explicit goal
+- do not treat `docs\md\` as part of the maintained publishing or navigation surface
+- do not resolve gaps in supported docs by telling readers to browse `docs\md\` instead of fixing the supported pages
+
 ## What Still Needs Confirmation
 
 The docs can say confidently that `docs\chm\` and `docs\md\` are archival or legacy artifacts. These points still need confirmation before stronger claims are made:
@@ -78,6 +84,7 @@ The docs can say confidently that `docs\chm\` and `docs\md\` are archival or leg
 - Use `docs\md\` to recover API detail or locate legacy terminology.
 - Use `docs\chm\` only when the old packaged-help context matters.
 - Rephrase recovered information into the supported top-level docs instead of sending readers directly into the legacy trees unless archival lookup is the explicit goal.
+- Keep `docs\md\` available as a preserved source tree and tooling input, not as a parallel public docs system.
 - Cross-check compatibility-sensitive statements against [Version Matrix](../compatibility/version-matrix.md) before treating an old docs page as current guidance.
 
 ## Related Pages

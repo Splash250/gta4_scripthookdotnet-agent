@@ -30,10 +30,10 @@ These pages must exist, be internally consistent, and serve as the supported nav
 
 | Gate | Required files | Release-ready expectation |
 | --- | --- | --- |
-| Top-level docs entry point exists | [`docs/README.md`](../README.md) | The page identifies the supported docs tree, routes readers to guides, examples, reference, and compatibility, and does not send new readers to `docs/md/` as the default path. |
+| Top-level docs entry point exists | [`docs/README.md`](../README.md) | The page identifies the supported docs tree, routes readers to guides, examples, reference, and compatibility, and does not send new readers to `docs/md/` as the default path or describe it as part of the supported publishing surface. |
 | Section landing pages exist | [`docs/guides/README.md`](../guides/README.md), [`docs/examples/README.md`](../examples/README.md), [`docs/reference/README.md`](../reference/README.md), [`docs/compatibility/README.md`](../compatibility/README.md) | Each landing page explains when to use the section, what it contains, and where readers should go next. |
 | Reference entry page exists | [`docs/reference/api/index.md`](../reference/api/index.md) | The normalized API tree has a browsable root page that can serve as the generated reference entry point behind the curated landing pages. |
-| Legacy status is explained | [`docs/reference/legacy-chm.md`](../reference/legacy-chm.md) | The release distinguishes supported docs from archival assets under `docs/chm/` and `docs/md/` so readers are not forced to infer which tree is current. |
+| Legacy status is explained | [`docs/reference/legacy-chm.md`](../reference/legacy-chm.md) | The release distinguishes supported docs from archival assets under `docs/chm/` and `docs/md/` so readers are not forced to infer which tree is current, and it states that `docs/md/` is archive-only rather than a parallel public docs surface. |
 
 ## Guide And Example Coverage
 
@@ -91,6 +91,7 @@ Production readiness depends on separating supported documentation from archival
 | --- | --- | --- |
 | Legacy artifacts remain preserved | `docs/chm/`, `docs/md/` | The archival trees remain available for traceability and parity checking; they are not rewritten as the supported docs surface. |
 | Supported docs explain legacy status | [`docs/reference/legacy-chm.md`](../reference/legacy-chm.md), [`docs/production-docs/migration-rules.md`](migration-rules.md) | Maintainers and readers can see why the legacy trees still exist and how they relate to the supported docs set. |
+| Legacy export is excluded from supported navigation | [`docs/README.md`](../README.md), [`docs/reference/legacy-chm.md`](../reference/legacy-chm.md), [`docs/reference/README.md`](../reference/README.md) | The supported landing pages and policy docs consistently describe `docs/md/` as archival/source material only, not as a maintained reader-facing navigation or publishing path. |
 | Export-era quality debt is tracked | [`docs/production-docs/link-and-quality-baseline.md`](link-and-quality-baseline.md), [`docs/production-docs/reference-link-report.md`](reference-link-report.md) | Known legacy-link and export-noise issues are documented explicitly rather than silently carried into release claims. |
 | Legacy carry-over has an explicit release decision | [`docs/production-docs/link-and-quality-baseline.md`](link-and-quality-baseline.md), [`docs/reference/legacy-chm.md`](../reference/legacy-chm.md), [`docs/production-docs/reference-link-report.md`](reference-link-report.md) | If unresolved legacy references remain in normalized output, the release notes or ownership policy must classify them as either accepted archival carry-over or a blocker to publication. |
 

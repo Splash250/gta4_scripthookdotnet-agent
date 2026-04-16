@@ -19510,7 +19510,7 @@ Model Class | GTA Namespace | Model Constructor Overload List
 ## Visual Basic
 
 Overloads Public Sub New( \_
-   ByVal *Hash* As [UInteger](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemUInt32ClassTopic.asp) \_
+   ByVal *Hash* As [UInteger](https://learn.microsoft.com/dotnet/api/system.uint32) \_
 )
 
 ## C#
@@ -20162,7 +20162,7 @@ Model Class | GTA Namespace
 
 ## Visual Basic
 
-Public Shared Widening Operator CType(source As [UInteger](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemUInt32ClassTopic.asp)) As GTA.Model
+Public Shared Widening Operator CType(source As [UInteger](https://learn.microsoft.com/dotnet/api/system.uint32)) As GTA.Model
 
 ## C#
 
@@ -24637,7 +24637,7 @@ Inherits [System.Collections.Generic.List(Of GTA.Ped)](https://learn.microsoft.c
 
 ## C#
 
-public class PedCollection **: [List`1](http://msdn.microsoft.com/library/default.asp?url=/library/en-us/cpref/html/frlrfSystemCollectionsGenericListClassTopic.asp)**
+public class PedCollection **: [List`1](https://learn.microsoft.com/dotnet/api/system.collections.generic.list-1)**
 
 #### Thread Safety
 

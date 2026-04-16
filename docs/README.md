@@ -32,13 +32,19 @@ If you already know what you are trying to build, use these entry points:
 
 The `docs/md/` tree remains the legacy Markdown export from the CHM documentation set. It is still useful as source material and parity reference, but it is not the supported reader-facing navigation model anymore.
 
+Treat `docs/md/` as archive-only content:
+
+- do not send new readers there as the normal way to use the docs
+- do not treat it as part of the supported published navigation surface
+- do not update it as if it were the maintained public documentation tree
+
 Use the pages in this new top-level structure when you want:
 
 - a human-oriented starting point
 - links organized by task instead of export filename
 - section landing pages that explain where to go next
 
-Use `docs/md/` only when you need the raw namespace export, such as `docs/md/index.md` or `docs/md/TOC.md`, for archival lookup or migration traceability.
+Use `docs/md/` only when you need the raw namespace export, such as `docs/md/index.md` or `docs/md/TOC.md`, for archival lookup, migration traceability, or tooling input behind `docs/reference/api/`.
 
 ## Section Map
 
