@@ -430,35 +430,91 @@ def count_markdown_indented_code_blocks(markdown_text: str) -> int:
     return len(MARKDOWN_INDENTED_CODE_PATTERN.findall(normalize_markdown(markdown_text)))
 
 
+def detect_html_field_classes(raw_html: str) -> dict[str, bool]:
+    html_section_map = html_sections(raw_html)
+    return {
+        "language_signature_sections": bool(
+            extract_html_signature(raw_html, "visual_basic") or extract_html_signature(raw_html, "csharp")
+        ),
+        "parameters": bool(extract_html_parameter_names(raw_html)),
+        "returns": bool(html_section_map.get("return value", "")),
+        "remarks": bool(html_section_map.get("remarks", "")),
+        "examples": bool(html_section_map.get("examples", "")),
+        "inheritance_lines": any(marker in raw_html for marker in INHERITANCE_MARKERS),
+        "member_inventory": any(marker in raw_html for marker in MEMBERS_MARKERS),
+        "overload_inventory": "overload list" in html_section_map or any(marker in raw_html for marker in OVERLOAD_MARKERS),
+        "requirements_or_version_notes": bool(
+            " ".join(
+                filter(None, [html_section_map.get("requirements", ""), html_section_map.get("version information", "")])
+            ).strip()
+        ),
+        "thread_safety": bool(html_section_map.get("thread safety", "")),
+    }
+
+
+def detect_markdown_field_classes(markdown_text: str) -> dict[str, bool]:
+    normalized_markdown = normalize_markdown(markdown_text)
+    markdown_section_map = markdown_sections(markdown_text)
+    return {
+        "language_signature_sections": bool(
+            extract_markdown_signature(markdown_text, "visual_basic")
+            or extract_markdown_signature(markdown_text, "csharp")
+        ),
+        "parameters": bool(extract_markdown_parameter_names(markdown_text)),
+        "returns": bool(markdown_section_map.get("return value", "")),
+        "remarks": bool(markdown_section_map.get("remarks", "")),
+        "examples": bool(markdown_section_map.get("examples", "")),
+        "inheritance_lines": any(marker in normalized_markdown for marker in INHERITANCE_MARKERS),
+        "member_inventory": "#### Members" in normalized_markdown,
+        "overload_inventory": "#### Overload List" in normalized_markdown,
+        "requirements_or_version_notes": bool(
+            " ".join(
+                filter(
+                    None,
+                    [markdown_section_map.get("requirements", ""), markdown_section_map.get("version information", "")],
+                )
+            ).strip()
+        ),
+        "thread_safety": bool(markdown_section_map.get("thread safety", "")),
+    }
+
+
 def extract_fields(raw_html: str, markdown_text: str) -> tuple[dict[str, object], dict[str, object]]:
     html_section_map = html_sections(raw_html)
     markdown_section_map = markdown_sections(markdown_text)
-    html_text = strip_html(raw_html)
+    html_field_classes = detect_html_field_classes(raw_html)
+    markdown_field_classes = detect_markdown_field_classes(markdown_text)
     html_text = strip_html(html_body(raw_html))
     markdown_text_only = strip_markdown(markdown_text)
+    html_visual_basic_signature = extract_html_signature(raw_html, "visual_basic")
+    html_csharp_signature = extract_html_signature(raw_html, "csharp")
+    markdown_visual_basic_signature = extract_markdown_signature(markdown_text, "visual_basic")
+    markdown_csharp_signature = extract_markdown_signature(markdown_text, "csharp")
+    html_parameter_names = extract_html_parameter_names(raw_html)
+    markdown_parameter_names = extract_markdown_parameter_names(markdown_text)
+    html_requirements_or_version_notes = " ".join(
+        filter(None, [html_section_map.get("requirements", ""), html_section_map.get("version information", "")])
+    ).strip()
+    markdown_requirements_or_version_notes = " ".join(
+        filter(None, [markdown_section_map.get("requirements", ""), markdown_section_map.get("version information", "")])
+    ).strip()
 
     html_fields = {
         "title": html_title(raw_html),
         "summary_text": first_html_paragraph(raw_html),
-        "visual_basic_signature": extract_html_signature(raw_html, "visual_basic"),
-        "csharp_signature": extract_html_signature(raw_html, "csharp"),
-        "language_signature_sections": sum(
-            1
-            for key in ("visual_basic_signature", "csharp_signature")
-            if extract_html_signature(raw_html, "visual_basic" if key == "visual_basic_signature" else "csharp")
-        ),
-        "parameter_names": extract_html_parameter_names(raw_html),
+        "visual_basic_signature": html_visual_basic_signature,
+        "csharp_signature": html_csharp_signature,
+        "language_signature_sections": int(html_field_classes["language_signature_sections"])
+        * sum(1 for signature in (html_visual_basic_signature, html_csharp_signature) if signature),
+        "parameter_names": html_parameter_names,
         "return_value": html_section_map.get("return value", ""),
         "remarks": html_section_map.get("remarks", ""),
         "examples": html_section_map.get("examples", ""),
-        "requirements_or_version_notes": " ".join(
-            filter(None, [html_section_map.get("requirements", ""), html_section_map.get("version information", "")])
-        ).strip(),
-        "inheritance_lines": any(marker in raw_html for marker in INHERITANCE_MARKERS),
-        "member_inventory": any(marker in raw_html for marker in MEMBERS_MARKERS),
-        "inheritance_or_enum_members": any(marker in raw_html for marker in INHERITANCE_MARKERS)
-        or any(marker in raw_html for marker in MEMBERS_MARKERS),
-        "overload_inventory": "overload list" in html_section_map or any(marker in raw_html for marker in OVERLOAD_MARKERS),
+        "requirements_or_version_notes": html_requirements_or_version_notes,
+        "inheritance_lines": html_field_classes["inheritance_lines"],
+        "member_inventory": html_field_classes["member_inventory"],
+        "inheritance_or_enum_members": html_field_classes["inheritance_lines"] or html_field_classes["member_inventory"],
+        "overload_inventory": html_field_classes["overload_inventory"],
         "thread_safety": html_section_map.get("thread safety", ""),
         "external_reference_links": has_external_links(raw_html, is_html=True),
         "text": html_text,
@@ -466,25 +522,20 @@ def extract_fields(raw_html: str, markdown_text: str) -> tuple[dict[str, object]
     markdown_fields = {
         "title": markdown_h1(markdown_text),
         "summary_text": first_markdown_paragraph(markdown_text),
-        "visual_basic_signature": extract_markdown_signature(markdown_text, "visual_basic"),
-        "csharp_signature": extract_markdown_signature(markdown_text, "csharp"),
-        "language_signature_sections": sum(
-            1
-            for key in ("visual_basic_signature", "csharp_signature")
-            if extract_markdown_signature(markdown_text, "visual_basic" if key == "visual_basic_signature" else "csharp")
-        ),
-        "parameter_names": extract_markdown_parameter_names(markdown_text),
+        "visual_basic_signature": markdown_visual_basic_signature,
+        "csharp_signature": markdown_csharp_signature,
+        "language_signature_sections": int(markdown_field_classes["language_signature_sections"])
+        * sum(1 for signature in (markdown_visual_basic_signature, markdown_csharp_signature) if signature),
+        "parameter_names": markdown_parameter_names,
         "return_value": markdown_section_map.get("return value", ""),
         "remarks": markdown_section_map.get("remarks", ""),
         "examples": markdown_section_map.get("examples", ""),
-        "requirements_or_version_notes": " ".join(
-            filter(None, [markdown_section_map.get("requirements", ""), markdown_section_map.get("version information", "")])
-        ).strip(),
-        "inheritance_lines": any(marker in markdown_text for marker in INHERITANCE_MARKERS),
-        "member_inventory": "#### Members" in markdown_text,
-        "inheritance_or_enum_members": any(marker in markdown_text for marker in INHERITANCE_MARKERS)
-        or "#### Members" in markdown_text,
-        "overload_inventory": "#### Overload List" in markdown_text,
+        "requirements_or_version_notes": markdown_requirements_or_version_notes,
+        "inheritance_lines": markdown_field_classes["inheritance_lines"],
+        "member_inventory": markdown_field_classes["member_inventory"],
+        "inheritance_or_enum_members": markdown_field_classes["inheritance_lines"]
+        or markdown_field_classes["member_inventory"],
+        "overload_inventory": markdown_field_classes["overload_inventory"],
         "thread_safety": markdown_section_map.get("thread safety", ""),
         "external_reference_links": has_external_links(markdown_text, is_html=False),
         "text": markdown_text_only,

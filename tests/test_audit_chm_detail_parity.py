@@ -520,6 +520,71 @@ class AuditChmDetailParityTests(unittest.TestCase):
         self.assertTrue(enum_markdown_fields["member_inventory"])
         self.assertFalse(enum_field_presence["inheritance_or_enum_members"]["missing_in_markdown"])
 
+    def test_field_detection_helpers_cover_all_parity_critical_content_classes(self) -> None:
+        type_html = self.build_type_html(include_inheritance=True)
+        type_markdown = self.build_type_markdown(include_inheritance=True)
+        method_html = self.build_method_html(include_overloads=True)
+        method_markdown = self.build_method_markdown(include_overloads=True)
+        enum_html = self.build_type_html(title="Weapon Enumeration", include_members=True)
+        enum_markdown = self.build_type_markdown(title="Weapon Enumeration", include_members=True)
+
+        type_html_flags = self.audit.detect_html_field_classes(type_html)
+        type_markdown_flags = self.audit.detect_markdown_field_classes(type_markdown)
+        method_html_flags = self.audit.detect_html_field_classes(method_html)
+        method_markdown_flags = self.audit.detect_markdown_field_classes(method_markdown)
+        enum_html_flags = self.audit.detect_html_field_classes(enum_html)
+        enum_markdown_flags = self.audit.detect_markdown_field_classes(enum_markdown)
+
+        expected_keys = {
+            "language_signature_sections",
+            "parameters",
+            "returns",
+            "remarks",
+            "examples",
+            "inheritance_lines",
+            "member_inventory",
+            "overload_inventory",
+            "requirements_or_version_notes",
+            "thread_safety",
+        }
+        self.assertEqual(set(type_html_flags), expected_keys)
+        self.assertEqual(set(type_markdown_flags), expected_keys)
+
+        self.assertTrue(type_html_flags["language_signature_sections"])
+        self.assertTrue(type_markdown_flags["language_signature_sections"])
+        self.assertFalse(type_html_flags["parameters"])
+        self.assertFalse(type_markdown_flags["parameters"])
+        self.assertTrue(type_html_flags["inheritance_lines"])
+        self.assertTrue(type_markdown_flags["inheritance_lines"])
+        self.assertTrue(type_html_flags["requirements_or_version_notes"])
+        self.assertTrue(type_markdown_flags["requirements_or_version_notes"])
+        self.assertTrue(type_html_flags["thread_safety"])
+        self.assertTrue(type_markdown_flags["thread_safety"])
+
+        self.assertTrue(method_html_flags["language_signature_sections"])
+        self.assertTrue(method_markdown_flags["language_signature_sections"])
+        self.assertTrue(method_html_flags["parameters"])
+        self.assertTrue(method_markdown_flags["parameters"])
+        self.assertTrue(method_html_flags["returns"])
+        self.assertTrue(method_markdown_flags["returns"])
+        self.assertTrue(method_html_flags["remarks"])
+        self.assertTrue(method_markdown_flags["remarks"])
+        self.assertTrue(method_html_flags["examples"])
+        self.assertTrue(method_markdown_flags["examples"])
+        self.assertTrue(method_html_flags["overload_inventory"])
+        self.assertTrue(method_markdown_flags["overload_inventory"])
+        self.assertFalse(method_html_flags["member_inventory"])
+        self.assertFalse(method_markdown_flags["member_inventory"])
+        self.assertFalse(method_html_flags["thread_safety"])
+        self.assertFalse(method_markdown_flags["thread_safety"])
+
+        self.assertFalse(enum_html_flags["inheritance_lines"])
+        self.assertFalse(enum_markdown_flags["inheritance_lines"])
+        self.assertTrue(enum_html_flags["member_inventory"])
+        self.assertTrue(enum_markdown_flags["member_inventory"])
+        self.assertFalse(enum_html_flags["overload_inventory"])
+        self.assertFalse(enum_markdown_flags["overload_inventory"])
+
     def test_extract_fields_handles_chm_markup_noise_in_html(self) -> None:
         raw_html = """
         <html>
