@@ -24,9 +24,9 @@ Treat the supported docs tree as editorial output built from a mix of curated pa
 | --- | --- | --- |
 | `docs/guides/` | [README.md](../README.md), [ScriptHookDotNet.readme.txt](../ScriptHookDotNet.readme.txt), relevant runtime or packaging files, and the sample projects in [TestScriptCS/](../TestScriptCS), [TestScriptVB/](../TestScriptVB), and [GrabScript/](../GrabScript) | Guides should explain supported workflows in repo terms. Prefer the root readmes and checked-in sample projects over paraphrasing legacy exported API pages. |
 | `docs/examples/` | The checked-in sample projects in [TestScriptCS/](../TestScriptCS), [TestScriptVB/](../TestScriptVB), and [GrabScript/](../GrabScript) | Examples are documentation derived from working repo assets. If an example page disagrees with a sample project, fix the page or the project intentionally rather than letting them drift. |
-| `docs/reference/api/` | The legacy Markdown export under [docs/md/](md/), normalized through [docs/tools/normalize_reference.py](tools/normalize_reference.py) and orchestrated by [docs/tools/build_docs.ps1](tools/build_docs.ps1) | Do not hand-edit generated API pages as routine maintenance. Update the normalization flow or the curated preserved pages when the generated output is wrong. |
+| `docs/reference/api/` | The legacy `docs/md/` export archive, normalized through [docs/tools/normalize_reference.py](tools/normalize_reference.py) and orchestrated by [docs/tools/build_docs.ps1](tools/build_docs.ps1) | Do not hand-edit generated API pages as routine maintenance. Update the normalization flow or the curated preserved pages when the generated output is wrong. |
 | `docs/reference/` concept pages | Supported docs pages plus checked-in runtime/sample sources that demonstrate behavior | Concept pages may interpret behavior, but they should still point back to authoritative code or source docs. |
-| Legacy archive material | [docs/chm/](chm/) and [docs/md/](md/) | These folders are preserved for provenance, migration, and parity checks. They are not the supported navigation surface for new readers. |
+| Legacy archive material | `docs/chm/` and `docs/md/` | These archival paths are preserved in project history and migration notes for provenance and parity checks. They are not the supported navigation surface for new readers. |
 
 Keep [docs/production-docs/migration-rules.md](production-docs/migration-rules.md) and [docs/production-docs/publish-readiness-checklist.md](production-docs/publish-readiness-checklist.md) aligned with any process change that affects how docs are generated, validated, or published.
 
@@ -46,7 +46,7 @@ Typical guide/example maintenance does not require regenerating `docs/reference/
 
 ## Updating Generated Reference Content
 
-The normalized API tree under [docs/reference/api/](reference/api/) is generated from the archival export in [docs/md/](md/). The checked-in tooling for that process lives under [docs/tools/](tools/):
+The normalized API tree under [docs/reference/api/](reference/api/) is generated from the archival `docs/md/` export. The checked-in tooling for that process lives under [docs/tools/](tools/):
 
 - [docs/tools/build_docs.ps1](tools/build_docs.ps1) orchestrates the build from the repo root.
 - [docs/tools/normalize_reference.py](tools/normalize_reference.py) converts the legacy export into the normalized API tree.

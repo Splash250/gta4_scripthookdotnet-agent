@@ -1,0 +1,670 @@
+#!/usr/bin/env python3
+"""Audit detailed parity between decompiled CHM HTML and mapped Markdown pages."""
+
+from __future__ import annotations
+
+import argparse
+import csv
+import html
+import json
+import re
+from dataclasses import asdict, dataclass
+from datetime import date
+from pathlib import Path
+
+
+TITLE_PATTERN = re.compile(r"<title>(.*?)</title>", re.IGNORECASE | re.DOTALL)
+H1_PATTERN = re.compile(r"<h1\b[^>]*>(.*?)</h1>", re.IGNORECASE | re.DOTALL)
+BODY_PATTERN = re.compile(r"<body\b[^>]*>(.*?)</body>", re.IGNORECASE | re.DOTALL)
+SCRIPT_STYLE_PATTERN = re.compile(
+    r"<(script|style)\b[^>]*>.*?</\1>",
+    re.IGNORECASE | re.DOTALL,
+)
+COMMENT_PATTERN = re.compile(r"<!--.*?-->", re.DOTALL)
+TAG_PATTERN = re.compile(r"<[^>]+>")
+FRONT_MATTER_PATTERN = re.compile(r"^---\n.*?\n---\n+", re.DOTALL)
+WHITESPACE_PATTERN = re.compile(r"\s+")
+HTML_H4_SECTION_PATTERN = re.compile(
+    r"<h4\b[^>]*>\s*(?P<heading>.*?)\s*</h4>(?P<body>.*?)(?=(<h4\b|<hr\b|</div>\s*</body>|$))",
+    re.IGNORECASE | re.DOTALL,
+)
+MARKDOWN_SECTION_PATTERN = re.compile(
+    r"^####\s+(?P<heading>.+?)\n(?P<body>.*?)(?=^####\s+|\Z)",
+    re.MULTILINE | re.DOTALL,
+)
+MARKDOWN_VISUAL_BASIC_PATTERN = re.compile(
+    r"^##\s+Visual Basic\s*\n(?P<body>.*?)(?=^##\s+|^####\s+|\Z)",
+    re.MULTILINE | re.DOTALL,
+)
+MARKDOWN_CSHARP_PATTERN = re.compile(
+    r"^##\s+C#\s*\n(?P<body>.*?)(?=^##\s+|^####\s+|\Z)",
+    re.MULTILINE | re.DOTALL,
+)
+HTML_VISUAL_BASIC_PATTERN = re.compile(
+    r"<div class=['\"]syntax['\"]>\s*<span class=['\"]lang['\"]>\[Visual(?:&nbsp;|\s+)Basic\]</span>(?P<body>.*?)</div>",
+    re.IGNORECASE | re.DOTALL,
+)
+HTML_CSHARP_PATTERN = re.compile(
+    r"<div class=['\"]syntax['\"]>\s*<span class=['\"]lang['\"]>\[C#\]</span>(?P<body>.*?)</div>",
+    re.IGNORECASE | re.DOTALL,
+)
+HTML_DT_PATTERN = re.compile(r"<dt\b[^>]*>(.*?)</dt>", re.IGNORECASE | re.DOTALL)
+MARKDOWN_PARAMETER_PATTERN = re.compile(r"^\*(.+?)\*\s*$", re.MULTILINE)
+HTML_LINK_PATTERN = re.compile(r"<a\b[^>]*href=['\"](.*?)['\"]", re.IGNORECASE)
+MARKDOWN_LINK_PATTERN = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
+TITLE_SUFFIX_PATTERN = re.compile(
+    r"\s+(Class|Structure|Interface|Enumeration|Delegate|Method|Property|Event)$",
+    re.IGNORECASE,
+)
+CODE_FENCE_PATTERN = re.compile(r"^```", re.MULTILINE)
+BLOCKQUOTE_PATTERN = re.compile(r"^\s*>\s+", re.MULTILINE)
+LIST_ITEM_PATTERN = re.compile(r"^\s*(?:[-*+]|\d+\.)\s+", re.MULTILINE)
+HTML_LIST_PATTERN = re.compile(r"<(?:ul|ol|dl|blockquote)\b", re.IGNORECASE)
+HTML_TABLE_PATTERN = re.compile(r"<table\b", re.IGNORECASE)
+MARKDOWN_TABLE_PATTERN = re.compile(r"^\|.*\|\s*$", re.MULTILINE)
+HTML_CODE_PATTERN = re.compile(r"<(?:pre|code)\b", re.IGNORECASE)
+INHERITANCE_MARKERS = ("Derived types", "Inherits", "Inheritance Hierarchy")
+MEMBERS_MARKERS = ("#### Members", "dtH4'>Members", 'dtH4">Members')
+OVERLOAD_MARKERS = ("#### Overload List", "dtH4'>Overload List", 'dtH4">Overload List')
+
+INTENTIONAL_CURATION_SOURCES = {
+    "docs/md/GTA IV ScriptHook.Net Single File Documentation.md",
+    "docs/md/index.md",
+    "docs/md/misc/index.md",
+    "docs/md/TOC.md",
+}
+
+BLOCKING_FIELDS = (
+    "summary_text",
+    "visual_basic_signature",
+    "csharp_signature",
+    "parameter_names",
+    "return_value",
+    "remarks",
+    "examples",
+    "requirements_or_version_notes",
+    "inheritance_or_enum_members",
+    "overload_inventory",
+    "thread_safety",
+    "external_reference_links",
+)
+
+
+@dataclass(frozen=True)
+class MappingRow:
+    source_path: str
+    doc_kind: str
+    namespace_or_section: str
+    target_path: str
+    notes: str
+
+
+@dataclass(frozen=True)
+class PageAuditRecord:
+    source_path: str
+    relative_html_path: str
+    target_path: str
+    doc_kind: str
+    title_match: bool
+    html_text_length: int
+    markdown_text_length: int
+    density_ratio: float
+    code_block_count_html: int
+    code_block_count_markdown: int
+    list_count_html: int
+    list_count_markdown: int
+    table_count_html: int
+    table_count_markdown: int
+    link_count_html: int
+    link_count_markdown: int
+    signature_count_html: int
+    signature_count_markdown: int
+    field_presence: dict[str, dict[str, object]]
+    severity: str
+    notes: list[str]
+
+
+@dataclass(frozen=True)
+class AuditSummary:
+    total_pages: int
+    clean_findings: int
+    expected_findings: int
+    minor_findings: int
+    major_findings: int
+    blocking_findings: int
+
+
+def parse_args() -> argparse.Namespace:
+    parser = argparse.ArgumentParser(
+        description=(
+            "Compare decompiled CHM HTML detail fields against mapped Markdown "
+            "targets and emit Markdown plus JSON parity reports."
+        )
+    )
+    parser.add_argument(
+        "--repo-root",
+        type=Path,
+        default=Path("."),
+        help="Repository root. Defaults to the current directory.",
+    )
+    parser.add_argument(
+        "--decompiled-root",
+        type=Path,
+        default=Path(".maestro/tmp/chm-verify"),
+        help="Directory containing decompiled CHM HTML files.",
+    )
+    parser.add_argument(
+        "--page-map",
+        type=Path,
+        default=Path("docs/production-docs/reference-page-map.csv"),
+        help="CSV mapping between legacy export pages and supported Markdown targets.",
+    )
+    parser.add_argument(
+        "--report",
+        type=Path,
+        default=Path("docs/production-docs/chm-detail-parity-report.md"),
+        help="Markdown report path to write.",
+    )
+    parser.add_argument(
+        "--json-report",
+        type=Path,
+        default=Path("docs/production-docs/chm-detail-parity-report.json"),
+        help="JSON report path to write.",
+    )
+    return parser.parse_args()
+
+
+def resolve_path(repo_root: Path, raw_path: Path) -> Path:
+    return raw_path if raw_path.is_absolute() else (repo_root / raw_path)
+
+
+def load_page_map(page_map_path: Path) -> list[MappingRow]:
+    with page_map_path.open("r", encoding="utf-8", newline="") as handle:
+        reader = csv.DictReader(handle)
+        return [
+            MappingRow(
+                source_path=row["source_path"],
+                doc_kind=row["doc_kind"],
+                namespace_or_section=row["namespace_or_section"],
+                target_path=row["target_path"],
+                notes=row["notes"],
+            )
+            for row in reader
+        ]
+
+
+def source_path_to_html_relative(source_path: str) -> str:
+    relative = Path(source_path).relative_to("docs/md")
+    parts = relative.parts
+    if len(parts) == 1:
+        return relative.with_suffix(".html").name
+    if len(parts) == 2 and parts[1] == "index.md":
+        return f"{parts[0]}.html"
+    namespace = parts[0]
+    leaf = Path(parts[-1]).stem
+    return f"{namespace}.{leaf}.html"
+
+
+def normalize_text(value: str) -> str:
+    return WHITESPACE_PATTERN.sub(" ", value).strip()
+
+
+def strip_html(raw_html: str) -> str:
+    without_script_style = SCRIPT_STYLE_PATTERN.sub(" ", raw_html)
+    without_comments = COMMENT_PATTERN.sub(" ", without_script_style)
+    without_tags = TAG_PATTERN.sub(" ", without_comments)
+    return normalize_text(html.unescape(without_tags).replace("\xa0", " "))
+
+
+def strip_markdown(markdown_text: str) -> str:
+    text = FRONT_MATTER_PATTERN.sub("", markdown_text)
+    text = re.sub(r"`{1,3}", " ", text)
+    text = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r"\1", text)
+    text = re.sub(r"[*_>#|:-]", " ", text)
+    return normalize_text(text)
+
+
+def normalize_title(title: str) -> str:
+    plain = normalize_text(title.replace("\xa0", " "))
+    plain = TITLE_SUFFIX_PATTERN.sub("", plain).strip()
+    return plain.casefold()
+
+
+def markdown_h1(markdown_text: str) -> str:
+    body = FRONT_MATTER_PATTERN.sub("", markdown_text)
+    for line in body.splitlines():
+        if line.startswith("# "):
+            return line[2:].strip()
+    return ""
+
+
+def html_title(raw_html: str) -> str:
+    match = TITLE_PATTERN.search(raw_html)
+    if match:
+        return normalize_text(html.unescape(match.group(1)).replace("\xa0", " "))
+    h1_match = H1_PATTERN.search(raw_html)
+    if h1_match:
+        return normalize_text(html.unescape(strip_html(h1_match.group(1))).replace("\xa0", " "))
+    return ""
+
+
+def html_body(raw_html: str) -> str:
+    match = BODY_PATTERN.search(raw_html)
+    return match.group(1) if match else raw_html
+
+
+def html_sections(raw_html: str) -> dict[str, str]:
+    sections: dict[str, str] = {}
+    for match in HTML_H4_SECTION_PATTERN.finditer(raw_html):
+        heading = strip_html(match.group("heading")).casefold()
+        sections[heading] = normalize_text(strip_html(match.group("body")))
+    return sections
+
+
+def markdown_sections(markdown_text: str) -> dict[str, str]:
+    body = FRONT_MATTER_PATTERN.sub("", markdown_text)
+    sections: dict[str, str] = {}
+    for match in MARKDOWN_SECTION_PATTERN.finditer(body):
+        heading = normalize_text(match.group("heading")).casefold()
+        sections[heading] = normalize_text(match.group("body"))
+    return sections
+
+
+def first_html_paragraph(raw_html: str) -> str:
+    body = html_body(raw_html)
+    paragraphs = re.findall(r"<p\b[^>]*>(.*?)</p>", body, re.IGNORECASE | re.DOTALL)
+    for paragraph in paragraphs:
+        text = strip_html(paragraph)
+        if text:
+            return text
+    return ""
+
+
+def first_markdown_paragraph(markdown_text: str) -> str:
+    body = FRONT_MATTER_PATTERN.sub("", markdown_text)
+    body = re.sub(r"^# .*\n+", "", body, count=1)
+    blocks = [block.strip() for block in re.split(r"\n\s*\n", body) if block.strip()]
+    for block in blocks:
+        if block.startswith("## ") or block.startswith("#### "):
+            continue
+        return normalize_text(block)
+    return ""
+
+
+def extract_markdown_signature(markdown_text: str, language: str) -> str:
+    pattern = MARKDOWN_VISUAL_BASIC_PATTERN if language == "visual_basic" else MARKDOWN_CSHARP_PATTERN
+    match = pattern.search(FRONT_MATTER_PATTERN.sub("", markdown_text))
+    if not match:
+        return ""
+    return normalize_text(match.group("body"))
+
+
+def extract_html_signature(raw_html: str, language: str) -> str:
+    pattern = HTML_VISUAL_BASIC_PATTERN if language == "visual_basic" else HTML_CSHARP_PATTERN
+    match = pattern.search(raw_html)
+    if not match:
+        return ""
+    return normalize_text(strip_html(match.group("body")))
+
+
+def extract_markdown_parameter_names(markdown_text: str) -> list[str]:
+    body = FRONT_MATTER_PATTERN.sub("", markdown_text)
+    match = re.search(
+        r"^####\s+Parameters\s*\n(?P<body>.*?)(?=^####\s+|\Z)",
+        body,
+        re.MULTILINE | re.DOTALL,
+    )
+    if not match:
+        return []
+    section = match.group("body")
+    return [normalize_text(name).casefold() for name in MARKDOWN_PARAMETER_PATTERN.findall(section)]
+
+
+def extract_html_parameter_names(raw_html: str) -> list[str]:
+    section_match = re.search(
+        r"<h4\b[^>]*>\s*Parameters\s*</h4>(?P<body>.*?)(?=(<h4\b|<hr\b|</div>\s*</body>|$))",
+        raw_html,
+        re.IGNORECASE | re.DOTALL,
+    )
+    if not section_match:
+        return []
+    return [
+        normalize_text(strip_html(match)).casefold()
+        for match in HTML_DT_PATTERN.findall(section_match.group("body"))
+        if normalize_text(strip_html(match))
+    ]
+
+
+def extract_links(raw_text: str, *, is_html: bool) -> list[str]:
+    pattern = HTML_LINK_PATTERN if is_html else MARKDOWN_LINK_PATTERN
+    return pattern.findall(raw_text)
+
+
+def has_external_links(raw_text: str, *, is_html: bool) -> bool:
+    return any(link.startswith(("http://", "https://")) for link in extract_links(raw_text, is_html=is_html))
+
+
+def extract_fields(raw_html: str, markdown_text: str) -> tuple[dict[str, object], dict[str, object]]:
+    html_section_map = html_sections(raw_html)
+    markdown_section_map = markdown_sections(markdown_text)
+    html_text = strip_html(raw_html)
+    markdown_text_only = strip_markdown(markdown_text)
+
+    html_fields = {
+        "title": html_title(raw_html),
+        "summary_text": first_html_paragraph(raw_html),
+        "visual_basic_signature": extract_html_signature(raw_html, "visual_basic"),
+        "csharp_signature": extract_html_signature(raw_html, "csharp"),
+        "parameter_names": extract_html_parameter_names(raw_html),
+        "return_value": html_section_map.get("return value", ""),
+        "remarks": html_section_map.get("remarks", ""),
+        "examples": html_section_map.get("examples", ""),
+        "requirements_or_version_notes": " ".join(
+            filter(None, [html_section_map.get("requirements", ""), html_section_map.get("version information", "")])
+        ).strip(),
+        "inheritance_or_enum_members": any(
+            marker in raw_html for marker in INHERITANCE_MARKERS
+        ) or any(marker in raw_html for marker in MEMBERS_MARKERS),
+        "overload_inventory": "overload list" in html_section_map or any(marker in raw_html for marker in OVERLOAD_MARKERS),
+        "thread_safety": html_section_map.get("thread safety", ""),
+        "external_reference_links": has_external_links(raw_html, is_html=True),
+        "text": html_text,
+    }
+    markdown_fields = {
+        "title": markdown_h1(markdown_text),
+        "summary_text": first_markdown_paragraph(markdown_text),
+        "visual_basic_signature": extract_markdown_signature(markdown_text, "visual_basic"),
+        "csharp_signature": extract_markdown_signature(markdown_text, "csharp"),
+        "parameter_names": extract_markdown_parameter_names(markdown_text),
+        "return_value": markdown_section_map.get("return value", ""),
+        "remarks": markdown_section_map.get("remarks", ""),
+        "examples": markdown_section_map.get("examples", ""),
+        "requirements_or_version_notes": " ".join(
+            filter(None, [markdown_section_map.get("requirements", ""), markdown_section_map.get("version information", "")])
+        ).strip(),
+        "inheritance_or_enum_members": any(marker in markdown_text for marker in INHERITANCE_MARKERS)
+        or "#### Members" in markdown_text,
+        "overload_inventory": "#### Overload List" in markdown_text,
+        "thread_safety": markdown_section_map.get("thread safety", ""),
+        "external_reference_links": has_external_links(markdown_text, is_html=False),
+        "text": markdown_text_only,
+    }
+    return html_fields, markdown_fields
+
+
+def field_is_present(value: object) -> bool:
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, list):
+        return len(value) > 0
+    return bool(normalize_text(str(value)))
+
+
+def compare_field_presence(
+    html_fields: dict[str, object],
+    markdown_fields: dict[str, object],
+) -> tuple[dict[str, dict[str, object]], list[str]]:
+    field_presence: dict[str, dict[str, object]] = {}
+    blocking_notes: list[str] = []
+    for name in BLOCKING_FIELDS:
+        html_present = field_is_present(html_fields[name])
+        markdown_present = field_is_present(markdown_fields[name])
+        missing_in_markdown = html_present and not markdown_present
+        field_presence[name] = {
+            "html": html_present,
+            "markdown": markdown_present,
+            "missing_in_markdown": missing_in_markdown,
+        }
+        if missing_in_markdown:
+            blocking_notes.append(
+                f"missing key field `{name}` from Markdown while CHM includes it"
+            )
+    return field_presence, blocking_notes
+
+
+def count_html_code_blocks(raw_html: str) -> int:
+    return len(HTML_CODE_PATTERN.findall(raw_html))
+
+
+def count_markdown_code_blocks(markdown_text: str) -> int:
+    return CODE_FENCE_PATTERN.findall(markdown_text).__len__() // 2
+
+
+def count_markdown_lists(markdown_text: str) -> int:
+    return len(LIST_ITEM_PATTERN.findall(markdown_text)) + len(BLOCKQUOTE_PATTERN.findall(markdown_text))
+
+
+def audit_page(
+    *,
+    row: MappingRow,
+    html_path: Path,
+    markdown_text: str,
+    curated_allowlist: set[str],
+) -> PageAuditRecord:
+    raw_html = html_path.read_text(encoding="utf-8", errors="ignore")
+    html_fields, markdown_fields = extract_fields(raw_html, markdown_text)
+    field_presence, blocking_notes = compare_field_presence(html_fields, markdown_fields)
+    html_text_length = len(str(html_fields["text"]))
+    markdown_text_length = len(str(markdown_fields["text"]))
+    density_ratio = round(
+        markdown_text_length / html_text_length,
+        3,
+    ) if html_text_length else 0.0
+    title_match = normalize_title(str(html_fields["title"])) == normalize_title(str(markdown_fields["title"]))
+
+    notes: list[str] = []
+    severity = "clean"
+    if not title_match:
+        notes.append(
+            f"title mismatch: html={html_fields['title']!r} markdown={markdown_fields['title']!r}"
+        )
+        severity = "minor"
+
+    if blocking_notes:
+        notes.extend(blocking_notes)
+        severity = "blocking"
+    elif density_ratio < 0.75:
+        notes.append(f"density_ratio {density_ratio:.3f} falls materially below the HTML source")
+        severity = "major"
+    elif density_ratio < 0.9:
+        notes.append(f"density_ratio {density_ratio:.3f} is below the HTML source")
+        severity = "minor"
+
+    code_block_count_html = count_html_code_blocks(raw_html)
+    code_block_count_markdown = count_markdown_code_blocks(markdown_text)
+    if severity not in {"blocking", "expected"} and code_block_count_markdown < code_block_count_html:
+        notes.append(
+            f"code_block_count reduced from {code_block_count_html} to {code_block_count_markdown}"
+        )
+        severity = "major"
+
+    signature_count_html = sum(
+        1 for key in ("visual_basic_signature", "csharp_signature") if field_presence[key]["html"]
+    )
+    signature_count_markdown = sum(
+        1 for key in ("visual_basic_signature", "csharp_signature") if field_presence[key]["markdown"]
+    )
+    if severity not in {"blocking", "expected"} and signature_count_markdown < signature_count_html:
+        notes.append(
+            f"signature_count reduced from {signature_count_html} to {signature_count_markdown}"
+        )
+        severity = "major"
+
+    if severity != "clean" and row.source_path in curated_allowlist:
+        notes.append("allowlisted curated difference downgraded to expected")
+        severity = "expected"
+
+    return PageAuditRecord(
+        source_path=row.source_path,
+        relative_html_path=html_path.name,
+        target_path=row.target_path,
+        doc_kind=row.doc_kind,
+        title_match=title_match,
+        html_text_length=html_text_length,
+        markdown_text_length=markdown_text_length,
+        density_ratio=density_ratio,
+        code_block_count_html=code_block_count_html,
+        code_block_count_markdown=code_block_count_markdown,
+        list_count_html=len(HTML_LIST_PATTERN.findall(raw_html)),
+        list_count_markdown=count_markdown_lists(markdown_text),
+        table_count_html=len(HTML_TABLE_PATTERN.findall(raw_html)),
+        table_count_markdown=len(MARKDOWN_TABLE_PATTERN.findall(markdown_text)),
+        link_count_html=len(extract_links(raw_html, is_html=True)),
+        link_count_markdown=len(extract_links(markdown_text, is_html=False)),
+        signature_count_html=signature_count_html,
+        signature_count_markdown=signature_count_markdown,
+        field_presence=field_presence,
+        severity=severity,
+        notes=notes,
+    )
+
+
+def summarize(records: list[PageAuditRecord]) -> AuditSummary:
+    counts = {
+        "clean": 0,
+        "expected": 0,
+        "minor": 0,
+        "major": 0,
+        "blocking": 0,
+    }
+    for record in records:
+        counts[record.severity] += 1
+    return AuditSummary(
+        total_pages=len(records),
+        clean_findings=counts["clean"],
+        expected_findings=counts["expected"],
+        minor_findings=counts["minor"],
+        major_findings=counts["major"],
+        blocking_findings=counts["blocking"],
+    )
+
+
+def render_markdown_report(
+    *,
+    summary: AuditSummary,
+    records: list[PageAuditRecord],
+    decompiled_root: Path,
+    page_map_path: Path,
+) -> str:
+    today = date.today().isoformat()
+    page_lines = []
+    for record in records:
+        note_lines = record.notes or ["no issues detected"]
+        page_lines.append(
+            "\n".join(
+                [
+                    f"### {record.source_path}",
+                    "",
+                    f"- severity: {record.severity}",
+                    f"- html: `{record.relative_html_path}`",
+                    f"- target: `{record.target_path}`",
+                    f"- title_match: {record.title_match}",
+                    f"- density_ratio: {record.density_ratio:.3f}",
+                    f"- signature_count_html: {record.signature_count_html}",
+                    f"- signature_count_markdown: {record.signature_count_markdown}",
+                    f"- notes: {'; '.join(note_lines)}",
+                ]
+            )
+        )
+
+    return (
+        "---\n"
+        "type: report\n"
+        "title: CHM Detail Parity Report\n"
+        f"created: {today}\n"
+        "tags:\n"
+        "  - docs\n"
+        "  - chm\n"
+        "  - parity\n"
+        "  - detail-audit\n"
+        "related:\n"
+        "  - '[[CHM Detail Parity Methodology]]'\n"
+        "  - '[[CHM Parity Report]]'\n"
+        "---\n\n"
+        "# CHM Detail Parity Report\n\n"
+        f"Compared decompiled HTML from `{decompiled_root.as_posix()}` against page map `{page_map_path.as_posix()}`.\n\n"
+        "## Summary\n\n"
+        f"- total_pages: {summary.total_pages}\n"
+        f"- clean_findings: {summary.clean_findings}\n"
+        f"- expected_findings: {summary.expected_findings}\n"
+        f"- minor_findings: {summary.minor_findings}\n"
+        f"- major_findings: {summary.major_findings}\n"
+        f"- blocking_findings: {summary.blocking_findings}\n\n"
+        "## Per-Page Findings\n\n"
+        + ("\n\n".join(page_lines) if page_lines else "- None\n")
+        + "\n"
+    )
+
+
+def json_payload(summary: AuditSummary, records: list[PageAuditRecord]) -> dict[str, object]:
+    return {
+        "summary": asdict(summary),
+        "pages": [asdict(record) for record in records],
+    }
+
+
+def main() -> int:
+    args = parse_args()
+    repo_root = args.repo_root.resolve()
+    decompiled_root = resolve_path(repo_root, args.decompiled_root).resolve()
+    page_map_path = resolve_path(repo_root, args.page_map).resolve()
+    report_path = resolve_path(repo_root, args.report).resolve()
+    json_report_path = resolve_path(repo_root, args.json_report).resolve()
+
+    if not page_map_path.exists():
+        raise SystemExit(f"Page map does not exist: {page_map_path}")
+    if not decompiled_root.exists():
+        raise SystemExit(f"Decompiled CHM directory does not exist: {decompiled_root}")
+
+    page_map_rows = load_page_map(page_map_path)
+    curated_allowlist = set(INTENTIONAL_CURATION_SOURCES)
+    records: list[PageAuditRecord] = []
+
+    for row in page_map_rows:
+        html_relative = source_path_to_html_relative(row.source_path)
+        html_path = decompiled_root / html_relative
+        if not html_path.exists():
+            raise SystemExit(f"Mapped HTML page does not exist: {html_path}")
+
+        target_path = resolve_path(repo_root, Path(row.target_path))
+        if not target_path.exists():
+            raise SystemExit(f"Mapped target page does not exist: {target_path}")
+
+        markdown_text = target_path.read_text(encoding="utf-8")
+        records.append(
+            audit_page(
+                row=row,
+                html_path=html_path,
+                markdown_text=markdown_text,
+                curated_allowlist=curated_allowlist,
+            )
+        )
+
+    summary = summarize(records)
+    report_path.parent.mkdir(parents=True, exist_ok=True)
+    report_path.write_text(
+        render_markdown_report(
+            summary=summary,
+            records=records,
+            decompiled_root=decompiled_root,
+            page_map_path=page_map_path,
+        ),
+        encoding="utf-8",
+    )
+    json_report_path.write_text(
+        json.dumps(json_payload(summary, records), indent=2),
+        encoding="utf-8",
+    )
+
+    print(f"Audited {summary.total_pages} mapped pages")
+    print(f"Markdown report written to {report_path}")
+    print(f"JSON report written to {json_report_path}")
+    if summary.blocking_findings > 0:
+        raise SystemExit(
+            f"Blocking page-level parity findings: {summary.blocking_findings}"
+        )
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())

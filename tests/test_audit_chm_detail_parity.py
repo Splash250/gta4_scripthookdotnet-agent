@@ -1,0 +1,614 @@
+import csv
+import importlib.util
+import json
+import shutil
+import subprocess
+import sys
+import tempfile
+import unittest
+from pathlib import Path
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+SCRIPT_PATH = REPO_ROOT / "docs" / "tools" / "audit_chm_detail_parity.py"
+
+
+def load_audit_module():
+    spec = importlib.util.spec_from_file_location("audit_chm_detail_parity", SCRIPT_PATH)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"Unable to load module from {SCRIPT_PATH}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+class AuditChmDetailParityTests(unittest.TestCase):
+    maxDiff = None
+
+    def setUp(self) -> None:
+        self.audit = load_audit_module()
+        self.temp_dir = Path(tempfile.mkdtemp(prefix="audit-chm-detail-"))
+        self.repo_root = self.temp_dir / "repo"
+        self.decompiled_root = self.repo_root / ".maestro" / "tmp" / "chm-verify"
+        self.production_docs = self.repo_root / "docs" / "production-docs"
+        self.reference_api = self.repo_root / "docs" / "reference" / "api"
+        self.report_path = self.production_docs / "chm-detail-parity-report.md"
+        self.json_report_path = self.production_docs / "chm-detail-parity-report.json"
+        self.page_map_path = self.production_docs / "reference-page-map.csv"
+
+        self.decompiled_root.mkdir(parents=True)
+        self.production_docs.mkdir(parents=True)
+        self.reference_api.mkdir(parents=True)
+
+    def tearDown(self) -> None:
+        shutil.rmtree(self.temp_dir)
+
+    def run_script(self, *, page_map_path: Path | None = None) -> subprocess.CompletedProcess[str]:
+        return subprocess.run(
+            [
+                "python",
+                str(SCRIPT_PATH),
+                "--repo-root",
+                str(self.repo_root),
+                "--decompiled-root",
+                str(self.decompiled_root),
+                "--page-map",
+                str(page_map_path or self.page_map_path),
+                "--report",
+                str(self.report_path),
+                "--json-report",
+                str(self.json_report_path),
+            ],
+            cwd=REPO_ROOT,
+            capture_output=True,
+            text=True,
+        )
+
+    def write_page_map(self, rows: list[dict[str, str]]) -> None:
+        with self.page_map_path.open("w", encoding="utf-8", newline="") as handle:
+            writer = csv.DictWriter(
+                handle,
+                fieldnames=[
+                    "source_path",
+                    "doc_kind",
+                    "namespace_or_section",
+                    "target_path",
+                    "notes",
+                ],
+                quoting=csv.QUOTE_ALL,
+            )
+            writer.writeheader()
+            writer.writerows(rows)
+
+    def write_html(self, relative_path: str, title: str, body: str) -> None:
+        path = self.decompiled_root / relative_path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(
+            (
+                "<html><head>"
+                f"<title>{title}</title>"
+                "</head><body>"
+                f"{body}"
+                "</body></html>"
+            ),
+            encoding="utf-8",
+        )
+
+    def write_markdown(self, relative_path: str, text: str) -> None:
+        path = self.repo_root / relative_path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(text, encoding="utf-8")
+
+    def build_type_html(
+        self,
+        *,
+        title: str = "Vector3 Class",
+        summary: str = "Represents a three-dimensional vector.",
+        include_thread_safety: bool = True,
+        include_requirements: bool = True,
+    ) -> str:
+        thread_safety = (
+            "<h4 class='dtH4'>Thread Safety</h4>"
+            "<p>Static members are safe for multithreaded operations.</p>"
+            if include_thread_safety
+            else ""
+        )
+        requirements = (
+            "<h4 class='dtH4'>Requirements</h4>"
+            "<p><b>Namespace: </b><a href='GTA.html'>GTA</a></p>"
+            "<p><b>Assembly: </b>ScriptHookDotNet (in ScriptHookDotNet.dll)</p>"
+            if include_requirements
+            else ""
+        )
+        return (
+            f"<div id='TitleRow'><h1 class='dtH1'>{title}</h1></div>"
+            f"<div id='nstext'><p>{summary}</p>"
+            "<div class='syntax'><span class='lang'>[Visual Basic]</span>"
+            "<br />Public Class Vector3</div>"
+            "<div class='syntax'><span class='lang'>[C#]</span>"
+            "<div>public class Vector3</div></div>"
+            f"{thread_safety}"
+            f"{requirements}"
+            "<h4 class='dtH4'>See Also</h4>"
+            "<p><a href='https://learn.microsoft.com/dotnet/api/system.object'>System.Object</a></p>"
+            "</div>"
+        )
+
+    def build_type_markdown(
+        self,
+        *,
+        title: str = "Vector3 Class",
+        summary: str = "Represents a three-dimensional vector.",
+        include_vb: bool = True,
+        include_csharp: bool = True,
+        include_thread_safety: bool = True,
+        include_requirements: bool = True,
+    ) -> str:
+        chunks = [f"# {title}", "", summary, ""]
+        if include_vb:
+            chunks.extend(["## Visual Basic", "", "Public Class Vector3", ""])
+        if include_csharp:
+            chunks.extend(["## C#", "", "public class Vector3", ""])
+        if include_thread_safety:
+            chunks.extend(
+                [
+                    "#### Thread Safety",
+                    "",
+                    "Static members are safe for multithreaded operations.",
+                    "",
+                ]
+            )
+        if include_requirements:
+            chunks.extend(
+                [
+                    "#### Requirements",
+                    "",
+                    "**Namespace:**",
+                    "[GTA](index.md)",
+                    "",
+                    "**Assembly:** ScriptHookDotNet (in ScriptHookDotNet.dll)",
+                    "",
+                ]
+            )
+        chunks.extend(
+            [
+                "#### See Also",
+                "",
+                "[System.Object](https://learn.microsoft.com/dotnet/api/system.object)",
+                "",
+            ]
+        )
+        return "\n".join(chunks)
+
+    def build_method_html(
+        self,
+        *,
+        title: str = "Matrix.Lerp Method",
+        include_remarks: bool = True,
+        include_overloads: bool = False,
+    ) -> str:
+        remarks = (
+            "<h4 class='dtH4'>Remarks</h4>"
+            "<p>This method performs the linear interpolation.</p>"
+            "<pre class='code'>start + (end - start) * amount</pre>"
+            if include_remarks
+            else ""
+        )
+        overloads = (
+            "<h4 class='dtH4'>Overload List</h4>"
+            "<blockquote class='dtBlock'><a href='GTA.Matrix.Lerp_overload_1.html'>public Matrix Lerp(Matrix,Matrix,float)</a></blockquote>"
+            "<blockquote class='dtBlock'><a href='GTA.Matrix.Lerp_overload_2.html'>public Matrix Lerp(Matrix,Matrix,double)</a></blockquote>"
+            if include_overloads
+            else ""
+        )
+        return (
+            f"<div id='TitleRow'><h1 class='dtH1'>{title}</h1></div>"
+            "<div id='nstext'>"
+            "<p>Performs a linear interpolation between two matrices.</p>"
+            "<div class='syntax'><span class='lang'>[Visual Basic]</span>"
+            "<br />Public Shared Function Lerp(ByVal start As Matrix, ByVal [end] As Matrix, ByVal amount As Single) As Matrix</div>"
+            "<div class='syntax'><span class='lang'>[C#]</span>"
+            "<div>public static Matrix Lerp(Matrix start, Matrix end, float amount)</div></div>"
+            "<h4 class='dtH4'>Parameters</h4>"
+            "<dl>"
+            "<dt><i>start</i></dt><dd>Start matrix.</dd>"
+            "<dt><i>end</i></dt><dd>End matrix.</dd>"
+            "<dt><i>amount</i></dt><dd>Interpolation amount.</dd>"
+            "</dl>"
+            "<h4 class='dtH4'>Return Value</h4>"
+            "<p>The interpolated matrix.</p>"
+            f"{remarks}"
+            f"{overloads}"
+            "<h4 class='dtH4'>Examples</h4>"
+            "<pre class='code'>var value = Matrix.Lerp(start, end, 0.5f);</pre>"
+            "<h4 class='dtH4'>See Also</h4>"
+            "<p><a href='https://learn.microsoft.com/dotnet/api/system.single'>Single</a></p>"
+            "</div>"
+        )
+
+    def build_method_markdown(
+        self,
+        *,
+        title: str = "Lerp Method",
+        include_vb: bool = True,
+        include_csharp: bool = True,
+        include_remarks: bool = True,
+        include_overloads: bool = False,
+    ) -> str:
+        chunks = [f"# {title}", "", "Performs a linear interpolation between two matrices.", ""]
+        if include_vb:
+            chunks.extend(
+                [
+                    "## Visual Basic",
+                    "",
+                    "Public Shared Function Lerp(start As Matrix, [end] As Matrix, amount As Single) As Matrix",
+                    "",
+                ]
+            )
+        if include_csharp:
+            chunks.extend(
+                [
+                    "## C#",
+                    "",
+                    "public static Matrix Lerp(Matrix start, Matrix end, float amount)",
+                    "",
+                ]
+            )
+        chunks.extend(
+            [
+                "#### Parameters",
+                "",
+                "*start*",
+                ":   Start matrix.",
+                "",
+                "*end*",
+                ":   End matrix.",
+                "",
+                "*amount*",
+                ":   Interpolation amount.",
+                "",
+                "#### Return Value",
+                "",
+                "The interpolated matrix.",
+                "",
+            ]
+        )
+        if include_remarks:
+            chunks.extend(
+                [
+                    "#### Remarks",
+                    "",
+                    "This method performs the linear interpolation.",
+                    "",
+                    "```text",
+                    "start + (end - start) * amount",
+                    "```",
+                    "",
+                ]
+            )
+        if include_overloads:
+            chunks.extend(
+                [
+                    "#### Overload List",
+                    "",
+                    "> [public Matrix Lerp(Matrix,Matrix,float)](Matrix.Lerp_overload_1.md)",
+                    "",
+                    "> [public Matrix Lerp(Matrix,Matrix,double)](Matrix.Lerp_overload_2.md)",
+                    "",
+                ]
+            )
+        chunks.extend(
+            [
+                "#### Examples",
+                "",
+                "```csharp",
+                "var value = Matrix.Lerp(start, end, 0.5f);",
+                "```",
+                "",
+                "#### See Also",
+                "",
+                "[Single](https://learn.microsoft.com/dotnet/api/system.single)",
+                "",
+            ]
+        )
+        return "\n".join(chunks)
+
+    def test_load_page_map_reads_expected_row_shape(self) -> None:
+        self.write_page_map(
+            [
+                {
+                    "source_path": "docs/md/GTA/Vector3.md",
+                    "doc_kind": "type-page",
+                    "namespace_or_section": "GTA",
+                    "target_path": "docs/reference/api/GTA/Vector3.md",
+                    "notes": "Keep as a standalone generated type reference page.",
+                }
+            ]
+        )
+
+        rows = self.audit.load_page_map(self.page_map_path)
+
+        self.assertEqual(len(rows), 1)
+        row = rows[0]
+        self.assertEqual(row.source_path, "docs/md/GTA/Vector3.md")
+        self.assertEqual(row.doc_kind, "type-page")
+        self.assertEqual(row.target_path, "docs/reference/api/GTA/Vector3.md")
+
+    def test_generate_page_record_for_clean_type_page_contains_required_fields(self) -> None:
+        row = self.audit.MappingRow(
+            source_path="docs/md/GTA/Vector3.md",
+            doc_kind="type-page",
+            namespace_or_section="GTA",
+            target_path="docs/reference/api/GTA/Vector3.md",
+            notes="Keep as a standalone generated type reference page.",
+        )
+        html_path = self.decompiled_root / "GTA.Vector3.html"
+        html_path.write_text(
+            self.build_type_html(),
+            encoding="utf-8",
+        )
+        markdown_text = self.build_type_markdown()
+
+        record = self.audit.audit_page(
+            row=row,
+            html_path=html_path,
+            markdown_text=markdown_text,
+            curated_allowlist=set(),
+        )
+
+        for field_name in (
+            "source_path",
+            "relative_html_path",
+            "target_path",
+            "doc_kind",
+            "title_match",
+            "html_text_length",
+            "markdown_text_length",
+            "density_ratio",
+            "code_block_count_html",
+            "code_block_count_markdown",
+            "list_count_html",
+            "list_count_markdown",
+            "table_count_html",
+            "table_count_markdown",
+            "link_count_html",
+            "link_count_markdown",
+            "signature_count_html",
+            "signature_count_markdown",
+            "field_presence",
+            "severity",
+            "notes",
+        ):
+            self.assertTrue(hasattr(record, field_name), field_name)
+
+        self.assertEqual(record.relative_html_path, "GTA.Vector3.html")
+        self.assertTrue(record.title_match)
+        self.assertEqual(record.severity, "clean")
+        self.assertIn("summary_text", record.field_presence)
+        self.assertTrue(record.field_presence["summary_text"]["html"])
+        self.assertTrue(record.field_presence["summary_text"]["markdown"])
+        self.assertEqual(record.signature_count_html, 2)
+        self.assertEqual(record.signature_count_markdown, 2)
+
+    def test_assign_severity_is_major_when_density_falls_materially_below_html(self) -> None:
+        row = self.audit.MappingRow(
+            source_path="docs/md/GTA/Matrix.Lerp.md",
+            doc_kind="type-member",
+            namespace_or_section="GTA",
+            target_path="docs/reference/api/GTA/Matrix.Lerp.md",
+            notes="Fold member page Lerp into the owning type reference page.",
+        )
+        html_path = self.decompiled_root / "GTA.Matrix.Lerp.html"
+        html_path.write_text(
+            self.build_method_html(),
+            encoding="utf-8",
+        )
+        markdown_text = (
+            "# Lerp Method\n\n"
+            "Performs interpolation.\n\n"
+            "## Visual Basic\n\n"
+            "Public Shared Function Lerp(start As Matrix, [end] As Matrix, amount As Single) As Matrix\n\n"
+            "## C#\n\n"
+            "public static Matrix Lerp(Matrix start, Matrix end, float amount)\n\n"
+            "#### Parameters\n\n"
+            "*start*\n:   Start matrix.\n\n"
+            "*end*\n:   End matrix.\n\n"
+            "*amount*\n:   Interpolation amount.\n\n"
+            "#### Return Value\n\n"
+            "Interpolated matrix.\n\n"
+            "#### Remarks\n\n"
+            "Linear interpolation.\n\n"
+            "#### Examples\n\n"
+            "```csharp\n"
+            "Matrix.Lerp(start, end, 0.5f);\n"
+            "```\n\n"
+            "#### See Also\n\n"
+            "[Single](https://learn.microsoft.com/dotnet/api/system.single)\n"
+        )
+
+        record = self.audit.audit_page(
+            row=row,
+            html_path=html_path,
+            markdown_text=markdown_text,
+            curated_allowlist=set(),
+        )
+
+        self.assertEqual(record.severity, "major")
+        self.assertTrue(any("density_ratio" in note for note in record.notes))
+
+    def test_cli_argument_validation_fails_when_page_map_is_missing(self) -> None:
+        missing_page_map = self.production_docs / "missing.csv"
+
+        result = self.run_script(page_map_path=missing_page_map)
+
+        self.assertEqual(result.returncode, 1, msg=result.stdout + result.stderr)
+        self.assertIn("Page map does not exist", result.stderr)
+
+    def test_cli_returns_nonzero_when_blocking_findings_exist(self) -> None:
+        self.write_page_map(
+            [
+                {
+                    "source_path": "docs/md/GTA/Matrix.Lerp.md",
+                    "doc_kind": "type-member",
+                    "namespace_or_section": "GTA",
+                    "target_path": "docs/reference/api/GTA/Matrix.Lerp.md",
+                    "notes": "Fold member page Lerp into the owning type reference page.",
+                }
+            ]
+        )
+        self.write_html("GTA.Matrix.Lerp.html", "Matrix.Lerp Method", self.build_method_html())
+        self.write_markdown(
+            "docs/reference/api/GTA/Matrix.Lerp.md",
+            self.build_method_markdown(include_vb=False, include_csharp=False),
+        )
+
+        result = self.run_script()
+
+        self.assertEqual(result.returncode, 1, msg=result.stdout + result.stderr)
+        self.assertIn("Blocking page-level parity findings", result.stderr)
+        self.assertTrue(self.report_path.exists())
+        self.assertTrue(self.json_report_path.exists())
+        report_payload = json.loads(self.json_report_path.read_text(encoding="utf-8"))
+        self.assertEqual(report_payload["summary"]["blocking_findings"], 1)
+        self.assertEqual(report_payload["pages"][0]["severity"], "blocking")
+
+    def test_fixture_clean_type_page_match_is_clean(self) -> None:
+        self.write_page_map(
+            [
+                {
+                    "source_path": "docs/md/GTA/Vector3.md",
+                    "doc_kind": "type-page",
+                    "namespace_or_section": "GTA",
+                    "target_path": "docs/reference/api/GTA/Vector3.md",
+                    "notes": "Keep as a standalone generated type reference page.",
+                }
+            ]
+        )
+        self.write_html("GTA.Vector3.html", "Vector3 Class", self.build_type_html())
+        self.write_markdown("docs/reference/api/GTA/Vector3.md", self.build_type_markdown())
+
+        result = self.run_script()
+
+        self.assertEqual(result.returncode, 0, msg=result.stdout + result.stderr)
+        payload = json.loads(self.json_report_path.read_text(encoding="utf-8"))
+        self.assertEqual(payload["pages"][0]["severity"], "clean")
+
+    def test_fixture_missing_signature_blocks_is_blocking(self) -> None:
+        self.write_page_map(
+            [
+                {
+                    "source_path": "docs/md/GTA/Matrix.Lerp.md",
+                    "doc_kind": "type-member",
+                    "namespace_or_section": "GTA",
+                    "target_path": "docs/reference/api/GTA/Matrix.Lerp.md",
+                    "notes": "Fold member page Lerp into the owning type reference page.",
+                }
+            ]
+        )
+        self.write_html("GTA.Matrix.Lerp.html", "Matrix.Lerp Method", self.build_method_html())
+        self.write_markdown(
+            "docs/reference/api/GTA/Matrix.Lerp.md",
+            self.build_method_markdown(include_vb=False, include_csharp=False),
+        )
+
+        result = self.run_script()
+
+        self.assertEqual(result.returncode, 1, msg=result.stdout + result.stderr)
+        payload = json.loads(self.json_report_path.read_text(encoding="utf-8"))
+        record = payload["pages"][0]
+        self.assertEqual(record["severity"], "blocking")
+        self.assertFalse(record["field_presence"]["visual_basic_signature"]["markdown"])
+        self.assertFalse(record["field_presence"]["csharp_signature"]["markdown"])
+
+    def test_fixture_missing_remarks_is_blocking(self) -> None:
+        self.write_page_map(
+            [
+                {
+                    "source_path": "docs/md/GTA/Matrix.Lerp.md",
+                    "doc_kind": "type-member",
+                    "namespace_or_section": "GTA",
+                    "target_path": "docs/reference/api/GTA/Matrix.Lerp.md",
+                    "notes": "Fold member page Lerp into the owning type reference page.",
+                }
+            ]
+        )
+        self.write_html("GTA.Matrix.Lerp.html", "Matrix.Lerp Method", self.build_method_html())
+        self.write_markdown(
+            "docs/reference/api/GTA/Matrix.Lerp.md",
+            self.build_method_markdown(include_remarks=False),
+        )
+
+        result = self.run_script()
+
+        self.assertEqual(result.returncode, 1, msg=result.stdout + result.stderr)
+        payload = json.loads(self.json_report_path.read_text(encoding="utf-8"))
+        record = payload["pages"][0]
+        self.assertEqual(record["severity"], "blocking")
+        self.assertFalse(record["field_presence"]["remarks"]["markdown"])
+
+    def test_fixture_missing_overload_inventory_is_blocking(self) -> None:
+        self.write_page_map(
+            [
+                {
+                    "source_path": "docs/md/GTA/Matrix.Lerp_overloads.md",
+                    "doc_kind": "member-overload-list",
+                    "namespace_or_section": "GTA",
+                    "target_path": "docs/reference/api/GTA/Matrix.Lerp_overloads.md",
+                    "notes": "Collapse the Lerp overload summary into the owning type page.",
+                }
+            ]
+        )
+        self.write_html(
+            "GTA.Matrix.Lerp_overloads.html",
+            "Matrix.Lerp Method",
+            self.build_method_html(title="Matrix.Lerp Method", include_overloads=True, include_remarks=False),
+        )
+        self.write_markdown(
+            "docs/reference/api/GTA/Matrix.Lerp_overloads.md",
+            self.build_method_markdown(title="Lerp Method", include_overloads=False, include_remarks=False),
+        )
+
+        result = self.run_script()
+
+        self.assertEqual(result.returncode, 1, msg=result.stdout + result.stderr)
+        payload = json.loads(self.json_report_path.read_text(encoding="utf-8"))
+        record = payload["pages"][0]
+        self.assertEqual(record["severity"], "blocking")
+        self.assertFalse(record["field_presence"]["overload_inventory"]["markdown"])
+
+    def test_fixture_curated_difference_is_downgraded_to_expected(self) -> None:
+        self.write_page_map(
+            [
+                {
+                    "source_path": "docs/md/TOC.md",
+                    "doc_kind": "legacy-toc",
+                    "namespace_or_section": "archive",
+                    "target_path": "docs/reference/archive/legacy-export-toc.md",
+                    "notes": "Keep as an archival navigation aid instead of a primary entry page.",
+                }
+            ]
+        )
+        self.write_html(
+            "TOC.html",
+            "Documentation TOC",
+            "<div id='TitleRow'><h1 class='dtH1'>Documentation TOC</h1></div>"
+            "<div id='nstext'><h4 class='dtH4'>Overload List</h4>"
+            "<blockquote class='dtBlock'><a href='GTA.Matrix.Lerp_overload_1.html'>public Matrix Lerp(Matrix,Matrix,float)</a></blockquote></div>",
+        )
+        self.write_markdown(
+            "docs/reference/archive/legacy-export-toc.md",
+            "# Legacy Export TOC\n\nCurated archive index.\n",
+        )
+
+        result = self.run_script()
+
+        self.assertEqual(result.returncode, 0, msg=result.stdout + result.stderr)
+        payload = json.loads(self.json_report_path.read_text(encoding="utf-8"))
+        record = payload["pages"][0]
+        self.assertEqual(record["severity"], "expected")
+        self.assertTrue(any("allowlisted curated difference" in note for note in record["notes"]))
+
+
+if __name__ == "__main__":
+    unittest.main()
