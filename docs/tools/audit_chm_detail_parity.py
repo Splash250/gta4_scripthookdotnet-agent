@@ -73,7 +73,9 @@ BLOCKQUOTE_PATTERN = re.compile(r"^\s*>\s+", re.MULTILINE)
 LIST_ITEM_PATTERN = re.compile(r"^\s*(?:[-*+]|\d+\.)\s+", re.MULTILINE)
 HTML_LIST_PATTERN = re.compile(r"<(?:ul|ol|dl|blockquote)\b", re.IGNORECASE)
 HTML_TABLE_PATTERN = re.compile(r"<table\b", re.IGNORECASE)
-MARKDOWN_TABLE_PATTERN = re.compile(r"^\|.*\|\s*$", re.MULTILINE)
+MARKDOWN_TABLE_BLOCK_PATTERN = re.compile(
+    r"(?m)^(?P<header>\|.*\|\s*)\n^(?P<separator>\|?\s*[:\-][\-\|\s:]*\|?\s*)\n(?P<body>(?:^\|.*\|\s*(?:\n|$))+)"
+)
 HTML_CODE_PATTERN = re.compile(r"<(?:pre|code)\b", re.IGNORECASE)
 HTML_SIGNATURE_BLOCK_PATTERN = re.compile(
     r"<div\b[^>]*class=['\"][^'\"]*\bsyntax\b[^'\"]*['\"][^>]*>",
@@ -224,6 +226,10 @@ def normalize_text(value: str) -> str:
     return WHITESPACE_PATTERN.sub(" ", value).strip()
 
 
+def normalize_markdown(markdown_text: str) -> str:
+    return markdown_text.replace("\r\n", "\n").replace("\r", "\n")
+
+
 def strip_html(raw_html: str) -> str:
     without_script_style = SCRIPT_STYLE_PATTERN.sub(" ", raw_html)
     without_comments = COMMENT_PATTERN.sub(" ", without_script_style)
@@ -232,7 +238,7 @@ def strip_html(raw_html: str) -> str:
 
 
 def strip_markdown(markdown_text: str) -> str:
-    text = FRONT_MATTER_PATTERN.sub("", markdown_text)
+    text = FRONT_MATTER_PATTERN.sub("", normalize_markdown(markdown_text))
     text = re.sub(r"`{1,3}", " ", text)
     text = re.sub(r"\[([^\]]+)\]\(([^)]+)\)", r"\1", text)
     text = re.sub(r"[*_>#|:-]", " ", text)
@@ -246,7 +252,7 @@ def normalize_title(title: str) -> str:
 
 
 def markdown_h1(markdown_text: str) -> str:
-    body = FRONT_MATTER_PATTERN.sub("", markdown_text)
+    body = FRONT_MATTER_PATTERN.sub("", normalize_markdown(markdown_text))
     for line in body.splitlines():
         if line.startswith("# "):
             return line[2:].strip()
@@ -284,7 +290,7 @@ def html_section_bodies(raw_html: str) -> dict[str, str]:
 
 
 def markdown_sections(markdown_text: str) -> dict[str, str]:
-    body = FRONT_MATTER_PATTERN.sub("", markdown_text)
+    body = FRONT_MATTER_PATTERN.sub("", normalize_markdown(markdown_text))
     sections: dict[str, str] = {}
     for match in MARKDOWN_SECTION_PATTERN.finditer(body):
         heading = normalize_text(match.group("heading")).casefold()
@@ -303,7 +309,7 @@ def first_html_paragraph(raw_html: str) -> str:
 
 
 def first_markdown_paragraph(markdown_text: str) -> str:
-    body = FRONT_MATTER_PATTERN.sub("", markdown_text)
+    body = FRONT_MATTER_PATTERN.sub("", normalize_markdown(markdown_text))
     body = re.sub(r"^# .*\n+", "", body, count=1)
     blocks = [block.strip() for block in re.split(r"\n\s*\n", body) if block.strip()]
     for block in blocks:
@@ -315,7 +321,7 @@ def first_markdown_paragraph(markdown_text: str) -> str:
 
 def extract_markdown_signature(markdown_text: str, language: str) -> str:
     pattern = MARKDOWN_VISUAL_BASIC_PATTERN if language == "visual_basic" else MARKDOWN_CSHARP_PATTERN
-    match = pattern.search(FRONT_MATTER_PATTERN.sub("", markdown_text))
+    match = pattern.search(FRONT_MATTER_PATTERN.sub("", normalize_markdown(markdown_text)))
     if not match:
         return ""
     return normalize_text(match.group("body"))
@@ -338,7 +344,7 @@ def extract_html_signature(raw_html: str, language: str) -> str:
 
 
 def extract_markdown_parameter_names(markdown_text: str) -> list[str]:
-    body = FRONT_MATTER_PATTERN.sub("", markdown_text)
+    body = FRONT_MATTER_PATTERN.sub("", normalize_markdown(markdown_text))
     match = re.search(
         r"^####\s+Parameters\s*\n(?P<body>.*?)(?=^####\s+|\Z)",
         body,
@@ -363,7 +369,7 @@ def extract_html_parameter_names(raw_html: str) -> list[str]:
 
 def extract_links(raw_text: str, *, is_html: bool) -> list[str]:
     pattern = HTML_LINK_PATTERN if is_html else MARKDOWN_LINK_PATTERN
-    return pattern.findall(raw_text)
+    return pattern.findall(raw_text if is_html else normalize_markdown(raw_text))
 
 
 def count_external_links(raw_text: str, *, is_html: bool) -> int:
@@ -387,7 +393,7 @@ def count_html_heading_tags(raw_html: str) -> int:
 
 
 def count_markdown_heading_lines(markdown_text: str) -> int:
-    return len(MARKDOWN_HEADING_PATTERN.findall(FRONT_MATTER_PATTERN.sub("", markdown_text)))
+    return len(MARKDOWN_HEADING_PATTERN.findall(FRONT_MATTER_PATTERN.sub("", normalize_markdown(markdown_text))))
 
 
 def count_html_bullet_lists(raw_html: str) -> int:
@@ -395,10 +401,11 @@ def count_html_bullet_lists(raw_html: str) -> int:
 
 
 def count_markdown_bullet_lists(markdown_text: str) -> int:
+    normalized = normalize_markdown(markdown_text)
     return (
-        len(LIST_ITEM_PATTERN.findall(markdown_text))
-        + len(BLOCKQUOTE_PATTERN.findall(markdown_text))
-        + len(MARKDOWN_PARAMETER_PATTERN.findall(markdown_text))
+        len(LIST_ITEM_PATTERN.findall(normalized))
+        + len(BLOCKQUOTE_PATTERN.findall(normalized))
+        + len(MARKDOWN_PARAMETER_PATTERN.findall(normalized))
     )
 
 
@@ -407,7 +414,7 @@ def count_html_tables(raw_html: str) -> int:
 
 
 def count_markdown_tables(markdown_text: str) -> int:
-    return len(MARKDOWN_TABLE_PATTERN.findall(markdown_text))
+    return len(MARKDOWN_TABLE_BLOCK_PATTERN.findall(normalize_markdown(markdown_text)))
 
 
 def count_html_code_or_signature_blocks(raw_html: str) -> int:
@@ -416,11 +423,11 @@ def count_html_code_or_signature_blocks(raw_html: str) -> int:
 
 
 def count_markdown_fenced_code_blocks(markdown_text: str) -> int:
-    return len(CODE_FENCE_PATTERN.findall(markdown_text)) // 2
+    return len(CODE_FENCE_PATTERN.findall(normalize_markdown(markdown_text))) // 2
 
 
 def count_markdown_indented_code_blocks(markdown_text: str) -> int:
-    return len(MARKDOWN_INDENTED_CODE_PATTERN.findall(markdown_text))
+    return len(MARKDOWN_INDENTED_CODE_PATTERN.findall(normalize_markdown(markdown_text)))
 
 
 def extract_fields(raw_html: str, markdown_text: str) -> tuple[dict[str, object], dict[str, object]]:

@@ -583,6 +583,88 @@ class AuditChmDetailParityTests(unittest.TestCase):
         self.assertEqual(self.audit.count_html_code_or_signature_blocks(raw_html), 3)
         self.assertEqual(self.audit.count_external_links(raw_html, is_html=True), 1)
 
+    def test_markdown_extraction_handles_crlf_line_endings(self) -> None:
+        markdown_text = (
+            "---\r\n"
+            "type: reference\r\n"
+            "title: Matrix.Lerp Method\r\n"
+            "---\r\n"
+            "\r\n"
+            "# Matrix.Lerp Method\r\n"
+            "\r\n"
+            "Performs a linear interpolation between two matrices.\r\n"
+            "\r\n"
+            "## Visual Basic\r\n"
+            "\r\n"
+            "Public Shared Function Lerp(start As Matrix, [end] As Matrix, amount As Single) As Matrix\r\n"
+            "\r\n"
+            "## C#\r\n"
+            "\r\n"
+            "public static Matrix Lerp(Matrix start, Matrix end, float amount)\r\n"
+            "\r\n"
+            "#### Parameters\r\n"
+            "\r\n"
+            "*start*\r\n"
+            ":   Start matrix.\r\n"
+            "\r\n"
+            "*end*\r\n"
+            ":   End matrix.\r\n"
+            "\r\n"
+            "*amount*\r\n"
+            ":   Interpolation amount.\r\n"
+            "\r\n"
+            "#### Return Value\r\n"
+            "\r\n"
+            "The interpolated matrix.\r\n"
+            "\r\n"
+            "#### Remarks\r\n"
+            "\r\n"
+            "This method performs the linear interpolation.\r\n"
+            "\r\n"
+            "#### Examples\r\n"
+            "\r\n"
+            "```csharp\r\n"
+            "var value = Matrix.Lerp(start, end, 0.5f);\r\n"
+            "```\r\n"
+            "\r\n"
+            "#### See Also\r\n"
+            "\r\n"
+            "[Single](https://learn.microsoft.com/dotnet/api/system.single)\r\n"
+        )
+
+        _, markdown_fields = self.audit.extract_fields(self.build_method_html(), markdown_text)
+
+        self.assertEqual(markdown_fields["title"], "Matrix.Lerp Method")
+        self.assertEqual(
+            markdown_fields["summary_text"],
+            "Performs a linear interpolation between two matrices.",
+        )
+        self.assertEqual(markdown_fields["parameter_names"], ["start", "end", "amount"])
+        self.assertEqual(markdown_fields["return_value"], "The interpolated matrix.")
+        self.assertTrue(markdown_fields["remarks"])
+        self.assertTrue(markdown_fields["examples"])
+        self.assertEqual(markdown_fields["language_signature_sections"], 2)
+        self.assertTrue(markdown_fields["external_reference_links"])
+
+    def test_count_markdown_tables_counts_table_blocks_not_rows(self) -> None:
+        markdown_text = (
+            "# GTA Hierarchy\n\n"
+            "| Type | Implements |\n"
+            "| --- | --- |\n"
+            "| [Object](Object.md) | [IDisposable](https://example.invalid/disposable) |\n"
+            "| [Entity](Entity.md) | [IHandleObject](IHandleObject.md) |\n"
+            "\n"
+            "Paragraph between tables.\n"
+            "\n"
+            "| Left | Right |\n"
+            "| --- | --- |\n"
+            "| Alpha | Beta |\n"
+        )
+
+        self.assertEqual(self.audit.count_markdown_tables(markdown_text), 2)
+        self.assertEqual(self.audit.count_markdown_links(markdown_text), 4)
+        self.assertEqual(self.audit.count_external_links(markdown_text, is_html=False), 1)
+
     def test_assign_severity_is_major_when_density_falls_materially_below_html(self) -> None:
         row = self.audit.MappingRow(
             source_path="docs/md/GTA/Matrix.Lerp.md",
