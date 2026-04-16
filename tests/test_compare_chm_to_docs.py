@@ -7,6 +7,20 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT_PATH = REPO_ROOT / "docs" / "tools" / "compare_chm_to_docs.py"
+PAIRING_MODULE_PATH = REPO_ROOT / "docs" / "tools" / "chm_page_pairing.py"
+
+
+def load_pairing_module():
+    import importlib.util
+    import sys
+
+    spec = importlib.util.spec_from_file_location("chm_page_pairing", PAIRING_MODULE_PATH)
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"Unable to load module from {PAIRING_MODULE_PATH}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
 
 
 class CompareChmToDocsTests(unittest.TestCase):
@@ -373,6 +387,85 @@ class CompareChmToDocsTests(unittest.TestCase):
 
         self.assertEqual(result.returncode, 1, msg=result.stdout + result.stderr)
         self.assertIn("No decompiled CHM HTML files were found", result.stderr)
+
+    def test_shared_pairing_module_maps_html_and_source_paths_consistently(self) -> None:
+        pairing = load_pairing_module()
+        rows = [
+            pairing.MappingRow(
+                source_path="docs/md/index.md",
+                doc_kind="root-index",
+                namespace_or_section="reference-root",
+                target_path="docs/README.md",
+                notes="Root index.",
+            ),
+            pairing.MappingRow(
+                source_path="docs/md/GTA/index.md",
+                doc_kind="namespace-index",
+                namespace_or_section="GTA",
+                target_path="docs/reference/api/GTA/index.md",
+                notes="Namespace index.",
+            ),
+            pairing.MappingRow(
+                source_path="docs/md/GTA/Player.md",
+                doc_kind="type-page",
+                namespace_or_section="GTA",
+                target_path="docs/reference/api/GTA/Player.md",
+                notes="Type page.",
+            ),
+            pairing.MappingRow(
+                source_path="docs/md/GTA.Native/Function.md",
+                doc_kind="type-page",
+                namespace_or_section="GTA.Native",
+                target_path="docs/reference/api/GTA.Native/Function.md",
+                notes="Nested namespace page.",
+            ),
+        ]
+
+        namespace_roots = pairing.collect_namespace_roots(rows)
+        mapped_source_paths = {row.source_path for row in rows}
+
+        self.assertEqual(
+            pairing.legacy_source_from_html_path(
+                Path("index.html"),
+                namespace_roots,
+                mapped_source_paths,
+            ),
+            "docs/md/index.md",
+        )
+        self.assertEqual(
+            pairing.legacy_source_from_html_path(
+                Path("GTA.html"),
+                namespace_roots,
+                mapped_source_paths,
+            ),
+            "docs/md/GTA/index.md",
+        )
+        self.assertEqual(
+            pairing.legacy_source_from_html_path(
+                Path("GTA.Player.html"),
+                namespace_roots,
+                mapped_source_paths,
+            ),
+            "docs/md/GTA/Player.md",
+        )
+        self.assertEqual(
+            pairing.legacy_source_from_html_path(
+                Path("GTA.Native.Function.html"),
+                namespace_roots,
+                mapped_source_paths,
+            ),
+            "docs/md/GTA.Native/Function.md",
+        )
+        self.assertEqual(pairing.html_relative_from_source_path("docs/md/index.md"), "index.html")
+        self.assertEqual(pairing.html_relative_from_source_path("docs/md/GTA/index.md"), "GTA.html")
+        self.assertEqual(
+            pairing.html_relative_from_source_path("docs/md/GTA/Player.md"),
+            "GTA.Player.html",
+        )
+        self.assertEqual(
+            pairing.html_relative_from_source_path("docs/md/GTA.Native/Function.md"),
+            "GTA.Native.Function.html",
+        )
 
 
 if __name__ == "__main__":

@@ -107,6 +107,8 @@ class AuditChmDetailParityTests(unittest.TestCase):
         summary: str = "Represents a three-dimensional vector.",
         include_thread_safety: bool = True,
         include_requirements: bool = True,
+        include_inheritance: bool = False,
+        include_members: bool = False,
     ) -> str:
         thread_safety = (
             "<h4 class='dtH4'>Thread Safety</h4>"
@@ -121,6 +123,18 @@ class AuditChmDetailParityTests(unittest.TestCase):
             if include_requirements
             else ""
         )
+        inheritance = (
+            "<h4 class='dtH4'>Inheritance Hierarchy</h4>"
+            "<p><a href='GTA.Entity.html'>Entity</a> -> Vector3</p>"
+            if include_inheritance
+            else ""
+        )
+        members = (
+            "<h4 class='dtH4'>Members</h4>"
+            "<dl><dt>XAxis</dt><dd>X component.</dd><dt>YAxis</dt><dd>Y component.</dd></dl>"
+            if include_members
+            else ""
+        )
         return (
             f"<div id='TitleRow'><h1 class='dtH1'>{title}</h1></div>"
             f"<div id='nstext'><p>{summary}</p>"
@@ -130,6 +144,8 @@ class AuditChmDetailParityTests(unittest.TestCase):
             "<div>public class Vector3</div></div>"
             f"{thread_safety}"
             f"{requirements}"
+            f"{inheritance}"
+            f"{members}"
             "<h4 class='dtH4'>See Also</h4>"
             "<p><a href='https://learn.microsoft.com/dotnet/api/system.object'>System.Object</a></p>"
             "</div>"
@@ -144,6 +160,8 @@ class AuditChmDetailParityTests(unittest.TestCase):
         include_csharp: bool = True,
         include_thread_safety: bool = True,
         include_requirements: bool = True,
+        include_inheritance: bool = False,
+        include_members: bool = False,
     ) -> str:
         chunks = [f"# {title}", "", summary, ""]
         if include_vb:
@@ -171,6 +189,28 @@ class AuditChmDetailParityTests(unittest.TestCase):
                     "",
                 ]
             )
+        if include_inheritance:
+            chunks.extend(
+                [
+                    "#### Inheritance Hierarchy",
+                    "",
+                    "[Entity](Entity.md) -> Vector3",
+                    "",
+                ]
+            )
+        if include_members:
+            chunks.extend(
+                [
+                    "#### Members",
+                    "",
+                    "*XAxis*",
+                    ":   X component.",
+                    "",
+                    "*YAxis*",
+                    ":   Y component.",
+                    "",
+                ]
+            )
         chunks.extend(
             [
                 "#### See Also",
@@ -187,6 +227,7 @@ class AuditChmDetailParityTests(unittest.TestCase):
         title: str = "Matrix.Lerp Method",
         include_remarks: bool = True,
         include_overloads: bool = False,
+        include_indented_example: bool = False,
     ) -> str:
         remarks = (
             "<h4 class='dtH4'>Remarks</h4>"
@@ -201,6 +242,14 @@ class AuditChmDetailParityTests(unittest.TestCase):
             "<blockquote class='dtBlock'><a href='GTA.Matrix.Lerp_overload_2.html'>public Matrix Lerp(Matrix,Matrix,double)</a></blockquote>"
             if include_overloads
             else ""
+        )
+        indented_example = (
+            "<h4 class='dtH4'>Examples</h4>"
+            "<pre class='code'>var value = Matrix.Lerp(start, end, 0.5f);</pre>"
+            "<pre class='code'>    Console.WriteLine(value);</pre>"
+            if include_indented_example
+            else "<h4 class='dtH4'>Examples</h4>"
+            "<pre class='code'>var value = Matrix.Lerp(start, end, 0.5f);</pre>"
         )
         return (
             f"<div id='TitleRow'><h1 class='dtH1'>{title}</h1></div>"
@@ -220,8 +269,7 @@ class AuditChmDetailParityTests(unittest.TestCase):
             "<p>The interpolated matrix.</p>"
             f"{remarks}"
             f"{overloads}"
-            "<h4 class='dtH4'>Examples</h4>"
-            "<pre class='code'>var value = Matrix.Lerp(start, end, 0.5f);</pre>"
+            f"{indented_example}"
             "<h4 class='dtH4'>See Also</h4>"
             "<p><a href='https://learn.microsoft.com/dotnet/api/system.single'>Single</a></p>"
             "</div>"
@@ -235,6 +283,7 @@ class AuditChmDetailParityTests(unittest.TestCase):
         include_csharp: bool = True,
         include_remarks: bool = True,
         include_overloads: bool = False,
+        include_indented_code: bool = False,
     ) -> str:
         chunks = [f"# {title}", "", "Performs a linear interpolation between two matrices.", ""]
         if include_vb:
@@ -306,6 +355,17 @@ class AuditChmDetailParityTests(unittest.TestCase):
                 "var value = Matrix.Lerp(start, end, 0.5f);",
                 "```",
                 "",
+            ]
+        )
+        if include_indented_code:
+            chunks.extend(
+                [
+                    "    Console.WriteLine(value);",
+                    "",
+                ]
+            )
+        chunks.extend(
+            [
                 "#### See Also",
                 "",
                 "[Single](https://learn.microsoft.com/dotnet/api/system.single)",
@@ -390,6 +450,75 @@ class AuditChmDetailParityTests(unittest.TestCase):
         self.assertTrue(record.field_presence["summary_text"]["markdown"])
         self.assertEqual(record.signature_count_html, 2)
         self.assertEqual(record.signature_count_markdown, 2)
+        self.assertIn("missing_in_html", record.field_presence["summary_text"])
+        self.assertIn("missing_in_markdown", record.field_presence["summary_text"])
+
+    def test_extract_fields_captures_counts_and_presence_for_representative_page_shapes(self) -> None:
+        type_html = self.build_type_html(include_inheritance=True)
+        type_markdown = self.build_type_markdown(include_inheritance=True)
+        type_html_fields, type_markdown_fields = self.audit.extract_fields(type_html, type_markdown)
+        type_field_presence, _ = self.audit.compare_field_presence(type_html_fields, type_markdown_fields)
+
+        self.assertEqual(type_html_fields["title"], "Vector3 Class")
+        self.assertEqual(type_markdown_fields["title"], "Vector3 Class")
+        self.assertTrue(type_html_fields["inheritance_lines"])
+        self.assertTrue(type_markdown_fields["inheritance_lines"])
+        self.assertFalse(type_html_fields["member_inventory"])
+        self.assertFalse(type_markdown_fields["member_inventory"])
+        self.assertEqual(self.audit.count_html_heading_tags(type_html), 5)
+        self.assertEqual(self.audit.count_markdown_heading_lines(type_markdown), 7)
+        self.assertEqual(self.audit.count_html_bullet_lists(type_html), 0)
+        self.assertEqual(self.audit.count_markdown_bullet_lists(type_markdown), 0)
+        self.assertEqual(self.audit.count_html_tables(type_html), 0)
+        self.assertEqual(self.audit.count_markdown_tables(type_markdown), 0)
+        self.assertEqual(self.audit.count_external_links(type_html, is_html=True), 1)
+        self.assertEqual(self.audit.count_markdown_links(type_markdown), 3)
+        self.assertEqual(self.audit.count_external_links(type_markdown, is_html=False), 1)
+        self.assertFalse(type_field_presence["inheritance_or_enum_members"]["missing_in_markdown"])
+        self.assertFalse(type_field_presence["inheritance_or_enum_members"]["missing_in_html"])
+
+        member_html = self.build_method_html(include_overloads=False, include_indented_example=True)
+        member_markdown = self.build_method_markdown(include_overloads=False, include_indented_code=True)
+        member_html_fields, member_markdown_fields = self.audit.extract_fields(member_html, member_markdown)
+        member_field_presence, _ = self.audit.compare_field_presence(member_html_fields, member_markdown_fields)
+
+        self.assertEqual(member_html_fields["parameter_names"], ["start", "end", "amount"])
+        self.assertEqual(member_markdown_fields["parameter_names"], ["start", "end", "amount"])
+        self.assertTrue(member_html_fields["remarks"])
+        self.assertTrue(member_markdown_fields["remarks"])
+        self.assertTrue(member_html_fields["examples"])
+        self.assertTrue(member_markdown_fields["examples"])
+        self.assertFalse(member_html_fields["overload_inventory"])
+        self.assertFalse(member_markdown_fields["overload_inventory"])
+        self.assertEqual(self.audit.count_html_code_or_signature_blocks(member_html), 5)
+        self.assertEqual(self.audit.count_markdown_fenced_code_blocks(member_markdown), 2)
+        self.assertEqual(self.audit.count_markdown_indented_code_blocks(member_markdown), 1)
+        self.assertEqual(self.audit.count_html_bullet_lists(member_html), 1)
+        self.assertEqual(self.audit.count_markdown_bullet_lists(member_markdown), 3)
+        self.assertEqual(self.audit.count_external_links(member_html, is_html=True), 1)
+        self.assertEqual(self.audit.count_markdown_links(member_markdown), 1)
+        self.assertEqual(self.audit.count_external_links(member_markdown, is_html=False), 1)
+        self.assertFalse(member_field_presence["parameter_names"]["missing_in_markdown"])
+
+        overload_html = self.build_method_html(include_overloads=True, include_remarks=False)
+        overload_markdown = self.build_method_markdown(include_overloads=True, include_remarks=False)
+        overload_html_fields, overload_markdown_fields = self.audit.extract_fields(overload_html, overload_markdown)
+        overload_field_presence, _ = self.audit.compare_field_presence(overload_html_fields, overload_markdown_fields)
+
+        self.assertTrue(overload_html_fields["overload_inventory"])
+        self.assertTrue(overload_markdown_fields["overload_inventory"])
+        self.assertFalse(overload_field_presence["overload_inventory"]["missing_in_markdown"])
+
+        enum_html = self.build_type_html(title="Weapon Enumeration", include_members=True)
+        enum_markdown = self.build_type_markdown(title="Weapon Enumeration", include_members=True)
+        enum_html_fields, enum_markdown_fields = self.audit.extract_fields(enum_html, enum_markdown)
+        enum_field_presence, _ = self.audit.compare_field_presence(enum_html_fields, enum_markdown_fields)
+
+        self.assertFalse(enum_html_fields["inheritance_lines"])
+        self.assertFalse(enum_markdown_fields["inheritance_lines"])
+        self.assertTrue(enum_html_fields["member_inventory"])
+        self.assertTrue(enum_markdown_fields["member_inventory"])
+        self.assertFalse(enum_field_presence["inheritance_or_enum_members"]["missing_in_markdown"])
 
     def test_assign_severity_is_major_when_density_falls_materially_below_html(self) -> None:
         row = self.audit.MappingRow(
@@ -436,6 +565,8 @@ class AuditChmDetailParityTests(unittest.TestCase):
 
         self.assertEqual(record.severity, "major")
         self.assertTrue(any("density_ratio" in note for note in record.notes))
+        self.assertLess(record.density_ratio, 0.8)
+        self.assertIn("markdown_text_delta", record.notes[0] + " ".join(record.notes))
 
     def test_cli_argument_validation_fails_when_page_map_is_missing(self) -> None:
         missing_page_map = self.production_docs / "missing.csv"
@@ -520,6 +651,42 @@ class AuditChmDetailParityTests(unittest.TestCase):
         self.assertEqual(record["severity"], "blocking")
         self.assertFalse(record["field_presence"]["visual_basic_signature"]["markdown"])
         self.assertFalse(record["field_presence"]["csharp_signature"]["markdown"])
+        self.assertTrue(record["field_presence"]["visual_basic_signature"]["missing_in_markdown"])
+        self.assertTrue(record["field_presence"]["csharp_signature"]["missing_in_markdown"])
+
+    def test_title_only_markdown_with_high_textual_overlap_still_blocks_without_signatures(self) -> None:
+        row = self.audit.MappingRow(
+            source_path="docs/md/GTA/Matrix.Lerp.md",
+            doc_kind="type-member",
+            namespace_or_section="GTA",
+            target_path="docs/reference/api/GTA/Matrix.Lerp.md",
+            notes="Fold member page Lerp into the owning type reference page.",
+        )
+        html_path = self.decompiled_root / "GTA.Matrix.Lerp.html"
+        html_path.write_text(self.build_method_html(), encoding="utf-8")
+        markdown_text = (
+            "# Matrix.Lerp Method\n\n"
+            "Performs a linear interpolation between two matrices. "
+            "This method performs the linear interpolation. "
+            "Start matrix. End matrix. Interpolation amount. "
+            "The interpolated matrix. var value = Matrix.Lerp(start, end, 0.5f). "
+            "Performs a linear interpolation between two matrices. "
+            "This method performs the linear interpolation. "
+            "Start matrix. End matrix. Interpolation amount. "
+            "The interpolated matrix. var value = Matrix.Lerp(start, end, 0.5f).\n"
+        )
+
+        record = self.audit.audit_page(
+            row=row,
+            html_path=html_path,
+            markdown_text=markdown_text,
+            curated_allowlist=set(),
+        )
+
+        self.assertGreater(record.density_ratio, 0.8)
+        self.assertEqual(record.severity, "blocking")
+        self.assertTrue(record.field_presence["visual_basic_signature"]["missing_in_markdown"])
+        self.assertTrue(record.field_presence["csharp_signature"]["missing_in_markdown"])
 
     def test_fixture_missing_remarks_is_blocking(self) -> None:
         self.write_page_map(
@@ -608,6 +775,36 @@ class AuditChmDetailParityTests(unittest.TestCase):
         record = payload["pages"][0]
         self.assertEqual(record["severity"], "expected")
         self.assertTrue(any("allowlisted curated difference" in note for note in record["notes"]))
+
+    def test_json_report_records_directional_field_deltas(self) -> None:
+        self.write_page_map(
+            [
+                {
+                    "source_path": "docs/md/GTA/Vector3.md",
+                    "doc_kind": "type-page",
+                    "namespace_or_section": "GTA",
+                    "target_path": "docs/reference/api/GTA/Vector3.md",
+                    "notes": "Keep as a standalone generated type reference page.",
+                }
+            ]
+        )
+        self.write_html("GTA.Vector3.html", "Vector3 Class", self.build_type_html(include_requirements=False))
+        self.write_markdown(
+            "docs/reference/api/GTA/Vector3.md",
+            self.build_type_markdown(include_thread_safety=False),
+        )
+
+        result = self.run_script()
+
+        self.assertEqual(result.returncode, 1, msg=result.stdout + result.stderr)
+        payload = json.loads(self.json_report_path.read_text(encoding="utf-8"))
+        record = payload["pages"][0]
+        self.assertIn("density_delta", record)
+        self.assertIn("heading_count_delta", record)
+        self.assertIn("field_presence", record)
+        self.assertTrue(record["field_presence"]["requirements_or_version_notes"]["missing_in_html"])
+        self.assertTrue(record["field_presence"]["thread_safety"]["missing_in_markdown"])
+        self.assertFalse(record["field_presence"]["thread_safety"]["missing_in_html"])
 
 
 if __name__ == "__main__":

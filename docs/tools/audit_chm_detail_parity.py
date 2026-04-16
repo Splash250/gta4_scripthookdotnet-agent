@@ -8,9 +8,16 @@ import csv
 import html
 import json
 import re
+import sys
 from dataclasses import asdict, dataclass
 from datetime import date
 from pathlib import Path
+
+TOOLS_DIR = Path(__file__).resolve().parent
+if str(TOOLS_DIR) not in sys.path:
+    sys.path.insert(0, str(TOOLS_DIR))
+
+from chm_page_pairing import html_relative_from_source_path
 
 
 TITLE_PATTERN = re.compile(r"<title>(.*?)</title>", re.IGNORECASE | re.DOTALL)
@@ -49,9 +56,10 @@ HTML_CSHARP_PATTERN = re.compile(
     re.IGNORECASE | re.DOTALL,
 )
 HTML_DT_PATTERN = re.compile(r"<dt\b[^>]*>(.*?)</dt>", re.IGNORECASE | re.DOTALL)
-MARKDOWN_PARAMETER_PATTERN = re.compile(r"^\*(.+?)\*\s*$", re.MULTILINE)
+MARKDOWN_PARAMETER_PATTERN = re.compile(r"^(?<!\*)\*([^*\n]+)\*(?!\*)\s*$", re.MULTILINE)
 HTML_LINK_PATTERN = re.compile(r"<a\b[^>]*href=['\"](.*?)['\"]", re.IGNORECASE)
 MARKDOWN_LINK_PATTERN = re.compile(r"\[[^\]]+\]\(([^)]+)\)")
+MARKDOWN_HEADING_PATTERN = re.compile(r"^(#{1,6})\s+.+$", re.MULTILINE)
 TITLE_SUFFIX_PATTERN = re.compile(
     r"\s+(Class|Structure|Interface|Enumeration|Delegate|Method|Property|Event)$",
     re.IGNORECASE,
@@ -63,6 +71,8 @@ HTML_LIST_PATTERN = re.compile(r"<(?:ul|ol|dl|blockquote)\b", re.IGNORECASE)
 HTML_TABLE_PATTERN = re.compile(r"<table\b", re.IGNORECASE)
 MARKDOWN_TABLE_PATTERN = re.compile(r"^\|.*\|\s*$", re.MULTILINE)
 HTML_CODE_PATTERN = re.compile(r"<(?:pre|code)\b", re.IGNORECASE)
+HTML_SIGNATURE_BLOCK_PATTERN = re.compile(r"<div class=['\"]syntax['\"]", re.IGNORECASE)
+MARKDOWN_INDENTED_CODE_PATTERN = re.compile(r"(?m)(?:^(?: {4}|\t).+\n?)+")
 INHERITANCE_MARKERS = ("Derived types", "Inherits", "Inheritance Hierarchy")
 MEMBERS_MARKERS = ("#### Members", "dtH4'>Members", 'dtH4">Members')
 OVERLOAD_MARKERS = ("#### Overload List", "dtH4'>Overload List", 'dtH4">Overload List')
@@ -109,6 +119,10 @@ class PageAuditRecord:
     html_text_length: int
     markdown_text_length: int
     density_ratio: float
+    density_delta: int
+    heading_count_html: int
+    heading_count_markdown: int
+    heading_count_delta: int
     code_block_count_html: int
     code_block_count_markdown: int
     list_count_html: int
@@ -117,6 +131,8 @@ class PageAuditRecord:
     table_count_markdown: int
     link_count_html: int
     link_count_markdown: int
+    external_link_count_html: int
+    external_link_count_markdown: int
     signature_count_html: int
     signature_count_markdown: int
     field_presence: dict[str, dict[str, object]]
@@ -194,15 +210,7 @@ def load_page_map(page_map_path: Path) -> list[MappingRow]:
 
 
 def source_path_to_html_relative(source_path: str) -> str:
-    relative = Path(source_path).relative_to("docs/md")
-    parts = relative.parts
-    if len(parts) == 1:
-        return relative.with_suffix(".html").name
-    if len(parts) == 2 and parts[1] == "index.md":
-        return f"{parts[0]}.html"
-    namespace = parts[0]
-    leaf = Path(parts[-1]).stem
-    return f"{namespace}.{leaf}.html"
+    return html_relative_from_source_path(source_path)
 
 
 def normalize_text(value: str) -> str:
@@ -340,8 +348,60 @@ def extract_links(raw_text: str, *, is_html: bool) -> list[str]:
     return pattern.findall(raw_text)
 
 
+def count_external_links(raw_text: str, *, is_html: bool) -> int:
+    return sum(
+        1
+        for link in extract_links(raw_text, is_html=is_html)
+        if link.startswith(("http://", "https://"))
+    )
+
+
 def has_external_links(raw_text: str, *, is_html: bool) -> bool:
-    return any(link.startswith(("http://", "https://")) for link in extract_links(raw_text, is_html=is_html))
+    return count_external_links(raw_text, is_html=is_html) > 0
+
+
+def count_markdown_links(markdown_text: str) -> int:
+    return len(extract_links(markdown_text, is_html=False))
+
+
+def count_html_heading_tags(raw_html: str) -> int:
+    return len(re.findall(r"<h[1-6]\b", raw_html, re.IGNORECASE))
+
+
+def count_markdown_heading_lines(markdown_text: str) -> int:
+    return len(MARKDOWN_HEADING_PATTERN.findall(FRONT_MATTER_PATTERN.sub("", markdown_text)))
+
+
+def count_html_bullet_lists(raw_html: str) -> int:
+    return len(HTML_LIST_PATTERN.findall(raw_html))
+
+
+def count_markdown_bullet_lists(markdown_text: str) -> int:
+    return (
+        len(LIST_ITEM_PATTERN.findall(markdown_text))
+        + len(BLOCKQUOTE_PATTERN.findall(markdown_text))
+        + len(MARKDOWN_PARAMETER_PATTERN.findall(markdown_text))
+    )
+
+
+def count_html_tables(raw_html: str) -> int:
+    return len(HTML_TABLE_PATTERN.findall(raw_html))
+
+
+def count_markdown_tables(markdown_text: str) -> int:
+    return len(MARKDOWN_TABLE_PATTERN.findall(markdown_text))
+
+
+def count_html_code_or_signature_blocks(raw_html: str) -> int:
+    return len(HTML_CODE_PATTERN.findall(raw_html)) + len(HTML_SIGNATURE_BLOCK_PATTERN.findall(raw_html))
+
+
+def count_markdown_fenced_code_blocks(markdown_text: str) -> int:
+    return len(CODE_FENCE_PATTERN.findall(markdown_text)) // 2
+
+
+def count_markdown_indented_code_blocks(markdown_text: str) -> int:
+    return len(MARKDOWN_INDENTED_CODE_PATTERN.findall(markdown_text))
 
 
 def extract_fields(raw_html: str, markdown_text: str) -> tuple[dict[str, object], dict[str, object]]:
@@ -355,6 +415,11 @@ def extract_fields(raw_html: str, markdown_text: str) -> tuple[dict[str, object]
         "summary_text": first_html_paragraph(raw_html),
         "visual_basic_signature": extract_html_signature(raw_html, "visual_basic"),
         "csharp_signature": extract_html_signature(raw_html, "csharp"),
+        "language_signature_sections": sum(
+            1
+            for key in ("visual_basic_signature", "csharp_signature")
+            if extract_html_signature(raw_html, "visual_basic" if key == "visual_basic_signature" else "csharp")
+        ),
         "parameter_names": extract_html_parameter_names(raw_html),
         "return_value": html_section_map.get("return value", ""),
         "remarks": html_section_map.get("remarks", ""),
@@ -362,9 +427,10 @@ def extract_fields(raw_html: str, markdown_text: str) -> tuple[dict[str, object]
         "requirements_or_version_notes": " ".join(
             filter(None, [html_section_map.get("requirements", ""), html_section_map.get("version information", "")])
         ).strip(),
-        "inheritance_or_enum_members": any(
-            marker in raw_html for marker in INHERITANCE_MARKERS
-        ) or any(marker in raw_html for marker in MEMBERS_MARKERS),
+        "inheritance_lines": any(marker in raw_html for marker in INHERITANCE_MARKERS),
+        "member_inventory": any(marker in raw_html for marker in MEMBERS_MARKERS),
+        "inheritance_or_enum_members": any(marker in raw_html for marker in INHERITANCE_MARKERS)
+        or any(marker in raw_html for marker in MEMBERS_MARKERS),
         "overload_inventory": "overload list" in html_section_map or any(marker in raw_html for marker in OVERLOAD_MARKERS),
         "thread_safety": html_section_map.get("thread safety", ""),
         "external_reference_links": has_external_links(raw_html, is_html=True),
@@ -375,6 +441,11 @@ def extract_fields(raw_html: str, markdown_text: str) -> tuple[dict[str, object]
         "summary_text": first_markdown_paragraph(markdown_text),
         "visual_basic_signature": extract_markdown_signature(markdown_text, "visual_basic"),
         "csharp_signature": extract_markdown_signature(markdown_text, "csharp"),
+        "language_signature_sections": sum(
+            1
+            for key in ("visual_basic_signature", "csharp_signature")
+            if extract_markdown_signature(markdown_text, "visual_basic" if key == "visual_basic_signature" else "csharp")
+        ),
         "parameter_names": extract_markdown_parameter_names(markdown_text),
         "return_value": markdown_section_map.get("return value", ""),
         "remarks": markdown_section_map.get("remarks", ""),
@@ -382,6 +453,8 @@ def extract_fields(raw_html: str, markdown_text: str) -> tuple[dict[str, object]
         "requirements_or_version_notes": " ".join(
             filter(None, [markdown_section_map.get("requirements", ""), markdown_section_map.get("version information", "")])
         ).strip(),
+        "inheritance_lines": any(marker in markdown_text for marker in INHERITANCE_MARKERS),
+        "member_inventory": "#### Members" in markdown_text,
         "inheritance_or_enum_members": any(marker in markdown_text for marker in INHERITANCE_MARKERS)
         or "#### Members" in markdown_text,
         "overload_inventory": "#### Overload List" in markdown_text,
@@ -410,10 +483,12 @@ def compare_field_presence(
         html_present = field_is_present(html_fields[name])
         markdown_present = field_is_present(markdown_fields[name])
         missing_in_markdown = html_present and not markdown_present
+        missing_in_html = markdown_present and not html_present
         field_presence[name] = {
             "html": html_present,
             "markdown": markdown_present,
             "missing_in_markdown": missing_in_markdown,
+            "missing_in_html": missing_in_html,
         }
         if missing_in_markdown:
             blocking_notes.append(
@@ -427,11 +502,11 @@ def count_html_code_blocks(raw_html: str) -> int:
 
 
 def count_markdown_code_blocks(markdown_text: str) -> int:
-    return CODE_FENCE_PATTERN.findall(markdown_text).__len__() // 2
+    return count_markdown_fenced_code_blocks(markdown_text) + count_markdown_indented_code_blocks(markdown_text)
 
 
 def count_markdown_lists(markdown_text: str) -> int:
-    return len(LIST_ITEM_PATTERN.findall(markdown_text)) + len(BLOCKQUOTE_PATTERN.findall(markdown_text))
+    return count_markdown_bullet_lists(markdown_text)
 
 
 def audit_page(
@@ -450,7 +525,11 @@ def audit_page(
         markdown_text_length / html_text_length,
         3,
     ) if html_text_length else 0.0
+    density_delta = markdown_text_length - html_text_length
     title_match = normalize_title(str(html_fields["title"])) == normalize_title(str(markdown_fields["title"]))
+    heading_count_html = count_html_heading_tags(raw_html)
+    heading_count_markdown = count_markdown_heading_lines(markdown_text)
+    heading_count_delta = heading_count_markdown - heading_count_html
 
     notes: list[str] = []
     severity = "clean"
@@ -464,10 +543,16 @@ def audit_page(
         notes.extend(blocking_notes)
         severity = "blocking"
     elif density_ratio < 0.75:
-        notes.append(f"density_ratio {density_ratio:.3f} falls materially below the HTML source")
+        notes.append(
+            f"density_ratio {density_ratio:.3f} falls materially below the HTML source "
+            f"(markdown_text_delta={density_delta})"
+        )
         severity = "major"
     elif density_ratio < 0.9:
-        notes.append(f"density_ratio {density_ratio:.3f} is below the HTML source")
+        notes.append(
+            f"density_ratio {density_ratio:.3f} is below the HTML source "
+            f"(markdown_text_delta={density_delta})"
+        )
         severity = "minor"
 
     code_block_count_html = count_html_code_blocks(raw_html)
@@ -503,14 +588,20 @@ def audit_page(
         html_text_length=html_text_length,
         markdown_text_length=markdown_text_length,
         density_ratio=density_ratio,
+        density_delta=density_delta,
+        heading_count_html=heading_count_html,
+        heading_count_markdown=heading_count_markdown,
+        heading_count_delta=heading_count_delta,
         code_block_count_html=code_block_count_html,
         code_block_count_markdown=code_block_count_markdown,
-        list_count_html=len(HTML_LIST_PATTERN.findall(raw_html)),
+        list_count_html=count_html_bullet_lists(raw_html),
         list_count_markdown=count_markdown_lists(markdown_text),
-        table_count_html=len(HTML_TABLE_PATTERN.findall(raw_html)),
-        table_count_markdown=len(MARKDOWN_TABLE_PATTERN.findall(markdown_text)),
+        table_count_html=count_html_tables(raw_html),
+        table_count_markdown=count_markdown_tables(markdown_text),
         link_count_html=len(extract_links(raw_html, is_html=True)),
-        link_count_markdown=len(extract_links(markdown_text, is_html=False)),
+        link_count_markdown=count_markdown_links(markdown_text),
+        external_link_count_html=count_external_links(raw_html, is_html=True),
+        external_link_count_markdown=count_external_links(markdown_text, is_html=False),
         signature_count_html=signature_count_html,
         signature_count_markdown=signature_count_markdown,
         field_presence=field_presence,
@@ -560,6 +651,8 @@ def render_markdown_report(
                     f"- target: `{record.target_path}`",
                     f"- title_match: {record.title_match}",
                     f"- density_ratio: {record.density_ratio:.3f}",
+                    f"- density_delta: {record.density_delta}",
+                    f"- heading_count_delta: {record.heading_count_delta}",
                     f"- signature_count_html: {record.signature_count_html}",
                     f"- signature_count_markdown: {record.signature_count_markdown}",
                     f"- notes: {'; '.join(note_lines)}",

@@ -7,9 +7,16 @@ import argparse
 import csv
 import html
 import re
+import sys
 from dataclasses import dataclass
 from datetime import date
 from pathlib import Path
+
+TOOLS_DIR = Path(__file__).resolve().parent
+if str(TOOLS_DIR) not in sys.path:
+    sys.path.insert(0, str(TOOLS_DIR))
+
+from chm_page_pairing import collect_namespace_roots, legacy_source_from_html_path
 
 
 TITLE_PATTERN = re.compile(r"<title>(.*?)</title>", re.IGNORECASE | re.DOTALL)
@@ -126,61 +133,6 @@ def normalized_api_target_for_source(source_path: str) -> Path | None:
     if len(parts) < 3 or parts[0] != "docs" or parts[1] != "md":
         return None
     return Path("docs/reference/api").joinpath(*parts[2:])
-
-
-def collect_namespace_roots(page_map_rows: list[MappingRow]) -> list[str]:
-    namespaces = {
-        Path(row.source_path).relative_to("docs/md").parts[0]
-        for row in page_map_rows
-        if row.source_path.startswith("docs/md/")
-        and len(Path(row.source_path).relative_to("docs/md").parts) > 1
-    }
-    return sorted(namespaces, key=len, reverse=True)
-
-
-def legacy_source_from_html_path(
-    relative_html: Path,
-    namespace_roots: list[str],
-    mapped_source_paths: set[str],
-) -> str:
-    stem = relative_html.with_suffix("").as_posix().replace("/", ".")
-    if stem == "index":
-        return "docs/md/index.md"
-    if stem == "TOC":
-        return "docs/md/TOC.md"
-    if stem in namespace_roots:
-        return f"docs/md/{stem}/index.md"
-    if "." not in stem:
-        exact_stem_matches = [
-            source_path
-            for source_path in mapped_source_paths
-            if Path(source_path).stem == stem
-        ]
-        if len(exact_stem_matches) == 1:
-            return exact_stem_matches[0]
-        return f"docs/md/{stem}.md"
-
-    for namespace in namespace_roots:
-        if stem == namespace:
-            return f"docs/md/{namespace}/index.md"
-        namespace_prefix = f"{namespace}."
-        if stem == f"{namespace}.index":
-            return f"docs/md/{namespace}/index.md"
-        if stem.startswith(namespace_prefix):
-            leaf = stem[len(namespace_prefix) :]
-            return f"docs/md/{namespace}/{leaf}.md"
-
-    exact_stem_matches = [
-        source_path
-        for source_path in mapped_source_paths
-        if Path(source_path).stem == stem
-    ]
-    if len(exact_stem_matches) == 1:
-        return exact_stem_matches[0]
-
-    namespace, leaf = stem.split(".", 1)
-    return f"docs/md/{namespace}/{leaf}.md"
-
 
 def normalize_text(value: str) -> str:
     return WHITESPACE_PATTERN.sub(" ", value).strip()
