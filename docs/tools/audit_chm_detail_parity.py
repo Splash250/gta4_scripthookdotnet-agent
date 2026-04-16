@@ -146,6 +146,8 @@ class PageAuditRecord:
     signature_count_html: int
     signature_count_markdown: int
     field_presence: dict[str, dict[str, object]]
+    missing_in_markdown_fields: list[str]
+    missing_in_html_fields: list[str]
     severity: str
     notes: list[str]
 
@@ -597,9 +599,11 @@ def compute_directional_deltas(
 def compare_field_presence(
     html_fields: dict[str, object],
     markdown_fields: dict[str, object],
-) -> tuple[dict[str, dict[str, object]], list[str]]:
+) -> tuple[dict[str, dict[str, object]], list[str], list[str], list[str]]:
     field_presence: dict[str, dict[str, object]] = {}
     blocking_notes: list[str] = []
+    missing_in_markdown_fields: list[str] = []
+    missing_in_html_fields: list[str] = []
     for name in BLOCKING_FIELDS:
         html_present = field_is_present(html_fields[name])
         markdown_present = field_is_present(markdown_fields[name])
@@ -612,10 +616,18 @@ def compare_field_presence(
             "missing_in_html": missing_in_html,
         }
         if missing_in_markdown:
+            missing_in_markdown_fields.append(name)
             blocking_notes.append(
                 f"missing key field `{name}` from Markdown while CHM includes it"
             )
-    return field_presence, blocking_notes
+        if missing_in_html:
+            missing_in_html_fields.append(name)
+    return (
+        field_presence,
+        missing_in_markdown_fields,
+        missing_in_html_fields,
+        blocking_notes,
+    )
 
 
 def count_html_code_blocks(raw_html: str) -> int:
@@ -639,7 +651,12 @@ def audit_page(
 ) -> PageAuditRecord:
     raw_html = html_path.read_text(encoding="utf-8", errors="ignore")
     html_fields, markdown_fields = extract_fields(raw_html, markdown_text)
-    field_presence, blocking_notes = compare_field_presence(html_fields, markdown_fields)
+    (
+        field_presence,
+        missing_in_markdown_fields,
+        missing_in_html_fields,
+        blocking_notes,
+    ) = compare_field_presence(html_fields, markdown_fields)
     html_text_length = len(str(html_fields["text"]))
     markdown_text_length = len(str(markdown_fields["text"]))
     density_ratio = compute_density_ratio(html_text_length, markdown_text_length)
@@ -750,6 +767,8 @@ def audit_page(
         signature_count_html=signature_count_html,
         signature_count_markdown=signature_count_markdown,
         field_presence=field_presence,
+        missing_in_markdown_fields=missing_in_markdown_fields,
+        missing_in_html_fields=missing_in_html_fields,
         severity=severity,
         notes=notes,
     )
@@ -801,6 +820,8 @@ def render_markdown_report(
                     f"- heading_count_delta: {record.heading_count_delta}",
                     f"- signature_count_html: {record.signature_count_html}",
                     f"- signature_count_markdown: {record.signature_count_markdown}",
+                    f"- missing_in_markdown_fields: {json.dumps(record.missing_in_markdown_fields)}",
+                    f"- missing_in_html_fields: {json.dumps(record.missing_in_html_fields)}",
                     f"- notes: {'; '.join(note_lines)}",
                 ]
             )

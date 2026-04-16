@@ -438,6 +438,8 @@ class AuditChmDetailParityTests(unittest.TestCase):
             "signature_count_html",
             "signature_count_markdown",
             "field_presence",
+            "missing_in_markdown_fields",
+            "missing_in_html_fields",
             "severity",
             "notes",
         ):
@@ -457,12 +459,17 @@ class AuditChmDetailParityTests(unittest.TestCase):
         self.assertEqual(record.directional_deltas["signature_count"], 0)
         self.assertIn("missing_in_html", record.field_presence["summary_text"])
         self.assertIn("missing_in_markdown", record.field_presence["summary_text"])
+        self.assertEqual(record.missing_in_markdown_fields, [])
+        self.assertEqual(record.missing_in_html_fields, [])
 
     def test_extract_fields_captures_counts_and_presence_for_representative_page_shapes(self) -> None:
         type_html = self.build_type_html(include_inheritance=True)
         type_markdown = self.build_type_markdown(include_inheritance=True)
         type_html_fields, type_markdown_fields = self.audit.extract_fields(type_html, type_markdown)
-        type_field_presence, _ = self.audit.compare_field_presence(type_html_fields, type_markdown_fields)
+        type_field_presence, type_missing_in_markdown, type_missing_in_html, _ = self.audit.compare_field_presence(
+            type_html_fields,
+            type_markdown_fields,
+        )
 
         self.assertEqual(type_html_fields["title"], "Vector3 Class")
         self.assertEqual(type_markdown_fields["title"], "Vector3 Class")
@@ -481,11 +488,15 @@ class AuditChmDetailParityTests(unittest.TestCase):
         self.assertEqual(self.audit.count_external_links(type_markdown, is_html=False), 1)
         self.assertFalse(type_field_presence["inheritance_or_enum_members"]["missing_in_markdown"])
         self.assertFalse(type_field_presence["inheritance_or_enum_members"]["missing_in_html"])
+        self.assertEqual(type_missing_in_markdown, [])
+        self.assertEqual(type_missing_in_html, [])
 
         member_html = self.build_method_html(include_overloads=False, include_indented_example=True)
         member_markdown = self.build_method_markdown(include_overloads=False, include_indented_code=True)
         member_html_fields, member_markdown_fields = self.audit.extract_fields(member_html, member_markdown)
-        member_field_presence, _ = self.audit.compare_field_presence(member_html_fields, member_markdown_fields)
+        member_field_presence, member_missing_in_markdown, member_missing_in_html, _ = (
+            self.audit.compare_field_presence(member_html_fields, member_markdown_fields)
+        )
 
         self.assertEqual(member_html_fields["parameter_names"], ["start", "end", "amount"])
         self.assertEqual(member_markdown_fields["parameter_names"], ["start", "end", "amount"])
@@ -504,26 +515,37 @@ class AuditChmDetailParityTests(unittest.TestCase):
         self.assertEqual(self.audit.count_markdown_links(member_markdown), 1)
         self.assertEqual(self.audit.count_external_links(member_markdown, is_html=False), 1)
         self.assertFalse(member_field_presence["parameter_names"]["missing_in_markdown"])
+        self.assertEqual(member_missing_in_markdown, [])
+        self.assertEqual(member_missing_in_html, [])
 
         overload_html = self.build_method_html(include_overloads=True, include_remarks=False)
         overload_markdown = self.build_method_markdown(include_overloads=True, include_remarks=False)
         overload_html_fields, overload_markdown_fields = self.audit.extract_fields(overload_html, overload_markdown)
-        overload_field_presence, _ = self.audit.compare_field_presence(overload_html_fields, overload_markdown_fields)
+        overload_field_presence, overload_missing_in_markdown, overload_missing_in_html, _ = (
+            self.audit.compare_field_presence(overload_html_fields, overload_markdown_fields)
+        )
 
         self.assertTrue(overload_html_fields["overload_inventory"])
         self.assertTrue(overload_markdown_fields["overload_inventory"])
         self.assertFalse(overload_field_presence["overload_inventory"]["missing_in_markdown"])
+        self.assertEqual(overload_missing_in_markdown, [])
+        self.assertEqual(overload_missing_in_html, [])
 
         enum_html = self.build_type_html(title="Weapon Enumeration", include_members=True)
         enum_markdown = self.build_type_markdown(title="Weapon Enumeration", include_members=True)
         enum_html_fields, enum_markdown_fields = self.audit.extract_fields(enum_html, enum_markdown)
-        enum_field_presence, _ = self.audit.compare_field_presence(enum_html_fields, enum_markdown_fields)
+        enum_field_presence, enum_missing_in_markdown, enum_missing_in_html, _ = self.audit.compare_field_presence(
+            enum_html_fields,
+            enum_markdown_fields,
+        )
 
         self.assertFalse(enum_html_fields["inheritance_lines"])
         self.assertFalse(enum_markdown_fields["inheritance_lines"])
         self.assertTrue(enum_html_fields["member_inventory"])
         self.assertTrue(enum_markdown_fields["member_inventory"])
         self.assertFalse(enum_field_presence["inheritance_or_enum_members"]["missing_in_markdown"])
+        self.assertEqual(enum_missing_in_markdown, [])
+        self.assertEqual(enum_missing_in_html, [])
 
     def test_field_detection_helpers_cover_all_parity_critical_content_classes(self) -> None:
         type_html = self.build_type_html(include_inheritance=True)
@@ -1018,11 +1040,15 @@ class AuditChmDetailParityTests(unittest.TestCase):
         self.assertIn("heading_count_delta", record)
         self.assertIn("directional_deltas", record)
         self.assertIn("field_presence", record)
+        self.assertIn("missing_in_markdown_fields", record)
+        self.assertIn("missing_in_html_fields", record)
         self.assertEqual(record["directional_deltas"]["text_length"], record["density_delta"])
         self.assertEqual(record["directional_deltas"]["heading_count"], record["heading_count_delta"])
         self.assertGreater(record["directional_deltas"]["heading_count"], 0)
         self.assertGreater(record["directional_deltas"]["link_count"], 0)
         self.assertEqual(record["directional_deltas"]["signature_count"], 0)
+        self.assertEqual(record["missing_in_markdown_fields"], ["thread_safety"])
+        self.assertEqual(record["missing_in_html_fields"], ["requirements_or_version_notes"])
         self.assertTrue(record["field_presence"]["requirements_or_version_notes"]["missing_in_html"])
         self.assertTrue(record["field_presence"]["thread_safety"]["missing_in_markdown"])
         self.assertFalse(record["field_presence"]["thread_safety"]["missing_in_html"])
