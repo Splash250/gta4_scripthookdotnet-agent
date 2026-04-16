@@ -20,6 +20,17 @@ class PublishReadinessChecklistTests(unittest.TestCase):
         self.assertIn("## Compatibility Statements", content)
         self.assertIn("## Legacy-Artifact Handling", content)
 
+    def test_checklist_requires_truthful_page_map_zero_legacy_carryover_and_full_verification_run(self) -> None:
+        content = CHECKLIST_PATH.read_text(encoding="utf-8")
+
+        self.assertIn("docs/tools/decompile_chm.ps1", content)
+        self.assertIn("docs/tools/compare_chm_to_docs.py", content)
+        self.assertIn("disallowed_legacy_references: 0", content)
+        self.assertIn("unresolved_legacy_references: 0", content)
+        self.assertIn("unmapped_html_pages: 0", content)
+        self.assertIn("mapped_target_pages_missing: 0", content)
+        self.assertIn("page map is truthful", content.lower())
+
     def test_all_markdown_links_point_to_existing_repo_paths(self) -> None:
         content = CHECKLIST_PATH.read_text(encoding="utf-8")
         relative_links = re.findall(r"\[[^\]]+\]\((?!https?://|#)([^)]+)\)", content)
