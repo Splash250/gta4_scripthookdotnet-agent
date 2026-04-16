@@ -426,6 +426,7 @@ class AuditChmDetailParityTests(unittest.TestCase):
             "html_text_length",
             "markdown_text_length",
             "density_ratio",
+            "directional_deltas",
             "code_block_count_html",
             "code_block_count_markdown",
             "list_count_html",
@@ -446,10 +447,14 @@ class AuditChmDetailParityTests(unittest.TestCase):
         self.assertTrue(record.title_match)
         self.assertEqual(record.severity, "clean")
         self.assertIn("summary_text", record.field_presence)
+        self.assertIn("text_length", record.directional_deltas)
+        self.assertEqual(record.directional_deltas["text_length"], record.density_delta)
+        self.assertEqual(record.directional_deltas["heading_count"], record.heading_count_delta)
         self.assertTrue(record.field_presence["summary_text"]["html"])
         self.assertTrue(record.field_presence["summary_text"]["markdown"])
         self.assertEqual(record.signature_count_html, 2)
         self.assertEqual(record.signature_count_markdown, 2)
+        self.assertEqual(record.directional_deltas["signature_count"], 0)
         self.assertIn("missing_in_html", record.field_presence["summary_text"])
         self.assertIn("missing_in_markdown", record.field_presence["summary_text"])
 
@@ -1011,7 +1016,13 @@ class AuditChmDetailParityTests(unittest.TestCase):
         record = payload["pages"][0]
         self.assertIn("density_delta", record)
         self.assertIn("heading_count_delta", record)
+        self.assertIn("directional_deltas", record)
         self.assertIn("field_presence", record)
+        self.assertEqual(record["directional_deltas"]["text_length"], record["density_delta"])
+        self.assertEqual(record["directional_deltas"]["heading_count"], record["heading_count_delta"])
+        self.assertGreater(record["directional_deltas"]["heading_count"], 0)
+        self.assertGreater(record["directional_deltas"]["link_count"], 0)
+        self.assertEqual(record["directional_deltas"]["signature_count"], 0)
         self.assertTrue(record["field_presence"]["requirements_or_version_notes"]["missing_in_html"])
         self.assertTrue(record["field_presence"]["thread_safety"]["missing_in_markdown"])
         self.assertFalse(record["field_presence"]["thread_safety"]["missing_in_html"])

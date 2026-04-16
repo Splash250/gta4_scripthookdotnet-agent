@@ -129,6 +129,7 @@ class PageAuditRecord:
     markdown_text_length: int
     density_ratio: float
     density_delta: int
+    directional_deltas: dict[str, int]
     heading_count_html: int
     heading_count_markdown: int
     heading_count_delta: int
@@ -551,6 +552,48 @@ def field_is_present(value: object) -> bool:
     return bool(normalize_text(str(value)))
 
 
+def compute_density_ratio(html_count: int, markdown_count: int) -> float:
+    return round(markdown_count / html_count, 3) if html_count else 0.0
+
+
+def compute_directional_delta(html_count: int, markdown_count: int) -> int:
+    return markdown_count - html_count
+
+
+def compute_directional_deltas(
+    *,
+    html_text_length: int,
+    markdown_text_length: int,
+    heading_count_html: int,
+    heading_count_markdown: int,
+    code_block_count_html: int,
+    code_block_count_markdown: int,
+    list_count_html: int,
+    list_count_markdown: int,
+    table_count_html: int,
+    table_count_markdown: int,
+    link_count_html: int,
+    link_count_markdown: int,
+    external_link_count_html: int,
+    external_link_count_markdown: int,
+    signature_count_html: int,
+    signature_count_markdown: int,
+) -> dict[str, int]:
+    return {
+        "text_length": compute_directional_delta(html_text_length, markdown_text_length),
+        "heading_count": compute_directional_delta(heading_count_html, heading_count_markdown),
+        "code_block_count": compute_directional_delta(code_block_count_html, code_block_count_markdown),
+        "list_count": compute_directional_delta(list_count_html, list_count_markdown),
+        "table_count": compute_directional_delta(table_count_html, table_count_markdown),
+        "link_count": compute_directional_delta(link_count_html, link_count_markdown),
+        "external_link_count": compute_directional_delta(
+            external_link_count_html,
+            external_link_count_markdown,
+        ),
+        "signature_count": compute_directional_delta(signature_count_html, signature_count_markdown),
+    }
+
+
 def compare_field_presence(
     html_fields: dict[str, object],
     markdown_fields: dict[str, object],
@@ -599,15 +642,46 @@ def audit_page(
     field_presence, blocking_notes = compare_field_presence(html_fields, markdown_fields)
     html_text_length = len(str(html_fields["text"]))
     markdown_text_length = len(str(markdown_fields["text"]))
-    density_ratio = round(
-        markdown_text_length / html_text_length,
-        3,
-    ) if html_text_length else 0.0
-    density_delta = markdown_text_length - html_text_length
+    density_ratio = compute_density_ratio(html_text_length, markdown_text_length)
+    density_delta = compute_directional_delta(html_text_length, markdown_text_length)
     title_match = normalize_title(str(html_fields["title"])) == normalize_title(str(markdown_fields["title"]))
     heading_count_html = count_html_heading_tags(raw_html)
     heading_count_markdown = count_markdown_heading_lines(markdown_text)
-    heading_count_delta = heading_count_markdown - heading_count_html
+    heading_count_delta = compute_directional_delta(heading_count_html, heading_count_markdown)
+    code_block_count_html = count_html_code_blocks(raw_html)
+    code_block_count_markdown = count_markdown_code_blocks(markdown_text)
+    list_count_html = count_html_bullet_lists(raw_html)
+    list_count_markdown = count_markdown_lists(markdown_text)
+    table_count_html = count_html_tables(raw_html)
+    table_count_markdown = count_markdown_tables(markdown_text)
+    link_count_html = len(extract_links(raw_html, is_html=True))
+    link_count_markdown = count_markdown_links(markdown_text)
+    external_link_count_html = count_external_links(raw_html, is_html=True)
+    external_link_count_markdown = count_external_links(markdown_text, is_html=False)
+    signature_count_html = sum(
+        1 for key in ("visual_basic_signature", "csharp_signature") if field_presence[key]["html"]
+    )
+    signature_count_markdown = sum(
+        1 for key in ("visual_basic_signature", "csharp_signature") if field_presence[key]["markdown"]
+    )
+    directional_deltas = compute_directional_deltas(
+        html_text_length=html_text_length,
+        markdown_text_length=markdown_text_length,
+        heading_count_html=heading_count_html,
+        heading_count_markdown=heading_count_markdown,
+        code_block_count_html=code_block_count_html,
+        code_block_count_markdown=code_block_count_markdown,
+        list_count_html=list_count_html,
+        list_count_markdown=list_count_markdown,
+        table_count_html=table_count_html,
+        table_count_markdown=table_count_markdown,
+        link_count_html=link_count_html,
+        link_count_markdown=link_count_markdown,
+        external_link_count_html=external_link_count_html,
+        external_link_count_markdown=external_link_count_markdown,
+        signature_count_html=signature_count_html,
+        signature_count_markdown=signature_count_markdown,
+    )
 
     notes: list[str] = []
     severity = "clean"
@@ -623,30 +697,22 @@ def audit_page(
     elif density_ratio < 0.75:
         notes.append(
             f"density_ratio {density_ratio:.3f} falls materially below the HTML source "
-            f"(markdown_text_delta={density_delta})"
+            f"(markdown_text_delta={directional_deltas['text_length']})"
         )
         severity = "major"
     elif density_ratio < 0.9:
         notes.append(
             f"density_ratio {density_ratio:.3f} is below the HTML source "
-            f"(markdown_text_delta={density_delta})"
+            f"(markdown_text_delta={directional_deltas['text_length']})"
         )
         severity = "minor"
 
-    code_block_count_html = count_html_code_blocks(raw_html)
-    code_block_count_markdown = count_markdown_code_blocks(markdown_text)
     if severity not in {"blocking", "expected"} and code_block_count_markdown < code_block_count_html:
         notes.append(
             f"code_block_count reduced from {code_block_count_html} to {code_block_count_markdown}"
         )
         severity = "major"
 
-    signature_count_html = sum(
-        1 for key in ("visual_basic_signature", "csharp_signature") if field_presence[key]["html"]
-    )
-    signature_count_markdown = sum(
-        1 for key in ("visual_basic_signature", "csharp_signature") if field_presence[key]["markdown"]
-    )
     if severity not in {"blocking", "expected"} and signature_count_markdown < signature_count_html:
         notes.append(
             f"signature_count reduced from {signature_count_html} to {signature_count_markdown}"
@@ -667,19 +733,20 @@ def audit_page(
         markdown_text_length=markdown_text_length,
         density_ratio=density_ratio,
         density_delta=density_delta,
+        directional_deltas=directional_deltas,
         heading_count_html=heading_count_html,
         heading_count_markdown=heading_count_markdown,
         heading_count_delta=heading_count_delta,
         code_block_count_html=code_block_count_html,
         code_block_count_markdown=code_block_count_markdown,
-        list_count_html=count_html_bullet_lists(raw_html),
-        list_count_markdown=count_markdown_lists(markdown_text),
-        table_count_html=count_html_tables(raw_html),
-        table_count_markdown=count_markdown_tables(markdown_text),
-        link_count_html=len(extract_links(raw_html, is_html=True)),
+        list_count_html=list_count_html,
+        list_count_markdown=list_count_markdown,
+        table_count_html=table_count_html,
+        table_count_markdown=table_count_markdown,
+        link_count_html=link_count_html,
         link_count_markdown=count_markdown_links(markdown_text),
-        external_link_count_html=count_external_links(raw_html, is_html=True),
-        external_link_count_markdown=count_external_links(markdown_text, is_html=False),
+        external_link_count_html=external_link_count_html,
+        external_link_count_markdown=external_link_count_markdown,
         signature_count_html=signature_count_html,
         signature_count_markdown=signature_count_markdown,
         field_presence=field_presence,
@@ -730,6 +797,7 @@ def render_markdown_report(
                     f"- title_match: {record.title_match}",
                     f"- density_ratio: {record.density_ratio:.3f}",
                     f"- density_delta: {record.density_delta}",
+                    f"- directional_deltas: {json.dumps(record.directional_deltas, sort_keys=True)}",
                     f"- heading_count_delta: {record.heading_count_delta}",
                     f"- signature_count_html: {record.signature_count_html}",
                     f"- signature_count_markdown: {record.signature_count_markdown}",
