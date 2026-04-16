@@ -21,6 +21,7 @@ The deeper parity audit treats four repository locations as the contract surface
 - `docs/GTA IV ScriptHook.Net Documentation.chm` is the archival source of truth.
 - `.maestro/tmp/chm-verify/` is the analyzable CHM representation after decompilation.
 - `docs/production-docs/reference-page-map.csv` is the page-pairing contract between legacy CHM pages and supported Markdown targets.
+- `docs/production-docs/chm-detail-parity-allowlist.json` is the only place intentional exceptions may be declared for the deeper audit.
 - `docs/reference/api/` plus the other mapped Markdown targets under `docs/` are the supported documentation surface under audit.
 
 The audit runs page-by-page. Every row in `reference-page-map.csv` resolves to one decompiled HTML file and one Markdown target. The tool then emits one per-page record that captures structural counts, key field presence, and a severity level.
@@ -91,6 +92,18 @@ Severity is assigned with these rules:
 - `clean`: no actionable parity loss was detected.
 
 The command exits nonzero only when at least one `blocking` finding is present.
+
+## Allowlist Contract
+
+The allowlist is deliberately narrow. Each entry must identify one specific CHM-to-Markdown mapping and justify why that page is allowed to differ:
+
+- `source_path`: the legacy `docs/md/...` source anchor from `reference-page-map.csv`
+- `target_path`: the supported Markdown page that intentionally diverges
+- `allowed_missing_fields`: only the named contract fields may be absent from Markdown without remaining blocking
+- `allowed_density_floor`: the minimum acceptable `density_ratio` for that page if the Markdown page is intentionally more concise
+- `rationale`: reviewer-facing explanation that must stay true when future maintainers rerun the audit
+
+The deeper audit does not downgrade title mismatches, missing HTML files, or arbitrary structural regressions just because a source path is listed. If a finding falls outside the exact allowlisted shape, it remains `blocking`, `major`, or `minor`.
 
 ## Why Compare CHM HTML Directly
 

@@ -22,7 +22,7 @@ Use this checklist before calling the overhauled `docs/` tree production-ready f
 - Treat every item in this document as a release gate, not as a nice-to-have cleanup task.
 - Verify the named files directly in the working tree.
 - If a gate fails, record the blocking file and fix that artifact instead of waiving the requirement informally.
-- Use this page together with [Production Docs Style Guide](style-guide.md), [Production Docs Migration Rules](migration-rules.md), [Reference Link Validation Report](reference-link-report.md), [CHM Parity Report](chm-parity-report.md), and [Docs Review Remediation Report](review-remediation-report.md) during final review.
+- Use this page together with [Production Docs Style Guide](style-guide.md), [Production Docs Migration Rules](migration-rules.md), [Reference Link Validation Report](reference-link-report.md), [CHM Parity Report](chm-parity-report.md), [CHM Detail Parity Report](chm-detail-parity-report.md), and [Docs Review Remediation Report](review-remediation-report.md) during final review.
 
 ## Required Entry Pages
 
@@ -64,13 +64,14 @@ Release readiness requires objective validation results, not only spot-checked r
 | Gate | Required files or commands | Release-ready expectation |
 | --- | --- | --- |
 | Build orchestration exists | [`docs/tools/build_docs.ps1`](../tools/build_docs.ps1) | One checked-in script can rebuild the normalized reference output and validation report from repo-root sources. |
-| Full verification commands are checked in | [`docs/tools/build_docs.ps1`](../tools/build_docs.ps1), [`docs/tools/decompile_chm.ps1`](../tools/decompile_chm.ps1), [`docs/tools/compare_chm_to_docs.py`](../tools/compare_chm_to_docs.py) | Production readiness must be backed by a fresh repo-root run of the build, CHM decompile, and parity comparison flow rather than by stale reports or spot fixes. |
+| Full verification commands are checked in | [`docs/tools/build_docs.ps1`](../tools/build_docs.ps1), [`docs/tools/decompile_chm.ps1`](../tools/decompile_chm.ps1), [`docs/tools/compare_chm_to_docs.py`](../tools/compare_chm_to_docs.py), [`docs/tools/audit_chm_detail_parity.py`](../tools/audit_chm_detail_parity.py) | Production readiness must be backed by a fresh repo-root run of the build, CHM decompile, parity comparison, and deeper page-detail audit flow rather than by stale reports or spot fixes. |
 | Reference normalization exists | [`docs/tools/normalize_reference.py`](../tools/normalize_reference.py) | The release depends on the checked-in normalization script rather than manual editing of generated reference pages. |
 | Link validation exists | [`docs/tools/validate_reference_links.py`](../tools/validate_reference_links.py) | The release has an explicit validator for broken local links, malformed anchors, and legacy-link carry-over inside the reference tree. |
-| Latest validation reports are present | [`docs/production-docs/reference-link-report.md`](reference-link-report.md), [`docs/production-docs/chm-parity-report.md`](chm-parity-report.md) | Both reports reflect the latest repo-root verification run and remain consistent with the current working tree. |
+| Latest validation reports are present | [`docs/production-docs/reference-link-report.md`](reference-link-report.md), [`docs/production-docs/chm-parity-report.md`](chm-parity-report.md), [`docs/production-docs/chm-detail-parity-report.md`](chm-detail-parity-report.md) | All three reports reflect the latest repo-root verification run and remain consistent with the current working tree. |
 | Supported-doc legacy carry-over is zero | [`docs/production-docs/reference-link-report.md`](reference-link-report.md) | `disallowed_legacy_references: 0` and `unresolved_legacy_references: 0` are required before the docs set can be called production-ready. |
 | Critical reference breakage is zero | [`docs/production-docs/reference-link-report.md`](reference-link-report.md) | `critical_broken_local_links: 0` and `malformed_anchors: 0` are both required for a production-ready release. |
 | Page map is truthful and parity-clean | [`docs/production-docs/reference-page-map.csv`](reference-page-map.csv), [`docs/production-docs/chm-parity-report.md`](chm-parity-report.md) | The checked-in page map must describe real targets and the latest parity report must show `unmapped_html_pages: 0` and `mapped_target_pages_missing: 0` before publication. |
+| Deeper parity gate is clean enough for archival replacement claims | [`docs/production-docs/chm-detail-parity-report.md`](chm-detail-parity-report.md), [`docs/production-docs/chm-detail-parity-allowlist.json`](chm-detail-parity-allowlist.json) | `blocking_findings: 0` is required before declaring the supported docs semantically equivalent enough for archival replacement claims; any `expected` findings must match the checked-in allowlist rationale exactly. |
 | Docs tooling remains covered by tests | [`tests/test_build_docs.py`](../../tests/test_build_docs.py), [`tests/test_normalize_reference.py`](../../tests/test_normalize_reference.py), [`tests/test_validate_reference_links.py`](../../tests/test_validate_reference_links.py) | The docs generation and validation workflow still has passing automated tests after release-prep changes. |
 
 ## Compatibility Statements
@@ -102,8 +103,9 @@ Use this short sign-off block when reviewing the final release candidate:
 - Entry pages verified against `docs/README.md` and section landing pages.
 - Guide and example coverage verified against the files listed above.
 - Normalized API and concept coverage verified against `docs/reference/`.
-- Full verification rerun from the repo root with `docs/tools/build_docs.ps1`, `docs/tools/decompile_chm.ps1`, and `docs/tools/compare_chm_to_docs.py`, with the latest reports saved to `docs/production-docs/reference-link-report.md` and `docs/production-docs/chm-parity-report.md`.
+- Full verification rerun from the repo root with `docs/tools/build_docs.ps1`, `docs/tools/decompile_chm.ps1`, `docs/tools/compare_chm_to_docs.py`, and `docs/tools/audit_chm_detail_parity.py`, with the latest reports saved to `docs/production-docs/reference-link-report.md`, `docs/production-docs/chm-parity-report.md`, and `docs/production-docs/chm-detail-parity-report.md`.
 - `docs/production-docs/reference-page-map.csv` reviewed against `docs/production-docs/chm-parity-report.md` to confirm the page map is truthful and `mapped_target_pages_missing: 0`.
+- `docs/production-docs/chm-detail-parity-report.md` reviewed to confirm `blocking_findings: 0` before making semantic-equivalence or archival replacement claims.
 - `docs/production-docs/reference-link-report.md` reviewed to confirm `disallowed_legacy_references: 0` and `unresolved_legacy_references: 0`.
 - Compatibility statements reviewed against `docs/compatibility/README.md` and `docs/compatibility/version-matrix.md`.
 - Legacy-artifact handling reviewed against `docs/reference/legacy-chm.md`, `docs/production-docs/migration-rules.md`, and `docs/production-docs/link-and-quality-baseline.md`.

@@ -4,10 +4,14 @@ param(
     [string]$PythonExecutable = 'python',
     [string]$NormalizeScript,
     [string]$ValidateScript,
+    [string]$DetailParityScript,
     [string]$SourceRoot = 'docs/md',
     [string]$NormalizeOutputRoot = 'docs/reference/api',
     [string]$ValidationRoot = 'docs/reference',
     [string]$ReportPath = 'docs/production-docs/reference-link-report.md',
+    [string]$DetailParityReportPath = 'docs/production-docs/chm-detail-parity-report.md',
+    [string]$DetailParityJsonReportPath = 'docs/production-docs/chm-detail-parity-report.json',
+    [string]$DetailParityAllowlistPath = 'docs/production-docs/chm-detail-parity-allowlist.json',
     [string[]]$PreservePaths = @(
         'docs/reference/api/index.md',
         'docs/reference/api/GTA/index.md',
@@ -26,7 +30,9 @@ param(
         'docs/reference/api/misc/index.md'
     ),
     [string[]]$NormalizeArgs = @(),
-    [string[]]$ValidationArgs = @()
+    [string[]]$ValidationArgs = @(),
+    [string[]]$DetailParityArgs = @(),
+    [switch]$RunDetailParityAudit
 )
 
 Set-StrictMode -Version Latest
@@ -40,6 +46,9 @@ if (-not $NormalizeScript) {
 }
 if (-not $ValidateScript) {
     $ValidateScript = Join-Path $PSScriptRoot 'validate_reference_links.py'
+}
+if (-not $DetailParityScript) {
+    $DetailParityScript = Join-Path $PSScriptRoot 'audit_chm_detail_parity.py'
 }
 
 function Invoke-PythonStep {
@@ -165,6 +174,7 @@ function Assert-ValidationSummaryClean {
 $resolvedRepoRoot = (Resolve-Path $RepoRoot).Path
 $resolvedNormalizeScript = (Resolve-Path $NormalizeScript).Path
 $resolvedValidateScript = (Resolve-Path $ValidateScript).Path
+$resolvedDetailParityScript = (Resolve-Path $DetailParityScript).Path
 
 Push-Location $resolvedRepoRoot
 try {
@@ -172,6 +182,9 @@ try {
     $resolvedNormalizeOutputRoot = Resolve-RepoPath $NormalizeOutputRoot
     $resolvedValidationRoot = Resolve-RepoPath $ValidationRoot
     $resolvedReportPath = Resolve-RepoPath $ReportPath
+    $resolvedDetailParityReportPath = Resolve-RepoPath $DetailParityReportPath
+    $resolvedDetailParityJsonReportPath = Resolve-RepoPath $DetailParityJsonReportPath
+    $resolvedDetailParityAllowlistPath = Resolve-RepoPath $DetailParityAllowlistPath
     $normalizeStepArgs = @(
         '--source',
         $resolvedSourceRoot,
@@ -184,6 +197,16 @@ try {
         '--report',
         $resolvedReportPath
     ) + $ValidationArgs
+    $detailParityStepArgs = @(
+        '--repo-root',
+        $resolvedRepoRoot,
+        '--report',
+        $resolvedDetailParityReportPath,
+        '--json-report',
+        $resolvedDetailParityJsonReportPath,
+        '--allowlist',
+        $resolvedDetailParityAllowlistPath
+    ) + $DetailParityArgs
     $preservedFiles = Backup-PreservedFiles $PreservePaths
 
     Invoke-PythonStep `
@@ -200,6 +223,16 @@ try {
 
     $validationSummaryCounts = Get-ValidationSummaryCounts -ReportFile $resolvedReportPath
     Assert-ValidationSummaryClean -Counts $validationSummaryCounts
+
+    if ($RunDetailParityAudit) {
+        Invoke-PythonStep `
+            -StepName 'audit_chm_detail_parity.py' `
+            -ScriptPath $resolvedDetailParityScript `
+            -Arguments $detailParityStepArgs
+    }
+    else {
+        Write-Host "Detail parity audit is available via -RunDetailParityAudit."
+    }
 
     Write-Host 'Docs build completed.'
 }

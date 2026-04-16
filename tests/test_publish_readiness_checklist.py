@@ -25,6 +25,10 @@ class PublishReadinessChecklistTests(unittest.TestCase):
 
         self.assertIn("docs/tools/decompile_chm.ps1", content)
         self.assertIn("docs/tools/compare_chm_to_docs.py", content)
+        self.assertIn("docs/tools/audit_chm_detail_parity.py", content)
+        self.assertIn("docs/production-docs/chm-detail-parity-report.md", content)
+        self.assertIn("blocking_findings: 0", content)
+        self.assertIn("semantically equivalent enough for archival replacement claims", content)
         self.assertIn("disallowed_legacy_references: 0", content)
         self.assertIn("unresolved_legacy_references: 0", content)
         self.assertIn("unmapped_html_pages: 0", content)

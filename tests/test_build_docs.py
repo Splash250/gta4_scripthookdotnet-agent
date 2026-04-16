@@ -101,6 +101,45 @@ class BuildDocsPowerShellTests(unittest.TestCase):
             ),
             encoding="utf-8",
         )
+        self.detail_audit_script = self.tools_root / "detail_audit_stub.py"
+        self.detail_audit_script.write_text(
+            textwrap.dedent(
+                f"""\
+                from pathlib import Path
+                import argparse
+
+                parser = argparse.ArgumentParser()
+                parser.add_argument("--repo-root", required=True)
+                parser.add_argument("--report", required=True)
+                parser.add_argument("--json-report", required=True)
+                parser.add_argument("--allowlist", required=True)
+                parser.add_argument("--fail", action="store_true")
+                args = parser.parse_args()
+
+                report = Path(args.report)
+                json_report = Path(args.json_report)
+                allowlist = Path(args.allowlist)
+                report.parent.mkdir(parents=True, exist_ok=True)
+                json_report.parent.mkdir(parents=True, exist_ok=True)
+                if not allowlist.exists():
+                    raise SystemExit("missing allowlist")
+                report.write_text("# detail audit report\\n", encoding="utf-8")
+                json_report.write_text('{{"summary": {{"blocking_findings": 0}}, "pages": []}}\\n', encoding="utf-8")
+                with Path(r"{self.log_path}").open("a", encoding="utf-8") as handle:
+                    handle.write(
+                        "detail|"
+                        f"{{args.repo_root}}|"
+                        f"{{report}}|"
+                        f"{{json_report}}|"
+                        f"{{allowlist}}|"
+                        f"fail={{args.fail}}\\n"
+                    )
+
+                raise SystemExit(1 if args.fail else 0)
+                """
+            ),
+            encoding="utf-8",
+        )
         self.curated_index_bytes = b"---\r\ncurated: true\r\n---\r\n# Curated API Index\r\n"
         (self.normalize_output_root / "index.md").write_bytes(self.curated_index_bytes)
         (self.normalize_output_root / "GTA.Forms").mkdir(parents=True, exist_ok=True)
@@ -110,6 +149,7 @@ class BuildDocsPowerShellTests(unittest.TestCase):
             encoding="utf-8",
         )
         self.report_template_path.write_text(self.validation_report_body, encoding="utf-8")
+        (self.production_root / "chm-detail-parity-allowlist.json").write_text("[]\n", encoding="utf-8")
 
     def tearDown(self) -> None:
         shutil.rmtree(self.temp_dir)
@@ -221,6 +261,54 @@ class BuildDocsPowerShellTests(unittest.TestCase):
 
         self.assertEqual(result.returncode, 1, msg=result.stdout + result.stderr)
         self.assertIn("malformed_anchors=2", result.stderr)
+
+    def test_build_docs_can_opt_into_detail_parity_audit(self) -> None:
+        result = self.run_build_docs(
+            [
+                "-RunDetailParityAudit",
+                "-DetailParityScript",
+                str(self.detail_audit_script),
+            ]
+        )
+
+        self.assertEqual(result.returncode, 0, msg=result.stdout + result.stderr)
+        self.assertIn("Running audit_chm_detail_parity.py", result.stdout)
+        self.assertTrue((self.production_root / "chm-detail-parity-report.md").exists())
+        self.assertTrue((self.production_root / "chm-detail-parity-report.json").exists())
+        self.assertEqual(
+            self.log_path.read_text(encoding="utf-8").splitlines(),
+            [
+                f"normalize|{self.source_root}|{self.normalize_output_root}",
+                (
+                    "validate|"
+                    f"{self.reference_root}|"
+                    f"{self.production_root / 'reference-link-report.md'}|"
+                    "fail=False"
+                ),
+                (
+                    "detail|"
+                    f"{self.repo_root}|"
+                    f"{self.production_root / 'chm-detail-parity-report.md'}|"
+                    f"{self.production_root / 'chm-detail-parity-report.json'}|"
+                    f"{self.production_root / 'chm-detail-parity-allowlist.json'}|"
+                    "fail=False"
+                ),
+            ],
+        )
+
+    def test_build_docs_returns_nonzero_when_detail_parity_audit_fails(self) -> None:
+        result = self.run_build_docs(
+            [
+                "-RunDetailParityAudit",
+                "-DetailParityScript",
+                str(self.detail_audit_script),
+                "-DetailParityArgs",
+                "--fail",
+            ]
+        )
+
+        self.assertEqual(result.returncode, 1, msg=result.stdout + result.stderr)
+        self.assertIn("audit_chm_detail_parity.py failed", result.stderr)
 
 
 if __name__ == "__main__":

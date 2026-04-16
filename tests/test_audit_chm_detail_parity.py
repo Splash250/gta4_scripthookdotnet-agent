@@ -33,6 +33,7 @@ class AuditChmDetailParityTests(unittest.TestCase):
         self.decompiled_root = self.repo_root / ".maestro" / "tmp" / "chm-verify"
         self.production_docs = self.repo_root / "docs" / "production-docs"
         self.reference_api = self.repo_root / "docs" / "reference" / "api"
+        self.allowlist_path = self.production_docs / "chm-detail-parity-allowlist.json"
         self.report_path = self.production_docs / "chm-detail-parity-report.md"
         self.json_report_path = self.production_docs / "chm-detail-parity-report.json"
         self.page_map_path = self.production_docs / "reference-page-map.csv"
@@ -44,7 +45,12 @@ class AuditChmDetailParityTests(unittest.TestCase):
     def tearDown(self) -> None:
         shutil.rmtree(self.temp_dir)
 
-    def run_script(self, *, page_map_path: Path | None = None) -> subprocess.CompletedProcess[str]:
+    def run_script(
+        self,
+        *,
+        page_map_path: Path | None = None,
+        allowlist_path: Path | None = None,
+    ) -> subprocess.CompletedProcess[str]:
         return subprocess.run(
             [
                 "python",
@@ -55,6 +61,8 @@ class AuditChmDetailParityTests(unittest.TestCase):
                 str(self.decompiled_root),
                 "--page-map",
                 str(page_map_path or self.page_map_path),
+                "--allowlist",
+                str(allowlist_path or self.allowlist_path),
                 "--report",
                 str(self.report_path),
                 "--json-report",
@@ -99,6 +107,9 @@ class AuditChmDetailParityTests(unittest.TestCase):
         path = self.repo_root / relative_path
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_text(text, encoding="utf-8")
+
+    def write_allowlist(self, entries: list[dict[str, object]]) -> None:
+        self.allowlist_path.write_text(json.dumps(entries, indent=2), encoding="utf-8")
 
     def build_type_html(
         self,
@@ -1420,6 +1431,84 @@ class AuditChmDetailParityTests(unittest.TestCase):
                 }
             ]
         )
+        self.write_allowlist(
+            [
+                {
+                    "source_path": "docs/md/TOC.md",
+                    "target_path": "docs/reference/archive/legacy-export-toc.md",
+                    "allowed_missing_fields": ["overload_inventory"],
+                    "allowed_density_floor": 0.0,
+                    "rationale": "Curated archive TOC intentionally omits overload inventory details.",
+                }
+            ]
+        )
+        self.write_html(
+            "TOC.html",
+            "Documentation TOC",
+            "<div id='TitleRow'><h1 class='dtH1'>Documentation TOC</h1></div>"
+            "<div id='nstext'><h4 class='dtH4'>Overload List</h4>"
+            "<blockquote class='dtBlock'><a href='GTA.Matrix.Lerp_overload_1.html'>public Matrix Lerp(Matrix,Matrix,float)</a></blockquote></div>",
+        )
+        self.write_markdown(
+            "docs/reference/archive/legacy-export-toc.md",
+            "# Documentation TOC\n\nCurated archive index.\n",
+        )
+
+        result = self.run_script()
+
+        self.assertEqual(result.returncode, 0, msg=result.stdout + result.stderr)
+        payload = json.loads(self.json_report_path.read_text(encoding="utf-8"))
+        record = payload["pages"][0]
+        self.assertEqual(record["severity"], "expected")
+        self.assertTrue(any("allowlisted curated difference" in note for note in record["notes"]))
+        self.assertEqual(record["allowlist_rationale"], "Curated archive TOC intentionally omits overload inventory details.")
+
+    def test_load_allowlist_reads_expected_shape(self) -> None:
+        self.write_allowlist(
+            [
+                {
+                    "source_path": "docs/md/TOC.md",
+                    "target_path": "docs/reference/archive/legacy-export-toc.md",
+                    "allowed_missing_fields": ["overload_inventory", "remarks"],
+                    "allowed_density_floor": 0.25,
+                    "rationale": "Archive index is intentionally compressed.",
+                }
+            ]
+        )
+
+        entries = self.audit.load_allowlist(self.allowlist_path)
+
+        self.assertEqual(len(entries), 1)
+        entry = entries[0]
+        self.assertEqual(entry.source_path, "docs/md/TOC.md")
+        self.assertEqual(entry.target_path, "docs/reference/archive/legacy-export-toc.md")
+        self.assertEqual(entry.allowed_missing_fields, ("overload_inventory", "remarks"))
+        self.assertEqual(entry.allowed_density_floor, 0.25)
+        self.assertEqual(entry.rationale, "Archive index is intentionally compressed.")
+
+    def test_cli_uses_allowlist_only_for_explicitly_matching_difference_shape(self) -> None:
+        self.write_page_map(
+            [
+                {
+                    "source_path": "docs/md/TOC.md",
+                    "doc_kind": "legacy-toc",
+                    "namespace_or_section": "archive",
+                    "target_path": "docs/reference/archive/legacy-export-toc.md",
+                    "notes": "Keep as an archival navigation aid instead of a primary entry page.",
+                }
+            ]
+        )
+        self.write_allowlist(
+            [
+                {
+                    "source_path": "docs/md/TOC.md",
+                    "target_path": "docs/reference/archive/legacy-export-toc.md",
+                    "allowed_missing_fields": ["remarks"],
+                    "allowed_density_floor": 0.0,
+                    "rationale": "Only remarks differences are expected here.",
+                }
+            ]
+        )
         self.write_html(
             "TOC.html",
             "Documentation TOC",
@@ -1434,11 +1523,78 @@ class AuditChmDetailParityTests(unittest.TestCase):
 
         result = self.run_script()
 
-        self.assertEqual(result.returncode, 0, msg=result.stdout + result.stderr)
+        self.assertEqual(result.returncode, 1, msg=result.stdout + result.stderr)
         payload = json.loads(self.json_report_path.read_text(encoding="utf-8"))
         record = payload["pages"][0]
-        self.assertEqual(record["severity"], "expected")
-        self.assertTrue(any("allowlisted curated difference" in note for note in record["notes"]))
+        self.assertEqual(record["severity"], "blocking")
+        self.assertIsNone(record["allowlist_rationale"])
+
+    def test_markdown_report_contains_expected_summary_sections(self) -> None:
+        self.write_page_map(
+            [
+                {
+                    "source_path": "docs/md/GTA/Vector3.md",
+                    "doc_kind": "type-page",
+                    "namespace_or_section": "GTA",
+                    "target_path": "docs/reference/api/GTA/Vector3.md",
+                    "notes": "Keep as a standalone generated type reference page.",
+                },
+                {
+                    "source_path": "docs/md/GTA/Matrix.Lerp.md",
+                    "doc_kind": "type-member",
+                    "namespace_or_section": "GTA",
+                    "target_path": "docs/reference/api/GTA/Matrix.Lerp.md",
+                    "notes": "Fold member page Lerp into the owning type reference page.",
+                },
+                {
+                    "source_path": "docs/md/TOC.md",
+                    "doc_kind": "legacy-toc",
+                    "namespace_or_section": "archive",
+                    "target_path": "docs/reference/archive/legacy-export-toc.md",
+                    "notes": "Keep as an archival navigation aid instead of a primary entry page.",
+                },
+            ]
+        )
+        self.write_allowlist(
+            [
+                {
+                    "source_path": "docs/md/TOC.md",
+                    "target_path": "docs/reference/archive/legacy-export-toc.md",
+                    "allowed_missing_fields": ["overload_inventory"],
+                    "allowed_density_floor": 0.0,
+                    "rationale": "Archive TOC intentionally omits the CHM overload inventory.",
+                }
+            ]
+        )
+        self.write_html("GTA.Vector3.html", "Vector3 Class", self.build_type_html())
+        self.write_markdown("docs/reference/api/GTA/Vector3.md", self.build_type_markdown())
+        self.write_html("GTA.Matrix.Lerp.html", "Matrix.Lerp Method", self.build_method_html())
+        self.write_markdown(
+            "docs/reference/api/GTA/Matrix.Lerp.md",
+            self.build_method_markdown(include_remarks=False),
+        )
+        self.write_html(
+            "TOC.html",
+            "Documentation TOC",
+            "<div id='TitleRow'><h1 class='dtH1'>Documentation TOC</h1></div>"
+            "<div id='nstext'><h4 class='dtH4'>Overload List</h4>"
+            "<blockquote class='dtBlock'><a href='GTA.Matrix.Lerp_overload_1.html'>public Matrix Lerp(Matrix,Matrix,float)</a></blockquote></div>",
+        )
+        self.write_markdown(
+            "docs/reference/archive/legacy-export-toc.md",
+            "# Legacy Export TOC\n\nCurated archive index.\n",
+        )
+
+        result = self.run_script()
+
+        self.assertEqual(result.returncode, 1, msg=result.stdout + result.stderr)
+        report_text = self.report_path.read_text(encoding="utf-8")
+        self.assertIn("## Summary Counts By Severity", report_text)
+        self.assertIn("## Worst Density Drops", report_text)
+        self.assertIn("## Pages Missing Signature Fields", report_text)
+        self.assertIn("## Pages Missing Remarks/Examples/Requirements Fields", report_text)
+        self.assertIn("## Intentional Curated Exceptions", report_text)
+        self.assertIn("## Remediation Queue", report_text)
 
     def test_json_report_records_directional_field_deltas(self) -> None:
         self.write_page_map(

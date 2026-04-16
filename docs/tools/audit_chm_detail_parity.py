@@ -86,13 +86,6 @@ INHERITANCE_MARKERS = ("Derived types", "Inherits", "Inheritance Hierarchy")
 MEMBERS_MARKERS = ("#### Members", "dtH4'>Members", 'dtH4">Members')
 OVERLOAD_MARKERS = ("#### Overload List", "dtH4'>Overload List", 'dtH4">Overload List')
 
-INTENTIONAL_CURATION_SOURCES = {
-    "docs/md/GTA IV ScriptHook.Net Single File Documentation.md",
-    "docs/md/index.md",
-    "docs/md/misc/index.md",
-    "docs/md/TOC.md",
-}
-
 BLOCKING_FIELDS = (
     "summary_text",
     "visual_basic_signature",
@@ -116,6 +109,15 @@ class MappingRow:
     namespace_or_section: str
     target_path: str
     notes: str
+
+
+@dataclass(frozen=True)
+class AllowlistEntry:
+    source_path: str
+    target_path: str
+    allowed_missing_fields: tuple[str, ...]
+    allowed_density_floor: float
+    rationale: str
 
 
 @dataclass(frozen=True)
@@ -149,6 +151,7 @@ class PageAuditRecord:
     missing_in_markdown_fields: list[str]
     missing_in_html_fields: list[str]
     severity: str
+    allowlist_rationale: str | None
     notes: list[str]
 
 
@@ -188,6 +191,12 @@ def parse_args() -> argparse.Namespace:
         help="CSV mapping between legacy export pages and supported Markdown targets.",
     )
     parser.add_argument(
+        "--allowlist",
+        type=Path,
+        default=Path("docs/production-docs/chm-detail-parity-allowlist.json"),
+        help="JSON allowlist for intentional deeper-audit differences.",
+    )
+    parser.add_argument(
         "--report",
         type=Path,
         default=Path("docs/production-docs/chm-detail-parity-report.md"),
@@ -219,6 +228,37 @@ def load_page_map(page_map_path: Path) -> list[MappingRow]:
             )
             for row in reader
         ]
+
+
+def load_allowlist(allowlist_path: Path) -> list[AllowlistEntry]:
+    if not allowlist_path.exists():
+        return []
+
+    payload = json.loads(allowlist_path.read_text(encoding="utf-8"))
+    if not isinstance(payload, list):
+        raise SystemExit(f"Allowlist must be a JSON array: {allowlist_path}")
+
+    entries: list[AllowlistEntry] = []
+    for index, raw_entry in enumerate(payload):
+        if not isinstance(raw_entry, dict):
+            raise SystemExit(f"Allowlist entry #{index + 1} must be an object: {allowlist_path}")
+        allowed_missing_fields = raw_entry.get("allowed_missing_fields", [])
+        if not isinstance(allowed_missing_fields, list) or not all(
+            isinstance(field, str) for field in allowed_missing_fields
+        ):
+            raise SystemExit(
+                f"Allowlist entry #{index + 1} has invalid allowed_missing_fields: {allowlist_path}"
+            )
+        entries.append(
+            AllowlistEntry(
+                source_path=str(raw_entry["source_path"]),
+                target_path=str(raw_entry["target_path"]),
+                allowed_missing_fields=tuple(allowed_missing_fields),
+                allowed_density_floor=float(raw_entry["allowed_density_floor"]),
+                rationale=str(raw_entry["rationale"]),
+            )
+        )
+    return entries
 
 
 def source_path_to_html_relative(source_path: str) -> str:
@@ -642,13 +682,128 @@ def count_markdown_lists(markdown_text: str) -> int:
     return count_markdown_bullet_lists(markdown_text)
 
 
+def find_matching_allowlist_entry(
+    row: MappingRow,
+    allowlist_entries: list[AllowlistEntry],
+) -> AllowlistEntry | None:
+    for entry in allowlist_entries:
+        if entry.source_path == row.source_path and entry.target_path == row.target_path:
+            return entry
+    return None
+
+
+def classify_allowlist_match(
+    *,
+    entry: AllowlistEntry | None,
+    missing_in_markdown_fields: list[str],
+    density_ratio: float,
+    notes: list[str],
+) -> tuple[bool, str | None]:
+    if entry is None:
+        return False, None
+
+    allowed_missing_fields = set(entry.allowed_missing_fields)
+    if any(field not in allowed_missing_fields for field in missing_in_markdown_fields):
+        return False, None
+
+    unmatched_notes = [
+        note
+        for note in notes
+        if not note.startswith("missing key field `")
+        and not note.startswith("density_ratio ")
+    ]
+    if unmatched_notes:
+        return False, None
+
+    density_note_present = any(note.startswith("density_ratio ") for note in notes)
+    if density_note_present and density_ratio < entry.allowed_density_floor:
+        return False, None
+
+    return True, entry.rationale
+
+
+def make_missing_asset_record(
+    *,
+    row: MappingRow,
+    relative_html_path: str,
+    missing_asset_note: str,
+) -> PageAuditRecord:
+    return PageAuditRecord(
+        source_path=row.source_path,
+        relative_html_path=relative_html_path,
+        target_path=row.target_path,
+        doc_kind=row.doc_kind,
+        title_match=False,
+        html_text_length=0,
+        markdown_text_length=0,
+        density_ratio=0.0,
+        density_delta=0,
+        directional_deltas={
+            "text_length": 0,
+            "heading_count": 0,
+            "code_block_count": 0,
+            "list_count": 0,
+            "table_count": 0,
+            "link_count": 0,
+            "external_link_count": 0,
+            "signature_count": 0,
+        },
+        heading_count_html=0,
+        heading_count_markdown=0,
+        heading_count_delta=0,
+        code_block_count_html=0,
+        code_block_count_markdown=0,
+        list_count_html=0,
+        list_count_markdown=0,
+        table_count_html=0,
+        table_count_markdown=0,
+        link_count_html=0,
+        link_count_markdown=0,
+        external_link_count_html=0,
+        external_link_count_markdown=0,
+        signature_count_html=0,
+        signature_count_markdown=0,
+        field_presence={
+            name: {
+                "html": False,
+                "markdown": False,
+                "missing_in_markdown": False,
+                "missing_in_html": False,
+            }
+            for name in BLOCKING_FIELDS
+        },
+        missing_in_markdown_fields=[],
+        missing_in_html_fields=[],
+        severity="blocking",
+        allowlist_rationale=None,
+        notes=[missing_asset_note],
+    )
+
+
 def audit_page(
     *,
     row: MappingRow,
-    html_path: Path,
-    markdown_text: str,
-    curated_allowlist: set[str],
+    html_path: Path | None,
+    markdown_text: str | None,
+    allowlist_entries: list[AllowlistEntry] | None = None,
+    curated_allowlist: set[str] | None = None,
 ) -> PageAuditRecord:
+    del curated_allowlist
+    allowlist_entries = allowlist_entries or []
+    relative_html_path = html_path.name if html_path is not None else source_path_to_html_relative(row.source_path)
+    if html_path is None:
+        return make_missing_asset_record(
+            row=row,
+            relative_html_path=relative_html_path,
+            missing_asset_note=f"mapped HTML page does not exist: {relative_html_path}",
+        )
+    if markdown_text is None:
+        return make_missing_asset_record(
+            row=row,
+            relative_html_path=relative_html_path,
+            missing_asset_note=f"mapped target page does not exist: {row.target_path}",
+        )
+
     raw_html = html_path.read_text(encoding="utf-8", errors="ignore")
     html_fields, markdown_fields = extract_fields(raw_html, markdown_text)
     (
@@ -702,6 +857,7 @@ def audit_page(
 
     notes: list[str] = []
     severity = "clean"
+    allowlist_rationale: str | None = None
     if not title_match:
         notes.append(
             f"title mismatch: html={html_fields['title']!r} markdown={markdown_fields['title']!r}"
@@ -736,13 +892,20 @@ def audit_page(
         )
         severity = "major"
 
-    if severity != "clean" and row.source_path in curated_allowlist:
+    allowlist_entry = find_matching_allowlist_entry(row, allowlist_entries)
+    allowlist_match, allowlist_rationale = classify_allowlist_match(
+        entry=allowlist_entry,
+        missing_in_markdown_fields=missing_in_markdown_fields,
+        density_ratio=density_ratio,
+        notes=notes,
+    )
+    if severity != "clean" and allowlist_match:
         notes.append("allowlisted curated difference downgraded to expected")
         severity = "expected"
 
     return PageAuditRecord(
         source_path=row.source_path,
-        relative_html_path=html_path.name,
+        relative_html_path=relative_html_path,
         target_path=row.target_path,
         doc_kind=row.doc_kind,
         title_match=title_match,
@@ -770,6 +933,7 @@ def audit_page(
         missing_in_markdown_fields=missing_in_markdown_fields,
         missing_in_html_fields=missing_in_html_fields,
         severity=severity,
+        allowlist_rationale=allowlist_rationale,
         notes=notes,
     )
 
@@ -794,38 +958,99 @@ def summarize(records: list[PageAuditRecord]) -> AuditSummary:
     )
 
 
+SEVERITY_ORDER = {
+    "blocking": 0,
+    "major": 1,
+    "minor": 2,
+    "expected": 3,
+    "clean": 4,
+}
+
+
+def display_path(path: Path, repo_root: Path) -> str:
+    try:
+        return path.resolve().relative_to(repo_root.resolve()).as_posix()
+    except ValueError:
+        return path.as_posix()
+
+
 def render_markdown_report(
     *,
     summary: AuditSummary,
     records: list[PageAuditRecord],
+    repo_root: Path,
     decompiled_root: Path,
     page_map_path: Path,
+    allowlist_path: Path,
 ) -> str:
     today = date.today().isoformat()
-    page_lines = []
-    for record in records:
-        note_lines = record.notes or ["no issues detected"]
-        page_lines.append(
-            "\n".join(
-                [
-                    f"### {record.source_path}",
-                    "",
-                    f"- severity: {record.severity}",
-                    f"- html: `{record.relative_html_path}`",
-                    f"- target: `{record.target_path}`",
-                    f"- title_match: {record.title_match}",
-                    f"- density_ratio: {record.density_ratio:.3f}",
-                    f"- density_delta: {record.density_delta}",
-                    f"- directional_deltas: {json.dumps(record.directional_deltas, sort_keys=True)}",
-                    f"- heading_count_delta: {record.heading_count_delta}",
-                    f"- signature_count_html: {record.signature_count_html}",
-                    f"- signature_count_markdown: {record.signature_count_markdown}",
-                    f"- missing_in_markdown_fields: {json.dumps(record.missing_in_markdown_fields)}",
-                    f"- missing_in_html_fields: {json.dumps(record.missing_in_html_fields)}",
-                    f"- notes: {'; '.join(note_lines)}",
-                ]
-            )
+    severity_lines = [
+        f"- blocking_findings: {summary.blocking_findings}",
+        f"- major_findings: {summary.major_findings}",
+        f"- minor_findings: {summary.minor_findings}",
+        f"- expected_findings: {summary.expected_findings}",
+        f"- clean_findings: {summary.clean_findings}",
+        f"- total_pages: {summary.total_pages}",
+    ]
+
+    worst_density_records = sorted(records, key=lambda record: (record.density_ratio, record.source_path))[:10]
+    worst_density_lines = [
+        (
+            f"- `{record.source_path}` -> `{record.target_path}` "
+            f"(severity={record.severity}, density_ratio={record.density_ratio:.3f}, density_delta={record.density_delta})"
         )
+        for record in worst_density_records
+    ]
+
+    signature_records = [
+        record
+        for record in records
+        if any(field in record.missing_in_markdown_fields for field in ("visual_basic_signature", "csharp_signature"))
+    ]
+    signature_lines = [
+        (
+            f"- `{record.source_path}` -> `{record.target_path}` "
+            f"(severity={record.severity}, missing={json.dumps([field for field in record.missing_in_markdown_fields if field in {'visual_basic_signature', 'csharp_signature'}])})"
+        )
+        for record in signature_records
+    ]
+
+    content_gap_fields = {"remarks", "examples", "requirements_or_version_notes"}
+    content_gap_records = [
+        record for record in records if any(field in content_gap_fields for field in record.missing_in_markdown_fields)
+    ]
+    content_gap_lines = [
+        (
+            f"- `{record.source_path}` -> `{record.target_path}` "
+            f"(severity={record.severity}, missing={json.dumps([field for field in record.missing_in_markdown_fields if field in content_gap_fields])})"
+        )
+        for record in content_gap_records
+    ]
+
+    expected_records = [record for record in records if record.severity == "expected"]
+    expected_lines = [
+        (
+            f"- `{record.source_path}` -> `{record.target_path}` "
+            f"(density_ratio={record.density_ratio:.3f}, rationale={record.allowlist_rationale or 'n/a'})"
+        )
+        for record in expected_records
+    ]
+
+    remediation_records = sorted(
+        [record for record in records if record.severity != "clean"],
+        key=lambda record: (
+            SEVERITY_ORDER[record.severity],
+            record.density_ratio,
+            record.source_path,
+        ),
+    )
+    remediation_lines = [
+        (
+            f"- severity={record.severity} | `{record.source_path}` -> `{record.target_path}` | "
+            f"density_ratio={record.density_ratio:.3f} | notes={' ; '.join(record.notes or ['no issues detected'])}"
+        )
+        for record in remediation_records
+    ]
 
     return (
         "---\n"
@@ -842,16 +1067,20 @@ def render_markdown_report(
         "  - '[[CHM Parity Report]]'\n"
         "---\n\n"
         "# CHM Detail Parity Report\n\n"
-        f"Compared decompiled HTML from `{decompiled_root.as_posix()}` against page map `{page_map_path.as_posix()}`.\n\n"
-        "## Summary\n\n"
-        f"- total_pages: {summary.total_pages}\n"
-        f"- clean_findings: {summary.clean_findings}\n"
-        f"- expected_findings: {summary.expected_findings}\n"
-        f"- minor_findings: {summary.minor_findings}\n"
-        f"- major_findings: {summary.major_findings}\n"
-        f"- blocking_findings: {summary.blocking_findings}\n\n"
-        "## Per-Page Findings\n\n"
-        + ("\n\n".join(page_lines) if page_lines else "- None\n")
+        f"Compared decompiled HTML from `{display_path(decompiled_root, repo_root)}` against page map `{display_path(page_map_path, repo_root)}`.\n\n"
+        f"Intentional curated differences are limited to `{display_path(allowlist_path, repo_root)}`.\n\n"
+        "## Summary Counts By Severity\n\n"
+        + "\n".join(severity_lines)
+        + "\n\n## Worst Density Drops\n\n"
+        + ("\n".join(worst_density_lines) if worst_density_lines else "- None\n")
+        + "\n\n## Pages Missing Signature Fields\n\n"
+        + ("\n".join(signature_lines) if signature_lines else "- None\n")
+        + "\n\n## Pages Missing Remarks/Examples/Requirements Fields\n\n"
+        + ("\n".join(content_gap_lines) if content_gap_lines else "- None\n")
+        + "\n\n## Intentional Curated Exceptions\n\n"
+        + ("\n".join(expected_lines) if expected_lines else "- None\n")
+        + "\n\n## Remediation Queue\n\n"
+        + ("\n".join(remediation_lines) if remediation_lines else "- None\n")
         + "\n"
     )
 
@@ -868,6 +1097,7 @@ def main() -> int:
     repo_root = args.repo_root.resolve()
     decompiled_root = resolve_path(repo_root, args.decompiled_root).resolve()
     page_map_path = resolve_path(repo_root, args.page_map).resolve()
+    allowlist_path = resolve_path(repo_root, args.allowlist).resolve()
     report_path = resolve_path(repo_root, args.report).resolve()
     json_report_path = resolve_path(repo_root, args.json_report).resolve()
 
@@ -877,26 +1107,19 @@ def main() -> int:
         raise SystemExit(f"Decompiled CHM directory does not exist: {decompiled_root}")
 
     page_map_rows = load_page_map(page_map_path)
-    curated_allowlist = set(INTENTIONAL_CURATION_SOURCES)
+    allowlist_entries = load_allowlist(allowlist_path)
     records: list[PageAuditRecord] = []
 
     for row in page_map_rows:
         html_relative = source_path_to_html_relative(row.source_path)
         html_path = decompiled_root / html_relative
-        if not html_path.exists():
-            raise SystemExit(f"Mapped HTML page does not exist: {html_path}")
-
         target_path = resolve_path(repo_root, Path(row.target_path))
-        if not target_path.exists():
-            raise SystemExit(f"Mapped target page does not exist: {target_path}")
-
-        markdown_text = target_path.read_text(encoding="utf-8")
         records.append(
             audit_page(
                 row=row,
-                html_path=html_path,
-                markdown_text=markdown_text,
-                curated_allowlist=curated_allowlist,
+                html_path=html_path if html_path.exists() else None,
+                markdown_text=target_path.read_text(encoding="utf-8") if target_path.exists() else None,
+                allowlist_entries=allowlist_entries,
             )
         )
 
@@ -906,8 +1129,10 @@ def main() -> int:
         render_markdown_report(
             summary=summary,
             records=records,
+            repo_root=repo_root,
             decompiled_root=decompiled_root,
             page_map_path=page_map_path,
+            allowlist_path=allowlist_path,
         ),
         encoding="utf-8",
     )
