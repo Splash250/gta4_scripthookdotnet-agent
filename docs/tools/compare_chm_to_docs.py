@@ -543,6 +543,18 @@ def render_report(
     )
 
 
+def blocking_findings(summary: ComparisonSummary) -> list[str]:
+    blocking_counts = (
+        ("unmapped_html_pages", summary.unmapped_html_pages),
+        ("mapped_target_pages_missing", summary.mapped_target_pages_missing),
+        ("title_parity_mismatches", summary.title_parity_mismatches),
+        ("namespace_indexes_missing", summary.namespace_indexes_missing),
+        ("root_indexes_missing", summary.root_indexes_missing),
+        ("high_value_marker_failures", summary.high_value_marker_failures),
+    )
+    return [f"{label}={value}" for label, value in blocking_counts if value > 0]
+
+
 def main() -> int:
     args = parse_args()
     repo_root = args.repo_root.resolve()
@@ -570,12 +582,19 @@ def main() -> int:
         encoding="utf-8",
     )
 
+    blocking_issues = blocking_findings(summary)
+
     print(
         "Compared "
         f"{summary.total_decompiled_html_pages} decompiled HTML pages against "
         f"{len(page_map_rows)} mapped rows"
     )
     print(f"Report written to {report_path}")
+    if blocking_issues:
+        raise SystemExit(
+            "Parity report contains blocking issues: "
+            + ", ".join(blocking_issues)
+        )
     return 0
 
 

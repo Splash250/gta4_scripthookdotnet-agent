@@ -113,7 +113,11 @@ class CompareChmToDocsTests(unittest.TestCase):
 
         result = self.run_script()
 
-        self.assertEqual(result.returncode, 0, msg=result.stdout + result.stderr)
+        self.assertEqual(result.returncode, 1, msg=result.stdout + result.stderr)
+        self.assertIn("Parity report contains blocking issues", result.stderr)
+        self.assertIn("unmapped_html_pages=1", result.stderr)
+        self.assertIn("mapped_target_pages_missing=1", result.stderr)
+        self.assertIn("high_value_marker_failures=3", result.stderr)
         report = self.report_path.read_text(encoding="utf-8")
         self.assertIn("# CHM Parity Report", report)
         self.assertIn("## Missing Pages", report)
@@ -182,7 +186,10 @@ class CompareChmToDocsTests(unittest.TestCase):
 
         result = self.run_script()
 
-        self.assertEqual(result.returncode, 0, msg=result.stdout + result.stderr)
+        self.assertEqual(result.returncode, 1, msg=result.stdout + result.stderr)
+        self.assertIn("Parity report contains blocking issues", result.stderr)
+        self.assertIn("mapped_target_pages_missing=4", result.stderr)
+        self.assertIn("high_value_marker_failures=4", result.stderr)
         report = self.report_path.read_text(encoding="utf-8")
         self.assertIn("- mapped_target_pages_missing: 4", report)
         self.assertIn("- high_value_marker_failures: 4", report)
@@ -198,6 +205,35 @@ class CompareChmToDocsTests(unittest.TestCase):
             "`docs/md/GTA/Player.md` high-value target is missing entirely at `docs/reference/gta/player.md`.",
             report,
         )
+
+    def test_compare_chm_to_docs_returns_nonzero_when_report_is_not_clean(self) -> None:
+        self.page_map_path.write_text(
+            "\n".join(
+                [
+                    '"source_path","doc_kind","namespace_or_section","target_path","notes"',
+                    '"docs/md/GTA/Player.md","type-page","GTA","docs/reference/gta/player.md","Legacy folded path retained in inventory."',
+                ]
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+
+        self.write_html(
+            "GTA.Player.html",
+            "Player Class",
+            "Character Model CanControlCharacter money",
+        )
+        self.write_markdown(
+            "docs/reference/api/GTA/Player.md",
+            "# Player Class\n\nCharacter\n\nModel\n\nCanControlCharacter\n",
+        )
+
+        result = self.run_script()
+
+        self.assertEqual(result.returncode, 1, msg=result.stdout + result.stderr)
+        self.assertIn("Parity report contains blocking issues", result.stderr)
+        self.assertIn("mapped_target_pages_missing=1", result.stderr)
+        self.assertIn("high_value_marker_failures=1", result.stderr)
 
     def test_compare_chm_to_docs_does_not_flag_missing_source_markers_as_target_failures(self) -> None:
         self.page_map_path.write_text(
@@ -312,7 +348,9 @@ class CompareChmToDocsTests(unittest.TestCase):
 
         result = self.run_script()
 
-        self.assertEqual(result.returncode, 0, msg=result.stdout + result.stderr)
+        self.assertEqual(result.returncode, 1, msg=result.stdout + result.stderr)
+        self.assertIn("Parity report contains blocking issues", result.stderr)
+        self.assertIn("mapped_target_pages_missing=1", result.stderr)
         report = self.report_path.read_text(encoding="utf-8")
         self.assertIn("- root_indexes_checked: 1", report)
         self.assertIn("- mapped_target_pages_missing: 1", report)

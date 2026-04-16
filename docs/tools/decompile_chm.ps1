@@ -1,7 +1,7 @@
 [CmdletBinding()]
 param(
     [string]$RepoRoot,
-    [string]$ChmPath = 'docs/chm/GTA IV ScriptHook.Net Documentation.chm',
+    [string]$ChmPath = 'docs/GTA IV ScriptHook.Net Documentation.chm',
     [string]$OutputRoot = '.maestro/tmp/chm-verify',
     [string]$HtmlHelpExecutable = 'C:\WINDOWS\hh.exe',
     [string[]]$ExpectedHtmlFiles = @(
@@ -56,7 +56,6 @@ function Assert-PathIsWithinRoot {
 }
 
 $resolvedRepoRoot = (Resolve-Path $RepoRoot).Path
-$resolvedChmPath = Resolve-RepoPath $ChmPath
 $resolvedOutputRoot = Resolve-RepoPath $OutputRoot
 $resolvedHtmlHelpExecutable = if ([System.IO.Path]::IsPathRooted($HtmlHelpExecutable)) {
     [System.IO.Path]::GetFullPath($HtmlHelpExecutable)
@@ -69,8 +68,18 @@ if (-not (Test-Path -LiteralPath $resolvedHtmlHelpExecutable)) {
     throw "HTML Help executable not found: $resolvedHtmlHelpExecutable"
 }
 
+$resolvedChmPath = Resolve-RepoPath $ChmPath
 if (-not (Test-Path -LiteralPath $resolvedChmPath)) {
-    throw "CHM file not found: $resolvedChmPath"
+    $legacyFallbackChmPath = Resolve-RepoPath 'docs/chm/GTA IV ScriptHook.Net Documentation.chm'
+    if (
+        $ChmPath -eq 'docs/GTA IV ScriptHook.Net Documentation.chm' -and
+        (Test-Path -LiteralPath $legacyFallbackChmPath)
+    ) {
+        $resolvedChmPath = $legacyFallbackChmPath
+    }
+    else {
+        throw "CHM file not found: $resolvedChmPath"
+    }
 }
 
 Assert-PathIsWithinRoot -RootPath $resolvedRepoRoot -CandidatePath $resolvedOutputRoot

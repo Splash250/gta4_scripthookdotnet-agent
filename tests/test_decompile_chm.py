@@ -94,6 +94,18 @@ class DecompileChmPowerShellTests(unittest.TestCase):
         self.assertIn("Decompiling CHM to", result.stdout)
         self.assertIn("Decompile completed with", result.stdout)
 
+    def test_decompile_chm_uses_docs_root_chm_path_by_default(self) -> None:
+        docs_root_chm = self.docs_root / "GTA IV ScriptHook.Net Documentation.chm"
+        docs_root_chm.write_text("stub chm payload in docs root\n", encoding="utf-8")
+        self.chm_path.unlink()
+
+        result = self.run_script()
+
+        self.assertEqual(result.returncode, 0, msg=result.stdout + result.stderr)
+        logged_args = self.log_path.read_text(encoding="utf-8").strip()
+        self.assertIn(str(docs_root_chm), logged_args)
+        self.assertTrue((self.output_root / "GTA.AnimationSet.html").exists())
+
     def test_decompile_chm_fails_when_expected_html_is_missing(self) -> None:
         result = self.run_script(mode="missing-html")
 
