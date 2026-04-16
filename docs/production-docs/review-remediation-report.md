@@ -105,6 +105,31 @@ The current generated artifacts report a clean state on the reviewed gates:
 - `reference-link-report.md`: `critical_broken_local_links=0`, `malformed_anchors=0`, `disallowed_legacy_references=0`, `allowed_legacy_references=0`, `unresolved_legacy_references=0`
 - `chm-parity-report.md`: `unmapped_html_pages=0`, `mapped_target_pages_missing=0`, `title_parity_mismatches=0`, `namespace_indexes_missing=0`, `root_indexes_missing=0`, `high_value_marker_failures=0`
 
+## Focused Reader-Facing Spot-Check
+
+The final review also included a manual spot-check of the supported reader path and the intentionally retained archive surfaces. Pages checked in that pass:
+
+- `docs/README.md`
+- `docs/reference/README.md`
+- `docs/reference/api/index.md`
+- `docs/guides/getting-started.md`
+- `docs/reference/api/GTA/Script.md`
+- `docs/reference/api/GTA/World.md`
+- `docs/reference/api/GTA/Vehicle.md`
+- `docs/reference/api/GTA/Player.md`
+- `docs/reference/api/GTA/Ped.md`
+- `docs/reference/api/GTA.Native/Function.md`
+- `docs/reference/api/GTA.Forms/Form.md`
+- `docs/reference/archive/legacy-single-file-export.md`
+- `docs/reference/archive/legacy-export-toc.md`
+
+Findings from that spot-check:
+
+- `docs/README.md`, `docs/reference/README.md`, and `docs/reference/api/index.md` all route readers through the supported docs structure and describe `docs/md/` as archival or parity-only context rather than a required starting point.
+- `docs/guides/getting-started.md` was corrected during this pass so routine API lookup now points to `docs/reference/README.md` and `docs/reference/api/index.md` instead of suggesting `docs/md/index.md` or `docs/md/TOC.md` as equivalent reader-facing destinations.
+- The enriched API pages checked above continue to link readers toward supported concept, guide, and example pages rather than back into export-only navigation.
+- `docs/reference/archive/legacy-single-file-export.md` and `docs/reference/archive/legacy-export-toc.md` both label themselves as archive-only pages and redirect normal browsing back to the supported reference entry points.
+
 ## Intentionally Retained Archive Exceptions
 
 The remediation kept a small number of intentional curation differences, but they are now explicit and documented instead of accidental:

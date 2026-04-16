@@ -46,7 +46,7 @@ If scripts are not loading or are failing after startup, open [Debug ScriptHookD
 
 The older `README.md` and `ScriptHookDotNet.readme.txt` still contain the authoritative historical instructions that this guide set is based on. They are useful source material, but they assume a release archive layout rather than a modern repo reader trying to understand `dist\`, `bin\`, and the checked-in sample projects separately.
 
-For API lookup after you finish the setup flow, use [Reference](../reference/README.md) or the archival export entry points in `docs/md/index.md` and `docs/md/TOC.md`.
+For API lookup after you finish the setup flow, use [Reference](../reference/README.md) when you want the supported landing page or [API Reference](../reference/api/index.md) when you already know you need namespace and topic navigation. Treat `docs/md/` as archival source material only when you are tracing legacy export content or parity history.
 
 ## Related Pages
 
@@ -55,3 +55,4 @@ For API lookup after you finish the setup flow, use [Reference](../reference/REA
 - [Write Your First Script](first-script.md)
 - [Debug ScriptHookDotNet Scripts](debugging.md)
 - [Reference](../reference/README.md)
+- [API Reference](../reference/api/index.md)

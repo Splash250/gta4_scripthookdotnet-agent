@@ -89,6 +89,16 @@ class CuratedReferencePagesTests(unittest.TestCase):
                     self.assertIn(target, [match for match in LINK_PATTERN.findall(content)])
                     self.assert_link_exists(page_path, target)
 
+    def test_getting_started_points_api_lookup_to_supported_reference_paths(self) -> None:
+        page_path = REPO_ROOT / "docs" / "guides" / "getting-started.md"
+        content = page_path.read_text(encoding="utf-8")
+
+        self.assertIn("[Reference](../reference/README.md)", content)
+        self.assertIn("[API Reference](../reference/api/index.md)", content)
+        self.assertNotIn("docs/md/index.md", content)
+        self.assertNotIn("docs/md/TOC.md", content)
+        self.assertNotIn("archival export entry points", content)
+
 
 if __name__ == "__main__":
     unittest.main()
