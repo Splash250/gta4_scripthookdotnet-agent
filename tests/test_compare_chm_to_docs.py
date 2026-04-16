@@ -466,6 +466,10 @@ class CompareChmToDocsTests(unittest.TestCase):
             pairing.html_relative_from_source_path("docs/md/GTA.Native/Function.md"),
             "GTA.Native.Function.html",
         )
+        self.assertEqual(
+            pairing.html_relative_from_source_path("docs/md/misc/GTAHierarchy.md"),
+            "GTAHierarchy.html",
+        )
 
 
 if __name__ == "__main__":

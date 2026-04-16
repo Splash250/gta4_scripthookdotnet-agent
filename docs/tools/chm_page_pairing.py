@@ -79,4 +79,6 @@ def html_relative_from_source_path(source_path: str) -> str:
         return f"{parts[0]}.html"
     namespace = parts[0]
     leaf = Path(parts[-1]).stem
+    if namespace == "misc" and leaf == "GTAHierarchy":
+        return "GTAHierarchy.html"
     return f"{namespace}.{leaf}.html"

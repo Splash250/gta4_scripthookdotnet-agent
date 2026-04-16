@@ -1,7 +1,7 @@
 ---
 type: report
 title: CHM Parity Report
-created: 2026-04-16
+created: 2026-04-17
 tags:
   - docs
   - chm

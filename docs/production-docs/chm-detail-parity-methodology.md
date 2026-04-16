@@ -71,6 +71,8 @@ The audit checks these detail fields on every supported type or member page:
 
 These fields intentionally cover both standalone type pages and folded member pages. Some page kinds will not contain every field. The audit only treats a field as missing when the CHM page contains it and the mapped Markdown page does not.
 
+For `external_reference_links`, the extractor ignores the CHM footer boilerplate so the HazardX copyright link does not count as a required semantic reference field.
+
 ## Metric Meanings
 
 The structural metrics are deliberately simple. They are not semantic equivalence proofs; they are change detectors that help focus review:
@@ -101,9 +103,17 @@ The allowlist is deliberately narrow. Each entry must identify one specific CHM-
 - `target_path`: the supported Markdown page that intentionally diverges
 - `allowed_missing_fields`: only the named contract fields may be absent from Markdown without remaining blocking
 - `allowed_density_floor`: the minimum acceptable `density_ratio` for that page if the Markdown page is intentionally more concise
+- `allow_missing_html`: set to `true` only when the mapping is intentionally curated and the real CHM decompile does not emit a standalone HTML page for that row
 - `rationale`: reviewer-facing explanation that must stay true when future maintainers rerun the audit
 
-The deeper audit does not downgrade title mismatches, missing HTML files, or arbitrary structural regressions just because a source path is listed. If a finding falls outside the exact allowlisted shape, it remains `blocking`, `major`, or `minor`.
+The deeper audit does not downgrade title mismatches or arbitrary structural regressions just because a source path is listed. It only downgrades missing-HTML findings when `allow_missing_html` is explicitly present, and it only downgrades field or density findings when the exact allowlisted shape matches. If a finding falls outside that explicit contract, it remains `blocking`, `major`, or `minor`.
+
+## Real-Run Notes
+
+The 2026-04-17 full CHM rerun surfaced two methodology corrections:
+
+- `docs/md/misc/GTAHierarchy.md` must pair to `GTAHierarchy.html`, not `misc.GTAHierarchy.html`.
+- Curated archive and landing rows such as `docs/md/index.md` and `docs/md/TOC.md` need explicit `allow_missing_html` entries because the supported Markdown corpus intentionally keeps those pages even though the CHM decompile emits no standalone HTML peer.
 
 ## Why Compare CHM HTML Directly
 

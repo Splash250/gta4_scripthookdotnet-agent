@@ -1463,6 +1463,63 @@ class AuditChmDetailParityTests(unittest.TestCase):
         self.assertTrue(any("allowlisted curated difference" in note for note in record["notes"]))
         self.assertEqual(record["allowlist_rationale"], "Curated archive TOC intentionally omits overload inventory details.")
 
+    def test_allowlist_can_downgrade_missing_html_for_curated_rows(self) -> None:
+        self.write_page_map(
+            [
+                {
+                    "source_path": "docs/md/index.md",
+                    "doc_kind": "root-index",
+                    "namespace_or_section": "reference-root",
+                    "target_path": "docs/README.md",
+                    "notes": "Promote the export landing page into the curated docs root overview.",
+                }
+            ]
+        )
+        self.write_allowlist(
+            [
+                {
+                    "source_path": "docs/md/index.md",
+                    "target_path": "docs/README.md",
+                    "allowed_missing_fields": [],
+                    "allowed_density_floor": 0.0,
+                    "allow_missing_html": True,
+                    "rationale": "Curated landing page intentionally has no standalone CHM HTML page.",
+                }
+            ]
+        )
+        self.write_markdown(
+            "docs/README.md",
+            "# ScriptHookDotNet Docs\n\nCurated docs overview.\n",
+        )
+
+        result = self.run_script()
+
+        self.assertEqual(result.returncode, 0, msg=result.stdout + result.stderr)
+        payload = json.loads(self.json_report_path.read_text(encoding="utf-8"))
+        record = payload["pages"][0]
+        self.assertEqual(record["severity"], "expected")
+        self.assertIn("mapped HTML page does not exist", " ".join(record["notes"]))
+        self.assertTrue(any("allowlisted curated difference" in note for note in record["notes"]))
+
+    def test_count_external_links_ignores_html_footer_copyright_links(self) -> None:
+        raw_html = """
+        <html>
+          <body>
+            <div id='nstext'>
+              <h1 class='dtH1'>GTA.Multiplayer Namespace</h1>
+              <p><a href='GTA.MultiplayerHierarchy.html'>Namespace hierarchy</a></p>
+            </div>
+            <div id='footer'>
+              <p><a target='_blank' href='http://www.hazardx.com'>Copyright © 2010 HazardX</a></p>
+            </div>
+          </body>
+        </html>
+        """
+
+        self.assertEqual(self.audit.count_external_links(raw_html, is_html=True), 0)
+        html_fields, _ = self.audit.extract_fields(raw_html, "# GTA.Multiplayer\n")
+        self.assertFalse(html_fields["external_reference_links"])
+
     def test_load_allowlist_reads_expected_shape(self) -> None:
         self.write_allowlist(
             [

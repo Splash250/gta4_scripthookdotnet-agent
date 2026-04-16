@@ -1,1 +1,34 @@
-[]
+[
+  {
+    "source_path": "docs/md/GTA IV ScriptHook.Net Single File Documentation.md",
+    "target_path": "docs/reference/archive/legacy-single-file-export.md",
+    "allowed_missing_fields": [],
+    "allowed_density_floor": 0.0,
+    "allow_missing_html": true,
+    "rationale": "Curated archive preserves the legacy monolithic export even though the real CHM decompile does not emit a standalone HTML page for it."
+  },
+  {
+    "source_path": "docs/md/index.md",
+    "target_path": "docs/README.md",
+    "allowed_missing_fields": [],
+    "allowed_density_floor": 0.0,
+    "allow_missing_html": true,
+    "rationale": "The supported docs landing page is a curated overview; the CHM decompile does not emit a standalone root index HTML page."
+  },
+  {
+    "source_path": "docs/md/misc/index.md",
+    "target_path": "docs/reference/api/misc/index.md",
+    "allowed_missing_fields": [],
+    "allowed_density_floor": 0.0,
+    "allow_missing_html": true,
+    "rationale": "The misc namespace landing page is a generated navigation bucket, not a standalone decompiled CHM HTML page."
+  },
+  {
+    "source_path": "docs/md/TOC.md",
+    "target_path": "docs/reference/archive/legacy-export-toc.md",
+    "allowed_missing_fields": [],
+    "allowed_density_floor": 0.0,
+    "allow_missing_html": true,
+    "rationale": "The archival TOC is retained for reference, while the real CHM decompile does not produce a dedicated TOC.html page."
+  }
+]

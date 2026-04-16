@@ -31,6 +31,10 @@ COMMENT_PATTERN = re.compile(r"<!--.*?-->", re.DOTALL)
 TAG_PATTERN = re.compile(r"<[^>]+>")
 FRONT_MATTER_PATTERN = re.compile(r"^---\n.*?\n---\n+", re.DOTALL)
 WHITESPACE_PATTERN = re.compile(r"\s+")
+HTML_FOOTER_PATTERN = re.compile(
+    r"<div\b[^>]*id=['\"]footer['\"][^>]*>.*?</div>\s*</div>\s*$|<div\b[^>]*id=['\"]footer['\"][^>]*>.*?</div>|<footer\b[^>]*>.*?</footer>",
+    re.IGNORECASE | re.DOTALL,
+)
 HTML_H4_SECTION_PATTERN = re.compile(
     r"<h4\b[^>]*>\s*(?P<heading>.*?)\s*</h4>(?P<body>.*?)(?=(<h4\b|<hr\b|</div>\s*</body>|$))",
     re.IGNORECASE | re.DOTALL,
@@ -117,6 +121,7 @@ class AllowlistEntry:
     target_path: str
     allowed_missing_fields: tuple[str, ...]
     allowed_density_floor: float
+    allow_missing_html: bool
     rationale: str
 
 
@@ -255,6 +260,7 @@ def load_allowlist(allowlist_path: Path) -> list[AllowlistEntry]:
                 target_path=str(raw_entry["target_path"]),
                 allowed_missing_fields=tuple(allowed_missing_fields),
                 allowed_density_floor=float(raw_entry["allowed_density_floor"]),
+                allow_missing_html=bool(raw_entry.get("allow_missing_html", False)),
                 rationale=str(raw_entry["rationale"]),
             )
         )
@@ -415,10 +421,15 @@ def extract_links(raw_text: str, *, is_html: bool) -> list[str]:
     return pattern.findall(raw_text if is_html else normalize_markdown(raw_text))
 
 
+def html_content_for_link_audit(raw_html: str) -> str:
+    body = html_body(raw_html)
+    return HTML_FOOTER_PATTERN.sub(" ", body)
+
+
 def count_external_links(raw_text: str, *, is_html: bool) -> int:
     return sum(
         1
-        for link in extract_links(html_body(raw_text) if is_html else raw_text, is_html=is_html)
+        for link in extract_links(html_content_for_link_audit(raw_text) if is_html else raw_text, is_html=is_html)
         if link.startswith(("http://", "https://"))
     )
 
@@ -791,12 +802,26 @@ def audit_page(
     del curated_allowlist
     allowlist_entries = allowlist_entries or []
     relative_html_path = html_path.name if html_path is not None else source_path_to_html_relative(row.source_path)
+    allowlist_entry = find_matching_allowlist_entry(row, allowlist_entries)
     if html_path is None:
-        return make_missing_asset_record(
+        record = make_missing_asset_record(
             row=row,
             relative_html_path=relative_html_path,
             missing_asset_note=f"mapped HTML page does not exist: {relative_html_path}",
         )
+        if allowlist_entry is not None and allowlist_entry.allow_missing_html:
+            record = PageAuditRecord(
+                **{
+                    **asdict(record),
+                    "severity": "expected",
+                    "allowlist_rationale": allowlist_entry.rationale,
+                    "notes": [
+                        *record.notes,
+                        "allowlisted curated difference downgraded to expected",
+                    ],
+                }
+            )
+        return record
     if markdown_text is None:
         return make_missing_asset_record(
             row=row,
@@ -892,7 +917,6 @@ def audit_page(
         )
         severity = "major"
 
-    allowlist_entry = find_matching_allowlist_entry(row, allowlist_entries)
     allowlist_match, allowlist_rationale = classify_allowlist_match(
         entry=allowlist_entry,
         missing_in_markdown_fields=missing_in_markdown_fields,
