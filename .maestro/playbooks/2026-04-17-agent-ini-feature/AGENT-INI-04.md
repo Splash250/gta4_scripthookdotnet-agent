@@ -75,6 +75,15 @@ Verify the end-to-end feature against the real build output and document exactly
     ```
     and still calls `EnsureAgentIniExists()` only inside `NetHook::Initialize(bool isPrimary, ...)`, so the observed failure remains upstream of the managed bootstrap path.
   - 2026-04-17 verification rerun: `python -m pytest tests\test_agent_ini_bootstrap.py tests\test_agent_ini_runtime.py -q` still passes (`7 passed in 0.02s`). Repo-side coverage therefore remains green for the expected default `agent.ini` payload and `/agent` formatting behavior, but the first unchecked task is still blocked on the native startup path failing before ScriptHookDotNet initialization.
+  - 2026-04-17 evidence refresh: during the latest manual repro, `GTAIV` (PID `162304`) and `PlayGTAIV` (PID `157244`) were still running from a start time of `2026-04-17 15:58:49`. `D:\Games\Grand Theft Auto IV\ScriptHook.log` still exists at 263 bytes with `LastWriteTime` `2026-04-17 15:58:49`, while both `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log` and `D:\Games\Grand Theft Auto IV\agent.ini` remain absent. The native log was locked against shared reads by the running game process, which is consistent with the same startup attempt still being active and still not having progressed far enough to emit ScriptHookDotNet-managed output.
+  - 2026-04-17 verification rerun: `python -m pytest tests\test_agent_ini_bootstrap.py tests\test_agent_ini_runtime.py -q` passed again (`7 passed in 0.02s`). This keeps the repo-side expectation unchanged: if initialization ever reaches `EnsureAgentIniExists()`, the seeded file contents should be:
+    ```ini
+    # Auto-created by ScriptHookDotNet for agent bootstrap
+
+    [Agent]
+    Enabled=true
+    ```
+    The checkbox remains open because the currently available live runtime still fails upstream of `NetHook::Initialize`, so the automatic file creation path cannot be observed end to end.
 - [ ] Verify that editing `<gta-root>\\agent.ini` to contain real key/value data causes `/agent` to print the existing contents rather than overwriting the file.
 - [ ] Verify that invoking `/agent` after startup on an existing populated file does not change the file timestamp or contents unless the file had to be created because it was missing.
 - [ ] Add a short maintainer note to an appropriate docs file, such as `README.md`, `ScriptHookDotNet.readme.txt`, or a repo-local docs page, only if the project already documents built-in console commands there. The note should mention automatic `agent.ini` creation and the `agent` console command.
