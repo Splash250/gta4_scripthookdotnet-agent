@@ -6,10 +6,14 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT_HOOK_ROOT = REPO_ROOT / "ScriptHookDotNet"
 CONSOLE_COMMANDS_CPP = SCRIPT_HOOK_ROOT / "ConsoleCommands.cpp"
+CONSOLE_CPP = SCRIPT_HOOK_ROOT / "Console.cpp"
+GAME_CPP = SCRIPT_HOOK_ROOT / "Game.cpp"
+GAME_H = SCRIPT_HOOK_ROOT / "Game.h"
 NET_HOOK_CPP = SCRIPT_HOOK_ROOT / "NetHook.cpp"
 NET_HOOK_H = SCRIPT_HOOK_ROOT / "NetHook.h"
 SETTINGS_FILE_CPP = SCRIPT_HOOK_ROOT / "SettingsFile.cpp"
 SETTINGS_FILE_H = SCRIPT_HOOK_ROOT / "SettingsFile.h"
+SCRIPT_DOMAIN_CPP = SCRIPT_HOOK_ROOT / "ScriptDomain.cpp"
 
 
 class AgentIniRuntimeTests(unittest.TestCase):
@@ -79,6 +83,53 @@ class AgentIniRuntimeTests(unittest.TestCase):
         self.assertIn("pAgentIniSettings->Load();", nethook_content)
         self.assertNotIn("Save(", format_body)
         self.assertNotIn("StringToFile", format_body)
+
+    def test_agent_console_command_branch_is_read_only(self) -> None:
+        content = CONSOLE_COMMANDS_CPP.read_text(encoding="utf-8")
+
+        branch_start = content.index('} else if (cmd == "agent") { // AGENT')
+        branch_end = content.index('} else if (cmd == "flip") { // FLIP', branch_start)
+        branch_body = content[branch_start:branch_end]
+
+        self.assertIn('Console->Print("Agent command:");', branch_body)
+        self.assertIn("Console->Print(NetHook::FormatAgentIniForConsole());", branch_body)
+        self.assertNotIn("Helper::StringToFile", branch_body)
+        self.assertNotIn("Save(", branch_body)
+        self.assertNotIn("SetValue(", branch_body)
+
+    def test_agent_ini_write_is_confined_to_missing_file_bootstrap(self) -> None:
+        net_hook_content = NET_HOOK_CPP.read_text(encoding="utf-8")
+        console_commands_content = CONSOLE_COMMANDS_CPP.read_text(encoding="utf-8")
+
+        self.assertEqual(net_hook_content.count("Helper::StringToFile("), 1)
+
+        ensure_exists_start = net_hook_content.index("bool NetHook::EnsureAgentIniExists() {")
+        ensure_exists_end = net_hook_content.index("bool NetHook::EnsureAgentIniLoaded() {")
+        ensure_exists_body = net_hook_content[ensure_exists_start:ensure_exists_end]
+        self.assertIn("if (System::IO::File::Exists(agentIniPath)) return true;", ensure_exists_body)
+        self.assertIn(
+            "Helper::StringToFile(agentIniPath, defaultContents, System::Text::Encoding::ASCII);",
+            ensure_exists_body,
+        )
+
+        agent_branch_start = console_commands_content.index('} else if (cmd == "agent") { // AGENT')
+        agent_branch_end = console_commands_content.index('} else if (cmd == "flip") { // FLIP', agent_branch_start)
+        agent_branch_body = console_commands_content[agent_branch_start:agent_branch_end]
+
+        self.assertNotIn("Helper::StringToFile", agent_branch_body)
+        self.assertNotIn("Save(", agent_branch_body)
+
+    def test_script_side_console_proxy_can_send_agent_command_without_write_path(self) -> None:
+        game_header = GAME_H.read_text(encoding="utf-8")
+        game_content = GAME_CPP.read_text(encoding="utf-8")
+        console_content = CONSOLE_CPP.read_text(encoding="utf-8")
+        script_domain_content = SCRIPT_DOMAIN_CPP.read_text(encoding="utf-8")
+
+        self.assertIn("static property GTA::base::Console^ Console {", game_header)
+        self.assertIn("return NetHook::Console;", game_content)
+        self.assertIn('NetHook::RaiseEventInLocalScriptDomain(RemoteEvent::ConsoleEvent,"SendCommand",(System::Object^)CommandLine);', console_content)
+        self.assertIn('else if (cmd == "sendcommand")', script_domain_content)
+        self.assertIn('NetHook::Console->SendCommand((String^)ev->Argument(1));', script_domain_content)
 
     def test_settingsfile_tracks_last_load_outcome(self) -> None:
         header = SETTINGS_FILE_H.read_text(encoding="utf-8")
