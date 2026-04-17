@@ -174,6 +174,37 @@ class AgentIniRuntimeTests(unittest.TestCase):
             console_command_body.index("ScriptDomain->TriggerEvent(ScriptEvent::ConsoleCommand, e);"),
         )
 
+    def test_primary_startup_loads_agent_ini_before_agent_command_can_be_dispatched(self) -> None:
+        net_hook_content = NET_HOOK_CPP.read_text(encoding="utf-8")
+        console_commands_content = CONSOLE_COMMANDS_CPP.read_text(encoding="utf-8")
+
+        initialize_start = net_hook_content.index("void NetHook::Initialize(bool isPrimary, int hModule){")
+        initialize_end = net_hook_content.index("bool NetHook::isInsideScript::get() {", initialize_start)
+        initialize_body = net_hook_content[initialize_start:initialize_end]
+        primary_block_start = initialize_body.rindex("if (isPrimary) {")
+        primary_block_end = initialize_body.index("} else {", primary_block_start)
+        primary_block = initialize_body[primary_block_start:primary_block_end]
+
+        self.assertIn("if (!EnsureAgentIniExists()) return;", primary_block)
+        self.assertIn("if (!EnsureAgentIniLoaded()) return;", primary_block)
+        self.assertIn("cons->Command += gcnew ConsoleEventHandler(&ConsoleCommand);", primary_block)
+        self.assertLess(
+            primary_block.index("if (!EnsureAgentIniLoaded()) return;"),
+            primary_block.index("cons->Command += gcnew ConsoleEventHandler(&ConsoleCommand);"),
+        )
+
+        command_handler_start = net_hook_content.index("void NetHook::ConsoleCommand(Object^ sender, ConsoleEventArgs^ e) {")
+        command_handler_end = net_hook_content.index("[System::Runtime::ExceptionServices::HandleProcessCorruptedStateExceptions]", command_handler_start)
+        command_handler = net_hook_content[command_handler_start:command_handler_end]
+        self.assertIn("if (ConsoleCommands::ProcessCommand(e)) return;", command_handler)
+
+        agent_branch_start = console_commands_content.index('} else if (cmd == "agent") { // AGENT')
+        agent_branch_end = console_commands_content.index('} else if (cmd == "flip") { // FLIP', agent_branch_start)
+        agent_branch = console_commands_content[agent_branch_start:agent_branch_end]
+        self.assertIn("Console->Print(NetHook::FormatAgentIniForConsole());", agent_branch)
+        self.assertNotIn("Helper::StringToFile", agent_branch)
+        self.assertNotIn("Save(", agent_branch)
+
     def test_settingsfile_tracks_last_load_outcome(self) -> None:
         header = SETTINGS_FILE_H.read_text(encoding="utf-8")
         content = SETTINGS_FILE_CPP.read_text(encoding="utf-8")
