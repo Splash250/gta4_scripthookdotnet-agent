@@ -15,6 +15,23 @@ Verify the end-to-end feature against the real build output and document exactly
 - [x] Run a clean release build with `& "C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\MSBuild\Current\Bin\MSBuild.exe" ScriptHookDotNet.sln /t:Clean,Build /p:Configuration=Release /p:Platform=Win32 /m /v:minimal` or equivalent clean-then-build sequence and confirm `bin/ScriptHookDotNet.asi` is produced.
   - 2026-04-17: Verified locally with exit code 0. Output artifact: `D:\Games\GTAIV_Modding\gta4_scripthookdotnet-agent\bin\ScriptHookDotNet.asi` (652,288 bytes, 2026-04-17 15:33:30).
 - [ ] Verify that deleting `<gta-root>\\agent.ini` before startup causes ScriptHookDotNet to recreate it automatically on the next initialization path, and record the observed default file contents in the task comment.
+  - 2026-04-17 latest pass refresh: no task images were present under `.maestro/playbooks/2026-04-17-agent-ini-feature`, so `0` images were analyzed for this pass. Confirmed the working folder still exists at `D:\Games\GTAIV_Modding\gta4_scripthookdotnet-agent\.maestro\playbooks\Working`. Re-ran `python -m pytest tests\test_agent_ini_bootstrap.py tests\test_agent_ini_runtime.py -q`, which passed (`12 passed in 0.02s`). Re-scanned `D:\Games` for local `GTAIV.exe` installs and still found only `D:\Games\Grand Theft Auto IV\GTAIV.exe` (`1, 0, 8, 0`, 15,628,696 bytes) and `D:\Games\GTAIV_Backup\GTAIV.exe` (`1.2.0.59`, 17,425,752 bytes). `D:\Games\Grand Theft Auto IV\ScriptHook.log` still exists at 263 bytes with `LastWriteTime` `2026-04-17 15:58:49` and SHA-256 `734055F47CB791FB4274212DF605C8DFD029460E8E7DB0B0845BD21BDE140693`, while both `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log` and `D:\Games\Grand Theft Auto IV\agent.ini` remain absent. Deployment parity still rules out a stale copy because `D:\Games\Grand Theft Auto IV\ScriptHook.dll` matches `dist\ScriptHook.dll` at SHA-256 `2B10866A374B52F8550F7D0E416B3550F9B58F9DC839F62C938197FE9F56FA8E`, and `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.asi` matches `bin\ScriptHookDotNet.asi` at SHA-256 `94C32FD8653544CEB75360E432C242AA0197A78ADCB932C51761CC12F87E98A8`. `D:\Games\Grand Theft Auto IV\ScriptHook.log` still contains only:
+    ```text
+    Log start: Fri Apr 17 15:58:49 2026
+    -----------------------------------------------
+    [INFO] GTA IV Script Hook 0.5.1 - (C) 2009, Aru - Initialized
+    [INFO] Process base address: 0xcc0000
+    [INFO] Auto detecting game version
+    [FATAL] Failed to detect game version
+    ```
+    The repo-side bootstrap payload remains unchanged in `ScriptHookDotNet\NetHook.cpp`:
+    ```ini
+    # Auto-created by ScriptHookDotNet for agent bootstrap
+
+    [Agent]
+    Enabled=true
+    ```
+    This checkbox must remain unchecked in the current local environment because the external native ScriptHook layer still fails before ScriptHookDotNet reaches `NetHook::Initialize(bool isPrimary, ...)` far enough to recreate `agent.ini`.
   - 2026-04-17 latest run refresh: no task images were present under `.maestro/playbooks/2026-04-17-agent-ini-feature`, so `0` images were analyzed for this pass. Confirmed the working folder still exists at `D:\Games\GTAIV_Modding\gta4_scripthookdotnet-agent\.maestro\playbooks\Working`. Re-ran `python -m pytest tests\test_agent_ini_bootstrap.py tests\test_agent_ini_runtime.py -q`, which passed (`12 passed in 0.03s`). Re-checked the live install without changing source: `D:\Games\Grand Theft Auto IV\GTAIV.exe` still reports file version `1, 0, 8, 0`, `D:\Games\GTAIV_Backup\GTAIV.exe` still reports `1.2.0.59`, `D:\Games\Grand Theft Auto IV\ScriptHook.log` still exists at 263 bytes with `LastWriteTime` `2026-04-17 15:58:49`, and both `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log` and `D:\Games\Grand Theft Auto IV\agent.ini` remain absent. Deployment parity still rules out a stale copy because `D:\Games\Grand Theft Auto IV\ScriptHook.dll` matches `dist\ScriptHook.dll` at SHA-256 `2B10866A374B52F8550F7D0E416B3550F9B58F9DC839F62C938197FE9F56FA8E`, and `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.asi` matches `bin\ScriptHookDotNet.asi` at SHA-256 `94C32FD8653544CEB75360E432C242AA0197A78ADCB932C51761CC12F87E98A8`. `D:\Games\Grand Theft Auto IV\ScriptHook.log` still contains only:
     ```text
     Log start: Fri Apr 17 15:58:49 2026
