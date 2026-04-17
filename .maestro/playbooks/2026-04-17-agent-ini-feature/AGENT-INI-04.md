@@ -15,6 +15,23 @@ Verify the end-to-end feature against the real build output and document exactly
 - [x] Run a clean release build with `& "C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\MSBuild\Current\Bin\MSBuild.exe" ScriptHookDotNet.sln /t:Clean,Build /p:Configuration=Release /p:Platform=Win32 /m /v:minimal` or equivalent clean-then-build sequence and confirm `bin/ScriptHookDotNet.asi` is produced.
   - 2026-04-17: Verified locally with exit code 0. Output artifact: `D:\Games\GTAIV_Modding\gta4_scripthookdotnet-agent\bin\ScriptHookDotNet.asi` (652,288 bytes, 2026-04-17 15:33:30).
 - [ ] Verify that deleting `<gta-root>\\agent.ini` before startup causes ScriptHookDotNet to recreate it automatically on the next initialization path, and record the observed default file contents in the task comment.
+  - 2026-04-17 latest verification refresh: no task images were present under `.maestro/playbooks/2026-04-17-agent-ini-feature`, so `0` images were analyzed for this pass. Confirmed the working folder still exists at `D:\Games\GTAIV_Modding\gta4_scripthookdotnet-agent\.maestro\playbooks\Working`. Re-ran `python -m pytest tests/test_agent_ini_bootstrap.py tests/test_agent_ini_runtime.py -q`, which passed (`13 passed in 0.02s`). Reconfirmed the repo-side bootstrap guard is unchanged: `ScriptHookDotNet\NetHook.cpp:57` still defines `EnsureAgentIniExists()`, `ScriptHookDotNet\NetHook.cpp:60` still short-circuits when `agent.ini` already exists, `ScriptHookDotNet\NetHook.cpp:90` still formats loaded settings for `/agent`, and the bundled native `ScriptHook\Game.h:41-44` still only enumerates `Version101` through `Version104`.
+  - 2026-04-17 latest delete-then-start retry: deleted `D:\Games\Grand Theft Auto IV\agent.ini`, `D:\Games\Grand Theft Auto IV\ScriptHook.log`, and `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log`, launched `D:\Games\Grand Theft Auto IV\GTAIV.exe`, waited 15 seconds, and then terminated the still-running process. The process reported exit code `-1073741819`. After the retry, `D:\Games\Grand Theft Auto IV\agent.ini` was still absent, `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log` was still absent, and `D:\Games\Grand Theft Auto IV\ScriptHook.log` refreshed to `2026-04-17T22:13:36.6974713+02:00` with SHA-256 `7237BB36D8EA69A7726154AA46B17CECFA61E8E5D74BA2368775DAA7083B4017`, still ending at:
+    ```text
+    Log start: Fri Apr 17 22:13:36 2026
+    -----------------------------------------------
+    [INFO] GTA IV Script Hook 0.5.1 - (C) 2009, Aru - Initialized
+    [INFO] Process base address: 0xcc0000
+    [INFO] Auto detecting game version
+    [FATAL] Failed to detect game version
+    ```
+    This checkbox remains blocked and stays unchecked because the live `1.0.8.0` runtime still fails in native `ScriptHook.dll` version detection before `ScriptHookDotNet.asi` reaches the managed initialization path that would recreate `agent.ini`. If startup ever reaches `NetHook::EnsureAgentIniExists()`, the seeded default payload would still be:
+    ```ini
+    # Auto-created by ScriptHookDotNet for agent bootstrap
+
+    [Agent]
+    Enabled=true
+    ```
   - 2026-04-17 latest verification refresh: no task images were present under `.maestro/playbooks/2026-04-17-agent-ini-feature`, so `0` images were analyzed for this pass. Confirmed the working folder still exists at `D:\Games\GTAIV_Modding\gta4_scripthookdotnet-agent\.maestro\playbooks\Working`. Re-ran `python -m pytest tests/test_agent_ini_bootstrap.py tests/test_agent_ini_runtime.py -q`, which passed (`13 passed in 0.02s`). Re-ran the real delete-then-start check against `D:\Games\Grand Theft Auto IV\GTAIV.exe` after deleting `agent.ini`, `ScriptHook.log`, and `ScriptHookDotNet.log`; the process still exited with code `-1073741819`, recreated only `ScriptHook.log`, and that fresh native log still ended at `[FATAL] Failed to detect game version`, while both `agent.ini` and `ScriptHookDotNet.log` remained absent. I also re-checked `D:\Games\GTAIV_Backup\GTAIV.exe` as a fallback target: launching it still exited with code `0` and produced no hook logs at all, and temporarily copying the same `xlive.dll` loader from the live install into that backup directory still produced no `ScriptHook.log`, no `ScriptHookDotNet.log`, and no `agent.ini`, so it still does not exercise the ScriptHook startup path in this environment. Repo-side expectations remain unchanged: `ScriptHookDotNet\NetHook.cpp` still seeds the default payload below only after native startup succeeds, so this checkbox remains blocked and stays unchecked until a compatible native ScriptHook runtime can initialize far enough to execute `EnsureAgentIniExists()`:
     ```ini
     # Auto-created by ScriptHookDotNet for agent bootstrap
