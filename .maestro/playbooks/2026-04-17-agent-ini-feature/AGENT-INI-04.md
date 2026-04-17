@@ -103,6 +103,23 @@ Verify the end-to-end feature against the real build output and document exactly
     [FATAL] Failed to detect game version
     ```
     `Test-Path` remains `False` for both `D:\Games\Grand Theft Auto IV\agent.ini` and `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log`. Repo-side source inspection still shows that `ScriptHookDotNet\NetHook.cpp` creates missing `agent.ini` files only after `NetHook::Initialize(bool isPrimary, ...)` begins running, while `ScriptHookDotNet.sln` still builds only `ScriptHookDotNet\ScriptHookDotNet.vcxproj` and the checked-in `ScriptHook\Game.h` native header still exposes version enums only for `Version101` through `Version104`. Combined with the documented runtime support window in `ScriptHookDotNet.readme.txt` (`GTA IV 1.0.1.0` through `1.0.7.0`) and the available local installs at `1.0.8.0` and `1.2.0.59`, this checkbox remains blocked pending a native ScriptHook runtime that can successfully initialize far enough to enter the managed bootstrap path.
+  - 2026-04-17 latest evidence refresh: re-checked the available local installs and live output paths without changing code. `D:\Games\Grand Theft Auto IV\GTAIV.exe` still reports file version `1.0.8.0`; `D:\Games\GTAIV_Backup\GTAIV.exe` still reports `1.2.0.59`. `D:\Games\Grand Theft Auto IV\ScriptHook.log` still exists at 263 bytes with `LastWriteTime` `2026-04-17 15:58:49`, while both `D:\Games\Grand Theft Auto IV\agent.ini` and `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log` are still absent. The native log still contains only:
+    ```text
+    Log start: Fri Apr 17 15:58:49 2026
+    -----------------------------------------------
+    [INFO] GTA IV Script Hook 0.5.1 - (C) 2009, Aru - Initialized
+    [INFO] Process base address: 0xcc0000
+    [INFO] Auto detecting game version
+    [FATAL] Failed to detect game version
+    ```
+    Re-ran `python -m pytest tests\test_agent_ini_bootstrap.py tests\test_agent_ini_runtime.py -q` and it still passed (`7 passed in 0.02s`). This run does not change the conclusion: the expected default bootstrap payload is still:
+    ```ini
+    # Auto-created by ScriptHookDotNet for agent bootstrap
+
+    [Agent]
+    Enabled=true
+    ```
+    but the checkbox remains blocked because the currently available native ScriptHook runtime still fails before `NetHook::Initialize(bool isPrimary, ...)` can create or load `agent.ini`.
 - [ ] Verify that editing `<gta-root>\\agent.ini` to contain real key/value data causes `/agent` to print the existing contents rather than overwriting the file.
 - [ ] Verify that invoking `/agent` after startup on an existing populated file does not change the file timestamp or contents unless the file had to be created because it was missing.
 - [ ] Add a short maintainer note to an appropriate docs file, such as `README.md`, `ScriptHookDotNet.readme.txt`, or a repo-local docs page, only if the project already documents built-in console commands there. The note should mention automatic `agent.ini` creation and the `agent` console command.
