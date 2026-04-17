@@ -35,6 +35,14 @@ class AgentIniRuntimeTests(unittest.TestCase):
         self.assertIn("pAgentIniSettings = GTA::SettingsFile::Open(agentIniPath);", content)
         self.assertIn("pAgentIniSettings->Load();", content)
 
+    def test_existing_agent_ini_is_loaded_and_formatted_without_recreation(self) -> None:
+        content = NET_HOOK_CPP.read_text(encoding="utf-8")
+
+        self.assertIn("if (System::IO::File::Exists(agentIniPath)) return true;", content)
+        self.assertIn("array<String^>^ categories = pAgentIniSettings->GetCategoryNames();", content)
+        self.assertIn('sb->AppendLine("[" + ((categoryName->Length > 0) ? categoryName : "Default") + "]");', content)
+        self.assertIn('sb->AppendLine(valueNames[n] + "=" + value);', content)
+
     def test_settingsfile_tracks_last_load_outcome(self) -> None:
         header = SETTINGS_FILE_H.read_text(encoding="utf-8")
         content = SETTINGS_FILE_CPP.read_text(encoding="utf-8")
