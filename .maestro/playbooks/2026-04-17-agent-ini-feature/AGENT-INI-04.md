@@ -193,6 +193,23 @@ Verify the end-to-end feature against the real build output and document exactly
     [FATAL] Failed to detect game version
     ```
     `D:\Games\Grand Theft Auto IV\agent.ini` and `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log` remain absent, so the real startup path still fails before `NetHook::Initialize(bool isPrimary, ...)` can call `EnsureAgentIniExists()`. This checkbox remains blocked in the current environment and should stay unchecked until a native ScriptHook runtime is available that can initialize past game-version detection.
+  - 2026-04-17 current run refresh: rechecked the first unchecked task without changing source. No companion images were referenced anywhere under `.maestro/playbooks/2026-04-17-agent-ini-feature`. `python -m pytest tests\test_agent_ini_bootstrap.py tests\test_agent_ini_runtime.py -q` still passes (`7 passed in 0.02s`). The live deployment under `D:\Games\Grand Theft Auto IV` is still current rather than stale: `ScriptHook.dll` matches `dist\ScriptHook.dll` with SHA-256 `2B10866A374B52F8550F7D0E416B3550F9B58F9DC839F62C938197FE9F56FA8E`, and `ScriptHookDotNet.asi` matches `bin\ScriptHookDotNet.asi` with SHA-256 `94C32FD8653544CEB75360E432C242AA0197A78ADCB932C51761CC12F87E98A8`. The only local GTA IV installs still report `1, 0, 8, 0` at `D:\Games\Grand Theft Auto IV\GTAIV.exe` and `1.2.0.59` at `D:\Games\GTAIV_Backup\GTAIV.exe`. `D:\Games\Grand Theft Auto IV\ScriptHook.log` still exists while both `D:\Games\Grand Theft Auto IV\agent.ini` and `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log` remain absent, and the native log still ends at:
+    ```text
+    Log start: Fri Apr 17 15:58:49 2026
+    -----------------------------------------------
+    [INFO] GTA IV Script Hook 0.5.1 - (C) 2009, Aru - Initialized
+    [INFO] Process base address: 0xcc0000
+    [INFO] Auto detecting game version
+    [FATAL] Failed to detect game version
+    ```
+    Repo inspection is unchanged: `ScriptHookDotNet\NetHook.cpp` still seeds missing `agent.ini` files with:
+    ```ini
+    # Auto-created by ScriptHookDotNet for agent bootstrap
+
+    [Agent]
+    Enabled=true
+    ```
+    but `ScriptHookDotNet.sln` still builds only `ScriptHookDotNet\ScriptHookDotNet.vcxproj`, while the checked-in native `ScriptHook\Game.h` still exposes only `Version101` through `Version104`. The real startup verification remains blocked upstream in the external native ScriptHook path, so this checkbox must stay open in the current environment.
 - [ ] Verify that editing `<gta-root>\\agent.ini` to contain real key/value data causes `/agent` to print the existing contents rather than overwriting the file.
 - [ ] Verify that invoking `/agent` after startup on an existing populated file does not change the file timestamp or contents unless the file had to be created because it was missing.
 - [ ] Add a short maintainer note to an appropriate docs file, such as `README.md`, `ScriptHookDotNet.readme.txt`, or a repo-local docs page, only if the project already documents built-in console commands there. The note should mention automatic `agent.ini` creation and the `agent` console command.
