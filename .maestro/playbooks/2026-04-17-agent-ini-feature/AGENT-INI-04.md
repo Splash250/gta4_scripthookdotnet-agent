@@ -15,6 +15,59 @@ Verify the end-to-end feature against the real build output and document exactly
 - [x] Run a clean release build with `& "C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\MSBuild\Current\Bin\MSBuild.exe" ScriptHookDotNet.sln /t:Clean,Build /p:Configuration=Release /p:Platform=Win32 /m /v:minimal` or equivalent clean-then-build sequence and confirm `bin/ScriptHookDotNet.asi` is produced.
   - 2026-04-17: Verified locally with exit code 0. Output artifact: `D:\Games\GTAIV_Modding\gta4_scripthookdotnet-agent\bin\ScriptHookDotNet.asi` (652,288 bytes, 2026-04-17 15:33:30).
 - [ ] Verify that deleting `<gta-root>\\agent.ini` before startup causes ScriptHookDotNet to recreate it automatically on the next initialization path, and record the observed default file contents in the task comment.
+  - 2026-04-17 current blocker refresh: no task images were present under `.maestro/playbooks/2026-04-17-agent-ini-feature`, so `0` images were analyzed for this pass. Confirmed the working folder still exists at `D:\Games\GTAIV_Modding\gta4_scripthookdotnet-agent\.maestro\playbooks\Working`. Re-ran `python -m pytest tests/test_agent_ini_bootstrap.py tests/test_agent_ini_runtime.py -q`, which passed (`13 passed in 0.02s`). Reconfirmed deployment parity: `D:\Games\Grand Theft Auto IV\ScriptHook.dll` still matches `dist\ScriptHook.dll` at SHA-256 `2B10866A374B52F8550F7D0E416B3550F9B58F9DC839F62C938197FE9F56FA8E`, and `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.asi` still matches `bin\ScriptHookDotNet.asi` at SHA-256 `94C32FD8653544CEB75360E432C242AA0197A78ADCB932C51761CC12F87E98A8`. The live target is still `D:\Games\Grand Theft Auto IV\GTAIV.exe` version `1, 0, 8, 0` (15,628,696 bytes, SHA-256 `3D90E7C516FA450CA002E5031E62C0F66B404590F33E6CC9793B0DA4FFFBFD0F`), while the bundled native `ScriptHook\Game.h` still only exposes `Version101` through `Version104`.
+  - 2026-04-17 current delete-then-start retry: deleted `D:\Games\Grand Theft Auto IV\agent.ini`, launched `D:\Games\Grand Theft Auto IV\GTAIV.exe`, waited 15 seconds, and observed the process exit on its own with code `-1073741819`. After the launch, `D:\Games\Grand Theft Auto IV\agent.ini` was still absent, `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log` was still absent, and `D:\Games\Grand Theft Auto IV\ScriptHook.log` refreshed to `2026-04-17 21:11:49` at 263 bytes with SHA-256 `AABE456060A39F454FEB6722DBB45D13F602B9AE3EB85DFB765101B177E80646`, still ending at:
+    ```text
+    Log start: Fri Apr 17 21:11:49 2026
+    -----------------------------------------------
+    [INFO] GTA IV Script Hook 0.5.1 - (C) 2009, Aru - Initialized
+    [INFO] Process base address: 0xcc0000
+    [INFO] Auto detecting game version
+    [FATAL] Failed to detect game version
+    ```
+    Repo-side expectations remain unchanged: `ScriptHookDotNet\NetHook.cpp` still resolves `agent.ini` under `Game::InstallFolder`, seeds the default payload below, and only reaches `EnsureAgentIniExists()` after native startup succeeds. If startup ever reaches that managed bootstrap path, the seeded default payload would still be:
+    ```ini
+    # Auto-created by ScriptHookDotNet for agent bootstrap
+
+    [Agent]
+    Enabled=true
+    ```
+    This checkbox remains blocked and stays unchecked because the current deployed runtime still fails in native `ScriptHook.dll` version detection before `ScriptHookDotNet.asi` reaches the managed initialization path that would recreate `agent.ini`.
+  - 2026-04-17 current pass refresh: no task images were present under `.maestro/playbooks/2026-04-17-agent-ini-feature`, so `0` images were analyzed for this pass. Confirmed the working folder still exists at `D:\Games\GTAIV_Modding\gta4_scripthookdotnet-agent\.maestro\playbooks\Working`. Re-ran `python -m pytest tests/test_agent_ini_bootstrap.py tests/test_agent_ini_runtime.py -q`, which passed (`13 passed in 0.02s`). Reconfirmed local deployment parity: `D:\Games\Grand Theft Auto IV\ScriptHook.dll` still matches `dist\ScriptHook.dll` at SHA-256 `2B10866A374B52F8550F7D0E416B3550F9B58F9DC839F62C938197FE9F56FA8E`, and `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.asi` still matches `bin\ScriptHookDotNet.asi` at SHA-256 `94C32FD8653544CEB75360E432C242AA0197A78ADCB932C51761CC12F87E98A8`. The only local startup candidates still found are `D:\Games\Grand Theft Auto IV\GTAIV.exe` (`1, 0, 8, 0`, 15,628,696 bytes, SHA-256 `3D90E7C516FA450CA002E5031E62C0F66B404590F33E6CC9793B0DA4FFFBFD0F`) and `D:\Games\GTAIV_Backup\GTAIV.exe` (`1.2.0.59`, 17,425,752 bytes, SHA-256 `08759A5516F9837920EA504436236BBAB89D0826A8E4D04FF106345177B5345D`).
+  - 2026-04-17 current pass delete-then-start retry: deleted `D:\Games\Grand Theft Auto IV\agent.ini`, launched `D:\Games\Grand Theft Auto IV\GTAIV.exe`, waited 15 seconds, and observed the process exit on its own with code `-1073741819`. After the launch, `D:\Games\Grand Theft Auto IV\agent.ini` was still absent, `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log` was still absent, and `D:\Games\Grand Theft Auto IV\ScriptHook.log` refreshed to `2026-04-17 21:03:43` at 263 bytes with SHA-256 `3698225AC7D1E85D698D71A94C8CD4020DC57DCFC34A53FA829AAADFD1D59660`, still ending at:
+    ```text
+    Log start: Fri Apr 17 21:03:43 2026
+    -----------------------------------------------
+    [INFO] GTA IV Script Hook 0.5.1 - (C) 2009, Aru - Initialized
+    [INFO] Process base address: 0xcc0000
+    [INFO] Auto detecting game version
+    [FATAL] Failed to detect game version
+    ```
+    Repo-side expectations are unchanged: `ScriptHookDotNet\NetHook.cpp` still resolves `agent.ini` under `Game::InstallFolder`, seeds the default payload below, and only reaches `EnsureAgentIniExists()` after native startup succeeds, while the bundled native `ScriptHook\Game.h` still exposes only `Version101` through `Version104`.
+    ```ini
+    # Auto-created by ScriptHookDotNet for agent bootstrap
+
+    [Agent]
+    Enabled=true
+    ```
+    This checkbox remains blocked and stays unchecked because the current live runtime still dies in the native `ScriptHook.dll` version-detection path before `ScriptHookDotNet.asi` reaches the managed initialization path that would recreate `agent.ini`.
+  - 2026-04-17 verification refresh: no task images were present under `.maestro/playbooks/2026-04-17-agent-ini-feature`, so `0` images were analyzed for this pass. Confirmed the working folder still exists at `D:\Games\GTAIV_Modding\gta4_scripthookdotnet-agent\.maestro\playbooks\Working`. Re-ran `python -m pytest tests/test_agent_ini_bootstrap.py tests/test_agent_ini_runtime.py -q`, which passed (`13 passed in 0.02s`).
+  - 2026-04-17 live delete-then-start retry: `D:\Games\Grand Theft Auto IV\GTAIV.exe` is still `1, 0, 8, 0` at 15,628,696 bytes with SHA-256 `3D90E7C516FA450CA002E5031E62C0F66B404590F33E6CC9793B0DA4FFFBFD0F`; `D:\Games\GTAIV_Backup\GTAIV.exe` is still `1.2.0.59` at 17,425,752 bytes with SHA-256 `08759A5516F9837920EA504436236BBAB89D0826A8E4D04FF106345177B5345D`; `D:\Games\Grand Theft Auto IV\ScriptHook.dll` still matches `dist\ScriptHook.dll` at SHA-256 `2B10866A374B52F8550F7D0E416B3550F9B58F9DC839F62C938197FE9F56FA8E`; and `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.asi` still matches `bin\ScriptHookDotNet.asi` at SHA-256 `94C32FD8653544CEB75360E432C242AA0197A78ADCB932C51761CC12F87E98A8`. After deleting `D:\Games\Grand Theft Auto IV\agent.ini` and launching `D:\Games\Grand Theft Auto IV\GTAIV.exe`, the process exited on its own within 15 seconds with code `-1073741819`; `D:\Games\Grand Theft Auto IV\agent.ini` was still absent; `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log` was still absent; and `D:\Games\Grand Theft Auto IV\ScriptHook.log` refreshed to `2026-04-17 20:59:08` at 263 bytes with SHA-256 `C2AC0C9B36846D3BF639DB672AC103C9807751E49FD155FD4C8D2E90F0D6DF07`, still ending at:
+    ```text
+    -----------------------------------------------
+    [INFO] GTA IV Script Hook 0.5.1 - (C) 2009, Aru - Initialized
+    [INFO] Process base address: 0xcc0000
+    [INFO] Auto detecting game version
+    [FATAL] Failed to detect game version
+    ```
+    Repo-side expectations remain unchanged: `ScriptHookDotNet\NetHook.cpp` still resolves `agent.ini` under `Game::InstallFolder` and only reaches `EnsureAgentIniExists()` after native startup succeeds, while the bundled native `ScriptHook\Game.h` still only exposes `Version101` through `Version104` even though the managed support table still includes later versions such as `GameVersion::v1080`. If startup ever reaches the managed bootstrap path, the seeded default payload would still be:
+    ```ini
+    # Auto-created by ScriptHookDotNet for agent bootstrap
+
+    [Agent]
+    Enabled=true
+    ```
+    This checkbox remains blocked and stays unchecked because the current local runtime still fails in the external native `ScriptHook.dll` version-detection path before `ScriptHookDotNet.asi` reaches the managed initialization path that would recreate `agent.ini`.
   - 2026-04-17 current pass refresh: no task images were present under `.maestro/playbooks/2026-04-17-agent-ini-feature`, so `0` images were analyzed for this pass. Confirmed the working folder still exists at `D:\Games\GTAIV_Modding\gta4_scripthookdotnet-agent\.maestro\playbooks\Working`. Re-ran `python -m pytest tests/test_agent_ini_bootstrap.py tests/test_agent_ini_runtime.py -q`, which passed (`13 passed in 0.02s`).
   - 2026-04-17 current pass live retry: `D:\Games\Grand Theft Auto IV\GTAIV.exe` is still `1, 0, 8, 0` at 15,628,696 bytes with SHA-256 `3D90E7C516FA450CA002E5031E62C0F66B404590F33E6CC9793B0DA4FFFBFD0F`; `D:\Games\GTAIV_Backup\GTAIV.exe` is still `1.2.0.59` at 17,425,752 bytes with SHA-256 `08759A5516F9837920EA504436236BBAB89D0826A8E4D04FF106345177B5345D`; `D:\Games\Grand Theft Auto IV\ScriptHook.dll` still matches `dist\ScriptHook.dll` at SHA-256 `2B10866A374B52F8550F7D0E416B3550F9B58F9DC839F62C938197FE9F56FA8E`; and `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.asi` still matches `bin\ScriptHookDotNet.asi` at SHA-256 `94C32FD8653544CEB75360E432C242AA0197A78ADCB932C51761CC12F87E98A8`.
   - 2026-04-17 current pass delete-then-start retry: deleted `D:\Games\Grand Theft Auto IV\agent.ini`, launched `D:\Games\Grand Theft Auto IV\GTAIV.exe`, waited 15 seconds, and observed the process exit on its own with code `-1073741819`. After the launch, `D:\Games\Grand Theft Auto IV\agent.ini` was still absent, `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log` was still absent, and `D:\Games\Grand Theft Auto IV\ScriptHook.log` refreshed to `2026-04-17 20:56:38` at 263 bytes with SHA-256 `4F9EACD61866F3ED29D0EE42E2B307D5E525FFB702F6CD701439552E86B1F5F3`, still ending at:
@@ -579,6 +632,59 @@ Verify the end-to-end feature against the real build output and document exactly
     Enabled=true
     ```
     This checkbox remains blocked and stays unchecked because the live startup path still dies in the external native `ScriptHook.dll` layer before `ScriptHookDotNet.asi` reaches the managed initialization path that would recreate `agent.ini`.
+  - 2026-04-17 fresh blocker verification: no task images were present under `.maestro/playbooks/2026-04-17-agent-ini-feature`, so `0` images were analyzed for this pass. Re-ran `python -m pytest tests/test_agent_ini_bootstrap.py tests/test_agent_ini_runtime.py -q`, which passed (`13 passed in 0.02s`). Reconfirmed the only local GTA IV executables are `D:\Games\Grand Theft Auto IV\GTAIV.exe` (`1, 0, 8, 0`, 15,628,696 bytes) and `D:\Games\GTAIV_Backup\GTAIV.exe` (`1.2.0.59`, 17,425,752 bytes), while the bundled native `ScriptHook\Game.h` still only exposes `Version101` through `Version104`. Deployment parity still rules out stale binaries because `D:\Games\Grand Theft Auto IV\ScriptHook.dll` matches `dist\ScriptHook.dll` at SHA-256 `2B10866A374B52F8550F7D0E416B3550F9B58F9DC839F62C938197FE9F56FA8E`, and `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.asi` matches `bin\ScriptHookDotNet.asi` at SHA-256 `94C32FD8653544CEB75360E432C242AA0197A78ADCB932C51761CC12F87E98A8`. After deleting `D:\Games\Grand Theft Auto IV\agent.ini` and launching `D:\Games\Grand Theft Auto IV\GTAIV.exe`, the process again exited within 15 seconds with code `-1073741819`; `D:\Games\Grand Theft Auto IV\agent.ini` was still absent; `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log` was still absent; and `D:\Games\Grand Theft Auto IV\ScriptHook.log` refreshed to `2026-04-17 21:01:10`, still ending at:
+    ```text
+    Log start: Fri Apr 17 21:01:10 2026
+    -----------------------------------------------
+    [INFO] GTA IV Script Hook 0.5.1 - (C) 2009, Aru - Initialized
+    [INFO] Process base address: 0xcc0000
+    [INFO] Auto detecting game version
+    [FATAL] Failed to detect game version
+    ```
+    Repo-side expectations are still unchanged: `ScriptHookDotNet\NetHook.cpp` still reaches `EnsureAgentIniExists()` only after native version detection succeeds, so the managed bootstrap would still seed:
+    ```ini
+    # Auto-created by ScriptHookDotNet for agent bootstrap
+
+    [Agent]
+    Enabled=true
+    ```
+    This checkbox remains blocked and stays unchecked because the current local runtime still dies in the native `ScriptHook.dll` version-detection path before `ScriptHookDotNet.asi` reaches the managed initialization path that would recreate `agent.ini`.
+  - 2026-04-17 latest blocker refresh: no task images were present under `.maestro/playbooks/2026-04-17-agent-ini-feature`, so `0` images were analyzed for this pass. Confirmed the working folder still exists at `D:\Games\GTAIV_Modding\gta4_scripthookdotnet-agent\.maestro\playbooks\Working`. Re-ran `python -m pytest tests/test_agent_ini_bootstrap.py tests/test_agent_ini_runtime.py -q`, which passed (`13 passed in 0.02s`). Reconfirmed the deployed runtime inventory: `D:\Games\Grand Theft Auto IV\GTAIV.exe` is still `1, 0, 8, 0` at 15,628,696 bytes with SHA-256 `3D90E7C516FA450CA002E5031E62C0F66B404590F33E6CC9793B0DA4FFFBFD0F`; `D:\Games\Grand Theft Auto IV\ScriptHook.dll` still matches `dist\ScriptHook.dll` at SHA-256 `2B10866A374B52F8550F7D0E416B3550F9B58F9DC839F62C938197FE9F56FA8E`; and `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.asi` still matches `bin\ScriptHookDotNet.asi` at SHA-256 `94C32FD8653544CEB75360E432C242AA0197A78ADCB932C51761CC12F87E98A8`. `D:\Games\GTAIV_Backup\GTAIV.exe` is still `1.2.0.59` at 17,425,752 bytes with SHA-256 `08759A5516F9837920EA504436236BBAB89D0826A8E4D04FF106345177B5345D`, but that backup folder still has no deployed `ScriptHook.dll` or `ScriptHookDotNet.asi`, so it is not a live verification target for this checkbox.
+  - 2026-04-17 latest delete-then-start retry: deleted `D:\Games\Grand Theft Auto IV\agent.ini`, launched `D:\Games\Grand Theft Auto IV\GTAIV.exe`, waited 15 seconds, and observed the process exit on its own with code `-1073741819` before any forced termination was needed. After the launch, `D:\Games\Grand Theft Auto IV\agent.ini` was still absent, `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log` was still absent, and `D:\Games\Grand Theft Auto IV\ScriptHook.log` refreshed to `2026-04-17 21:07:01` at 263 bytes with SHA-256 `6A78F5493C941ADC14DD19F226CCF2DA4285315F3DB82B3B28AF8F91D27AC12A`, still ending at:
+    ```text
+    Log start: Fri Apr 17 21:07:01 2026
+    -----------------------------------------------
+    [INFO] GTA IV Script Hook 0.5.1 - (C) 2009, Aru - Initialized
+    [INFO] Process base address: 0xcc0000
+    [INFO] Auto detecting game version
+    [FATAL] Failed to detect game version
+    ```
+    Repo-side expectations are still unchanged: `ScriptHook\Game.h` still exposes only `Version101` through `Version104`, and `ScriptHookDotNet\NetHook.cpp` still reaches `EnsureAgentIniExists()` only after native startup succeeds. The seeded default payload would still be:
+    ```ini
+    # Auto-created by ScriptHookDotNet for agent bootstrap
+
+    [Agent]
+    Enabled=true
+    ```
+    This checkbox remains blocked and stays unchecked because the current deployed runtime still fails in native `ScriptHook.dll` version detection before `ScriptHookDotNet.asi` reaches the managed initialization path that would recreate `agent.ini`.
+  - 2026-04-17 current blocker refresh: no task images were present under `.maestro/playbooks/2026-04-17-agent-ini-feature`, so `0` images were analyzed for this pass. Confirmed the working folder still exists at `D:\Games\GTAIV_Modding\gta4_scripthookdotnet-agent\.maestro\playbooks\Working`. Re-ran `python -m pytest tests/test_agent_ini_bootstrap.py tests/test_agent_ini_runtime.py -q`, which passed (`13 passed in 0.02s`). Reconfirmed the only local GTA IV executables under `D:\Games` are still `D:\Games\Grand Theft Auto IV\GTAIV.exe` (`1, 0, 8, 0`, 15,628,696 bytes, SHA-256 `3D90E7C516FA450CA002E5031E62C0F66B404590F33E6CC9793B0DA4FFFBFD0F`) and `D:\Games\GTAIV_Backup\GTAIV.exe` (`1.2.0.59`, 17,425,752 bytes, SHA-256 `08759A5516F9837920EA504436236BBAB89D0826A8E4D04FF106345177B5345D`), while the bundled native `ScriptHook\Game.h` still only exposes `Version101` through `Version104`.
+  - 2026-04-17 current delete-then-start retry: deleted `D:\Games\Grand Theft Auto IV\agent.ini`, launched `D:\Games\Grand Theft Auto IV\GTAIV.exe`, waited 15 seconds, and observed the process exit on its own with code `-1073741819`. After the launch, `D:\Games\Grand Theft Auto IV\agent.ini` was still absent, `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log` was still absent, and `D:\Games\Grand Theft Auto IV\ScriptHook.log` refreshed to `2026-04-17 21:09:38` at 263 bytes with SHA-256 `DAAF6A88953905C3A5B3C44FA71D9A03AE5CF6CDAE7715A92904DA966CA7665B`, still ending at:
+    ```text
+    Log start: Fri Apr 17 21:09:38 2026
+    -----------------------------------------------
+    [INFO] GTA IV Script Hook 0.5.1 - (C) 2009, Aru - Initialized
+    [INFO] Process base address: 0xcc0000
+    [INFO] Auto detecting game version
+    [FATAL] Failed to detect game version
+    ```
+    Repo-side expectations are still unchanged: `ScriptHookDotNet\NetHook.cpp` only reaches `EnsureAgentIniExists()` after native startup succeeds, so the managed bootstrap would still seed:
+    ```ini
+    # Auto-created by ScriptHookDotNet for agent bootstrap
+
+    [Agent]
+    Enabled=true
+    ```
+    This checkbox remains blocked and stays unchecked because the current local runtime still dies in native `ScriptHook.dll` version detection before `ScriptHookDotNet.asi` reaches the managed initialization path that would recreate `agent.ini`.
 - [ ] Verify that editing `<gta-root>\\agent.ini` to contain real key/value data causes `/agent` to print the existing contents rather than overwriting the file.
   - 2026-04-17 current run verification: added a narrower repo-side regression check in `tests/test_agent_ini_runtime.py` and re-ran `python -m pytest tests/test_agent_ini_runtime.py -q`, which passed (`5 passed in 0.01s`). The new assertion confirms the managed path still short-circuits on pre-existing files via `if (System::IO::File::Exists(agentIniPath)) return true;` and formats loaded categories back to the console with `sb->AppendLine("[" + ((categoryName->Length > 0) ? categoryName : "Default") + "]");` plus `sb->AppendLine(valueNames[n] + "=" + value);`, which is consistent with `/agent` printing current settings instead of recreating the file.
   - 2026-04-17 current run live-runtime refresh: the available GTA IV install is still blocked before ScriptHookDotNet console startup, so this specific end-to-end checkbox still cannot be closed honestly in the local environment. `D:\Games\Grand Theft Auto IV\agent.ini` is still absent, `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log` is still absent, and `D:\Games\Grand Theft Auto IV\ScriptHook.log` still ends at:
