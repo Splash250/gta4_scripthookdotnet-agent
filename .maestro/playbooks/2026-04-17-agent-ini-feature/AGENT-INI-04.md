@@ -24,6 +24,23 @@ Verify the end-to-end feature against the real build output and document exactly
     [INFO] Auto detecting game version
     [FATAL] Failed to detect game version
     ```
+    The expected bootstrap payload if initialization reaches `EnsureAgentIniExists()` is still:
+    ```ini
+    # Auto-created by ScriptHookDotNet for agent bootstrap
+
+    [Agent]
+    Enabled=true
+    ```
+    This run still does not satisfy the real startup-path requirement. The external native ScriptHook layer fails before ScriptHookDotNet can enter `NetHook::Initialize(bool isPrimary, ...)`, so `agent.ini` recreation remains unobserved end to end and the checkbox must stay unchecked in the current local environment.
+  - 2026-04-17 current pass refresh: no task images were present under `.maestro/playbooks/2026-04-17-agent-ini-feature`, so `0` images were analyzed for this pass. Confirmed the working folder still exists at `D:\Games\GTAIV_Modding\gta4_scripthookdotnet-agent\.maestro\playbooks\Working`. Re-ran `python -m pytest tests\test_agent_ini_bootstrap.py tests\test_agent_ini_runtime.py -q` and it passed (`10 passed in 0.02s`). Refreshed the live runtime inventory without changing source: `D:\Games\Grand Theft Auto IV\GTAIV.exe` still exists at 15,628,696 bytes with file version `1, 0, 8, 0` and `LastWriteTime` `2026-04-12 12:46:51`; `D:\Games\GTAIV_Backup\GTAIV.exe` still exists at 17,425,752 bytes with file version `1.2.0.59` and `LastWriteTime` `2026-04-11 15:35:53`; `D:\Games\Grand Theft Auto IV\ScriptHook.log` still exists at 263 bytes with `LastWriteTime` `2026-04-17 15:58:49`; and both `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log` and `D:\Games\Grand Theft Auto IV\agent.ini` still remain absent. Fresh SHA-256 checks still show deployment parity rather than a stale copy: `D:\Games\Grand Theft Auto IV\ScriptHook.dll` still matches `dist\ScriptHook.dll` at `2B10866A374B52F8550F7D0E416B3550F9B58F9DC839F62C938197FE9F56FA8E`, and `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.asi` still matches `bin\ScriptHookDotNet.asi` at `94C32FD8653544CEB75360E432C242AA0197A78ADCB932C51761CC12F87E98A8`. `D:\Games\Grand Theft Auto IV\ScriptHook.log` still contains only:
+    ```text
+    Log start: Fri Apr 17 15:58:49 2026
+    -----------------------------------------------
+    [INFO] GTA IV Script Hook 0.5.1 - (C) 2009, Aru - Initialized
+    [INFO] Process base address: 0xcc0000
+    [INFO] Auto detecting game version
+    [FATAL] Failed to detect game version
+    ```
     The expected bootstrap payload if initialization ever reaches `EnsureAgentIniExists()` is still:
     ```ini
     # Auto-created by ScriptHookDotNet for agent bootstrap
