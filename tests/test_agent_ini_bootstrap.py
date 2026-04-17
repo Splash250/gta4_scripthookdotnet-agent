@@ -35,6 +35,17 @@ class AgentIniBootstrapTests(unittest.TestCase):
         self.assertRegex(content, re.compile(r'agent\.ini.*created', re.IGNORECASE))
         self.assertRegex(content, re.compile(r'agent\.ini.*failed', re.IGNORECASE))
 
+    def test_agent_ini_seed_payload_matches_expected_default_block(self) -> None:
+        content = NET_HOOK_CPP.read_text(encoding="utf-8")
+
+        self.assertIn(
+            '"# Auto-created by ScriptHookDotNet for agent bootstrap" + Environment::NewLine +\n'
+            '\t\t\tEnvironment::NewLine +\n'
+            '\t\t\t"[Agent]" + Environment::NewLine +\n'
+            '\t\t\t"Enabled=true" + Environment::NewLine;',
+            content,
+        )
+
 
 if __name__ == "__main__":
     unittest.main()
