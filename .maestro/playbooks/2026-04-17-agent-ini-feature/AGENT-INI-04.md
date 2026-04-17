@@ -164,6 +164,25 @@ Verify the end-to-end feature against the real build output and document exactly
     Enabled=true
     ```
     but it still does so only after `NetHook::Initialize(bool isPrimary, ...)` reaches the managed bootstrap path. This checkbox remains blocked because the currently available native ScriptHook runtime still fails upstream before ScriptHookDotNet initialization begins.
+  - 2026-04-17 current run refresh: reran the repo-side verification with `python -m pytest tests\test_agent_ini_bootstrap.py tests\test_agent_ini_runtime.py -q` and it still passed (`7 passed in 0.02s`). Rechecked the only two local GTA IV installs and the live output paths:
+    - `D:\Games\Grand Theft Auto IV\GTAIV.exe`: exists, 15,628,696 bytes, `LastWriteTime` `2026-04-12 12:46:51`, file version `1, 0, 8, 0`
+    - `D:\Games\GTAIV_Backup\GTAIV.exe`: exists, 17,425,752 bytes, `LastWriteTime` `2026-04-11 15:35:53`, file version `1.2.0.59`
+    - `D:\Games\Grand Theft Auto IV\ScriptHook.log`: exists, 263 bytes, `LastWriteTime` `2026-04-17 15:58:49`
+    - `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log`: still absent
+    - `D:\Games\Grand Theft Auto IV\agent.ini`: still absent
+  - The live deployment still matches the repo artifacts under test:
+    - `D:\Games\Grand Theft Auto IV\ScriptHook.dll` SHA-256 `2B10866A374B52F8550F7D0E416B3550F9B58F9DC839F62C938197FE9F56FA8E` = `dist\ScriptHook.dll`
+    - `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.asi` SHA-256 `94C32FD8653544CEB75360E432C242AA0197A78ADCB932C51761CC12F87E98A8` = `bin\ScriptHookDotNet.asi`
+  - `D:\Games\Grand Theft Auto IV\ScriptHook.log` still contains only:
+    ```text
+    Log start: Fri Apr 17 15:58:49 2026
+    -----------------------------------------------
+    [INFO] GTA IV Script Hook 0.5.1 - (C) 2009, Aru - Initialized
+    [INFO] Process base address: 0xcc0000
+    [INFO] Auto detecting game version
+    [FATAL] Failed to detect game version
+    ```
+    With no local runtime that can get past that native startup failure, this checkbox remains blocked: the managed `EnsureAgentIniExists()` path is still covered by source inspection and passing tests, but it still cannot be observed end to end in the available live environment.
 - [ ] Verify that editing `<gta-root>\\agent.ini` to contain real key/value data causes `/agent` to print the existing contents rather than overwriting the file.
 - [ ] Verify that invoking `/agent` after startup on an existing populated file does not change the file timestamp or contents unless the file had to be created because it was missing.
 - [ ] Add a short maintainer note to an appropriate docs file, such as `README.md`, `ScriptHookDotNet.readme.txt`, or a repo-local docs page, only if the project already documents built-in console commands there. The note should mention automatic `agent.ini` creation and the `agent` console command.
