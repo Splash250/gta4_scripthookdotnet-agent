@@ -213,7 +213,7 @@ namespace GTA{
 	//	Standard = 8,
 	//};
 
-	public enum class Bone {
+	public enum class Bone : System::UInt32 {
 		//Back = 1223,
 		//Body = 1201,
 		//Head = 1216, //1205,
