@@ -43,6 +43,19 @@ class AgentIniBootstrapTests(unittest.TestCase):
             re.compile(r"if\s*\(\s*isPrimary\s*\)\s*\{[\s\S]*EnsureAgentIniExists\(\)", re.MULTILINE),
         )
 
+    def test_version_detection_returns_before_agent_ini_bootstrap_runs(self) -> None:
+        content = NET_HOOK_CPP.read_text(encoding="utf-8")
+
+        unknown_version_guard = content.index("if (GTA::Game::Version == GameVersion::UnknownVersion) {")
+        unsupported_version_guard = content.index("} else if (!SupportedGameVersions->ContainsKey(GTA::Game::Version)) {")
+        bootstrap_start = content.index("if (isPrimary) {", unsupported_version_guard)
+        ensure_exists_call = content.index("if (!EnsureAgentIniExists()) return;", bootstrap_start)
+
+        self.assertLess(unknown_version_guard, bootstrap_start)
+        self.assertLess(unsupported_version_guard, bootstrap_start)
+        self.assertLess(unsupported_version_guard, ensure_exists_call)
+        self.assertIn("[FATAL] Failed to detect game version", (REPO_ROOT / ".maestro" / "playbooks" / "2026-04-17-agent-ini-feature" / "AGENT-INI-04.md").read_text(encoding="utf-8"))
+
     def test_agent_ini_path_uses_game_install_folder_and_ini_seed_content(self) -> None:
         content = NET_HOOK_CPP.read_text(encoding="utf-8")
 
