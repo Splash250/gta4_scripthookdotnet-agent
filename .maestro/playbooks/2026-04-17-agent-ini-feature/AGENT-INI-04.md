@@ -130,6 +130,22 @@ Verify the end-to-end feature against the real build output and document exactly
     [FATAL] Failed to detect game version
     ```
     `Test-Path` is still `False` for both `D:\Games\Grand Theft Auto IV\agent.ini` and `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log`. Repo inspection is unchanged: the managed side still supports `GameVersion::v1080` in `ScriptHookDotNet\NetHook.cpp`, but the checked-in native `ScriptHook\Game.h` source still exposes only `Version101` through `Version104`, and there is still no repo project that rebuilds `dist\ScriptHook.dll`. This checkbox therefore remains blocked on the external native ScriptHook startup path and cannot be marked complete in the current local environment.
+  - 2026-04-17 latest run refresh: re-checked the deployed runtime without changing code. `D:\Games\Grand Theft Auto IV\GTAIV.exe` still reports version `1.0.8.0`; `D:\Games\GTAIV_Backup\GTAIV.exe` still reports `1.2.0.59`; `D:\Games\Grand Theft Auto IV\ScriptHook.log` still exists at 263 bytes with `LastWriteTime` `2026-04-17 15:58:49`; and both `D:\Games\Grand Theft Auto IV\agent.ini` and `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log` still remain absent. The live deployment is still current rather than stale: `D:\Games\Grand Theft Auto IV\ScriptHook.dll` matches `dist\ScriptHook.dll` with SHA-256 `2B10866A374B52F8550F7D0E416B3550F9B58F9DC839F62C938197FE9F56FA8E`, and `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.asi` matches `bin\ScriptHookDotNet.asi` with SHA-256 `94C32FD8653544CEB75360E432C242AA0197A78ADCB932C51761CC12F87E98A8`. `ScriptHook.log` still contains only:
+    ```text
+    Log start: Fri Apr 17 15:58:49 2026
+    -----------------------------------------------
+    [INFO] GTA IV Script Hook 0.5.1 - (C) 2009, Aru - Initialized
+    [INFO] Process base address: 0xcc0000
+    [INFO] Auto detecting game version
+    [FATAL] Failed to detect game version
+    ```
+    This leaves the checkbox blocked for the same reason as before: the native C++ ScriptHook never reaches ScriptHookDotNet initialization in the available local runtimes, so missing-file recreation cannot be observed end to end even though the repo-side bootstrap code still expects:
+    ```ini
+    # Auto-created by ScriptHookDotNet for agent bootstrap
+
+    [Agent]
+    Enabled=true
+    ```
 - [ ] Verify that editing `<gta-root>\\agent.ini` to contain real key/value data causes `/agent` to print the existing contents rather than overwriting the file.
 - [ ] Verify that invoking `/agent` after startup on an existing populated file does not change the file timestamp or contents unless the file had to be created because it was missing.
 - [ ] Add a short maintainer note to an appropriate docs file, such as `README.md`, `ScriptHookDotNet.readme.txt`, or a repo-local docs page, only if the project already documents built-in console commands there. The note should mention automatic `agent.ini` creation and the `agent` console command.
