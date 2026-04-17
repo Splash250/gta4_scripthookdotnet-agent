@@ -97,6 +97,26 @@ class AgentIniRuntimeTests(unittest.TestCase):
         self.assertNotIn("Save(", branch_body)
         self.assertNotIn("SetValue(", branch_body)
 
+    def test_agent_console_command_prints_loaded_settings_not_bootstrap_seed(self) -> None:
+        console_commands_content = CONSOLE_COMMANDS_CPP.read_text(encoding="utf-8")
+        net_hook_content = NET_HOOK_CPP.read_text(encoding="utf-8")
+
+        branch_start = console_commands_content.index('} else if (cmd == "agent") { // AGENT')
+        branch_end = console_commands_content.index('} else if (cmd == "flip") { // FLIP', branch_start)
+        branch_body = console_commands_content[branch_start:branch_end]
+        self.assertIn("Console->Print(NetHook::FormatAgentIniForConsole());", branch_body)
+        self.assertNotIn("Enabled=true", branch_body)
+        self.assertNotIn("Helper::StringToFile", branch_body)
+
+        format_start = net_hook_content.index("String^ NetHook::FormatAgentIniForConsole() {")
+        format_end = net_hook_content.index("[Security::Permissions::SecurityPermissionAttribute", format_start)
+        format_body = net_hook_content[format_start:format_end]
+        self.assertIn("array<String^>^ categories = pAgentIniSettings->GetCategoryNames();", format_body)
+        self.assertIn("array<String^>^ valueNames = pAgentIniSettings->GetValueNames(categoryName);", format_body)
+        self.assertIn('String^ value = pAgentIniSettings->GetValueString(valueNames[n], categoryName, String::Empty);', format_body)
+        self.assertNotIn("defaultContents", format_body)
+        self.assertNotIn("Enabled=true", format_body)
+
     def test_agent_ini_write_is_confined_to_missing_file_bootstrap(self) -> None:
         net_hook_content = NET_HOOK_CPP.read_text(encoding="utf-8")
         console_commands_content = CONSOLE_COMMANDS_CPP.read_text(encoding="utf-8")
