@@ -188,6 +188,8 @@ namespace GTA{
 
 		static bool isKeyPressed(System::Windows::Forms::Keys Key);
 		static void TryToDisableMouse();
+		static String^ GetAgentIniPath();
+		static bool EnsureAgentIniExists();
 
 		static void Log(String^ Text);
 		static void Log(String^ Text, Exception^ ex);

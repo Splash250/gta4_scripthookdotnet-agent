@@ -49,6 +49,28 @@ namespace GTA {
 		pGraphics = gcnew GTA::Graphics();
 	}
 
+	String^ NetHook::GetAgentIniPath() {
+		return System::IO::Path::Combine(Game::InstallFolder, "agent.ini");
+	}
+
+	bool NetHook::EnsureAgentIniExists() {
+		String^ agentIniPath = GetAgentIniPath();
+		if (System::IO::File::Exists(agentIniPath)) return true;
+
+		String^ defaultContents =
+			"# Auto-created by ScriptHookDotNet for agent bootstrap" + Environment::NewLine +
+			Environment::NewLine +
+			"[Agent]" + Environment::NewLine +
+			"Enabled=true" + Environment::NewLine;
+		bool created = Helper::StringToFile(agentIniPath, defaultContents, System::Text::Encoding::ASCII);
+		if (created) {
+			Log("agent.ini created at '" + agentIniPath + "'.");
+		} else {
+			Log("agent.ini creation failed at '" + agentIniPath + "'.");
+		}
+		return created;
+	}
+
 	[Security::Permissions::SecurityPermissionAttribute(Security::Permissions::SecurityAction::Demand, ControlAppDomain = true )]
 	[System::Runtime::ExceptionServices::HandleProcessCorruptedStateExceptions]
 	void NetHook::Initialize(bool isPrimary, int hModule){
@@ -123,6 +145,7 @@ namespace GTA {
 			Helper::EnforceCultureUS();
 
 			if (isPrimary) {
+				if (!EnsureAgentIniExists()) return;
 
 				GTA::Console^ cons = (GTA::Console^)pConsole;
 				pFormHost = gcnew GTA::Forms::FormHost(nullptr);
