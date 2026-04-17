@@ -40,28 +40,28 @@ namespace value {
 	}
 	
 	void Tasks::AimAt(Vector3 target, int duration) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
 		Scripting::TaskAimGunAtCoord(ped->Handle, target.X, target.Y, target.Z, duration);
 	}
 	void Tasks::AimAt(Ped^ target, int duration) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
-		OBJECT_NON_EXISTING_CHECK(target);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
+		OBJECT_NON_EXISTING_CHECK_VOID(target);
 		Scripting::TaskAimGunAtChar(ped->Handle, target->Handle, duration);
 	}
 	void Tasks::CruiseWithVehicle(GTA::Vehicle^ Vehicle, float SpeedMph, bool ObeyTrafficLaws) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(Vehicle);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(Vehicle);
 		Scripting::TaskCarDriveWander(ped->Handle, Vehicle->Handle, SpeedMph, (ObeyTrafficLaws ? 1 : 2));
 	}
 	void Tasks::Die() {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
 		Scripting::TaskDie(ped->Handle);
 	}
 
 
 	void Tasks::DrivePointRoute(GTA::Vehicle^ Vehicle, float Speed, ... array<Vector3>^ RoutePoints) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(Vehicle);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(Vehicle);
 		if (isNULL(RoutePoints) || (RoutePoints->Length == 0)) return;
 		Scripting::TaskFlushRoute();
 		for (int i = 0; i < RoutePoints->Length; i++) {
@@ -75,9 +75,9 @@ namespace value {
 	// MissionIDs for TaskCarMission: 5(wait), 12(follow) and 21(drive to player)
 
 	void Tasks::DriveTo(GTA::Vehicle^ Vehicle, Ped^ TargetPed, float SpeedMph, bool ObeyTrafficLaws, bool AllowToDriveRoadsWrongWay) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(Vehicle);
-		OBJECT_NON_EXISTING_CHECK(TargetPed);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(Vehicle);
+		OBJECT_NON_EXISTING_CHECK_VOID(TargetPed);
 		if (!AllowToDriveRoadsWrongWay)
 			Scripting::TaskCarMissionPedTargetNotAgainstTraffic(ped->Handle, Vehicle->Handle, TargetPed->Handle, 4, SpeedMph, (ObeyTrafficLaws ? 1 : 2), 5, 10);
 		else
@@ -88,9 +88,9 @@ namespace value {
 	}
 
 	void Tasks::DriveTo(GTA::Vehicle^ Vehicle, GTA::Vehicle^ TargetVehicle, float SpeedMph, bool ObeyTrafficLaws, bool AllowToDriveRoadsWrongWay) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(Vehicle);
-		OBJECT_NON_EXISTING_CHECK(TargetVehicle);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(Vehicle);
+		OBJECT_NON_EXISTING_CHECK_VOID(TargetVehicle);
 		if (!AllowToDriveRoadsWrongWay)
 			Scripting::TaskCarMissionNotAgainstTraffic(ped->Handle, Vehicle->Handle, TargetVehicle->Handle, 1, SpeedMph, (ObeyTrafficLaws ? 1 : 2), 10, 5);
 		else
@@ -101,8 +101,8 @@ namespace value {
 	}
 
 	void Tasks::DriveTo(GTA::Vehicle^ Vehicle, Vector3 Target, float SpeedMph, bool ObeyTrafficLaws, bool AllowToDriveRoadsWrongWay) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(Vehicle);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(Vehicle);
 		if (!AllowToDriveRoadsWrongWay)
 			Scripting::TaskCarMissionCoorsTargetNotAgainstTraffic(ped->Handle, Vehicle->Handle, Target.X, Target.Y, Target.Z, 4, SpeedMph, (ObeyTrafficLaws ? 1 : 2), 5, 10);
 		else
@@ -137,12 +137,12 @@ namespace value {
 	//	Scripting::TaskEnterCarAsDriver(ped->Handle, vehicle->Handle, 0);
 	//}
 	void Tasks::EnterVehicle() {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
 		Scripting::TaskEnterCarAsPassenger(ped->Handle, 0, 0, -2);
 	}
 	void Tasks::EnterVehicle(GTA::Vehicle^ vehicle, GTA::VehicleSeat Seat) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(vehicle);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(vehicle);
 		if (Seat <= VehicleSeat::None) return;
 		if (Seat == VehicleSeat::Driver)
 			Scripting::TaskEnterCarAsDriver(ped->Handle, vehicle->Handle, 0);
@@ -151,26 +151,26 @@ namespace value {
 	}
 
 	void Tasks::FightAgainst(Ped^ target, int duration) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
-		OBJECT_NON_EXISTING_CHECK(target);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
+		OBJECT_NON_EXISTING_CHECK_VOID(target);
 		Scripting::TaskCombatTimed(ped->Handle, target->Handle, duration);
 	}
 	void Tasks::FightAgainst(Ped^ target) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
-		OBJECT_NON_EXISTING_CHECK(target);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
+		OBJECT_NON_EXISTING_CHECK_VOID(target);
 		Scripting::TaskCombat(ped->Handle, target->Handle);
 	}
 	void Tasks::FightAgainstHatedTargets(float radius, int duration) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
 		Scripting::TaskCombatHatedTargetsAroundCharTimed(ped->Handle, radius, duration);
 	}
 	void Tasks::FightAgainstHatedTargets(float radius) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
 		Scripting::TaskCombatHatedTargetsAroundChar(ped->Handle, radius);
 	}
 	void Tasks::FleeFromChar(Ped^ target, bool onPavements, int duration) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
-		OBJECT_NON_EXISTING_CHECK(target);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
+		OBJECT_NON_EXISTING_CHECK_VOID(target);
 		if (onPavements)
 			Scripting::TaskSmartFleeCharPreferringPavements(ped->Handle, target->Handle, 100.0f, duration);
 		else
@@ -184,20 +184,20 @@ namespace value {
 	}
 
 	void Tasks::GoTo(Ped^ TargetPed, float OffsetRight, float OffsetFront, int duration) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
-		OBJECT_NON_EXISTING_CHECK(TargetPed);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
+		OBJECT_NON_EXISTING_CHECK_VOID(TargetPed);
 		Scripting::TaskGotoCharOffset(ped->Handle, TargetPed->Handle, duration, OffsetRight, OffsetFront);
 	}
 	void Tasks::GoTo(Ped^ TargetPed, float OffsetRight, float OffsetFront) {
 		GoTo(TargetPed, OffsetRight, OffsetFront, -1);
 	}
 	void Tasks::GoTo(Ped^ TargetPed) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
-		OBJECT_NON_EXISTING_CHECK(TargetPed);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
+		OBJECT_NON_EXISTING_CHECK_VOID(TargetPed);
 		Scripting::TaskGotoCharOffset(ped->Handle, TargetPed->Handle, -1, 0.0f, 0.0f);
 	}
 	void Tasks::GoTo(Vector3 Position, bool IgnorePaths) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
 		if (IgnorePaths)
 			Scripting::TaskGoStraightToCoord(ped->Handle, Position.X, Position.Y, Position.Z, 2, -1);
 		else
@@ -207,7 +207,7 @@ namespace value {
 		GoTo(Position, false);
 	}
 	void Tasks::RunTo(Vector3 Position, bool IgnorePaths) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
 		if (IgnorePaths)
 			Scripting::TaskGoStraightToCoord(ped->Handle, Position.X, Position.Y, Position.Z, 4, -1);
 		else
@@ -218,58 +218,58 @@ namespace value {
 	}
 
 	void Tasks::GuardCurrentPosition() {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
 		Scripting::TaskGuardCurrentPosition(ped->Handle, 15.0f, 10.0f, 1);
 	}
 	void Tasks::HandsUp(int duration) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
 		if (duration<0) duration=MAX_DURATION;
 		Scripting::TaskHandsUp(ped->Handle, duration);
 	}
 	void Tasks::LandHelicopter(Vehicle^ heli, Vector3 Position) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(heli);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(heli);
 		Scripting::TaskHeliMission(ped->Handle, heli->Handle, 0, 0, Position.X, Position.Y, Position.Z, 5, 0.0f, 0, -1.0f, -1, -1);
 	}
 	void Tasks::LeaveVehicle(Vehicle^ vehicle, bool CloseDoor) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(vehicle);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(vehicle);
 		if (CloseDoor)
 			Scripting::TaskLeaveCar(ped->Handle,vehicle->Handle);
 		else
 			Scripting::TaskLeaveCarDontCloseDoor(ped->Handle,vehicle->Handle);
 	}
 	void Tasks::LeaveVehicle() {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
 		Scripting::TaskLeaveAnyCar(ped->Handle);
 	}
 	void Tasks::LeaveVehicleImmediately(Vehicle^ vehicle) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(vehicle);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(vehicle);
 		Scripting::TaskLeaveCarImmediately(ped->Handle,vehicle->Handle);
 	}
 	
 	void Tasks::LookAt(GTA::Vector3 target, int duration) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
 		Scripting::TaskLookAtCoord(ped->Handle, target.X, target.Y, target.Z, duration, 0);
 	}
 	void Tasks::LookAt(GTA::Object^ target, int duration) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
-		OBJECT_NON_EXISTING_CHECK(target);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
+		OBJECT_NON_EXISTING_CHECK_VOID(target);
 		Scripting::TaskLookAtObject(ped->Handle, target->Handle, duration, 0);
 	}
 	void Tasks::LookAt(GTA::Vehicle^ target, int duration) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
-		OBJECT_NON_EXISTING_CHECK(target);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
+		OBJECT_NON_EXISTING_CHECK_VOID(target);
 		Scripting::TaskLookAtVehicle(ped->Handle, target->Handle, duration, 0);
 	}
 	void Tasks::LookAt(GTA::Ped^ target, int duration) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
-		OBJECT_NON_EXISTING_CHECK(target);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
+		OBJECT_NON_EXISTING_CHECK_VOID(target);
 		Scripting::TaskLookAtChar(ped->Handle, target->Handle, duration, 0);
 	}
 	void Tasks::PlayAnimation(GTA::AnimationSet^ AnimationSet, String^ AnimationName, float Speed, AnimationFlags Flags) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
 		if (System::Object::ReferenceEquals(AnimationSet,nullptr)) return;
 		if (!AnimationSet->LoadToMemoryNow()) return;
 		char* pAnimName = PinStringA(AnimationName);
@@ -285,62 +285,62 @@ namespace value {
 		PlayAnimation(AnimationSet, AnimationName, Speed, AnimationFlags::None);
 	}
 	void Tasks::PutAwayMobilePhone() {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
 		Scripting::TaskUseMobilePhone(ped->Handle, false);
 	}
 	void Tasks::ShootAt(Ped^ target, ShootMode mode, int duration) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
-		OBJECT_NON_EXISTING_CHECK(target);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
+		OBJECT_NON_EXISTING_CHECK_VOID(target);
 		Scripting::TaskShootAtChar(ped->Handle, target->Handle, duration, (i32)mode);
 	}
 	void Tasks::ShootAt(Ped^ target, ShootMode mode) {
 		ShootAt(target, mode, -1);
 	}
 	void Tasks::StandStill(int duration) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
 		if (duration<0) duration=MAX_DURATION;
 		Scripting::TaskStandStill(ped->Handle,duration);
 	}
 	void Tasks::SwapWeapon(GTA::Weapon Weapon) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
 		Scripting::TaskSwapWeapon(ped->Handle,(Scripting::eWeapon)Weapon);
 	}
 	void Tasks::StartScenario(String^ ScenarioName, Vector3 Position) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
 		char* ptr = PinStringA(ScenarioName);
 		Scripting::TaskStartScenarioAtPosition(ped->Handle, ptr, Position.X, Position.Y, Position.Z, 0);
 		FreeString(ptr);
 	}
 	void Tasks::TurnTo(Vector3 Position) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
 		Scripting::TaskTurnCharToFaceCoord(ped->Handle, Position.X, Position.Y, Position.Z);
 	}
 	void Tasks::TurnTo(Ped^ target) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
-		OBJECT_NON_EXISTING_CHECK(target);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
+		OBJECT_NON_EXISTING_CHECK_VOID(target);
 		Scripting::TaskTurnCharToFaceChar(ped->Handle, target->Handle);
 	}
 	void Tasks::UseMobilePhone() {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
 		Scripting::TaskUseMobilePhone(ped->Handle, true);
 	}
 	void Tasks::UseMobilePhone(int duration) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
 		Scripting::TaskUseMobilePhoneTimed(ped->Handle, duration);
 	}
 	void Tasks::Wait(int duration) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
 		if (duration<0) duration=MAX_DURATION;
 		Scripting::TaskPause(ped->Handle,duration);
 	}
 	void Tasks::WalkRelativeToPed(Ped^ target, float OffsetToRight, float OffsetToFront, int duration) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
-		OBJECT_NON_EXISTING_CHECK(target);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
+		OBJECT_NON_EXISTING_CHECK_VOID(target);
 		if (duration<0) duration=-1;
 		Scripting::TaskGotoCharOffset(ped->Handle, target->Handle, duration, OffsetToRight, OffsetToFront);
 	}
 	void Tasks::WanderAround() {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
 		Scripting::TaskWanderStandard(ped->Handle);
 	}
 	//void Tasks::WarpIntoVehicle(GTA::Vehicle^ vehicle, int PassengerSeat) {
@@ -351,8 +351,8 @@ namespace value {
 	//}
 	void Tasks::WarpIntoVehicle(GTA::Vehicle^ vehicle, GTA::VehicleSeat Seat) {
 		if (Seat <= VehicleSeat::None) return;
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
-		OBJECT_NON_EXISTING_CHECK(vehicle);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
+		OBJECT_NON_EXISTING_CHECK_VOID(vehicle);
 		if (Seat == VehicleSeat::Driver)
 			Scripting::TaskWarpCharIntoCarAsDriver(ped->Handle, vehicle->Handle);
 		else
@@ -366,20 +366,20 @@ namespace value {
 	}
 
 	void PedTasks::AlwaysKeepTask::set(bool value) {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
 		unmanaged::Native::SetCharKeepTask(ped->Handle,value);
 	}
 
 	void PedTasks::ClearAll() {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
 		unmanaged::Native::ClearCharTasks(ped->Handle);
 	}
 	void PedTasks::ClearAllImmediately() {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
 		unmanaged::Native::ClearCharTasksImmediately(ped->Handle);
 	}
 	void PedTasks::ClearSecondary() {
-		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(ped);
+		OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(ped);
 		unmanaged::Native::ClearCharSecondaryTask(ped->Handle);
 	}
 

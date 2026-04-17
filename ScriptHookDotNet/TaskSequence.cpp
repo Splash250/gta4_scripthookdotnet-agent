@@ -65,7 +65,7 @@ namespace GTA {
 	}
 
 	void TaskSequence::Perform(GTA::Ped^ TargetPed) {
-		OBJECT_NON_EXISTING_CHECK(TargetPed);
+		OBJECT_NON_EXISTING_CHECK_VOID(TargetPed);
 		if (!bClosed) {
 			bClosed = true;
 			Scripting::CloseSequenceTask(pHandle);

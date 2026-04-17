@@ -104,7 +104,7 @@ namespace GTA{
 		return Vector3(x,y,z);
 	}
 	void Ped::Position::set(Vector3 value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		try{
 		unmanaged::Native::SetCharCoordinates(pHandle,value.X,value.Y,value.Z);
 		} catch(System::Exception^ ex) {
@@ -120,7 +120,7 @@ namespace GTA{
 		return Vector3(x,y,z);
 	}
 	void Ped::Velocity::set(Vector3 value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetCharVelocity(pHandle,value.X,value.Y,value.Z);
 	}
 
@@ -131,7 +131,7 @@ namespace GTA{
 		return val;
 	}
 	void Ped::Heading::set(float value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetCharHeading(pHandle,value);
 	}
 	Vector3 Ped::Direction::get(){
@@ -158,7 +158,7 @@ namespace GTA{
 	//}
 
 	void Ped::Voice::set(String^ value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		if ( isNULL(value) || (value->Length == 0) || value->Equals("default",StringComparison::InvariantCultureIgnoreCase) ) {
 			SetDefaultVoice();
 			return;
@@ -178,12 +178,12 @@ namespace GTA{
 		return val-100;
 	}
 	void Ped::Health::set(int value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		unmanaged::Native::SetCharHealth(pHandle,value+100);
 	}
 
 	void Ped::MaxHealth::set(int value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		unmanaged::Native::SetCharMaxHealth(pHandle,value+100);
 	}
 
@@ -194,7 +194,7 @@ namespace GTA{
 		return val;
 	}
 	void Ped::Armor::set(int value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		int diff = value - Armor;
 		if (diff == 0) return;
 		Scripting::AddArmourToChar(pHandle,diff);
@@ -205,7 +205,7 @@ namespace GTA{
 		return Scripting::GetCharMoney(pHandle);
 	}
 	void Ped::Money::set(int value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetCharMoney(pHandle,value);
 	}
 
@@ -220,7 +220,7 @@ namespace GTA{
 		return Scripting::IsCharOnFire(pHandle);
 	}
 	void Ped::isOnFire::set(bool value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		if (value) {
 			int fire = Scripting::StartCharFire(pHandle);
 			if (fire == 0) return;
@@ -235,7 +235,7 @@ namespace GTA{
 		return Scripting::IsPedAMissionPed(pHandle);
 	}
 	void Ped::isRequiredForMission::set(bool value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		if (value)
 			unmanaged::Native::SetCharAsMissionChar(pHandle);
 		else
@@ -315,7 +315,7 @@ namespace GTA{
 		return Scripting::IsPedRagdoll(pHandle);
 	}
 	void Ped::isRagdoll::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		if (value) {
 			PreventRagdoll = false;
 			unmanaged::Native::SwitchPedToRagdoll(pHandle, 10000, -1, 0, 1, 1, 0); // 10000, 10000, 0, 0, 0, 0) //10000, -1, 2, 1, 1, 0
@@ -341,7 +341,7 @@ namespace GTA{
 	}
 
 	void Ped::Invincible::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetCharInvincible(pHandle,value);
 	}
 	
@@ -349,7 +349,7 @@ namespace GTA{
 	//	return Scripting::IsCharVisible(pHandle);
 	//}
 	void Ped::Visible::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetCharVisible(pHandle,value);
 	}
 
@@ -363,12 +363,12 @@ namespace GTA{
 		return Room(force_cast<int>(rk),force_cast<int>(ii));
 	}
 	void Ped::CurrentRoom::set(Room value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetRoomForCharByKey( pHandle, force_cast<Scripting::eInteriorRoomKey>(value.RoomKey) );
 	}
 
 	void Ped::FreezePosition::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::FreezeCharPosition(pHandle,value);
 	}
 
@@ -386,15 +386,15 @@ namespace GTA{
 	}
 
 	void Ped::AttachTo(Vehicle^ vehicle, GTA::Vector3 Offset) {
-		NON_EXISTING_CHECK();
-		OBJECT_NON_EXISTING_CHECK(vehicle);
+		NON_EXISTING_CHECK_VOID();
+		OBJECT_NON_EXISTING_CHECK_VOID(vehicle);
 		//float x = offset.X;
 		//float y = offset.Y;
 		//float z = offset.Z;
 		Scripting::AttachPedToCar(pHandle, vehicle->Handle, 0, Offset.X, Offset.Y, Offset.Z, 0.0f, 0.0f, 0, 0);
 	}
 	void Ped::Detach() {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::DetachPed(pHandle,true);
 	}
 	bool Ped::isAttachedToVehicle() {
@@ -403,20 +403,20 @@ namespace GTA{
 	}
 
 	void Ped::ApplyForce(Vector3 Direction, Vector3 Rotation) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		unmanaged::Native::ApplyForceToPed(pHandle, 3, Direction.X, Direction.Y, Direction.Z, Rotation.X, Rotation.Y, Rotation.Z, 0 , 0, 1, 1);
 	}
 	void Ped::ApplyForce(Vector3 Direction) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		ApplyForce(Direction,Vector3());
 	}
 
 	void Ped::ApplyForceRelative(Vector3 Direction, Vector3 Rotation) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		unmanaged::Native::ApplyForceToPed(pHandle, 3, Direction.X, Direction.Y, Direction.Z, Rotation.X, Rotation.Y, Rotation.Z, 0 , 1, 1, 1);
 	}
 	void Ped::ApplyForceRelative(Vector3 Direction) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		ApplyForceRelative(Direction,Vector3());
 	}
 
@@ -426,51 +426,51 @@ namespace GTA{
 	//}
 
 	void Ped::Accuracy::set(int value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetCharAccuracy(pHandle,value);
 	}
 	void Ped::AlwaysDiesOnLowHealth::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetCharWillMoveWhenInjured(pHandle,!value);
 		Scripting::SetPedDiesWhenInjured(pHandle,value);
 	}
 	void Ped::BlockPermanentEvents::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetBlockingOfNonTemporaryEvents(pHandle,value);
 	}
 	void Ped::BlockWeaponSwitching::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::BlockPedWeaponSwitching(pHandle,value);
 	}
 	void Ped::BlockGestures::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::BlockCharGestureAnims(pHandle,value);
 	}
 	void Ped::CanBeDraggedOutOfVehicle::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetCharCantBeDraggedOut(pHandle,!value);
 	}
 	void Ped::CanBeKnockedOffBike::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetCharCanBeKnockedOffBike(pHandle,value);
 	}
 	void Ped::CanSwitchWeapons::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::BlockPedWeaponSwitching(pHandle,!value);
 	}
 	void Ped::CowerInsteadOfFleeing::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetCharWillCowerInsteadOfFleeing(pHandle,value);
 	}
 	void Ped::DuckWhenAimedAtByGroupMember::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetGroupCharDucksWhenAimedAt(pHandle,value);
 	}
 	//void Ped::Drunk::set(bool value) {
 	//	Scripting::SetPedIsDrunk(pHandle,value);
 	//}
 	void Ped::Enemy::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetCharAsEnemy(pHandle,value);
 	}
 	//void Ped::IgnoreMinorShockingEvents::set(bool value) {
@@ -489,31 +489,31 @@ namespace GTA{
 	//	Scripting::SetCharSuffersCriticalHits(pHandle,value);
 	//}
 	void Ped::PreventRagdoll::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::UnlockRagdoll(pHandle,!value);
 	}
 	void Ped::PriorityTargetForEnemies::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetCharIsTargetPriority(pHandle,value);
 	}
 	void Ped::SenseRange::set(float value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetSenseRange(pHandle,value);
 	}
 	void Ped::WantedByPolice::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetCharWantedByPolice(pHandle,value);
 	}
 	void Ped::WillDoDrivebys::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetCharWillDoDrivebys(pHandle,value);
 	}
 	void Ped::WillFlyThroughWindscreen::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetCharWillFlyThroughWindscreen(pHandle,value);
 	}
 	void Ped::WillUseCarsInCombat::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetCharWillUseCarsInCombat(pHandle,value);
 	}
 
@@ -532,27 +532,27 @@ namespace GTA{
 		return (GTA::RelationshipGroup) *(int*)(MemoryAddress+0xBB4);
 	}
 	void Ped::RelationshipGroup::set(GTA::RelationshipGroup group) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		//Scripting::AllowGangRelationshipsToBeChangedByNextCommand(true);
 		Scripting::SetCharRelationshipGroup(pHandle,(u32)group);
 	}
 	void Ped::ChangeRelationship(GTA::RelationshipGroup group, Relationship level) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		//Scripting::AllowGangRelationshipsToBeChangedByNextCommand(true);
 		Scripting::SetCharRelationship(pHandle,(u32)level,(u32)group);
 	}
 	void Ped::CantBeDamagedByRelationshipGroup(GTA::RelationshipGroup group, bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		//Scripting::AllowGangRelationshipsToBeChangedByNextCommand(true);
 		Scripting::SetCharNotDamagedByRelationshipGroup(pHandle,value,(u32)group);
 	}
 
 	void Ped::FireDamageMultiplier::set(float value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetCharFireDamageMultiplier(pHandle,value);
 	}
 	void Ped::GravityMultiplier::set(float value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetCharGravity(pHandle,value);
 	}
 
@@ -686,7 +686,7 @@ namespace GTA{
 	}
 
 	void Ped::SetPathfinding(bool AllowClimbovers, bool AllowLadders, bool AllowDropFromHeight) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetPedPathMayUseClimbovers(pHandle,AllowClimbovers);
 		Scripting::SetPedPathMayUseLadders(pHandle,AllowLadders);
 		Scripting::SetPedPathMayDropFromHeight(pHandle,AllowDropFromHeight);
@@ -695,29 +695,29 @@ namespace GTA{
 	// METHODS
 
 	void Ped::GiveFakeNetworkName(System::String^ Name, System::Drawing::Color Color) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		char* stringPointer = (char*)Marshal::StringToHGlobalAnsi(Name).ToPointer();
 		Scripting::GivePedFakeNetworkName(pHandle, stringPointer, Color.R, Color.G, Color.B, Color.A);
 		Marshal::FreeHGlobal(IntPtr(stringPointer));
 	}
 
 	void Ped::RemoveFakeNetworkName() {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::RemoveFakeNetworkNameFromPed(pHandle);
 	}
 
 	void Ped::FleeByVehicle(GTA::Vehicle^ Vehicle) {
-		NON_EXISTING_CHECK();
-		OBJECT_NON_EXISTING_CHECK(Vehicle);
+		NON_EXISTING_CHECK_VOID();
+		OBJECT_NON_EXISTING_CHECK_VOID(Vehicle);
 		Scripting::ForcePedToFleeWhilstDrivingVehicle(pHandle,Vehicle->Handle);
 	}
 
 	void Ped::ShootAt(Vector3 Position) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::FirePedWeapon(pHandle, Position.X, Position.Y, Position.Z);
 	}
 	void Ped::ForceHelmet(bool enable) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		if (enable) {
 			Scripting::GivePedHelmet(pHandle);
 		} else {
@@ -725,7 +725,7 @@ namespace GTA{
 		}
 	}
 	void Ped::ForceRagdoll(int duration, bool TryToStayUpright) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		PreventRagdoll = false;
 		unmanaged::Native::SwitchPedToRagdoll(pHandle, 10000, duration, (TryToStayUpright ? 2 : 0), 1, 1, 0); 
 		//Behavior:
@@ -734,17 +734,17 @@ namespace GTA{
 		// 2 = Try to stand
 	}
 	void Ped::SetDefensiveArea(Vector3 Position, float Radius) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetCharSphereDefensiveArea(pHandle, Position.X, Position.Y, Position.Z, Radius);
 	}
 	void Ped::MakeProofTo(bool Bullets, bool Fire, bool Explosions, bool FallingDamage, bool MeleeAttacks) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		unmanaged::Native::SetCharProofs(pHandle, Bullets, Fire, Explosions, FallingDamage, MeleeAttacks);
 	}
 
 	void Ped::WarpIntoVehicle(GTA::Vehicle^ Vehicle, VehicleSeat Seat) {
-		NON_EXISTING_CHECK();
-		OBJECT_NON_EXISTING_CHECK(Vehicle);
+		NON_EXISTING_CHECK_VOID();
+		OBJECT_NON_EXISTING_CHECK_VOID(Vehicle);
 		if (Seat <= VehicleSeat::None) return;
 		if (Seat == VehicleSeat::Driver) {
 			Scripting::WarpCharIntoCar(pHandle,Vehicle->Handle);
@@ -757,36 +757,36 @@ namespace GTA{
 	}
 
 	void Ped::DropCurrentWeapon() {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::ForceCharToDropWeapon(pHandle);
 	}
 	void Ped::LeaveGroup() {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		unmanaged::Native::RemoveCharFromGroup(pHandle);
 	}
 	void Ped::LeaveVehicle() {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::TaskLeaveAnyCar(pHandle);
 	}
 	void Ped::RandomizeOutfit() {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetCharRandomComponentVariation(pHandle);
 	}
 	//void Ped::SwitchToRagdoll() {
 	//	Scripting::SwitchPedToRagdoll(pHandle, 10000, 10000, 0, 0, 0, 0);
 	//}
 	void Ped::BecomeMissionCharacter() {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetCharAsMissionChar(pHandle);
 	}
 
 	void Ped::CancelAmbientSpeech() {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		unmanaged::Native::CancelCurrentlyPlayingAmbientSpeech(pHandle);
 	}
 
 	void Ped::SayAmbientSpeech(String^ PhraseID) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		CancelAmbientSpeech();
 		char* ptr = PinStringA(PhraseID);
 		Scripting::SayAmbientSpeech(pHandle,ptr,1,1,0);
@@ -795,7 +795,7 @@ namespace GTA{
 	// Generic_Fuck_Off, Intimidate_Resp, Thanks, SELL_GOODS
 
 	void Ped::StartKillingSpree(bool alsoAttackPlayer) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		//GTA::RelationshipGroup grp = GTA::RelationshipGroup::Civillian_Male; // GTA::RelationshipGroup::Criminal
 		//RelationshipGroup = grp;
 		//ChangeRelationship(grp, GTA::Relationship::Like);
@@ -836,7 +836,7 @@ namespace GTA{
 	//	Scripting::RemoveCharElegantly(pHandle);
 	//}
 	void Ped::NoLongerNeeded() {
-		NON_EXISTING_CHECK_RELAXED();
+		NON_EXISTING_CHECK_RELAXED_VOID();
 		Scripting::Ped p = pHandle;
 		unmanaged::Native::MarkCharAsNoLongerNeeded(&p);
 	}
@@ -851,12 +851,12 @@ namespace GTA{
 		}
 	}
 	void Ped::Die() {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		//Scripting::TaskDie(pHandle);
 		Health = -100;
 	}
 	void Ped::Delete() {
-		NON_EXISTING_CHECK_RELAXED();
+		NON_EXISTING_CHECK_RELAXED_VOID();
 		SetExistsFalse();
 		if (pHandle == 0) return;
 		int ped = pHandle;
@@ -865,7 +865,7 @@ namespace GTA{
 	}
 
 	void Ped::SetDefaultVoice() {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		unmanaged::Native::SetVoiceIdFromHeadComponent(pHandle, false, Scripting::IsCharMale(pHandle));
 	}
 

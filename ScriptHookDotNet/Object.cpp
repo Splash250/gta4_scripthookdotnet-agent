@@ -57,7 +57,7 @@ namespace GTA {
 		return Vector3(x,y,z);
 	}
 	void GTA::Object::Position::set(Vector3 value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		unmanaged::Native::SetObjectCoordinates(pHandle,value.X,value.Y,value.Z);
 	}
 
@@ -69,7 +69,7 @@ namespace GTA {
 		return RotationQuaternion.ToRotation();
 	}
 	void GTA::Object::Rotation::set(Vector3 value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		unmanaged::Native::SetObjectRotation(pHandle,value.X,value.Y,value.Z);
 	}
 
@@ -80,7 +80,7 @@ namespace GTA {
 		return Quaternion(x,y,z,w);
 	}
 	void GTA::Object::RotationQuaternion::set(Quaternion value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		unmanaged::Native::SetObjectQuaternion(pHandle,value.X,value.Y,value.Z,value.W);
 	}
 
@@ -93,7 +93,7 @@ namespace GTA {
 		return Room(force_cast<int>(rk),force_cast<int>(0));
 	}
 	void GTA::Object::CurrentRoom::set(Room value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::AddObjectToInteriorRoomByKey(pHandle,force_cast<u32>(value.RoomKey));
 	}
 
@@ -104,7 +104,7 @@ namespace GTA {
 		return val;
 	}
 	void GTA::Object::Heading::set(float value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetObjectHeading(pHandle,value);
 	}
 	Vector3 GTA::Object::Direction::get(){
@@ -118,7 +118,7 @@ namespace GTA {
 		return Vector3(x,y,z);
 	}
 	void GTA::Object::Velocity::set(Vector3 value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		ApplyForce(value-Velocity);
 	}
 
@@ -133,7 +133,7 @@ namespace GTA {
 		return Scripting::IsObjectOnFire(pHandle);
 	}
 	void GTA::Object::isOnFire::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		if (value) {
 			int fire = Scripting::StartObjectFire(pHandle);
 			if (fire == 0) return;
@@ -144,25 +144,25 @@ namespace GTA {
 	}
 
 	void GTA::Object::Visible::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetObjectVisible(pHandle,value);
 	}
 
 	void GTA::Object::Collision::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetObjectCollision(pHandle,value);
 	}
 	void GTA::Object::RecordCollisions::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetObjectRecordsCollisions(pHandle,value);
 	}
 	void GTA::Object::Dynamic::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetObjectDynamic(pHandle,value);
 	}
 
 	void GTA::Object::FreezePosition::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::FreezeObjectPosition(pHandle,value);
 	}
 
@@ -181,22 +181,22 @@ namespace GTA {
 	}
 
 	void GTA::Object::AttachToPed(Ped^ ped, Bone bone, Vector3 PositionOffset, Vector3 Rotation) {
-		NON_EXISTING_CHECK();
-		OBJECT_NON_EXISTING_CHECK(ped);
+		NON_EXISTING_CHECK_VOID();
+		OBJECT_NON_EXISTING_CHECK_VOID(ped);
 		CurrentRoom = ped->CurrentRoom;
 		if (isAttachedSomewhere) Detach();
 		Scripting::AttachObjectToPed(pHandle, ped->Handle, (u32)bone, PositionOffset.X, PositionOffset.Y, PositionOffset.Z, Rotation.X, Rotation.Y, Rotation.Z, 0);
 	}
 	void GTA::Object::AttachToVehicle(Vehicle^ vehicle, Vector3 PositionOffset, Vector3 Rotation) {
-		NON_EXISTING_CHECK();
-		OBJECT_NON_EXISTING_CHECK(vehicle);
+		NON_EXISTING_CHECK_VOID();
+		OBJECT_NON_EXISTING_CHECK_VOID(vehicle);
 		//CurrentRoom = vehicle->CurrentRoom;
 		if (isAttachedSomewhere) Detach();
 		Scripting::AttachObjectToCar(pHandle, vehicle->Handle, 0, PositionOffset.X, PositionOffset.Y, PositionOffset.Z, Rotation.X, Rotation.Y, Rotation.Z);
 	}
 
 	void GTA::Object::ApplyForce(Vector3 Direction, Vector3 Rotation) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		unmanaged::Native::ApplyForceToObject(pHandle, 3, Direction.X, Direction.Y, Direction.Z, Rotation.X, Rotation.Y, Rotation.Z, 0 , 0, 1, 1);
 	}
 	void GTA::Object::ApplyForce(Vector3 Direction) {
@@ -204,7 +204,7 @@ namespace GTA {
 	}
 
 	void GTA::Object::ApplyForceRelative(Vector3 Direction, Vector3 Rotation) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		unmanaged::Native::ApplyForceToObject(pHandle, 3, Direction.X, Direction.Y, Direction.Z, Rotation.X, Rotation.Y, Rotation.Z, 0 , 1, 1, 1);
 	}
 	void GTA::Object::ApplyForceRelative(Vector3 Direction) {
@@ -212,7 +212,7 @@ namespace GTA {
 	}
 
 	void GTA::Object::Delete() {
-		NON_EXISTING_CHECK_RELAXED();
+		NON_EXISTING_CHECK_RELAXED_VOID();
 		SetExistsFalse();
 		if (pHandle == 0) return;
 		int obj = pHandle;
@@ -220,7 +220,7 @@ namespace GTA {
 		//pHandle = 0;
 	}
 	void GTA::Object::Detach() {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::DetachObject(pHandle,true);
 	}
 
@@ -234,7 +234,7 @@ namespace GTA {
 		}
 	}
 	void GTA::Object::NoLongerNeeded() {
-		NON_EXISTING_CHECK_RELAXED();
+		NON_EXISTING_CHECK_RELAXED_VOID();
 		int h = pHandle;
 		Scripting::MarkObjectAsNoLongerNeeded(&h);
 	}

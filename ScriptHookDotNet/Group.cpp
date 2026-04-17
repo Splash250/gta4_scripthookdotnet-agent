@@ -66,8 +66,8 @@ namespace GTA{
 		return ContentCache::GetPed(p);
 	}
 	void Group::Leader::set(Ped^ value){
-		NON_EXISTING_CHECK();
-		OBJECT_NON_EXISTING_CHECK(value);
+		NON_EXISTING_CHECK_VOID();
+		OBJECT_NON_EXISTING_CHECK_VOID(value);
 		Scripting::SetGroupLeader(pHandle,value->Handle);
 	}
 
@@ -118,7 +118,7 @@ namespace GTA{
 		return ContentCache::GetPed(p);
 	}
 	void Group::RemoveAllMembers() {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		for (int i = MemberCount-1; i >= 0; i--) {
 			RemoveMember(i);
 		}
@@ -130,7 +130,7 @@ namespace GTA{
 		ForceNextExistsCheck();
 	}
 	void Group::RemoveMember(int Index) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		int p;
 		Scripting::GetGroupMember(pHandle,Index,&p);
 		if (p != 0) Scripting::RemoveCharFromGroup(p);
@@ -163,25 +163,25 @@ namespace GTA{
 	//	Scripting::SetGroupCharDucksWhenAimedAt(pHandle,duck);
 	//}
 	void Group::SeparationRange::set(float value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetGroupSeparationRange(pHandle,value);
 	}
 	void Group::FollowStatus::set(int value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetGroupFollowStatus(pHandle,value);
 	}
 	void Group::Formation::set(int value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetGroupFormation(pHandle,value);
 	}
 	void Group::FormationSpacing::set(float value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetGroupFormationSpacing(pHandle,value);
 	}
 
 	void Group::EnterVehicle(Vehicle^ vehicle, bool WithLeader, bool KeepCurrentDriver) {
-		NON_EXISTING_CHECK();
-		OBJECT_NON_EXISTING_CHECK(vehicle);
+		NON_EXISTING_CHECK_VOID();
+		OBJECT_NON_EXISTING_CHECK_VOID(vehicle);
 		PedCollection^ m = ToList(false);
 		m->OrderByDistanceTo(vehicle->Position);
 		if (WithLeader) {
@@ -224,7 +224,7 @@ namespace GTA{
 		return Scripting::DoesGroupExist(pHandle);
 	}
 	void Group::Delete() {
-		//NON_EXISTING_CHECK_RELAXED();
+		//NON_EXISTING_CHECK_RELAXED_VOID();
 		 if (!ExistsForced()) return;
 		SetExistsFalse();
 		if (pHandle == 0) return;

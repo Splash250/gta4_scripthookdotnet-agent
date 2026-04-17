@@ -84,18 +84,18 @@ namespace Euphoria {
 		}
 
 		//NetHook::Log("SendNmMessage"); 
-		OBJECT_NON_EXISTING_CHECK(TargetPed);
+		OBJECT_NON_EXISTING_CHECK_VOID(TargetPed);
 		unmanaged::Native::SendNmMessage(TargetPed->Handle);
 	}
 
 	void General::Abort(GTA::Ped^ TargetPed, nmMessageID MessageID) {
-		OBJECT_NON_EXISTING_CHECK(TargetPed);
+		OBJECT_NON_EXISTING_CHECK_VOID(TargetPed);
 		unmanaged::Native::CreateNmMessage(false,(u32)MessageID);
 		unmanaged::Native::SendNmMessage(TargetPed->Handle);
 	}
 
 	void General::EnforceRagdoll(GTA::Ped^ Ped, int duration) {
-		OBJECT_NON_EXISTING_CHECK(Ped);
+		OBJECT_NON_EXISTING_CHECK_VOID(Ped);
 		unmanaged::Native::SwitchPedToRagdoll(Ped->Handle, 10000, duration, 1, 1, 1, 0);  //unmanaged::Native
 	}
 

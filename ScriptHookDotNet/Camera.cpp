@@ -52,7 +52,7 @@ namespace GTA{
 		return Vector3(x,y,z);
 	}
 	void Camera::Position::set(Vector3 value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		unmanaged::Native::SetCamPos(pHandle,value.X,value.Y,value.Z);
 	}
 
@@ -63,7 +63,7 @@ namespace GTA{
 		return Vector3(x,y,z);
 	}
 	void Camera::Rotation::set(Vector3 value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		unmanaged::Native::SetCamRot(pHandle,value.X,value.Y,value.Z);
 	}
 
@@ -71,7 +71,7 @@ namespace GTA{
 		return Helper::RotationToDirection(Rotation);
 	}
 	void Camera::Direction::set(Vector3 value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Rotation = Helper::DirectionToRotation(value, Rotation.Y);
 	}
 
@@ -80,7 +80,7 @@ namespace GTA{
 		return Rotation.Z;
 	}
 	void Camera::Heading::set(float value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Vector3 rot = Rotation;
 		rot.Z = value;
 		Rotation = rot;
@@ -91,7 +91,7 @@ namespace GTA{
 		return Rotation.Y;
 	}
 	void Camera::Roll::set(float value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Vector3 rot = Rotation;
 		rot.Y = value;
 		Rotation = rot;
@@ -104,7 +104,7 @@ namespace GTA{
 		return fov;
 	}
 	void Camera::FOV::set(float value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		unmanaged::Native::SetCamFov(pHandle,value);
 	}
 
@@ -113,7 +113,7 @@ namespace GTA{
 		return Scripting::IsCamActive(pHandle);
 	}
 	void Camera::isActive::set(bool value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		if (value)
 			Activate();
 		else
@@ -121,7 +121,7 @@ namespace GTA{
 	}
 
 	void Camera::DrunkEffectIntensity::set(float value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		if (value <= 0.0001f)
 			unmanaged::Native::SetDrunkCam(pHandle, 0.0f, 0);
 		else
@@ -129,32 +129,32 @@ namespace GTA{
 	}
 
 	void Camera::TargetPed(Ped^ ped) {
-		NON_EXISTING_CHECK();
-		OBJECT_NON_EXISTING_CHECK(ped);
+		NON_EXISTING_CHECK_VOID();
+		OBJECT_NON_EXISTING_CHECK_VOID(ped);
 		unmanaged::Native::SetCamTargetPed(pHandle,ped->Handle);
 	}
 	void Camera::LookAt(GTA::Object^ object) {
-		NON_EXISTING_CHECK();
-		OBJECT_NON_EXISTING_CHECK(object);
+		NON_EXISTING_CHECK_VOID();
+		OBJECT_NON_EXISTING_CHECK_VOID(object);
 		unmanaged::Native::PointCamAtObject(pHandle, object->Handle);
 	}
 	void Camera::LookAt(Vehicle^ vehicle) {
-		NON_EXISTING_CHECK();
-		OBJECT_NON_EXISTING_CHECK(vehicle);
+		NON_EXISTING_CHECK_VOID();
+		OBJECT_NON_EXISTING_CHECK_VOID(vehicle);
 		unmanaged::Native::PointCamAtVehicle(pHandle, vehicle->Handle);
 	}
 	void Camera::LookAt(Ped^ ped) {
-		NON_EXISTING_CHECK();
-		OBJECT_NON_EXISTING_CHECK(ped);
+		NON_EXISTING_CHECK_VOID();
+		OBJECT_NON_EXISTING_CHECK_VOID(ped);
 		unmanaged::Native::PointCamAtPed(pHandle, ped->Handle);
 	}
 	void Camera::LookAt(Vector3 Position) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		unmanaged::Native::PointCamAtCoord(pHandle, Position.X, Position.Y, Position.Z);
 	}
 
 	void Camera::Activate() {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		i32 handle = pHandle;
 		unmanaged::Native::ActivateScriptedCams(1,1);
 		unmanaged::Native::BeginCamCommands(&handle);
@@ -166,7 +166,7 @@ namespace GTA{
 		return Scripting::CamIsSphereVisible(pHandle, Position.X, Position.Y, Position.Z, Radius);
 	}
 	void Camera::Deactivate() {
-		NON_EXISTING_CHECK_RELAXED();
+		NON_EXISTING_CHECK_RELAXED_VOID();
 		i32 handle = pHandle;
 		unmanaged::Native::SetCamActive(pHandle,false);
 		unmanaged::Native::SetCamPropagate(pHandle,false);
@@ -174,7 +174,7 @@ namespace GTA{
 		unmanaged::Native::ActivateScriptedCams(0,0);
 	}
 	void Camera::Delete() {
-		NON_EXISTING_CHECK_RELAXED();
+		NON_EXISTING_CHECK_RELAXED_VOID();
 		SetExistsFalse();
 		if (pHandle == 0) return;
 		if (isActive) Deactivate();

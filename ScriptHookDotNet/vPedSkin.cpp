@@ -77,7 +77,7 @@ namespace value {
 		return value;
 	}
 	void PedSkin::SetPropIndex(PedProp proptype, int index) {
-		OBJECT_NON_EXISTING_CHECK(ped);
+		OBJECT_NON_EXISTING_CHECK_VOID(ped);
 		Scripting::SetCharPropIndex(ped->Handle, (u32)proptype, (u32)index);
 	}
 

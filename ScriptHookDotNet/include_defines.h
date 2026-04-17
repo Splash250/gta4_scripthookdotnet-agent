@@ -192,11 +192,15 @@ namespace unmanaged {
 #endif
 
 #define OBJECT_NON_EXISTING_CHECK(object,returns) if (!object->Exists()) { throw gcnew NonExistingObjectException( NON_EXISTING_MESSAGE(object) ); return returns; }
+#define OBJECT_NON_EXISTING_CHECK_VOID(object) if (!object->Exists()) { throw gcnew NonExistingObjectException( NON_EXISTING_MESSAGE(object) ); return; }
 #define OBJECT_NON_EXISTING_CHECK_ALLOW_NULL(object,returns) if ((object->Handle != 0) && (!object->Exists())) { throw gcnew NonExistingObjectException( NON_EXISTING_MESSAGE(object) ); return returns; }
+#define OBJECT_NON_EXISTING_CHECK_ALLOW_NULL_VOID(object) if ((object->Handle != 0) && (!object->Exists())) { throw gcnew NonExistingObjectException( NON_EXISTING_MESSAGE(object) ); return; }
 #define OBJECT_NON_EXISTING_CHECK_RELAXED(object,returns) if (!object->Exists()) return returns
 
 #define NON_EXISTING_CHECK(returns) OBJECT_NON_EXISTING_CHECK(this,returns)
+#define NON_EXISTING_CHECK_VOID() OBJECT_NON_EXISTING_CHECK_VOID(this)
 #define NON_EXISTING_CHECK_RELAXED(returns) OBJECT_NON_EXISTING_CHECK_RELAXED(this,returns)
+#define NON_EXISTING_CHECK_RELAXED_VOID() if (!this->Exists()) return
 
 #define V3_NaN Vector3(float::NaN,float::NaN,float::NaN)
 #define V3_NULL Vector3()

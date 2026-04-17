@@ -84,8 +84,8 @@ namespace GTA {
 
 	void DecisionMaker::ApplyTo(GTA::Ped^ ped) {
 		if isNULL(ped) return;
-		NON_EXISTING_CHECK();
-		OBJECT_NON_EXISTING_CHECK(ped);
+		NON_EXISTING_CHECK_VOID();
+		OBJECT_NON_EXISTING_CHECK_VOID(ped);
 		switch (pCategory) {
 			case DecisionCategory::Behavior:
 				Scripting::SetCharDecisionMaker(ped->Handle,pHandle);
@@ -107,7 +107,7 @@ namespace GTA {
 	}
 
 	void DecisionMaker::RemoveEventResponse(int EventID) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		switch (pCategory) {
 			case DecisionCategory::Behavior:
 			case DecisionCategory::GroupBehavior:
@@ -123,7 +123,7 @@ namespace GTA {
 		}
 	}
 	void DecisionMaker::AddEventResponse(int EventID, int ResponseID, float param1, float param2, float param3, float param4) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		switch (pCategory) {
 			case DecisionCategory::Behavior:
 			case DecisionCategory::GroupBehavior:
@@ -140,55 +140,55 @@ namespace GTA {
 	}
 
 	void DecisionMaker::CanChangeTarget::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetDecisionMakerAttributeCanChangeTarget(pHandle,value);
 	}
 	void DecisionMaker::Caution::set(int value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetDecisionMakerAttributeCaution(pHandle,value);
 	}
 	void DecisionMaker::FireRate::set(int value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetDecisionMakerAttributeFireRate(pHandle,value);
 	}
 	void DecisionMaker::LowHealth::set(int value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetDecisionMakerAttributeLowHealth(pHandle,value);
 	}
 	void DecisionMaker::MovementStyle::set(int value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetDecisionMakerAttributeMovementStyle(pHandle,value);
 	}
 	void DecisionMaker::NavigationStyle::set(int value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetDecisionMakerAttributeNavigationStyle(pHandle,value);
 	}
 	void DecisionMaker::RetreatingBehavior::set(int value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetDecisionMakerAttributeRetreatingBehaviour(pHandle,value);
 	}
 	void DecisionMaker::SightRange::set(int value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetDecisionMakerAttributeSightRange(pHandle,value);
 	}
 	void DecisionMaker::StandingStyle::set(int value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetDecisionMakerAttributeStandingStyle(pHandle,value);
 	}
 	void DecisionMaker::TargetInjuredReaction::set(int value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetDecisionMakerAttributeTargetInjuredReaction(pHandle,value);
 	}
 	void DecisionMaker::TargetLossResponse::set(int value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetDecisionMakerAttributeTargetLossResponse(pHandle,value);
 	}
 	void DecisionMaker::Teamwork::set(int value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetDecisionMakerAttributeTeamwork(pHandle,value);
 	}
 	void DecisionMaker::WeaponAccuracy::set(int value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetDecisionMakerAttributeWeaponAccuracy(pHandle,value);
 	}
 
