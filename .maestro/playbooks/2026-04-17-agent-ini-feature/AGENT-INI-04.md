@@ -16,6 +16,23 @@ Verify the end-to-end feature against the real build output and document exactly
   - 2026-04-17: Verified locally with exit code 0. Output artifact: `D:\Games\GTAIV_Modding\gta4_scripthookdotnet-agent\bin\ScriptHookDotNet.asi` (652,288 bytes, 2026-04-17 15:33:30).
 - [ ] Verify that deleting `<gta-root>\\agent.ini` before startup causes ScriptHookDotNet to recreate it automatically on the next initialization path, and record the observed default file contents in the task comment.
   - 2026-04-17 latest verification refresh: no task images were present under `.maestro/playbooks/2026-04-17-agent-ini-feature`, so `0` images were analyzed for this pass. Confirmed the working folder still exists at `D:\Games\GTAIV_Modding\gta4_scripthookdotnet-agent\.maestro\playbooks\Working`. Re-ran `python -m pytest tests/test_agent_ini_bootstrap.py tests/test_agent_ini_runtime.py -q`, which passed (`13 passed in 0.02s`).
+  - 2026-04-17 latest delete-then-start retry: `D:\Games\Grand Theft Auto IV\GTAIV.exe` is still `1, 0, 8, 0` at 15,628,696 bytes with SHA-256 `3D90E7C516FA450CA002E5031E62C0F66B404590F33E6CC9793B0DA4FFFBFD0F`; `D:\Games\GTAIV_Backup\GTAIV.exe` is still `1.2.0.59` at 17,425,752 bytes with SHA-256 `08759A5516F9837920EA504436236BBAB89D0826A8E4D04FF106345177B5345D`; `D:\Games\Grand Theft Auto IV\ScriptHook.dll` still matches `dist\ScriptHook.dll` at SHA-256 `2B10866A374B52F8550F7D0E416B3550F9B58F9DC839F62C938197FE9F56FA8E`; and `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.asi` still matches `bin\ScriptHookDotNet.asi` at SHA-256 `94C32FD8653544CEB75360E432C242AA0197A78ADCB932C51761CC12F87E98A8`. After deleting `D:\Games\Grand Theft Auto IV\agent.ini` and launching `D:\Games\Grand Theft Auto IV\GTAIV.exe`, the process exited on its own within 15 seconds with code `-1073741819`; `D:\Games\Grand Theft Auto IV\agent.ini` was still absent; `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log` was still absent; and `D:\Games\Grand Theft Auto IV\ScriptHook.log` refreshed to `2026-04-17 20:48:06` at 263 bytes with SHA-256 `C878EFB874AC9D69833F6D33117B6FA704923A5405FDD752BB771143F2CBF10A`, still ending at:
+    ```text
+    Log start: Fri Apr 17 20:48:06 2026
+    -----------------------------------------------
+    [INFO] GTA IV Script Hook 0.5.1 - (C) 2009, Aru - Initialized
+    [INFO] Process base address: 0xcc0000
+    [INFO] Auto detecting game version
+    [FATAL] Failed to detect game version
+    ```
+    Repo-side expectations remain unchanged: `ScriptHookDotNet\NetHook.cpp` still resolves `agent.ini` under `Game::InstallFolder` and only reaches `EnsureAgentIniExists()` after native startup succeeds (`ScriptHookDotNet\NetHook.cpp:54-79,208`), while the bundled native `ScriptHook\Game.h` still only exposes `Version101` through `Version104` (`ScriptHook\Game.h:41-44`) even though the managed support table still includes later versions such as `GameVersion::v1080` (`ScriptHookDotNet\NetHook.cpp:156`). If startup ever reaches the managed bootstrap path, the seeded default payload would still be:
+    ```ini
+    # Auto-created by ScriptHookDotNet for agent bootstrap
+
+    [Agent]
+    Enabled=true
+    ```
+    This checkbox remains blocked and stays unchecked because the current local runtime still dies in the external native `ScriptHook.dll` version-detection path before `ScriptHookDotNet.asi` reaches the managed initialization path that would recreate `agent.ini`.
   - 2026-04-17 latest delete-then-start retry: `D:\Games\Grand Theft Auto IV\GTAIV.exe` is still `1, 0, 8, 0` at 15,628,696 bytes with SHA-256 `3D90E7C516FA450CA002E5031E62C0F66B404590F33E6CC9793B0DA4FFFBFD0F`; `D:\Games\GTAIV_Backup\GTAIV.exe` is still `1.2.0.59` at 17,425,752 bytes with SHA-256 `08759A5516F9837920EA504436236BBAB89D0826A8E4D04FF106345177B5345D`; `D:\Games\Grand Theft Auto IV\ScriptHook.dll` still matches `dist\ScriptHook.dll` at SHA-256 `2B10866A374B52F8550F7D0E416B3550F9B58F9DC839F62C938197FE9F56FA8E`; and `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.asi` still matches `bin\ScriptHookDotNet.asi` at SHA-256 `94C32FD8653544CEB75360E432C242AA0197A78ADCB932C51761CC12F87E98A8`. After deleting `D:\Games\Grand Theft Auto IV\agent.ini` and launching `D:\Games\Grand Theft Auto IV\GTAIV.exe`, the process exited on its own within 15 seconds with code `-1073741819`; `D:\Games\Grand Theft Auto IV\agent.ini` was still absent; `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log` was still absent; and `D:\Games\Grand Theft Auto IV\ScriptHook.log` refreshed to `2026-04-17 20:45:29`, still ending at:
     ```text
     Log start: Fri Apr 17 20:43:06 2026
