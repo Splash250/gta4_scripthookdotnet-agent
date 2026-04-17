@@ -27,7 +27,7 @@
 #include "Blip.h"
 #include "ContentCache.h"
 #include "Game.h"
-#include "MemoryAccess.h",
+#include "MemoryAccess.h"
 #include "Object.h"
 #include "Player.h"
 #include "Vehicle.h"
