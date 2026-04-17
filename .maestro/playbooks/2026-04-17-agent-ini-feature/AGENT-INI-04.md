@@ -15,6 +15,32 @@ Verify the end-to-end feature against the real build output and document exactly
 - [x] Run a clean release build with `& "C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\MSBuild\Current\Bin\MSBuild.exe" ScriptHookDotNet.sln /t:Clean,Build /p:Configuration=Release /p:Platform=Win32 /m /v:minimal` or equivalent clean-then-build sequence and confirm `bin/ScriptHookDotNet.asi` is produced.
   - 2026-04-17: Verified locally with exit code 0. Output artifact: `D:\Games\GTAIV_Modding\gta4_scripthookdotnet-agent\bin\ScriptHookDotNet.asi` (652,288 bytes, 2026-04-17 15:33:30).
 - [ ] Verify that deleting `<gta-root>\\agent.ini` before startup causes ScriptHookDotNet to recreate it automatically on the next initialization path, and record the observed default file contents in the task comment.
+  - 2026-04-17 current verification refresh: no task images were present under `.maestro/playbooks/2026-04-17-agent-ini-feature`, so `0` images were analyzed for this pass. `CLAUDE.md` is not present in the repo root for this workspace. Confirmed the working folder still exists at `D:\Games\GTAIV_Modding\gta4_scripthookdotnet-agent\.maestro\playbooks\Working`. Re-ran `python -m pytest tests/test_agent_ini_bootstrap.py tests/test_agent_ini_runtime.py -q`, which passed (`13 passed in 0.03s`). Reconfirmed the only local GTA IV executables are still `D:\Games\Grand Theft Auto IV\GTAIV.exe` version `1.0.8.0` and `D:\Games\GTAIV_Backup\GTAIV.exe` version `1.2.0.59`, both still outside the packaged `dist\ScriptHookDotNet.readme.txt` GTA IV support window of `1.0.5.0` through `1.0.7.0`.
+  - 2026-04-17 current delete-then-start retry: deleted `D:\Games\Grand Theft Auto IV\agent.ini`, `D:\Games\Grand Theft Auto IV\ScriptHook.log`, and `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log`, launched `D:\Games\Grand Theft Auto IV\GTAIV.exe`, waited 15 seconds, and observed the process exit on its own with code `-1073741819`. After the retry, `D:\Games\Grand Theft Auto IV\agent.ini` was still absent, `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log` was still absent, and `D:\Games\Grand Theft Auto IV\ScriptHook.log` refreshed to `2026-04-17T22:52:32` local time at 263 bytes with SHA-256 `495C6D928B5732F4FDBC3B1662231F8C4373A32D2241576A7FE4A42C03FC0B55`, still ending at:
+    ```text
+    Log start: Fri Apr 17 22:52:32 2026
+    -----------------------------------------------
+    [INFO] GTA IV Script Hook 0.5.1 - (C) 2009, Aru - Initialized
+    [INFO] Process base address: 0xcc0000
+    [INFO] Auto detecting game version
+    [FATAL] Failed to detect game version
+    ```
+    Repo-side expectations remain unchanged: `ScriptHookDotNet\NetHook.cpp` still seeds `agent.ini` only after native startup succeeds, and the default payload would still be:
+    ```ini
+    # Auto-created by ScriptHookDotNet for agent bootstrap
+
+    [Agent]
+    Enabled=true
+    ```
+    This checkbox remains blocked and stays unchecked because the local native `ScriptHook.dll` still fails in version detection before `ScriptHookDotNet.asi` reaches `NetHook::EnsureAgentIniExists()`.
+  - 2026-04-17 blocker refresh: no task images were present under `.maestro/playbooks/2026-04-17-agent-ini-feature`, so `0` images were analyzed for this pass. `CLAUDE.md` is not present in the repo root for this workspace. Confirmed the working folder still exists at `D:\Games\GTAIV_Modding\gta4_scripthookdotnet-agent\.maestro\playbooks\Working`. Re-ran `python -m pytest tests/test_agent_ini_bootstrap.py tests/test_agent_ini_runtime.py -q`, which passed (`13 passed in 0.02s`). Reconfirmed there is still no compatible local GTA IV runtime to exercise the real initialization path: the active install remains `D:\Games\Grand Theft Auto IV\GTAIV.exe` version `1.0.8.0`, while the only alternate local executable is `D:\Games\GTAIV_Backup\GTAIV.exe` version `1.2.0.59`; both are outside the packaged `dist\ScriptHookDotNet.readme.txt` support window of GTA IV `1.0.5.0` through `1.0.7.0`. This checkbox remains blocked and stays unchecked because the repo-side default payload is still clearly:
+    ```ini
+    # Auto-created by ScriptHookDotNet for agent bootstrap
+
+    [Agent]
+    Enabled=true
+    ```
+    but there is still no honest local runtime path that reaches `NetHook::EnsureAgentIniExists()` end to end.
   - 2026-04-17 latest verification pass: no task images were present under `.maestro/playbooks/2026-04-17-agent-ini-feature`, so `0` images were analyzed for this pass. `CLAUDE.md` is not present in the repo root for this workspace. Confirmed the working folder still exists at `D:\Games\GTAIV_Modding\gta4_scripthookdotnet-agent\.maestro\playbooks\Working`. Re-ran `python -m pytest tests/test_agent_ini_bootstrap.py tests/test_agent_ini_runtime.py -q`, which passed (`13 passed in 0.02s`). Refreshed the live deployment inventory again: `D:\Games\Grand Theft Auto IV\GTAIV.exe` is still version `1, 0, 8, 0` with SHA-256 `3D90E7C516FA450CA002E5031E62C0F66B404590F33E6CC9793B0DA4FFFBFD0F`; `D:\Games\Grand Theft Auto IV\ScriptHook.dll` is still version `0, 5, 1, 0` with SHA-256 `2B10866A374B52F8550F7D0E416B3550F9B58F9DC839F62C938197FE9F56FA8E`; `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.asi` is still present at 652,288 bytes with SHA-256 `94C32FD8653544CEB75360E432C242AA0197A78ADCB932C51761CC12F87E98A8`; and both `D:\Games\Grand Theft Auto IV\agent.ini` and `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log` were absent before launch.
   - 2026-04-17 latest delete-then-start retry: deleted `D:\Games\Grand Theft Auto IV\agent.ini`, `D:\Games\Grand Theft Auto IV\ScriptHook.log`, and `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log`, launched `D:\Games\Grand Theft Auto IV\GTAIV.exe`, waited 15 seconds, and observed the process exit on its own with code `-1073741819`. After the retry, `D:\Games\Grand Theft Auto IV\agent.ini` was still absent, `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log` was still absent, and `D:\Games\Grand Theft Auto IV\ScriptHook.log` refreshed to `2026-04-17T22:47:18.0237387+02:00` at 263 bytes with SHA-256 `E2A640EB9E1A519A4DCD47262A92F5A6E75359D8A14E21D6B286F953DFA674F7`, still ending at:
     ```text
