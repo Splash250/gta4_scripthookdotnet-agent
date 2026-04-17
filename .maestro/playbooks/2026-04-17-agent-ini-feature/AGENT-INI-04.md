@@ -15,6 +15,22 @@ Verify the end-to-end feature against the real build output and document exactly
 - [x] Run a clean release build with `& "C:\Program Files (x86)\Microsoft Visual Studio\18\BuildTools\MSBuild\Current\Bin\MSBuild.exe" ScriptHookDotNet.sln /t:Clean,Build /p:Configuration=Release /p:Platform=Win32 /m /v:minimal` or equivalent clean-then-build sequence and confirm `bin/ScriptHookDotNet.asi` is produced.
   - 2026-04-17: Verified locally with exit code 0. Output artifact: `D:\Games\GTAIV_Modding\gta4_scripthookdotnet-agent\bin\ScriptHookDotNet.asi` (652,288 bytes, 2026-04-17 15:33:30).
 - [ ] Verify that deleting `<gta-root>\\agent.ini` before startup causes ScriptHookDotNet to recreate it automatically on the next initialization path, and record the observed default file contents in the task comment.
+  - 2026-04-17 latest delete-then-start retry: deleted `D:\Games\Grand Theft Auto IV\agent.ini`, `D:\Games\Grand Theft Auto IV\ScriptHook.log`, and `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log`, launched `D:\Games\Grand Theft Auto IV\GTAIV.exe`, waited up to 15 seconds, and then had to terminate the still-running process. After termination, the process reported exit code `-1073741819`. `D:\Games\Grand Theft Auto IV\agent.ini` was still absent, `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log` was still absent, and `D:\Games\Grand Theft Auto IV\ScriptHook.log` refreshed to `2026-04-17 21:56:29` at 263 bytes with SHA-256 `E8E3E2B68A3E3EC55C311B804A353CDB8E90F15F84131F7741C9294680DB2A1E`, still ending at:
+    ```text
+    -----------------------------------------------
+    [INFO] GTA IV Script Hook 0.5.1 - (C) 2009, Aru - Initialized
+    [INFO] Process base address: 0xcc0000
+    [INFO] Auto detecting game version
+    [FATAL] Failed to detect game version
+    ```
+    Repo-side expectations remain unchanged: `ScriptHook\Game.h` still exposes only `Version101` through `Version104`, while `ScriptHookDotNet\NetHook.cpp` still reaches `EnsureAgentIniExists()` only after native startup succeeds. If startup ever reaches that managed bootstrap path, the seeded default payload would still be:
+    ```ini
+    # Auto-created by ScriptHookDotNet for agent bootstrap
+
+    [Agent]
+    Enabled=true
+    ```
+    This checkbox remains blocked and stays unchecked because the current live `1.0.8.0` runtime still fails in native `ScriptHook.dll` version detection before `ScriptHookDotNet.asi` reaches the managed initialization path that would recreate `agent.ini`.
   - 2026-04-17 latest verification pass: no task images were present under `.maestro/playbooks/2026-04-17-agent-ini-feature`, so `0` images were analyzed for this pass. Confirmed the working folder still exists at `D:\Games\GTAIV_Modding\gta4_scripthookdotnet-agent\.maestro\playbooks\Working`. Re-ran `python -m pytest tests/test_agent_ini_bootstrap.py tests/test_agent_ini_runtime.py -q`, which passed (`13 passed in 0.02s`). Reconfirmed deployment parity with the live target: `D:\Games\Grand Theft Auto IV\GTAIV.exe` is still version `1, 0, 8, 0` (15,628,696 bytes), `D:\Games\Grand Theft Auto IV\ScriptHook.dll` still matches `dist\ScriptHook.dll` at SHA-256 `2B10866A374B52F8550F7D0E416B3550F9B58F9DC839F62C938197FE9F56FA8E`, and `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.asi` still matches `bin\ScriptHookDotNet.asi` at SHA-256 `94C32FD8653544CEB75360E432C242AA0197A78ADCB932C51761CC12F87E98A8`.
   - 2026-04-17 latest delete-then-start retry: deleted `D:\Games\Grand Theft Auto IV\agent.ini`, `D:\Games\Grand Theft Auto IV\ScriptHook.log`, and `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log`, launched `D:\Games\Grand Theft Auto IV\GTAIV.exe`, waited up to 15 seconds, and observed the process exit on its own with code `-1073741819`. After the launch, `D:\Games\Grand Theft Auto IV\agent.ini` was still absent, `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log` was still absent, and `D:\Games\Grand Theft Auto IV\ScriptHook.log` refreshed to `2026-04-17 21:54:18` at 263 bytes with SHA-256 `0062A949A61760B42EC1656E26AE1E15A74C58521882AFE2B1E18D8883EE6F78`, still ending at:
     ```text
