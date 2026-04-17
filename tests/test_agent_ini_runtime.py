@@ -205,6 +205,29 @@ class AgentIniRuntimeTests(unittest.TestCase):
         self.assertNotIn("Helper::StringToFile", agent_branch)
         self.assertNotIn("Save(", agent_branch)
 
+    def test_script_loading_is_deferred_until_tick_can_run_scripts_gate_opens(self) -> None:
+        net_hook_content = NET_HOOK_CPP.read_text(encoding="utf-8")
+
+        initialize_start = net_hook_content.index("void NetHook::Initialize(bool isPrimary, int hModule){")
+        initialize_end = net_hook_content.index("bool NetHook::isInsideScript::get() {", initialize_start)
+        initialize_body = net_hook_content[initialize_start:initialize_end]
+        primary_block_start = initialize_body.rindex("if (isPrimary) {")
+        primary_block_end = initialize_body.index("} else {", primary_block_start)
+        primary_block = initialize_body[primary_block_start:primary_block_end]
+
+        self.assertIn("pScriptDomain->RequestAction(ScriptAction::LoadScripts);", primary_block)
+        self.assertNotIn("pScriptDomain->LoadScripts();", primary_block)
+
+        tick_start = net_hook_content.index("void NetHook::Tick() {")
+        tick_end = net_hook_content.index("[System::Runtime::ExceptionServices::HandleProcessCorruptedStateExceptions]", tick_start + 1)
+        tick_body = net_hook_content[tick_start:tick_end]
+        self.assertIn("if (!CanScriptsRunNow) return;", tick_body)
+        self.assertIn("ScriptDomain->Tick();", tick_body)
+        self.assertLess(
+            tick_body.index("if (!CanScriptsRunNow) return;"),
+            tick_body.index("ScriptDomain->Tick();"),
+        )
+
     def test_settingsfile_tracks_last_load_outcome(self) -> None:
         header = SETTINGS_FILE_H.read_text(encoding="utf-8")
         content = SETTINGS_FILE_CPP.read_text(encoding="utf-8")
