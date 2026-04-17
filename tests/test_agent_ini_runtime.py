@@ -131,6 +131,29 @@ class AgentIniRuntimeTests(unittest.TestCase):
         self.assertIn('else if (cmd == "sendcommand")', script_domain_content)
         self.assertIn('NetHook::Console->SendCommand((String^)ev->Argument(1));', script_domain_content)
 
+    def test_builtin_console_dispatch_handles_agent_before_script_commands_and_without_write_calls(self) -> None:
+        console_content = CONSOLE_CPP.read_text(encoding="utf-8")
+        net_hook_content = NET_HOOK_CPP.read_text(encoding="utf-8")
+
+        send_command_start = console_content.index("void Console::SendCommand(String^ CommandLine) {")
+        send_command_end = console_content.index("void Console::AddOldCommand(String^ CommandLine) {", send_command_start)
+        send_command_body = console_content[send_command_start:send_command_end]
+        self.assertIn("AddOldCommand(CommandLine);", send_command_body)
+        self.assertIn('Print("> " +  CommandLine);', send_command_body)
+        self.assertIn("OnCommand(gcnew ConsoleEventArgs(cmd,params->ToArray()));", send_command_body)
+        self.assertNotIn("Helper::StringToFile", send_command_body)
+        self.assertNotIn("Save(", send_command_body)
+
+        console_command_start = net_hook_content.index("void NetHook::ConsoleCommand(Object^ sender, ConsoleEventArgs^ e) {")
+        console_command_end = net_hook_content.index("[System::Runtime::ExceptionServices::HandleProcessCorruptedStateExceptions]", console_command_start)
+        console_command_body = net_hook_content[console_command_start:console_command_end]
+        self.assertIn("if (ConsoleCommands::ProcessCommand(e)) return;", console_command_body)
+        self.assertIn("ScriptDomain->TriggerEvent(ScriptEvent::ConsoleCommand, e);", console_command_body)
+        self.assertLess(
+            console_command_body.index("if (ConsoleCommands::ProcessCommand(e)) return;"),
+            console_command_body.index("ScriptDomain->TriggerEvent(ScriptEvent::ConsoleCommand, e);"),
+        )
+
     def test_settingsfile_tracks_last_load_outcome(self) -> None:
         header = SETTINGS_FILE_H.read_text(encoding="utf-8")
         content = SETTINGS_FILE_CPP.read_text(encoding="utf-8")
