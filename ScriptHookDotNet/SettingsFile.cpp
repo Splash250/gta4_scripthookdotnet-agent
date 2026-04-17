@@ -35,6 +35,8 @@ namespace GTA {
 		pFilename = Filename;
 		categories = gcnew Collections::Generic::Dictionary<String^,SettingCategory^>();
 		bChanged = false;
+		bLastLoadSucceeded = false;
+		bLastLoadHadParseErrors = false;
 	}
 	SettingsFile^ SettingsFile::Open(String^ Filename) {
 		return ContentCache::GetINI(Filename);
@@ -66,16 +68,28 @@ namespace GTA {
 
 	void SettingsFile::Load() {
 		Clear();
-		array<String^>^ Lines = Helper::StringToLines(Helper::FileToString(Filename, System::Text::Encoding::ASCII));
-		//if (Lines->Length == 0) NetHook::Log("No settings in file '"+Filename+"'!");
-		CurrentCategory = String::Empty;
-		for (int i = 0; i < Lines->Length; i++) {
-			if (!bAddNextLine)
-				ParseLine(Lines[i]);
-			else
-				ParseAddLine(Lines[i]);
-		}
-		bChanged = false;
+		bLastLoadSucceeded = false;
+		bLastLoadHadParseErrors = false;
+		try {
+			IO::FileStream^ fs = gcnew IO::FileStream(Filename, IO::FileMode::Open, IO::FileAccess::Read, IO::FileShare::Read);
+			IO::StreamReader^ sr = gcnew IO::StreamReader(fs, System::Text::Encoding::ASCII, true);
+			String^ data = sr->ReadToEnd();
+			sr->Close();
+			fs->Close();
+			delete sr;
+			delete fs;
+
+			array<String^>^ Lines = Helper::StringToLines(data);
+			CurrentCategory = String::Empty;
+			for (int i = 0; i < Lines->Length; i++) {
+				if (!bAddNextLine)
+					ParseLine(Lines[i]);
+				else
+					ParseAddLine(Lines[i]);
+			}
+			bChanged = false;
+			bLastLoadSucceeded = !bLastLoadHadParseErrors;
+		} catchErrors("Error while loading setting file '"+Filename+"'", bChanged = false; bLastLoadSucceeded = false; )
 	}
 	void SettingsFile::ParseLine(String^ DataLine) {
 		try {
@@ -109,7 +123,7 @@ namespace GTA {
 			//values->Add(name->ToLower(), val);
 			GetCategory(CurrentCategory)->SetValue(name, val);
 			//NetHook::Log("Found setting '"+name+"' with value '"+val+"'!");
-		} catchErrors("Error in setting file '"+Filename+"'",)//catch(...) {}
+		} catchErrors("Error in setting file '"+Filename+"'", bLastLoadHadParseErrors = true; )//catch(...) {}
 	}
 	void SettingsFile::ParseAddLine(String^ DataLine) {
 		bAddNextLine = false;
@@ -131,7 +145,7 @@ namespace GTA {
 				DataLine = String::Empty;
 			}
 			SetValue(CurrentCategory, pLastValueName, GetValueString(pLastValueName, CurrentCategory, String::Empty) + Environment::NewLine + DataLine);
-		} catchErrors("Error in setting file '"+Filename+"'",)//catch(...) {}
+		} catchErrors("Error in setting file '"+Filename+"'", bLastLoadHadParseErrors = true; )//catch(...) {}
 	}
 
 	bool SettingsFile::Save() {

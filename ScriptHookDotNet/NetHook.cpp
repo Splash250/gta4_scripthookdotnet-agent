@@ -36,6 +36,7 @@
 #include "Player.h"
 #include "RemoteScriptDomain.h"
 #include "ScriptDomain.h"
+#include "SettingsFile.h"
 #include "StartupThreadC.h"
 #include "fFormHost.h"
 #include "fMouse.h"
@@ -55,6 +56,7 @@ namespace GTA {
 
 	bool NetHook::EnsureAgentIniExists() {
 		String^ agentIniPath = GetAgentIniPath();
+		pAgentIniPath = agentIniPath;
 		if (System::IO::File::Exists(agentIniPath)) return true;
 
 		String^ defaultContents =
@@ -69,6 +71,64 @@ namespace GTA {
 			Log("agent.ini creation failed at '" + agentIniPath + "'.");
 		}
 		return created;
+	}
+
+	bool NetHook::EnsureAgentIniLoaded() {
+		String^ agentIniPath = GetAgentIniPath();
+		pAgentIniPath = agentIniPath;
+		if (!EnsureAgentIniExists()) {
+			pAgentIniSettings = nullptr;
+			return false;
+		}
+
+		pAgentIniSettings = GTA::SettingsFile::Open(agentIniPath);
+		if isNULL(pAgentIniSettings) return false;
+		pAgentIniSettings->Load();
+		return true;
+	}
+
+	String^ NetHook::FormatAgentIniForConsole() {
+		String^ agentIniPath = pAgentIniPath;
+		if (isNULL(agentIniPath) || (agentIniPath->Length == 0)) {
+			agentIniPath = GetAgentIniPath();
+			pAgentIniPath = agentIniPath;
+		}
+		if (!System::IO::File::Exists(agentIniPath) || isNULL(pAgentIniSettings)) {
+			if (!EnsureAgentIniLoaded()) {
+				return "agent.ini load failed at '" + agentIniPath + "'.";
+			}
+		}
+		if (isNULL(pAgentIniSettings)) {
+			return "agent.ini load failed at '" + agentIniPath + "'.";
+		}
+		if (!pAgentIniSettings->LastLoadSucceeded || pAgentIniSettings->LastLoadHadParseErrors) {
+			return "agent.ini load failed at '" + agentIniPath + "'.";
+		}
+
+		System::Text::StringBuilder^ sb = gcnew System::Text::StringBuilder();
+		array<String^>^ categories = pAgentIniSettings->GetCategoryNames();
+		bool hasValues = false;
+
+		for (int i = 0; i < categories->Length; i++) {
+			String^ categoryName = categories[i];
+			array<String^>^ valueNames = pAgentIniSettings->GetValueNames(categoryName);
+			Array::Sort(valueNames, StringComparer::InvariantCultureIgnoreCase);
+			if (valueNames->Length == 0) continue;
+
+			if (sb->Length > 0) sb->AppendLine();
+			sb->AppendLine("[" + ((categoryName->Length > 0) ? categoryName : "Default") + "]");
+			for (int n = 0; n < valueNames->Length; n++) {
+				String^ value = pAgentIniSettings->GetValueString(valueNames[n], categoryName, String::Empty);
+				value = value->Replace("\r", String::Empty)->Replace("\n", "\\n");
+				sb->AppendLine(valueNames[n] + "=" + value);
+			}
+			hasValues = true;
+		}
+
+		if (!hasValues) {
+			return "agent.ini is present but contains no settings.";
+		}
+		return sb->ToString()->TrimEnd();
 	}
 
 	[Security::Permissions::SecurityPermissionAttribute(Security::Permissions::SecurityAction::Demand, ControlAppDomain = true )]
@@ -146,6 +206,7 @@ namespace GTA {
 
 			if (isPrimary) {
 				if (!EnsureAgentIniExists()) return;
+				if (!EnsureAgentIniLoaded()) return;
 
 				GTA::Console^ cons = (GTA::Console^)pConsole;
 				pFormHost = gcnew GTA::Forms::FormHost(nullptr);

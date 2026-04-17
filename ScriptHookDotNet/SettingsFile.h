@@ -44,6 +44,8 @@ namespace GTA {
 		String^ pFilename;
 		Collections::Generic::Dictionary<String^,SettingCategory^>^ categories;
 		bool bChanged;
+		bool bLastLoadSucceeded;
+		bool bLastLoadHadParseErrors;
 		String^ pLastValueName;
 		bool bAddNextLine;
 		String^ CurrentCategory;
@@ -72,6 +74,16 @@ namespace GTA {
 		property String^ Filename {
 			String^ get() {
 				return pFilename;
+			}
+		}
+		property bool LastLoadSucceeded {
+			bool get() {
+				return bLastLoadSucceeded;
+			}
+		}
+		property bool LastLoadHadParseErrors {
+			bool get() {
+				return bLastLoadHadParseErrors;
 			}
 		}
 

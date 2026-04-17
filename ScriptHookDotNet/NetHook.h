@@ -25,6 +25,8 @@
 
 namespace GTA{
 
+	ref class SettingsFile;
+
 	using namespace System::Reflection;
 	using namespace System::CodeDom::Compiler;
 
@@ -68,6 +70,8 @@ namespace GTA{
 		static GTA::base::Mouse^ pMouse;
 		static GTA::KeyWatchDog^ pKeys;
 		static GTA::KeyboardLayout^ pKeyboardLayout;
+		static String^ pAgentIniPath = nullptr;
+		static GTA::SettingsFile^ pAgentIniSettings = nullptr;
 
 		//static System::Object^ syncrootLog = gcnew System::Object();
 
@@ -190,6 +194,8 @@ namespace GTA{
 		static void TryToDisableMouse();
 		static String^ GetAgentIniPath();
 		static bool EnsureAgentIniExists();
+		static bool EnsureAgentIniLoaded();
+		static String^ FormatAgentIniForConsole();
 
 		static void Log(String^ Text);
 		static void Log(String^ Text, Exception^ ex);
