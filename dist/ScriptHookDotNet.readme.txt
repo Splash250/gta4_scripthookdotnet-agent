@@ -149,6 +149,11 @@ If a script does not run, take a look at the logfile
 ScriptHookDotNet.log . It will write down all errors that
 occur during compiling or runtime.
 
+Maintainer note: the built-in console help now includes an
+"agent" command that prints the current agent.ini contents.
+On startup, ScriptHookDotNet also creates agent.ini in the
+main GTAIV folder automatically when the file is missing.
+
 Do NOT include ScriptHookDotNet.asi or ScriptHookDotNet.dll
 in the release of your script! Link to this thread instead!
 
