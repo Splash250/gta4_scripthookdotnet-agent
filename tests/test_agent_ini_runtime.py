@@ -59,6 +59,27 @@ class AgentIniRuntimeTests(unittest.TestCase):
         self.assertIn("if (!System::IO::File::Exists(agentIniPath) || isNULL(pAgentIniSettings))", format_body)
         self.assertIn('return sb->ToString()->TrimEnd();', format_body)
 
+    def test_agent_console_read_path_keeps_existing_agent_ini_read_only(self) -> None:
+        nethook_content = NET_HOOK_CPP.read_text(encoding="utf-8")
+        settings_content = SETTINGS_FILE_CPP.read_text(encoding="utf-8")
+
+        load_start = settings_content.index("void SettingsFile::Load() {")
+        parse_line_start = settings_content.index("void SettingsFile::ParseLine(String^ DataLine) {")
+        load_body = settings_content[load_start:parse_line_start]
+        self.assertIn(
+            "IO::FileStream^ fs = gcnew IO::FileStream(Filename, IO::FileMode::Open, IO::FileAccess::Read, IO::FileShare::Read);",
+            load_body,
+        )
+        self.assertNotIn("Save();", load_body)
+        self.assertIn("bChanged = false;", load_body)
+
+        format_start = nethook_content.index("String^ NetHook::FormatAgentIniForConsole() {")
+        format_end = nethook_content.index("[Security::Permissions::SecurityPermissionAttribute", format_start)
+        format_body = nethook_content[format_start:format_end]
+        self.assertIn("pAgentIniSettings->Load();", nethook_content)
+        self.assertNotIn("Save(", format_body)
+        self.assertNotIn("StringToFile", format_body)
+
     def test_settingsfile_tracks_last_load_outcome(self) -> None:
         header = SETTINGS_FILE_H.read_text(encoding="utf-8")
         content = SETTINGS_FILE_CPP.read_text(encoding="utf-8")
