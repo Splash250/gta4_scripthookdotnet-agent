@@ -50,6 +50,7 @@ namespace GTA {
 
 		if (cmd == "help") { // HELP
 			Console->Print("Commands:\n\
+				Agent              - Prints the current agent.ini contents.\n\
 				AbortScripts       - Abort all .Net scripts. Useful if you want to play multiplayer.\n\
 				Autosave           - Trigger an autosave\n\
 				Exit               - Leave the game\n\
@@ -105,6 +106,11 @@ namespace GTA {
 
 		} else if (cmd == "autosave") { // AUTOSAVE
 			GTA::Game::DoAutoSave();
+			return true;
+
+		} else if (cmd == "agent") { // AGENT
+			Console->Print("Agent command:");
+			Console->Print(NetHook::FormatAgentIniForConsole());
 			return true;
 
 		} else if (cmd == "flip") { // FLIP

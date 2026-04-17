@@ -5,6 +5,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SCRIPT_HOOK_ROOT = REPO_ROOT / "ScriptHookDotNet"
+CONSOLE_COMMANDS_CPP = SCRIPT_HOOK_ROOT / "ConsoleCommands.cpp"
 NET_HOOK_CPP = SCRIPT_HOOK_ROOT / "NetHook.cpp"
 NET_HOOK_H = SCRIPT_HOOK_ROOT / "NetHook.h"
 SETTINGS_FILE_CPP = SCRIPT_HOOK_ROOT / "SettingsFile.cpp"
@@ -12,6 +13,14 @@ SETTINGS_FILE_H = SCRIPT_HOOK_ROOT / "SettingsFile.h"
 
 
 class AgentIniRuntimeTests(unittest.TestCase):
+    def test_console_commands_expose_agent_command_and_help_text(self) -> None:
+        content = CONSOLE_COMMANDS_CPP.read_text(encoding="utf-8")
+
+        self.assertIn('Agent              - Prints the current agent.ini contents.', content)
+        self.assertIn('} else if (cmd == "agent") { // AGENT', content)
+        self.assertIn('Console->Print("Agent command:");', content)
+        self.assertIn("Console->Print(NetHook::FormatAgentIniForConsole());", content)
+
     def test_nethook_declares_shared_agent_ini_runtime_helpers(self) -> None:
         header = NET_HOOK_H.read_text(encoding="utf-8")
 
