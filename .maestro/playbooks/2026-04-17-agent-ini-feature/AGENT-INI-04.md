@@ -120,6 +120,16 @@ Verify the end-to-end feature against the real build output and document exactly
     Enabled=true
     ```
     but the checkbox remains blocked because the currently available native ScriptHook runtime still fails before `NetHook::Initialize(bool isPrimary, ...)` can create or load `agent.ini`.
+  - 2026-04-17 current run evidence refresh: re-ran `python -m pytest tests\test_agent_ini_bootstrap.py tests\test_agent_ini_runtime.py -q` and it still passed (`7 passed in 0.02s`). The deployed binaries under `D:\Games\Grand Theft Auto IV` still hash-match `dist\ScriptHook.dll` and `bin\ScriptHookDotNet.asi`, `D:\Games\Grand Theft Auto IV\GTAIV.exe` still reports `1.0.8.0`, and `D:\Games\Grand Theft Auto IV\ScriptHook.log` still contains only:
+    ```text
+    Log start: Fri Apr 17 15:58:49 2026
+    -----------------------------------------------
+    [INFO] GTA IV Script Hook 0.5.1 - (C) 2009, Aru - Initialized
+    [INFO] Process base address: 0xcc0000
+    [INFO] Auto detecting game version
+    [FATAL] Failed to detect game version
+    ```
+    `Test-Path` is still `False` for both `D:\Games\Grand Theft Auto IV\agent.ini` and `D:\Games\Grand Theft Auto IV\ScriptHookDotNet.log`. Repo inspection is unchanged: the managed side still supports `GameVersion::v1080` in `ScriptHookDotNet\NetHook.cpp`, but the checked-in native `ScriptHook\Game.h` source still exposes only `Version101` through `Version104`, and there is still no repo project that rebuilds `dist\ScriptHook.dll`. This checkbox therefore remains blocked on the external native ScriptHook startup path and cannot be marked complete in the current local environment.
 - [ ] Verify that editing `<gta-root>\\agent.ini` to contain real key/value data causes `/agent` to print the existing contents rather than overwriting the file.
 - [ ] Verify that invoking `/agent` after startup on an existing populated file does not change the file timestamp or contents unless the file had to be created because it was missing.
 - [ ] Add a short maintainer note to an appropriate docs file, such as `README.md`, `ScriptHookDotNet.readme.txt`, or a repo-local docs page, only if the project already documents built-in console commands there. The note should mention automatic `agent.ini` creation and the `agent` console command.
