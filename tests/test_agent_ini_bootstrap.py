@@ -4,12 +4,29 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+SOLUTION_FILE = REPO_ROOT / "ScriptHookDotNet.sln"
 SCRIPT_HOOK_ROOT = REPO_ROOT / "ScriptHookDotNet"
+PROJECT_FILE = SCRIPT_HOOK_ROOT / "ScriptHookDotNet.vcxproj"
+NATIVE_HOOK_GAME_H = REPO_ROOT / "ScriptHook" / "Game.h"
 NET_HOOK_CPP = SCRIPT_HOOK_ROOT / "NetHook.cpp"
 NET_HOOK_H = SCRIPT_HOOK_ROOT / "NetHook.h"
 
 
 class AgentIniBootstrapTests(unittest.TestCase):
+    def test_solution_builds_only_managed_asi_against_prebuilt_native_scripthook(self) -> None:
+        solution = SOLUTION_FILE.read_text(encoding="utf-8")
+        project = PROJECT_FILE.read_text(encoding="utf-8")
+        native_game_header = NATIVE_HOOK_GAME_H.read_text(encoding="utf-8")
+
+        self.assertIn('Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ScriptHookDotNet"', solution)
+        self.assertNotIn('Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "ScriptHook"', solution)
+        self.assertIn("$(ProjectDir)ScriptHook.lib", project)
+        self.assertRegex(
+            native_game_header,
+            re.compile(r"enum eVersion\s*\{[\s\S]*Version101,[\s\S]*Version104,[\s\S]*\};", re.MULTILINE),
+        )
+        self.assertNotIn("Version108", native_game_header)
+
     def test_nethook_declares_agent_ini_helpers(self) -> None:
         header = NET_HOOK_H.read_text(encoding="utf-8")
 
