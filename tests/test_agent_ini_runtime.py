@@ -97,6 +97,22 @@ class AgentIniRuntimeTests(unittest.TestCase):
         self.assertNotIn("Save(", branch_body)
         self.assertNotIn("SetValue(", branch_body)
 
+    def test_showposition_remains_the_observable_probe_command_for_live_console_checks(self) -> None:
+        content = CONSOLE_COMMANDS_CPP.read_text(encoding="utf-8")
+
+        self.assertIn(
+            "ShowPosition       - Displays the current position of the player and writes it to the log file.",
+            content,
+        )
+
+        branch_start = content.index('} else if (cmd == "showposition") { // SHOWPOSITION')
+        branch_end = content.index('} else if (cmd == "spawn") { // SPAWN', branch_start)
+        branch_body = content[branch_start:branch_end]
+
+        self.assertIn('NetHook::Log("Current Position: " + Player->Character->Position.ToString() + " Heading:" + Helper::FloatToString(Player->Character->Heading) );', branch_body)
+        self.assertNotIn("Helper::StringToFile", branch_body)
+        self.assertNotIn("Save(", branch_body)
+
     def test_agent_console_command_prints_loaded_settings_not_bootstrap_seed(self) -> None:
         console_commands_content = CONSOLE_COMMANDS_CPP.read_text(encoding="utf-8")
         net_hook_content = NET_HOOK_CPP.read_text(encoding="utf-8")
