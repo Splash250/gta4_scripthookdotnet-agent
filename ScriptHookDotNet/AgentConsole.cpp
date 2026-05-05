@@ -149,6 +149,32 @@ namespace GTA {
 		return lines;
 	}
 
+	bool AgentConsole::LooksLikeGameActionRequest(String^ input) {
+		if (String::IsNullOrWhiteSpace(input)) return false;
+
+		String^ normalized = input->Trim()->ToLowerInvariant();
+		array<String^>^ verbs = gcnew array<String^>{ "make", "change", "paint", "turn", "set", "give", "spawn", "teleport", "fix", "heal", "reload" };
+		array<String^>^ objects = gcnew array<String^>{ "boat", "car", "vehicle", "player", "health", "armor", "armour", "color", "red", "blue", "green", "time", "scripts" };
+		bool hasVerb = false;
+		bool hasObject = false;
+
+		for each (String^ verb in verbs) {
+			if (normalized->Contains(verb)) {
+				hasVerb = true;
+				break;
+			}
+		}
+
+		for each (String^ obj in objects) {
+			if (normalized->Contains(obj)) {
+				hasObject = true;
+				break;
+			}
+		}
+
+		return hasVerb && hasObject;
+	}
+
 	int AgentConsole::FirstLineOnScreen() {
 		int res = LastLineOnScreen() - LinesPerScreen + 1;
 		if (res < 0) res = 0;
