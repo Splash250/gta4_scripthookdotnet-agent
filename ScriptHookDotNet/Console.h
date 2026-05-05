@@ -164,6 +164,7 @@ namespace GTA {
 		List<String^>^ pLastCommands;
 		int OldSelect;
 		int LineOffset;
+		static const int MAX_INPUT_LINES = 6;
 		static const int MAX_COMMANDS = 20;
 		static const int MAX_LOG_LINES = 200;
 		static const float WIDTH = 1.0f;
@@ -180,6 +181,8 @@ namespace GTA {
 
 		int ArrayIndexToPos(int Index);
 		int NewestToArrayIndex(int Index);
+		int GetInputLineCount(int screenWidth);
+		System::Collections::Generic::List<String^>^ WrapInputLines(String^ text, int screenWidth, bool includeCaret);
 		void PollWorker();
 		void SendCommand();
 		void AddPrintLine(String^ Text);

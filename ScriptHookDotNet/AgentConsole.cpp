@@ -37,6 +37,9 @@
 
 namespace GTA {
 
+	using namespace System::Collections::Generic;
+	using namespace System::Windows::Forms;
+
 	AgentConsole::AgentConsole() {
 		bActive = false;
 		pPreviousResponseId = String::Empty;
@@ -67,7 +70,7 @@ namespace GTA {
 	}
 
 	int AgentConsole::LinesPerScreen::get() {
-		return int((pHeight - pBorder) / pFont->GetLineHeight(FontScaling::Pixel)) - 1;
+		return int((pHeight - pBorder) / pFont->GetLineHeight(FontScaling::Pixel)) - GetInputLineCount(Game::Resolution.Width);
 	}
 	int AgentConsole::LineCount::get() {
 		return pLog->Count;
@@ -78,6 +81,68 @@ namespace GTA {
 	}
 	int AgentConsole::NewestToArrayIndex(int Index) {
 		return pLastCommands->Count - Index - 1;
+	}
+
+	int AgentConsole::GetInputLineCount(int screenWidth) {
+		List<String^>^ lines = WrapInputLines(pInput, screenWidth, false);
+		return lines->Count;
+	}
+
+	List<String^>^ AgentConsole::WrapInputLines(String^ text, int screenWidth, bool includeCaret) {
+		List<String^>^ lines = gcnew List<String^>();
+		String^ input = isNULL(text) ? String::Empty : text;
+		if (includeCaret && (DateTime::Now.Millisecond < 500)) input += "_";
+
+		String^ prefixFirst = " > ";
+		String^ prefixNext = "   ";
+		int maxWidth = screenWidth - int((pBorder * 2.0f) + 24.0f);
+		if (maxWidth < 32) maxWidth = 32;
+
+		Drawing::Font^ font = pFont->WindowsFont;
+		int index = 0;
+		bool firstLine = true;
+
+		if (input->Length == 0) {
+			lines->Add(prefixFirst);
+			return lines;
+		}
+
+		while (index < input->Length) {
+			String^ prefix = firstLine ? prefixFirst : prefixNext;
+			int start = index;
+			int lastBreak = -1;
+			int candidateLength = 0;
+
+			while (index < input->Length) {
+				wchar_t ch = input[index];
+				if (Char::IsWhiteSpace(ch)) lastBreak = index;
+
+				String^ candidate = prefix + input->Substring(start, (index - start) + 1);
+				int measuredWidth = TextRenderer::MeasureText(candidate, font, Drawing::Size(Int32::MaxValue, Int32::MaxValue), TextFormatFlags::NoPadding | TextFormatFlags::SingleLine).Width;
+				if (measuredWidth > maxWidth) {
+					if (lastBreak >= start) {
+						candidateLength = lastBreak - start;
+						index = lastBreak + 1;
+					}
+					break;
+				}
+
+				candidateLength = (index - start) + 1;
+				index++;
+			}
+
+			if (candidateLength <= 0) candidateLength = 1;
+
+			String^ segment = input->Substring(start, candidateLength)->TrimEnd();
+			lines->Add(prefix + segment);
+			firstLine = false;
+
+			while ((index < input->Length) && Char::IsWhiteSpace(input[index])) index++;
+		}
+
+		if (lines->Count == 0) lines->Add(prefixFirst);
+		while (lines->Count > MAX_INPUT_LINES) lines->RemoveAt(0);
+		return lines;
 	}
 
 	int AgentConsole::FirstLineOnScreen() {
@@ -122,6 +187,8 @@ namespace GTA {
 
 		Drawing::Size res = Game::Resolution;
 		pHeight = pHeightPercentage * res.Height;
+		List<String^>^ inputLines = WrapInputLines(pInput, res.Width, true);
+		float inputHeight = lh * inputLines->Count;
 
 		if (scrollOffset >= 0) LineOffset = posToLineOffset(NetHook::Mouse->PositionPixel.Y + scrollOffset);
 
@@ -129,10 +196,13 @@ namespace GTA {
 		scrollRect = Drawing::RectangleF(res.Width - scrWidth, LineScrollPos(FirstLineOnScreen()), scrWidth, LineScrollPos(LinesOnScreen));
 		Graphics->DrawRectangle(scrollRect, pForeColor);
 
-		bool blink = (DateTime::Now.Millisecond < 500);
-		float pos = pHeight - lh - (pBorder * 0.5F);
-		Graphics->DrawText(" > " + pInput->Replace("~", "~~") + (blink ? "_" : String::Empty), pBorder, pos, pFont);
-
+		float pos = pHeight - inputHeight - (pBorder * 0.5F);
+		for (int i = 0; i < inputLines->Count; i++) {
+			Graphics->DrawText(inputLines[i]->Replace("~", "~~"), pBorder, pos, pFont);
+			pos += lh;
+		}
+		pos = pHeight - inputHeight - (pBorder * 0.5F);
+		
 		if (pLog->Count > 0) {
 			for (int i = pLog->Count - 1 - LineOffset; i >= 0; i--) {
 				pos -= lh;
