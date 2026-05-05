@@ -226,9 +226,9 @@ namespace GTA {
 	String^ AgentCommandSemantics::GetSemanticNotes(String^ commandName) {
 		if (String::IsNullOrEmpty(commandName)) return String::Empty;
 		String^ name = commandName->Trim()->ToLowerInvariant();
-		if (name == "flip") return "Flips the current vehicle upright. Usually silent on success unless the underlying command reports a problem.";
+		if (name == "flip") return "Flips the current vehicle upright and currently reports the resulting teleport destination on success.";
 		if (name == "heal") return "Restores health and armor to full and repairs the current vehicle. Usually silent on success. Cannot remove armor, set an exact numeric health value, or satisfy vehicle-only repair requests exactly.";
-		if (name == "spawn") return "Spawns a ped, vehicle, or object by exact model name. Usually emits output when the model is invalid or when spawn details are reported.";
+		if (name == "spawn") return "Spawns a ped, vehicle, or object by exact model name. Success is often silent; output is mainly used for invalid models or other error paths.";
 		if (name == "teleport") return "Supports waypoint teleport or explicit coordinates. Usually emits output when reporting a destination or a missing waypoint. Does not infer destinations from vague location descriptions.";
 		if (name == "setdaytime") return "Sets exact in-game time from HH:MM only.";
 		if (name == "settimescale") return "Sets a positive numeric timescale multiplier only.";
@@ -243,7 +243,6 @@ namespace GTA {
 		if (String::IsNullOrEmpty(commandName)) return false;
 		String^ name = commandName->Trim()->ToLowerInvariant();
 		return
-			(name == "flip") ||
 			(name == "heal");
 	}
 
@@ -251,7 +250,7 @@ namespace GTA {
 		if (String::IsNullOrEmpty(commandName)) return false;
 		String^ name = commandName->Trim()->ToLowerInvariant();
 		return
-			(name == "spawn") ||
+			(name == "flip") ||
 			(name == "reloadscripts") ||
 			(name == "showposition") ||
 			(name == "showplayers") ||
