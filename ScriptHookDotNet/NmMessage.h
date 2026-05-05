@@ -73,7 +73,7 @@ namespace Euphoria {
 			ListFloat->default[(int)ValueID] = (float)Value;
 		}
 		void SetValue(nmString ValueID, GTA::base::HandleObject^ Value) {
-			OBJECT_NON_EXISTING_CHECK(Value);
+			OBJECT_NON_EXISTING_CHECK_VOID(Value);
 			if isNULL(ListHandle) ListHandle = gcnew Dictionary<int,u32>();
 			if isNotNULL(Value)
 				ListHandle->default[(int)ValueID] = Value->Handle;

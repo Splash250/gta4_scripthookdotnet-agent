@@ -56,7 +56,7 @@ namespace GTA{
 
 	void SkinTemplate::FromPedSkin(value::PedSkin^ sk) {
 		if isNULL(sk) return;
-		OBJECT_NON_EXISTING_CHECK(sk->ped);
+		OBJECT_NON_EXISTING_CHECK_VOID(sk->ped);
 		int i;
 		pModel = sk->Model;
 		for (i=0; i<PROP_COUNT; i++) {
@@ -74,7 +74,7 @@ namespace GTA{
 
 	void SkinTemplate::ApplyToPed(Ped^ ped) {
 		if isNULL(ped) return;
-		OBJECT_NON_EXISTING_CHECK(ped);
+		OBJECT_NON_EXISTING_CHECK_VOID(ped);
 		value::PedSkin^ sk = ped->Skin;
 		int i;
 		//ped->Model = pModel;

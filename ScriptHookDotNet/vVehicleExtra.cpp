@@ -41,7 +41,7 @@ namespace value {
 		return Scripting::IsVehicleExtraTurnedOn(vehicle->Handle, (Scripting::eVehicleExtra)pID);
 	}
 	void VehicleExtra::Enabled::set(bool value) {
-		OBJECT_NON_EXISTING_CHECK(vehicle);
+		OBJECT_NON_EXISTING_CHECK_VOID(vehicle);
 		Scripting::TurnOffVehicleExtra(vehicle->Handle, pID, !value);
 	}
 

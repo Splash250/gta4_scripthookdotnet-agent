@@ -68,7 +68,7 @@ namespace value {
 	}
 
 	void PedComponent::Change(int model, int texture) {
-		OBJECT_NON_EXISTING_CHECK(ped);
+		OBJECT_NON_EXISTING_CHECK_VOID(ped);
 		if ( (model < 0) || (model >= AvailableModels) ) throw gcnew ArgumentOutOfRangeException("ModelIndex");
 		if ( (texture < 0) || (texture >= GetAvailableTextures(model)) ) throw gcnew ArgumentOutOfRangeException("TextureIndex");
 		Scripting::SetCharComponentVariation(ped->Handle, (Scripting::ePedComponent)pID, (u32)model, (u32)texture);

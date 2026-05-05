@@ -63,7 +63,7 @@ namespace value {
 	}
 	void Weapon::Ammo::set(int value) {
 		if (pID <= GTA::Weapon::Unarmed) return;
-		OBJECT_NON_EXISTING_CHECK(pOwner);
+		OBJECT_NON_EXISTING_CHECK_VOID(pOwner);
 		if (isPresent) {
 			Scripting::SetCharAmmo(pOwner->Handle,(Scripting::eWeapon)pID,value);
 		} else {
@@ -84,7 +84,7 @@ namespace value {
 	}
 	void Weapon::AmmoInClip::set(int value) {
 		if (pID <= GTA::Weapon::Unarmed) return;
-		OBJECT_NON_EXISTING_CHECK(pOwner);
+		OBJECT_NON_EXISTING_CHECK_VOID(pOwner);
 		if (!unmanaged::Native::HasCharGotWeapon(pOwner->Handle,(Scripting::eWeapon)pID)){
 			Scripting::GiveWeaponToChar(pOwner->Handle,(Scripting::eWeapon)pID,1,0);
 		}
@@ -109,7 +109,7 @@ namespace value {
 
 	void Weapon::Select() {
 		if (pID == GTA::Weapon::None) return;
-		OBJECT_NON_EXISTING_CHECK(pOwner);
+		OBJECT_NON_EXISTING_CHECK_VOID(pOwner);
 		Scripting::eWeapon w = (Scripting::eWeapon)pID;
 		if (!Scripting::HasCharGotWeapon(pOwner->Handle,w)) {
 			Scripting::GiveWeaponToChar(pOwner->Handle,w,1,0);
@@ -118,7 +118,7 @@ namespace value {
 	}
 	void Weapon::Remove() {
 		if (pID <= GTA::Weapon::Unarmed) return;
-		OBJECT_NON_EXISTING_CHECK(pOwner);
+		OBJECT_NON_EXISTING_CHECK_VOID(pOwner);
 		Scripting::RemoveWeaponFromChar(pOwner->Handle,(Scripting::eWeapon)pID);
 	}
 

@@ -31,7 +31,9 @@
 
 #pragma managed
 
-#define DrawText DrawText
+#ifdef DrawText
+#undef DrawText
+#endif
 
 namespace GTA {
 

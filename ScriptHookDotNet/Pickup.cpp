@@ -43,7 +43,7 @@ namespace GTA{
 		return Vector3(x,y,z);
 	}
 	void Pickup::Position::set(Vector3 value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		//Scripting::SetPickupCoordinates(pHandle,value.X,value.Y,value.Z);
 		throw gcnew NotImplementedException("It is not possible to change a pickup position");
 	}
@@ -57,12 +57,12 @@ namespace GTA{
 		return Room(force_cast<int>(rk),force_cast<int>(0));
 	}
 	void Pickup::CurrentRoom::set(Room value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::AddPickupToInteriorRoomByKey(pHandle,force_cast<u32>(value.RoomKey));
 	}
 
 	void Pickup::CollectableByCar::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetPickupCollectableByCar(pHandle,value);
 	}
 
@@ -72,8 +72,8 @@ namespace GTA{
 	}
 
 	void Pickup::GiveToPed(Ped^ ped) {
-		NON_EXISTING_CHECK();
-		OBJECT_NON_EXISTING_CHECK(ped);
+		NON_EXISTING_CHECK_VOID();
+		OBJECT_NON_EXISTING_CHECK_VOID(ped);
 		Scripting::GivePedPickupObject(ped->Handle, pHandle, true);
 	}
 
@@ -93,7 +93,7 @@ namespace GTA{
 	}
 
 	void Pickup::Delete() {
-		NON_EXISTING_CHECK_RELAXED();
+		NON_EXISTING_CHECK_RELAXED_VOID();
 		SetExistsFalse();
 		if (pHandle == 0) return;
 		Scripting::RemovePickup(pHandle);

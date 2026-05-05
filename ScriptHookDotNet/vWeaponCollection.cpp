@@ -58,7 +58,7 @@ namespace value {
 	}
 	void WeaponCollection::SetAmmoArray(array<int>^ ammo) {
 		if ( isNULL(ammo) || (ammo->Length < 19) ) return;
-		OBJECT_NON_EXISTING_CHECK(ped);
+		OBJECT_NON_EXISTING_CHECK_VOID(ped);
 		for (int i = 1; i < 19; i++) {
 			if (ammo[i] >= 0)	Scripting::GiveWeaponToChar(ped->Handle,i,ammo[i],0);
 		}
@@ -100,7 +100,7 @@ namespace value {
 		FromType(weapon)->Select();
 	}
 	void WeaponCollection::RemoveAll() {
-		OBJECT_NON_EXISTING_CHECK(ped);
+		OBJECT_NON_EXISTING_CHECK_VOID(ped);
 		Scripting::RemoveAllCharWeapons(ped->Handle);
 	}
 	

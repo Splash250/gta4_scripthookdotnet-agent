@@ -161,7 +161,7 @@ namespace GTA{
 		return gcnew String(Scripting::GetBlipName(pHandle));
 	}
 	void Blip::Name::set(String^ value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		char* stringPointer = (char*)Marshal::StringToHGlobalAnsi(value).ToPointer();
 		Scripting::ChangeBlipNameFromAscii(pHandle,stringPointer);
 		Marshal::FreeHGlobal(IntPtr(stringPointer));
@@ -173,17 +173,17 @@ namespace GTA{
 	}
 
 	void Blip::Friendly::set(bool value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetBlipAsFriendly(pHandle,value);
 	}
 
 	void Blip::Scale::set(float value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::ChangeBlipScale(pHandle,value);
 	}
 
 	void Blip::Transparency::set(float value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::ChangeBlipAlpha(pHandle,value);
 	}
 
@@ -192,7 +192,7 @@ namespace GTA{
 		return Scripting::IsBlipShortRange(pHandle);
 	}
 	void Blip::ShowOnlyWhenNear::set(bool value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetBlipAsShortRange(pHandle,value);
 	}
 
@@ -201,7 +201,7 @@ namespace GTA{
 		return (BlipIcon)Scripting::GetBlipSprite(pHandle);
 	}
 	void Blip::Icon::set(BlipIcon value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::ChangeBlipSprite(pHandle,(Scripting::eBlipSprite)value);
 	}
 
@@ -212,12 +212,12 @@ namespace GTA{
 		return (BlipColor)c;
 	}
 	void Blip::Color::set(BlipColor value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::ChangeBlipColour(pHandle,(Scripting::ColourIndex)value);
 	}
 
 	void Blip::SetColorRGB(Drawing::Color color) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::ChangeBlipColour(pHandle,(Scripting::ColourIndex)color.ToArgb());
 	}
 
@@ -226,22 +226,22 @@ namespace GTA{
 		return (BlipDisplay)Scripting::GetBlipInfoIdDisplay2(pHandle);
 	}
 	void Blip::Display::set(BlipDisplay value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::ChangeBlipDisplay(pHandle,(Scripting::eBlipDisplay)value);
 	}
 
 	void Blip::Priority::set(int value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::ChangeBlipPriority(pHandle,(Scripting::eBlipPriority)value);
 	}
 
 	void Blip::RouteActive::set(bool value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetRoute(pHandle,value);
 	}
 
 	void Blip::Delete() {
-		NON_EXISTING_CHECK_RELAXED();
+		NON_EXISTING_CHECK_RELAXED_VOID();
 		SetExistsFalse();
 		if (pHandle == 0) return;
 		try {

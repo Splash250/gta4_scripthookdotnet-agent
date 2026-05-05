@@ -37,8 +37,8 @@ namespace GTA {
 		Helper() {}
 
 	internal:
-		static String^ vbCr = gcnew String( (unsigned char)13 , 1);
-		static String^ vbLf = gcnew String( (unsigned char)10 , 1);
+		static String^ vbCr = gcnew String(L'\r', 1);
+		static String^ vbLf = gcnew String(L'\n', 1);
 		static System::Globalization::CultureInfo^ CultureIV = System::Globalization::CultureInfo::InvariantCulture;
 		static System::Random^ Random = gcnew System::Random();
 

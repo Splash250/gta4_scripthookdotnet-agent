@@ -59,7 +59,7 @@ namespace GTA{
 		return unmanaged::MemoryAccess::GetPositionOfVehicle(pHandle);
 	}
 	void Vehicle::Position::set(Vector3 value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		unmanaged::Native::SetCarCoordinates(pHandle,value.X,value.Y,value.Z);
 	}
 
@@ -70,7 +70,7 @@ namespace GTA{
 		return val;
 	}
 	void Vehicle::Heading::set(float value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetCarHeading(pHandle,value);
 	}
 	Vector3 Vehicle::Direction::get(){
@@ -81,7 +81,7 @@ namespace GTA{
 		return RotationQuaternion.ToRotation();
 	}
 	void Vehicle::Rotation::set(Vector3 value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		RotationQuaternion = Quaternion::FromRotation(value);
 	}
 
@@ -92,7 +92,7 @@ namespace GTA{
 		return Quaternion(x,y,z,w);
 	}
 	void Vehicle::RotationQuaternion::set(Quaternion value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		unmanaged::Native::SetVehicleQuaternion(pHandle,value.X,value.Y,value.Z,value.W);
 	}
 
@@ -105,7 +105,7 @@ namespace GTA{
 		return Room(force_cast<int>(rk),force_cast<int>(ii));
 	}
 	void Vehicle::CurrentRoom::set(Room value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetRoomForCarByKey( pHandle, force_cast<Scripting::eInteriorRoomKey>(value.InteriorID) );
 	}
 
@@ -115,20 +115,20 @@ namespace GTA{
 	}
 
 	void Vehicle::FreezePosition::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::FreezeCarPosition(pHandle,value);
 	}
 
 	void Vehicle::CanBeDamaged::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetCarCanBeDamaged(pHandle,value);
 	}
 	void Vehicle::CanBeVisiblyDamaged::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetCarCanBeVisiblyDamaged(pHandle,value);
 	}
 	void Vehicle::CanTiresBurst::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetCanBurstCarTyres(pHandle,value);
 	}
 
@@ -139,7 +139,7 @@ namespace GTA{
 		return res;
 	}
 	void Vehicle::Dirtyness::set(float value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetVehicleDirtLevel(pHandle,value);
 	}
 
@@ -150,7 +150,7 @@ namespace GTA{
 		return (GTA::DoorLock)stat;
 	}
 	void Vehicle::DoorLock::set(GTA::DoorLock value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::LockCarDoors(pHandle, (u32)value);
 	}
 	
@@ -159,7 +159,7 @@ namespace GTA{
 		return Scripting::GetEngineHealth(pHandle);
 	}
 	void Vehicle::EngineHealth::set(float value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetEngineHealth(pHandle,value);
 		if (value <= 0.0F) Scripting::SetCarEngineOn(pHandle, false, true);
 	}
@@ -169,7 +169,7 @@ namespace GTA{
 		return (CurrentRPM > 0.0f);
 	}
 	void Vehicle::EngineRunning::set(bool value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		if (value)
 			Scripting::SetCarEngineOn(pHandle,true,false); //true,true
 		else
@@ -177,12 +177,12 @@ namespace GTA{
 	}
 
 	void Vehicle::HazardLightsOn::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetVehHazardLights(pHandle,value);
 	}
 
 	void Vehicle::InteriorLightOn::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetVehInteriorlight(pHandle,value);
 	}
 
@@ -193,7 +193,7 @@ namespace GTA{
 		return val;
 	}
 	void Vehicle::Health::set(int value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		unmanaged::Native::SetCarHealth(pHandle,value);
 	}
 
@@ -221,7 +221,7 @@ namespace GTA{
 		return Scripting::IsCarOnFire(pHandle);
 	}
 	void Vehicle::isOnFire::set(bool value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		if (value) {
 			int fire = Scripting::StartCarFire(pHandle);
 			if (fire == 0) return;
@@ -236,7 +236,7 @@ namespace GTA{
 		return Scripting::IsCarAMissionCar(pHandle);
 	}
 	void Vehicle::isRequiredForMission::set(bool value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		if (value)
 			Scripting::SetCarAsMissionCar(pHandle);
 		else
@@ -285,7 +285,7 @@ namespace GTA{
 	}
 
 	void Vehicle::NeedsToBeHotwired::set(bool value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetNeedsToBeHotwired(pHandle,value);
 	}
 
@@ -301,12 +301,12 @@ namespace GTA{
 		return Scripting::GetPetrolTankHealth(pHandle);
 	}
 	void Vehicle::PetrolTankHealth::set(float value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetPetrolTankHealth(pHandle,value);
 	}
 
 	void Vehicle::PreviouslyOwnedByPlayer::set(bool value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetHasBeenOwnedByPlayer(pHandle,value);
 	}
 
@@ -315,12 +315,12 @@ namespace GTA{
 		return Scripting::IsCarSirenOn(pHandle);
 	}
 	void Vehicle::SirenActive::set(bool value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SwitchCarSiren(pHandle, value);
 	}
 
 	void Vehicle::AllowSirenWithoutDriver::set(bool value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetSirenWithNoDriver(pHandle, value);
 	}
 
@@ -331,7 +331,7 @@ namespace GTA{
 		return s;
 	}
 	void Vehicle::Speed::set(float value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		if (Model.isTrain) {
 			unmanaged::Native::SetTrainSpeed(pHandle,value);
 			unmanaged::Native::SetTrainCruiseSpeed(pHandle,value);
@@ -356,12 +356,12 @@ namespace GTA{
 		return Direction * Speed;
 	}
 	void Vehicle::Velocity::set(Vector3 value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		ApplyForce(value-Velocity);
 	}
 
 	void Vehicle::Visible::set(bool value) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SetCarVisible(pHandle,value);
 	}
 
@@ -376,7 +376,7 @@ namespace GTA{
 	}
 	//[TypeConverter(Design::ColorConverter::typeid)] 
 	void Vehicle::Color::set(GTA::ColorIndex value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		int c1,c2;
 		Scripting::GetCarColours(pHandle,&c1,&c2);
 		c1 = (Scripting::ColourIndex)value.Index;
@@ -390,7 +390,7 @@ namespace GTA{
 		return GTA::ColorIndex((int)c2);
 	}
 	void Vehicle::FeatureColor1::set(GTA::ColorIndex value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		int c1,c2;
 		Scripting::GetCarColours(pHandle,&c1,&c2);
 		c2 = (Scripting::ColourIndex)value.Index;
@@ -404,7 +404,7 @@ namespace GTA{
 		return GTA::ColorIndex((int)c1);
 	}
 	void Vehicle::SpecularColor::set(GTA::ColorIndex value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		int c1,c2;
 		Scripting::GetExtraCarColours(pHandle,&c1,&c2);
 		c1 = (Scripting::ColourIndex)value.Index;
@@ -418,7 +418,7 @@ namespace GTA{
 		return GTA::ColorIndex((int)c2);
 	}
 	void Vehicle::FeatureColor2::set(GTA::ColorIndex value){
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		int c1,c2;
 		Scripting::GetExtraCarColours(pHandle,&c1,&c2);
 		c2 = (Scripting::ColourIndex)value.Index;
@@ -568,7 +568,7 @@ namespace GTA{
 	}
 
 	void Vehicle::ApplyForce(Vector3 Direction, Vector3 Rotation) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		unmanaged::Native::ApplyForceToCar(pHandle, 3, Direction.X, Direction.Y, Direction.Z, Rotation.X, Rotation.Y, Rotation.Z, 0 , 0, 1, 1);
 	}
 	void Vehicle::ApplyForce(Vector3 Direction) {
@@ -576,7 +576,7 @@ namespace GTA{
 	}
 
 	void Vehicle::ApplyForceRelative(Vector3 Direction, Vector3 Rotation) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		unmanaged::Native::ApplyForceToCar(pHandle, 3, Direction.X, Direction.Y, Direction.Z, Rotation.X, Rotation.Y, Rotation.Z, 0 , 1, 1, 1);
 	}
 	void Vehicle::ApplyForceRelative(Vector3 Direction) {
@@ -589,11 +589,11 @@ namespace GTA{
 		return Scripting::IsCarTyreBurst(pHandle, (Scripting::eVehicleTyre)wheel);
 	}
 	void Vehicle::BurstTire(GTA::VehicleWheel wheel) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::BurstCarTyre(pHandle, (Scripting::eVehicleTyre)wheel);
 	}
 	void Vehicle::FixTire(GTA::VehicleWheel wheel) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		// The native call below fixes the tire but the model still remains bursted so we do 
 		// this from memory to make sure the model is replaced
 		u32 offset = 0;
@@ -626,22 +626,22 @@ namespace GTA{
 
 
 	void Vehicle::CloseAllDoors() {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::CloseAllCarDoors(pHandle);
 	}
 	void Vehicle::Delete() {
-		NON_EXISTING_CHECK_RELAXED();
+		NON_EXISTING_CHECK_RELAXED_VOID();
 		SetExistsFalse();
 		if (pHandle == 0) return;
 		int car = pHandle;
 		unmanaged::Native::DeleteCar(&car);
 	}
 	void Vehicle::EveryoneLeaveVehicle() {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::TaskEveryoneLeaveCar(pHandle);
 	}
 	void Vehicle::PassengersLeaveVehicle(bool Immediately) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Ped^ p;
 		int seats = PassengerSeats;
 		for (int seat = 0; seat < seats; seat++) {
@@ -672,20 +672,20 @@ namespace GTA{
 	}
 
 	void Vehicle::Explode() {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		unmanaged::Native::ExplodeCar(pHandle, true, false);
 	}
 	void Vehicle::NoLongerNeeded() {
-		NON_EXISTING_CHECK_RELAXED();
+		NON_EXISTING_CHECK_RELAXED_VOID();
 		int h = pHandle;
 		unmanaged::Native::MarkCarAsNoLongerNeeded(&h);
 	}
 	void Vehicle::PlaceOnGroundProperly() {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		unmanaged::Native::SetCarOnGroundProperly(pHandle);
 	}
 	void Vehicle::PlaceOnNextStreetProperly() {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		float tX, tY, tZ, tH;
 		Vector3 p = Position;
 		for (int i = 1; i<40; i++) {
@@ -699,19 +699,19 @@ namespace GTA{
 		}
 	}
 	void Vehicle::Repair() {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		unmanaged::Native::FixCar(pHandle);
 	}
 	void Vehicle::MakeProofTo(bool Bullets, bool Fire, bool Explosions, bool Collisions, bool MeleeAttacks) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		unmanaged::Native::SetCarProofs(pHandle, Bullets, Fire, Explosions, Collisions, MeleeAttacks);
 	}
 	void Vehicle::SoundHorn(int duration) {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Scripting::SoundCarHorn(pHandle,duration);
 	}
 	void Vehicle::Wash() {
-		NON_EXISTING_CHECK();
+		NON_EXISTING_CHECK_VOID();
 		Dirtyness = 0.0;
 		Scripting::WashVehicleTextures(pHandle,255);
 	}

@@ -66,8 +66,8 @@ namespace value {
 
 	/*
 	void Euphoria::GrabVehicle(Vehicle^ v, int duration) {
-		OBJECT_NON_EXISTING_CHECK(ped);
-		OBJECT_NON_EXISTING_CHECK(v);
+		OBJECT_NON_EXISTING_CHECK_VOID(ped);
+		OBJECT_NON_EXISTING_CHECK_VOID(v);
 
 		BodyBalance->Start(duration);
 

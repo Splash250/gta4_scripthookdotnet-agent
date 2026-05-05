@@ -53,7 +53,7 @@ namespace value {
 		return a;
 	}
 	void VehicleDoor::Angle::set(float value) {
-		OBJECT_NON_EXISTING_CHECK(vehicle);
+		OBJECT_NON_EXISTING_CHECK_VOID(vehicle);
 		if (value > 1.0f) value = 1.0f;
 		if (value > 0.001f)
 			Scripting::ControlCarDoor(vehicle->Handle, (u32)door, 1, value);
@@ -77,15 +77,15 @@ namespace value {
 	}
 
 	void VehicleDoor::Open() {
-		OBJECT_NON_EXISTING_CHECK(vehicle);
+		OBJECT_NON_EXISTING_CHECK_VOID(vehicle);
 		Scripting::OpenCarDoor(vehicle->Handle,(Scripting::eVehicleDoor)door);
 	}
 	void VehicleDoor::Close() {
-		OBJECT_NON_EXISTING_CHECK(vehicle);
+		OBJECT_NON_EXISTING_CHECK_VOID(vehicle);
 		Scripting::ShutCarDoor(vehicle->Handle,(Scripting::eVehicleDoor)door);
 	}
 	void VehicleDoor::Break() {
-		OBJECT_NON_EXISTING_CHECK(vehicle);
+		OBJECT_NON_EXISTING_CHECK_VOID(vehicle);
 		Scripting::BreakCarDoor(vehicle->Handle,(Scripting::eVehicleDoor)door, false);
 	}
 

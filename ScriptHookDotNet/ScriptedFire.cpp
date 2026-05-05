@@ -50,7 +50,7 @@ namespace GTA{
 	}
 
 	void ScriptedFire::Delete() {
-		NON_EXISTING_CHECK_RELAXED();
+		NON_EXISTING_CHECK_RELAXED_VOID();
 		SetExistsFalse();
 		if (pHandle == 0) return;
 		Scripting::RemoveScriptFire(pHandle);
