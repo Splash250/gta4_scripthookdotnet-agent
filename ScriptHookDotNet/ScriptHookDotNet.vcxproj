@@ -236,6 +236,8 @@
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="MemoryAccess.cpp" />
     <ClCompile Include="AgentClient.cpp" />
+    <ClCompile Include="AgentCommandIntent.cpp" />
+    <ClCompile Include="AgentCommandRegistry.cpp" />
     <ClCompile Include="AgentSettings.cpp" />
     <ClCompile Include="AgentConsole.cpp" />
     <ClCompile Include="Console.cpp" />
@@ -283,6 +285,8 @@
     <ClInclude Include="..\ScriptHook\Types.h" />
     <ClInclude Include="..\ScriptHook\Version.h" />
     <ClInclude Include="AgentClient.h" />
+    <ClInclude Include="AgentCommandIntent.h" />
+    <ClInclude Include="AgentCommandRegistry.h" />
     <ClInclude Include="AgentSettings.h" />
     <ClInclude Include="Blip.h" />
     <ClInclude Include="Camera.h" />

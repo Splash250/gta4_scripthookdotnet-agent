@@ -156,6 +156,8 @@ namespace GTA {
 		bool bActive;
 		String^ pPreviousResponseId;
 		AgentRequestWorker^ pWorker;
+		AgentCommandSpec^ pPendingCommandSpec;
+		String^ pPendingCommandLine;
 		String^ pInput;
 		Font^ pFont;
 		Drawing::Color pBackColor;
@@ -183,6 +185,8 @@ namespace GTA {
 		int NewestToArrayIndex(int Index);
 		int GetInputLineCount(int screenWidth);
 		System::Collections::Generic::List<String^>^ WrapInputLines(String^ text, int screenWidth, bool includeCaret);
+		void ClearPendingAction();
+		void ExecuteBuiltInCommand(String^ commandLine, AgentCommandSpec^ spec);
 		void PollWorker();
 		void SendCommand();
 		void AddPrintLine(String^ Text);

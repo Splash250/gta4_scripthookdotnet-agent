@@ -23,6 +23,8 @@
 #include "stdafx.h"
 
 #include "AgentClient.h"
+#include "AgentCommandIntent.h"
+#include "AgentCommandRegistry.h"
 #include "AgentSettings.h"
 #include "Console.h"
 
@@ -44,6 +46,8 @@ namespace GTA {
 		bActive = false;
 		pPreviousResponseId = String::Empty;
 		pWorker = gcnew AgentRequestWorker();
+		pPendingCommandSpec = nullptr;
+		pPendingCommandLine = String::Empty;
 		pInput = String::Empty;
 		pLog = gcnew List<String^>();
 		pLastCommands = gcnew List<String^>();
@@ -317,7 +321,24 @@ namespace GTA {
 		bActive = false;
 		pPreviousResponseId = String::Empty;
 		pWorker = gcnew AgentRequestWorker();
+		ClearPendingAction();
 		OnClosed();
+	}
+
+	void AgentConsole::ClearPendingAction() {
+		pPendingCommandSpec = nullptr;
+		pPendingCommandLine = String::Empty;
+	}
+
+	void AgentConsole::ExecuteBuiltInCommand(String^ commandLine, AgentCommandSpec^ spec) {
+		if (String::IsNullOrEmpty(commandLine) || isNULL(spec)) return;
+
+		Print("(AGENT STATUS) Running command: " + commandLine);
+		if (spec->Risk == AgentCommandRisk::ReadOnly)
+			Print("(AGENT STATUS) Built-in command output will appear in the standard ScriptHook console for now.");
+
+		NetHook::DefaultConsole->SendCommand(commandLine);
+		ClearPendingAction();
 	}
 
 	void AgentConsole::PollWorker() {
@@ -353,6 +374,64 @@ namespace GTA {
 		if (line->Equals("exit", StringComparison::InvariantCultureIgnoreCase) ||
 			line->Equals("/exit", StringComparison::InvariantCultureIgnoreCase)) {
 			NetHook::ExitAgentConsole();
+			return;
+		}
+
+		if isNotNULL(pPendingCommandSpec) {
+			String^ answer = line->ToLowerInvariant();
+			if ((answer == "yes") || (answer == "confirm")) {
+				ExecuteBuiltInCommand(pPendingCommandLine, pPendingCommandSpec);
+				return;
+			}
+			if ((answer == "no") || (answer == "cancel")) {
+				Print("(AGENT STATUS) Command cancelled.");
+				ClearPendingAction();
+				return;
+			}
+			Print("(AGENT STATUS) Reply yes/confirm or no/cancel.");
+			return;
+		}
+
+		AgentIntent^ intent = AgentCommandIntent::Resolve(line);
+		if (intent->Type == AgentIntentType::BuiltInExplain) {
+			AgentCommandSpec^ spec = AgentCommandRegistry::Find(intent->CommandName);
+			if isNotNULL(spec) {
+				Print("(AGENT REPLY) " + spec->Name + ": " + spec->Description);
+				Print("(AGENT REPLY) Usage: " + spec->Usage);
+				if (!spec->AgentAccessible)
+					Print("(AGENT STATUS) This command exists, but agent mode does not execute it directly.");
+				else if (spec->RequiresConfirmation)
+					Print("(AGENT STATUS) This command requires confirmation before agent mode will run it.");
+			}
+			return;
+		}
+
+		if (intent->Type == AgentIntentType::BuiltInRun) {
+			AgentCommandSpec^ spec = AgentCommandRegistry::Find(intent->CommandName);
+			if isNULL(spec) {
+				Print("(AGENT ERROR) That is not a supported built-in ScriptHookDotNet command.");
+				return;
+			}
+			if (!spec->AgentAccessible) {
+				Print("(AGENT ERROR) Agent mode is not allowed to run that built-in command.");
+				return;
+			}
+
+			Print("(AGENT STATUS) Interpreted request as command: " + intent->CommandLine);
+			if (spec->RequiresConfirmation) {
+				pPendingCommandSpec = spec;
+				pPendingCommandLine = intent->CommandLine;
+				Print("(AGENT STATUS) Reply yes/confirm or no/cancel.");
+				return;
+			}
+
+			ExecuteBuiltInCommand(intent->CommandLine, spec);
+			return;
+		}
+
+		if (intent->Type == AgentIntentType::UnsupportedAction) {
+			Print("(AGENT STATUS) " + intent->Message);
+			Print("(AGENT STATUS) If you want, I can help design a script for GAME_ROOT/scripts and then reload scripts so it applies.");
 			return;
 		}
 
