@@ -499,26 +499,68 @@ namespace GTA {
 		}
 
 		bool looksLikeAction = LooksLikeGameActionRequest(line);
-		bool classifierPreferred = looksLikeAction;
-		if (!classifierPreferred) {
-			array<wchar_t>^ separators = gcnew array<wchar_t>(1);
-			separators[0] = ' ';
-			array<String^>^ words = line->Split(separators, StringSplitOptions::RemoveEmptyEntries);
-			bool isQuestion = line->Contains("?");
-			bool isExplanationQuestion = false;
-			String^ normalized = line->ToLowerInvariant();
-			if (isQuestion) {
-				isExplanationQuestion =
-					normalized->StartsWith("what ") ||
-					normalized->StartsWith("why ") ||
-					normalized->StartsWith("how ");
-			}
-
-			if (!isQuestion && (words->Length <= 8))
-				classifierPreferred = true;
-			else if (isQuestion && !isExplanationQuestion && (words->Length <= 8))
-				classifierPreferred = true;
-		}
+		String^ normalized = line->ToLowerInvariant()->Trim();
+		String^ paddedNormalized = " " + normalized + " ";
+		bool isQuestion = line->Contains("?");
+		bool looksLikeCreativeChat =
+			normalized->StartsWith("tell me ") ||
+			normalized->StartsWith("write me ") ||
+			normalized->StartsWith("write ") ||
+			normalized->StartsWith("tell ") ||
+			normalized->Contains(" joke ") ||
+			normalized->EndsWith(" joke") ||
+			normalized->Contains(" haiku ") ||
+			normalized->EndsWith(" haiku") ||
+			normalized->Contains(" poem ") ||
+			normalized->EndsWith(" poem") ||
+			normalized->Contains(" story ") ||
+			normalized->EndsWith(" story");
+		bool looksLikeExplanationQuestion =
+			normalized->StartsWith("what ") ||
+			normalized->StartsWith("why ") ||
+			normalized->StartsWith("how ") ||
+			normalized->StartsWith("should i ") ||
+			normalized->StartsWith("should we ") ||
+			normalized->StartsWith("can you explain ") ||
+			normalized->StartsWith("could you explain ") ||
+			normalized->StartsWith("explain ") ||
+			normalized->Contains(" explain ") ||
+			normalized->Contains(" should i use ") ||
+			normalized->Contains(" help me understand ") ||
+			normalized->Contains(" what does ");
+		bool looksLikeCommandStyleRequest =
+			normalized->StartsWith("make ") ||
+			normalized->StartsWith("change ") ||
+			normalized->StartsWith("paint ") ||
+			normalized->StartsWith("turn ") ||
+			normalized->StartsWith("set ") ||
+			normalized->StartsWith("give ") ||
+			normalized->StartsWith("spawn ") ||
+			normalized->StartsWith("teleport ") ||
+			normalized->StartsWith("fix ") ||
+			normalized->StartsWith("heal ") ||
+			normalized->StartsWith("reload ") ||
+			normalized->StartsWith("remove ") ||
+			normalized->StartsWith("can you ") ||
+			normalized->StartsWith("could you ") ||
+			normalized->StartsWith("please ") ||
+			normalized->StartsWith("i want ") ||
+			normalized->StartsWith("i need ") ||
+			paddedNormalized->Contains(" make ") ||
+			paddedNormalized->Contains(" change ") ||
+			paddedNormalized->Contains(" paint ") ||
+			paddedNormalized->Contains(" turn ") ||
+			paddedNormalized->Contains(" set ") ||
+			paddedNormalized->Contains(" give ") ||
+			paddedNormalized->Contains(" spawn ") ||
+			paddedNormalized->Contains(" teleport ") ||
+			paddedNormalized->Contains(" fix ") ||
+			paddedNormalized->Contains(" heal ") ||
+			paddedNormalized->Contains(" reload ") ||
+			paddedNormalized->Contains(" remove ");
+		bool classifierPreferred =
+			looksLikeAction ||
+			(!looksLikeCreativeChat && !looksLikeExplanationQuestion && looksLikeCommandStyleRequest);
 
 		if (classifierPreferred) {
 			if (pReasoningWorker->IsBusy) {
