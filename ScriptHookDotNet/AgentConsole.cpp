@@ -47,8 +47,6 @@ namespace GTA {
 		bActive = false;
 		pPreviousResponseId = String::Empty;
 		pWorker = gcnew AgentRequestWorker();
-		pActiveCommandExecution = nullptr;
-		pLastCommandExecution = nullptr;
 		pPendingCommandSpec = nullptr;
 		pPendingCommandLine = String::Empty;
 		pInput = String::Empty;
@@ -393,8 +391,6 @@ namespace GTA {
 		bActive = false;
 		pPreviousResponseId = String::Empty;
 		pWorker = gcnew AgentRequestWorker();
-		pActiveCommandExecution = nullptr;
-		pLastCommandExecution = nullptr;
 		ClearPendingAction();
 		OnClosed();
 	}
@@ -408,8 +404,6 @@ namespace GTA {
 		if (String::IsNullOrEmpty(commandLine) || isNULL(spec)) return;
 
 		AgentCommandExecution^ execution = gcnew AgentCommandExecution(commandLine, spec->Name);
-		pActiveCommandExecution = execution;
-		pLastCommandExecution = execution;
 
 		Print("(AGENT STATUS) Running command: " + commandLine);
 		Print("(AGENT STATUS) Mirroring built-in command output below when available.");
@@ -420,15 +414,14 @@ namespace GTA {
 		finally {
 			NetHook::EndAgentCommandCapture();
 			execution->MarkCompleted();
-			pActiveCommandExecution = nullptr;
 		}
 
 		if (execution->SawErrorLikeOutput)
 			Print("(AGENT STATUS) Command reported a problem. Review mirrored output above.");
-		else if (execution->OutputLines->Count > 0)
-			Print("(AGENT STATUS) Command completed with output mirrored above.");
 		else if (execution->SawWarningLikeOutput)
 			Print("(AGENT STATUS) Command completed with warnings.");
+		else if (execution->OutputLines->Count > 0)
+			Print("(AGENT STATUS) Command completed with output mirrored above.");
 		else
 			Print("(AGENT STATUS) Command completed.");
 

@@ -499,17 +499,21 @@ namespace GTA {
 	void NetHook::BeginAgentCommandCapture(GTA::AgentConsole^ agentConsole, GTA::AgentCommandExecution^ execution) {
 		pAgentCommandCaptureConsole = agentConsole;
 		pAgentCommandCaptureExecution = execution;
+		pAgentCommandCaptureThreadId = System::Threading::Thread::CurrentThread->ManagedThreadId;
 		bAgentCommandCaptureActive = isNotNULL(agentConsole) && isNotNULL(execution);
 	}
 
 	void NetHook::EndAgentCommandCapture() {
 		bAgentCommandCaptureActive = false;
+		pAgentCommandCaptureThreadId = 0;
 		pAgentCommandCaptureConsole = nullptr;
 		pAgentCommandCaptureExecution = nullptr;
 	}
 
 	bool NetHook::HasAgentCommandCapture() {
-		return bAgentCommandCaptureActive && isNotNULL(pAgentCommandCaptureExecution);
+		return bAgentCommandCaptureActive
+			&& isNotNULL(pAgentCommandCaptureExecution)
+			&& (System::Threading::Thread::CurrentThread->ManagedThreadId == pAgentCommandCaptureThreadId);
 	}
 
 	void NetHook::AppendAgentCommandOutput(String^ text) {

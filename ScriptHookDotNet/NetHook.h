@@ -69,6 +69,7 @@ namespace GTA{
 		static GTA::AgentConsole^ pAgentConsole;
 		static GTA::AgentConsole^ pAgentCommandCaptureConsole;
 		static GTA::AgentCommandExecution^ pAgentCommandCaptureExecution;
+		static int pAgentCommandCaptureThreadId = 0;
 		static bool bAgentCommandCaptureActive = false;
 		static GTA::base::Mouse^ pMouse;
 		static GTA::KeyWatchDog^ pKeys;
