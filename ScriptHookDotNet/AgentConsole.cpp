@@ -528,7 +528,7 @@ namespace GTA {
 			normalized->Contains(" should i use ") ||
 			normalized->Contains(" help me understand ") ||
 			normalized->Contains(" what does ");
-		bool looksLikeCommandStyleRequest =
+		bool hasDirectCommandVerb =
 			normalized->StartsWith("make ") ||
 			normalized->StartsWith("change ") ||
 			normalized->StartsWith("paint ") ||
@@ -541,11 +541,6 @@ namespace GTA {
 			normalized->StartsWith("heal ") ||
 			normalized->StartsWith("reload ") ||
 			normalized->StartsWith("remove ") ||
-			normalized->StartsWith("can you ") ||
-			normalized->StartsWith("could you ") ||
-			normalized->StartsWith("please ") ||
-			normalized->StartsWith("i want ") ||
-			normalized->StartsWith("i need ") ||
 			paddedNormalized->Contains(" make ") ||
 			paddedNormalized->Contains(" change ") ||
 			paddedNormalized->Contains(" paint ") ||
@@ -558,6 +553,31 @@ namespace GTA {
 			paddedNormalized->Contains(" heal ") ||
 			paddedNormalized->Contains(" reload ") ||
 			paddedNormalized->Contains(" remove ");
+		bool hasGameNounOrState =
+			paddedNormalized->Contains(" boat ") ||
+			paddedNormalized->Contains(" car ") ||
+			paddedNormalized->Contains(" vehicle ") ||
+			paddedNormalized->Contains(" player ") ||
+			paddedNormalized->Contains(" health ") ||
+			paddedNormalized->Contains(" armor ") ||
+			paddedNormalized->Contains(" armour ") ||
+			paddedNormalized->Contains(" scripts ") ||
+			paddedNormalized->Contains(" waypoint ") ||
+			paddedNormalized->Contains(" wp ") ||
+			paddedNormalized->Contains(" time ") ||
+			paddedNormalized->Contains(" color ") ||
+			paddedNormalized->Contains(" red ") ||
+			paddedNormalized->Contains(" blue ") ||
+			paddedNormalized->Contains(" green ");
+		bool hasConversationalActionPrefix =
+			normalized->StartsWith("can you ") ||
+			normalized->StartsWith("could you ") ||
+			normalized->StartsWith("please ") ||
+			normalized->StartsWith("i want ") ||
+			normalized->StartsWith("i need ");
+		bool looksLikeCommandStyleRequest =
+			hasDirectCommandVerb ||
+			(hasConversationalActionPrefix && (looksLikeAction || hasGameNounOrState));
 		bool classifierPreferred =
 			looksLikeAction ||
 			(!looksLikeCreativeChat && !looksLikeExplanationQuestion && looksLikeCommandStyleRequest);
