@@ -156,6 +156,7 @@ namespace GTA {
 		bool bActive;
 		String^ pPreviousResponseId;
 		AgentRequestWorker^ pWorker;
+		AgentReasoningWorker^ pReasoningWorker;
 		AgentCommandExecution^ pActiveCommandExecution;
 		AgentCommandSpec^ pPendingCommandSpec;
 		String^ pPendingCommandLine;
@@ -189,6 +190,7 @@ namespace GTA {
 		bool LooksLikeGameActionRequest(String^ input);
 		void ClearPendingAction();
 		void ExecuteBuiltInCommand(String^ commandLine, AgentCommandSpec^ spec);
+		void HandleReasoningResult(AgentReasoningResult^ result);
 		void PollWorker();
 		void SendCommand();
 		void AddPrintLine(String^ Text);

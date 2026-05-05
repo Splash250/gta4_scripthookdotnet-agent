@@ -57,6 +57,25 @@ namespace GTA {
 		return true;
 	}
 
+	bool AgentCommandIntent::LooksLikeNaturalLanguageTail(String^ normalizedTail) {
+		if (String::IsNullOrEmpty(normalizedTail)) return false;
+
+		String^ padded = " " + normalizedTail + " ";
+		return
+			padded->Contains(" please ") ||
+			padded->Contains(" can ") ||
+			padded->Contains(" could ") ||
+			padded->Contains(" would ") ||
+			padded->Contains(" should ") ||
+			padded->Contains(" me ") ||
+			padded->Contains(" my ") ||
+			padded->Contains(" the ") ||
+			padded->Contains(" a ") ||
+			padded->Contains(" an ") ||
+			padded->Contains(" want ") ||
+			padded->Contains(" need ");
+	}
+
 	AgentIntent^ AgentCommandIntent::CreateBuiltInIntent(AgentIntentType type, String^ originalInput, String^ commandName, String^ commandLine) {
 		AgentIntent^ intent = gcnew AgentIntent();
 		intent->Type = type;
@@ -85,6 +104,19 @@ namespace GTA {
 					return CreateBuiltInIntent(AgentIntentType::BuiltInRun, intent->OriginalInput, spec->Name, commandLine);
 			}
 			return intent;
+		}
+
+		array<String^>^ directParts = intent->OriginalInput->Split(gcnew array<wchar_t>{' '}, 2, StringSplitOptions::RemoveEmptyEntries);
+		if (directParts->Length > 0) {
+			AgentCommandSpec^ directSpec = AgentCommandRegistry::Find(directParts[0]);
+			if isNotNULL(directSpec) {
+				String^ normalizedTail = String::Empty;
+				if (directParts->Length > 1)
+					normalizedTail = Normalize(directParts[1]);
+
+				if (!LooksLikeNaturalLanguageTail(normalizedTail))
+					return CreateBuiltInIntent(AgentIntentType::BuiltInRun, intent->OriginalInput, directSpec->Name, intent->OriginalInput);
+			}
 		}
 
 		if (normalized->StartsWith("what does ")) {

@@ -140,13 +140,13 @@ namespace GTA {
 		return result;
 	}
 
-	AgentResponse^ AgentClient::Send(String^ userInput, String^ previousResponseId) {
+	AgentResponse^ AgentClient::SendCore(String^ instructions, String^ userInput, String^ previousResponseId) {
 		AgentResponse^ result = gcnew AgentResponse();
 
 		String^ apiKey = AgentSettings::ApiKey->Trim();
 		String^ model = AgentSettings::Model->Trim();
-		String^ systemPrompt = AgentSettings::SystemPrompt->Trim();
-		if ((apiKey->Length == 0) || (model->Length == 0) || (systemPrompt->Length == 0)) {
+		String^ prompt = isNULL(instructions) ? String::Empty : instructions->Trim();
+		if ((apiKey->Length == 0) || (model->Length == 0) || (prompt->Length == 0)) {
 			result->Error = "agents.ini is missing required OpenAI settings.";
 			return result;
 		}
@@ -158,7 +158,7 @@ namespace GTA {
 			StringBuilder^ body = gcnew StringBuilder();
 			body->Append("{");
 			body->Append("\"model\":\"")->Append(EscapeJson(model))->Append("\",");
-			body->Append("\"instructions\":\"")->Append(EscapeJson(systemPrompt))->Append("\",");
+			body->Append("\"instructions\":\"")->Append(EscapeJson(prompt))->Append("\",");
 			body->Append("\"input\":[{\"role\":\"user\",\"content\":[{\"type\":\"input_text\",\"text\":\"")->Append(EscapeJson(userInput))->Append("\"}]}]");
 			if (!String::IsNullOrEmpty(previousResponseId)) {
 				body->Append(",\"previous_response_id\":\"")->Append(EscapeJson(previousResponseId))->Append("\"");
@@ -195,6 +195,14 @@ namespace GTA {
 			result->Error = "OpenAI request failed: " + ex->Message;
 			return result;
 		}
+	}
+
+	AgentResponse^ AgentClient::Send(String^ userInput, String^ previousResponseId) {
+		return SendCore(AgentSettings::SystemPrompt, userInput, previousResponseId);
+	}
+
+	AgentResponse^ AgentClient::SendIsolated(String^ instructions, String^ userInput) {
+		return SendCore(instructions, userInput, String::Empty);
 	}
 
 	AgentRequestWorker::AgentRequestWorker() {

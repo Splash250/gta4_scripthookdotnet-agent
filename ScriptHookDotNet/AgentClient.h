@@ -51,9 +51,11 @@ namespace GTA {
 		static AgentResponse^ ParseResponse(String^ json);
 		static String^ ExtractOutputText(System::Collections::Generic::Dictionary<String^, System::Object^>^ root);
 		static String^ ExtractErrorText(System::Collections::Generic::Dictionary<String^, System::Object^>^ root);
+		static AgentResponse^ SendCore(String^ instructions, String^ userInput, String^ previousResponseId);
 
 	public:
 		static AgentResponse^ Send(String^ userInput, String^ previousResponseId);
+		static AgentResponse^ SendIsolated(String^ instructions, String^ userInput);
 	};
 
 	CLASS_ATTRIBUTES

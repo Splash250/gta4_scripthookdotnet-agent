@@ -69,9 +69,13 @@ namespace GTA {
 	ref class AgentClient;
 	ref class AgentCommandExecution;
 	ref class AgentCommandIntent;
+	ref class AgentCommandReasoning;
 	ref class AgentCommandRegistry;
 	ref class AgentCommandSpec;
+	ref class AgentCommandSemantics;
 	ref class AgentIntent;
+	ref class AgentReasoningResult;
+	ref class AgentReasoningWorker;
 	ref class AgentRequestWorker;
 	ref class AgentResponse;
 	ref class AgentSettings;

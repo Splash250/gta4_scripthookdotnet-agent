@@ -56,6 +56,7 @@ namespace GTA {
 
 		static String^ Normalize(String^ input);
 		static bool ContainsAll(String^ haystack, ... array<String^>^ needles);
+		static bool LooksLikeNaturalLanguageTail(String^ normalizedTail);
 		static AgentIntent^ CreateBuiltInIntent(AgentIntentType type, String^ originalInput, String^ commandName, String^ commandLine);
 
 	public:

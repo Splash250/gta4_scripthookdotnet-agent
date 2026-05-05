@@ -25,6 +25,7 @@
 #include "AgentClient.h"
 #include "AgentCommandExecution.h"
 #include "AgentCommandIntent.h"
+#include "AgentCommandReasoning.h"
 #include "AgentCommandRegistry.h"
 #include "AgentCommandSemantics.h"
 #include "AgentSettings.h"
@@ -48,6 +49,7 @@ namespace GTA {
 		bActive = false;
 		pPreviousResponseId = String::Empty;
 		pWorker = gcnew AgentRequestWorker();
+		pReasoningWorker = gcnew AgentReasoningWorker();
 		pActiveCommandExecution = nullptr;
 		pPendingCommandSpec = nullptr;
 		pPendingCommandLine = String::Empty;
@@ -171,6 +173,7 @@ namespace GTA {
 		array<String^>^ verbs = gcnew array<String^>{ "make", "change", "paint", "turn", "set", "give", "spawn", "teleport", "fix", "heal", "reload" };
 		array<String^>^ strongObjects = gcnew array<String^>{ "boat", "car", "vehicle", "player" };
 		array<String^>^ stateObjects = gcnew array<String^>{ "health", "armor", "armour", "scripts" };
+
 		bool hasVerb = false;
 		bool hasStrongObject = false;
 		bool hasStateObject = false;
@@ -221,6 +224,7 @@ namespace GTA {
 
 		return false;
 	}
+
 	int AgentConsole::FirstLineOnScreen() {
 		int res = LastLineOnScreen() - LinesPerScreen + 1;
 		if (res < 0) res = 0;
@@ -378,6 +382,7 @@ namespace GTA {
 		if (bActive) return;
 		AgentSettings::Reload();
 		if isNULL(pWorker) pWorker = gcnew AgentRequestWorker();
+		if isNULL(pReasoningWorker) pReasoningWorker = gcnew AgentReasoningWorker();
 		ScrollToEnd();
 		bActive = true;
 		OnOpened();
@@ -393,6 +398,7 @@ namespace GTA {
 		bActive = false;
 		pPreviousResponseId = String::Empty;
 		pWorker = gcnew AgentRequestWorker();
+		pReasoningWorker = gcnew AgentReasoningWorker();
 		pActiveCommandExecution = nullptr;
 		ClearPendingAction();
 		OnClosed();
@@ -438,6 +444,13 @@ namespace GTA {
 	}
 
 	void AgentConsole::PollWorker() {
+		if isNotNULL(pReasoningWorker) {
+			AgentReasoningResult^ reasoningResult;
+			if (pReasoningWorker->TryTakeCompleted(reasoningResult) && isNotNULL(reasoningResult)) {
+				HandleReasoningResult(reasoningResult);
+			}
+		}
+
 		if isNULL(pWorker) return;
 		AgentResponse^ response;
 		if (!pWorker->TryTakeCompleted(response)) return;
@@ -449,6 +462,63 @@ namespace GTA {
 			return;
 		}
 		Print("(AGENT REPLY) " + response->Text);
+	}
+
+	void AgentConsole::HandleReasoningResult(AgentReasoningResult^ result) {
+		if isNULL(result) return;
+
+		if (result->Decision == AgentReasoningDecision::BuiltInExplain) {
+			AgentCommandSpec^ spec = AgentCommandRegistry::Find(result->CommandName);
+			if isNotNULL(spec) {
+				Print("(AGENT REPLY) " + spec->Name + ": " + spec->Description);
+				Print("(AGENT REPLY) Usage: " + spec->Usage);
+			}
+			return;
+		}
+
+		if (result->Decision == AgentReasoningDecision::BuiltInRun) {
+			AgentCommandSpec^ spec = AgentCommandRegistry::Find(result->CommandName);
+			if (isNULL(spec) || String::IsNullOrEmpty(result->ValidatedCommandLine)) {
+				Print("(AGENT ERROR) Reasoning did not produce a valid built-in command.");
+				Print("(AGENT STATUS) If you want, I can help design a script for GAME_ROOT/scripts and then reload scripts so it applies.");
+				return;
+			}
+
+			Print("(AGENT STATUS) Interpreted request as command: " + result->ValidatedCommandLine);
+			if (!String::IsNullOrEmpty(result->Explanation))
+				Print("(AGENT STATUS) " + result->Explanation);
+
+			if (spec->RequiresConfirmation) {
+				pPendingCommandSpec = spec;
+				pPendingCommandLine = result->ValidatedCommandLine;
+				Print("(AGENT STATUS) Reply yes/confirm or no/cancel.");
+				return;
+			}
+
+			ExecuteBuiltInCommand(result->ValidatedCommandLine, spec);
+			return;
+		}
+
+		if (result->Decision == AgentReasoningDecision::NoExactBuiltInFit) {
+			if (!String::IsNullOrEmpty(result->FailureReason))
+				Print("(AGENT STATUS) " + result->FailureReason);
+			else
+				Print("(AGENT STATUS) No exact built-in ScriptHookDotNet command can satisfy that request.");
+			Print("(AGENT STATUS) If you want, I can help design a script for GAME_ROOT/scripts and then reload scripts so it applies.");
+			return;
+		}
+
+		if (result->Decision == AgentReasoningDecision::NormalChat) {
+			Print("(AGENT STATUS) That request looks action-oriented, but no verified built-in command path was approved.");
+			Print("(AGENT STATUS) If you want, I can help design a script for GAME_ROOT/scripts and then reload scripts so it applies.");
+			return;
+		}
+
+		if (!String::IsNullOrEmpty(result->FailureReason))
+			Print("(AGENT ERROR) " + result->FailureReason);
+		else
+			Print("(AGENT ERROR) Built-in command reasoning failed.");
+		Print("(AGENT STATUS) If you want, I can help design a script for GAME_ROOT/scripts and then reload scripts so it applies.");
 	}
 
 	void AgentConsole::SendCommand() {
