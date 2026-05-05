@@ -417,6 +417,7 @@ namespace GTA {
 		finally {
 			NetHook::EndAgentCommandCapture();
 			execution->MarkCompleted();
+			pActiveCommandExecution = nullptr;
 		}
 
 		if (execution->SawErrorLikeOutput)
@@ -428,7 +429,6 @@ namespace GTA {
 		else
 			Print("(AGENT STATUS) Command completed.");
 
-		pActiveCommandExecution = nullptr;
 		ClearPendingAction();
 	}
 
