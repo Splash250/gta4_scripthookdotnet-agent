@@ -156,6 +156,8 @@ namespace GTA {
 		bool bActive;
 		String^ pPreviousResponseId;
 		AgentRequestWorker^ pWorker;
+		AgentCommandExecution^ pActiveCommandExecution;
+		AgentCommandExecution^ pLastCommandExecution;
 		AgentCommandSpec^ pPendingCommandSpec;
 		String^ pPendingCommandLine;
 		String^ pInput;

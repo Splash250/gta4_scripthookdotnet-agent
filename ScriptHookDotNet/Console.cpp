@@ -326,6 +326,8 @@ namespace GTA {
 	void Console::Print(String^ Text) {
 		if (isNULL(Text) || (Text->Length == 0)) { 
 			AddPrintLine(String::Empty);
+			if (NetHook::HasAgentCommandCapture())
+				NetHook::AppendAgentCommandOutput(String::Empty);
 			return;
 		}
 		//array<String^>^ ary = Text->Split(splitChars, StringSplitOptions::RemoveEmptyEntries);
@@ -333,6 +335,8 @@ namespace GTA {
 		array<String^>^ ary = Text->Replace("\r","")->Split(splitChars, StringSplitOptions::None);
 		for (int i = 0; i < ary->Length; i++) {
 			AddPrintLine(ary[i]);
+			if (NetHook::HasAgentCommandCapture())
+				NetHook::AppendAgentCommandOutput(ary[i]);
 		}
 	}
 	void Console::AddPrintLine(String^ Text) {

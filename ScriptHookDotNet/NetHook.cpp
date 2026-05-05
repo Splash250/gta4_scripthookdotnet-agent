@@ -26,6 +26,7 @@
 #include "NetHook.h"
 
 #include "Console.h"
+#include "AgentCommandExecution.h"
 #include "ConsoleCommands.h"
 #include "D3D_Device.h"
 #include "Game.h"
@@ -493,6 +494,31 @@ namespace GTA {
 		if (NetHook::isPrimary) return nullptr;
 		RemoteScriptDomain::Instance->RaiseEventInLocalScriptDomain(EventID, Arguments);
 		return RemoteScriptDomain::Instance->LastRemoteEventResult;
+	}
+
+	void NetHook::BeginAgentCommandCapture(GTA::AgentConsole^ agentConsole, GTA::AgentCommandExecution^ execution) {
+		pAgentCommandCaptureConsole = agentConsole;
+		pAgentCommandCaptureExecution = execution;
+		bAgentCommandCaptureActive = isNotNULL(agentConsole) && isNotNULL(execution);
+	}
+
+	void NetHook::EndAgentCommandCapture() {
+		bAgentCommandCaptureActive = false;
+		pAgentCommandCaptureConsole = nullptr;
+		pAgentCommandCaptureExecution = nullptr;
+	}
+
+	bool NetHook::HasAgentCommandCapture() {
+		return bAgentCommandCaptureActive && isNotNULL(pAgentCommandCaptureExecution);
+	}
+
+	void NetHook::AppendAgentCommandOutput(String^ text) {
+		if (!HasAgentCommandCapture()) return;
+
+		String^ outputLine = isNULL(text) ? String::Empty : text;
+		pAgentCommandCaptureExecution->AppendOutputLine(outputLine);
+		if (isNotNULL(pAgentCommandCaptureConsole))
+			pAgentCommandCaptureConsole->Print("(COMMAND) " + outputLine);
 	}
 
 

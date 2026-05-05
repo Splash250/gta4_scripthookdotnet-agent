@@ -67,6 +67,9 @@ namespace GTA{
 		static GTA::base::Console^ pConsole;
 		static GTA::Console^ pDefaultConsole;
 		static GTA::AgentConsole^ pAgentConsole;
+		static GTA::AgentConsole^ pAgentCommandCaptureConsole;
+		static GTA::AgentCommandExecution^ pAgentCommandCaptureExecution;
+		static bool bAgentCommandCaptureActive = false;
 		static GTA::base::Mouse^ pMouse;
 		static GTA::KeyWatchDog^ pKeys;
 		static GTA::KeyboardLayout^ pKeyboardLayout;
@@ -194,6 +197,10 @@ namespace GTA{
 		static void RequestScriptAction(ScriptAction action);
 		static void DisplayText(String^ Text, int Duration);
 		static System::Object^ RaiseEventInLocalScriptDomain(RemoteEvent EventID, ... array<System::Object^>^ Arguments);
+		static void BeginAgentCommandCapture(GTA::AgentConsole^ agentConsole, GTA::AgentCommandExecution^ execution);
+		static void EndAgentCommandCapture();
+		static bool HasAgentCommandCapture();
+		static void AppendAgentCommandOutput(String^ text);
 
 		static bool isKeyPressed(System::Windows::Forms::Keys Key);
 		static void TryToDisableMouse();

@@ -23,6 +23,7 @@
 #include "stdafx.h"
 
 #include "AgentClient.h"
+#include "AgentCommandExecution.h"
 #include "AgentCommandIntent.h"
 #include "AgentCommandRegistry.h"
 #include "AgentSettings.h"
@@ -46,6 +47,8 @@ namespace GTA {
 		bActive = false;
 		pPreviousResponseId = String::Empty;
 		pWorker = gcnew AgentRequestWorker();
+		pActiveCommandExecution = nullptr;
+		pLastCommandExecution = nullptr;
 		pPendingCommandSpec = nullptr;
 		pPendingCommandLine = String::Empty;
 		pInput = String::Empty;
@@ -390,6 +393,8 @@ namespace GTA {
 		bActive = false;
 		pPreviousResponseId = String::Empty;
 		pWorker = gcnew AgentRequestWorker();
+		pActiveCommandExecution = nullptr;
+		pLastCommandExecution = nullptr;
 		ClearPendingAction();
 		OnClosed();
 	}
@@ -402,11 +407,31 @@ namespace GTA {
 	void AgentConsole::ExecuteBuiltInCommand(String^ commandLine, AgentCommandSpec^ spec) {
 		if (String::IsNullOrEmpty(commandLine) || isNULL(spec)) return;
 
-		Print("(AGENT STATUS) Running command: " + commandLine);
-		if (spec->Risk == AgentCommandRisk::ReadOnly)
-			Print("(AGENT STATUS) Built-in command output will appear in the standard ScriptHook console for now.");
+		AgentCommandExecution^ execution = gcnew AgentCommandExecution(commandLine, spec->Name);
+		pActiveCommandExecution = execution;
+		pLastCommandExecution = execution;
 
-		NetHook::DefaultConsole->SendCommand(commandLine);
+		Print("(AGENT STATUS) Running command: " + commandLine);
+		Print("(AGENT STATUS) Mirroring built-in command output below when available.");
+		NetHook::BeginAgentCommandCapture(this, execution);
+		try {
+			NetHook::DefaultConsole->SendCommand(commandLine);
+		}
+		finally {
+			NetHook::EndAgentCommandCapture();
+			execution->MarkCompleted();
+			pActiveCommandExecution = nullptr;
+		}
+
+		if (execution->SawErrorLikeOutput)
+			Print("(AGENT STATUS) Command reported a problem. Review mirrored output above.");
+		else if (execution->OutputLines->Count > 0)
+			Print("(AGENT STATUS) Command completed with output mirrored above.");
+		else if (execution->SawWarningLikeOutput)
+			Print("(AGENT STATUS) Command completed with warnings.");
+		else
+			Print("(AGENT STATUS) Command completed.");
+
 		ClearPendingAction();
 	}
 
