@@ -67,9 +67,9 @@ namespace GTA {
 	bool AgentCommandSemantics::ValidateFlip(String^ userInput, AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
 		commandLine = String::Empty;
 		(void)userInput;
-		if (!ValidateNoArgumentCommand(result, failureReason)) return false;
-		commandLine = "flip";
-		return true;
+		(void)result;
+		failureReason = "flip semantic validator is declared but not enabled in this phase step.";
+		return false;
 	}
 
 	bool AgentCommandSemantics::ValidateHeal(String^ userInput, AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
@@ -119,29 +119,10 @@ namespace GTA {
 
 	bool AgentCommandSemantics::ValidateSpawn(String^ userInput, AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
 		commandLine = String::Empty;
-		failureReason = String::Empty;
 		(void)userInput;
-		if (isNULL(result) || isNULL(result->Arguments)) {
-			failureReason = "spawn requires a readable argument object.";
-			return false;
-		}
-		if (!result->Arguments->ContainsKey("model")) {
-			failureReason = "spawn requires an exact model name.";
-			return false;
-		}
-
-		String^ model = result->Arguments["model"]->Trim();
-		if (String::IsNullOrWhiteSpace(model)) {
-			failureReason = "spawn requires an exact model name.";
-			return false;
-		}
-		if (result->Arguments->Count > 1) {
-			failureReason = "spawn only accepts an exact model name in this milestone.";
-			return false;
-		}
-
-		commandLine = "spawn " + model;
-		return true;
+		(void)result;
+		failureReason = "spawn semantic validator is declared but not enabled in this phase step.";
+		return false;
 	}
 
 	bool AgentCommandSemantics::ValidateTeleport(AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
@@ -252,25 +233,25 @@ namespace GTA {
 	bool AgentCommandSemantics::ValidateReloadScripts(String^ userInput, AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
 		commandLine = String::Empty;
 		(void)userInput;
-		if (!ValidateNoArgumentCommand(result, failureReason)) return false;
-		commandLine = "reloadscripts";
-		return true;
+		(void)result;
+		failureReason = "reloadscripts semantic validator is declared but not enabled in this phase step.";
+		return false;
 	}
 
 	bool AgentCommandSemantics::ValidateStartScripts(String^ userInput, AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
 		commandLine = String::Empty;
 		(void)userInput;
-		if (!ValidateNoArgumentCommand(result, failureReason)) return false;
-		commandLine = "startscripts";
-		return true;
+		(void)result;
+		failureReason = "startscripts semantic validator is declared but not enabled in this phase step.";
+		return false;
 	}
 
 	bool AgentCommandSemantics::ValidateAbortScripts(String^ userInput, AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
 		commandLine = String::Empty;
 		(void)userInput;
-		if (!ValidateNoArgumentCommand(result, failureReason)) return false;
-		commandLine = "abortscripts";
-		return true;
+		(void)result;
+		failureReason = "abortscripts semantic validator is declared but not enabled in this phase step.";
+		return false;
 	}
 
 	String^ AgentCommandSemantics::GetArgumentSchema(String^ commandName) {
@@ -338,18 +319,8 @@ namespace GTA {
 		}
 
 		String^ name = result->CommandName->Trim()->ToLowerInvariant();
-		if (name == "abortscripts")
-			return ValidateAbortScripts(userInput, result, commandLine, failureReason);
-		if (name == "flip")
-			return ValidateFlip(userInput, result, commandLine, failureReason);
 		if (name == "heal")
 			return ValidateHeal(userInput, result, commandLine, failureReason);
-		if (name == "reloadscripts")
-			return ValidateReloadScripts(userInput, result, commandLine, failureReason);
-		if (name == "spawn")
-			return ValidateSpawn(userInput, result, commandLine, failureReason);
-		if (name == "startscripts")
-			return ValidateStartScripts(userInput, result, commandLine, failureReason);
 		if (name == "teleport")
 			return ValidateTeleport(result, commandLine, failureReason);
 		if (name == "setdaytime")
