@@ -64,12 +64,90 @@ namespace GTA {
 		return true;
 	}
 
+	// Exact fit examples:
+	// - "flip my car back over"
+	// - "put my vehicle back on its wheels"
+	// - "turn my car right side up"
+	// Must refuse:
+	// - "fix my car"
+	// - "repair my flipped car"
+	// - "paint my flipped car red"
 	bool AgentCommandSemantics::ValidateFlip(String^ userInput, AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
 		commandLine = String::Empty;
-		(void)userInput;
-		(void)result;
-		failureReason = "flip semantic validator is declared but not enabled in this phase step.";
-		return false;
+		if (!ValidateNoArgumentCommand(result, failureReason)) return false;
+
+		String^ normalized = Normalize(userInput);
+		bool mentionsRepair =
+			normalized->Contains("fix") ||
+			normalized->Contains("repair") ||
+			normalized->Contains("restore") ||
+			normalized->Contains("restoration");
+		bool mentionsCosmetic =
+			normalized->Contains("paint") ||
+			normalized->Contains("repaint") ||
+			normalized->Contains("color") ||
+			normalized->Contains("colour") ||
+			normalized->Contains("clean") ||
+			normalized->Contains("wash") ||
+			normalized->Contains("upgrade") ||
+			normalized->Contains("custom") ||
+			normalized->Contains("mod") ||
+			normalized->Contains("tune");
+		bool mentionsOrientation =
+			normalized->Contains("flip") ||
+			normalized->Contains("upright") ||
+			normalized->Contains("right side up") ||
+			normalized->Contains("right-side up") ||
+			normalized->Contains("back over") ||
+			normalized->Contains("on its wheels") ||
+			normalized->Contains("on the wheels") ||
+			normalized->Contains("on my wheels") ||
+			normalized->Contains("turn it over") ||
+			normalized->Contains("roll it over") ||
+			normalized->Contains("rolled over") ||
+			normalized->Contains("turned over");
+		bool mentionsNonCurrentVehicleTarget =
+			normalized->Contains("another car") ||
+			normalized->Contains("another vehicle") ||
+			normalized->Contains("that car") ||
+			normalized->Contains("that vehicle") ||
+			normalized->Contains("his car") ||
+			normalized->Contains("her car") ||
+			normalized->Contains("their car") ||
+			normalized->Contains("someone else's car") ||
+			normalized->Contains("someone elses car") ||
+			normalized->Contains("nearby car") ||
+			normalized->Contains("parked car");
+		bool mentionsNonVehicleTarget =
+			normalized->Contains("bike") ||
+			normalized->Contains("bicycle") ||
+			normalized->Contains("boat") ||
+			normalized->Contains("heli") ||
+			normalized->Contains("helicopter") ||
+			normalized->Contains("plane") ||
+			normalized->Contains("ped") ||
+			normalized->Contains("person") ||
+			normalized->Contains("object");
+
+		if (mentionsRepair) {
+			failureReason = "The built-in flip command only puts the current vehicle back upright; it does not repair or restore it.";
+			return false;
+		}
+		if (mentionsCosmetic) {
+			failureReason = "The built-in flip command does not repaint, clean, customize, or otherwise change the vehicle beyond reorienting it.";
+			return false;
+		}
+		if (mentionsNonCurrentVehicleTarget || mentionsNonVehicleTarget) {
+			failureReason = "The built-in flip command only works on the player's current vehicle, not another target in the world.";
+			return false;
+		}
+		if (!mentionsOrientation) {
+			failureReason = "The built-in flip command is only an exact fit for requests to put the current vehicle upright.";
+			return false;
+		}
+
+		commandLine = "flip";
+		return true;
 	}
 
 	bool AgentCommandSemantics::ValidateHeal(String^ userInput, AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
@@ -319,6 +397,8 @@ namespace GTA {
 		}
 
 		String^ name = result->CommandName->Trim()->ToLowerInvariant();
+		if (name == "flip")
+			return ValidateFlip(userInput, result, commandLine, failureReason);
 		if (name == "heal")
 			return ValidateHeal(userInput, result, commandLine, failureReason);
 		if (name == "teleport")
