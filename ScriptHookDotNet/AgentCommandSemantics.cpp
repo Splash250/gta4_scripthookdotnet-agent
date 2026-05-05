@@ -94,18 +94,14 @@ namespace GTA {
 			normalized->Contains("mod") ||
 			normalized->Contains("tune");
 		bool mentionsOrientation =
-			normalized->Contains("flip") ||
 			normalized->Contains("upright") ||
 			normalized->Contains("right side up") ||
 			normalized->Contains("right-side up") ||
 			normalized->Contains("back over") ||
-			normalized->Contains("on its wheels") ||
-			normalized->Contains("on the wheels") ||
-			normalized->Contains("on my wheels") ||
-			normalized->Contains("turn it over") ||
-			normalized->Contains("roll it over") ||
-			normalized->Contains("rolled over") ||
-			normalized->Contains("turned over");
+			normalized->Contains("back upright") ||
+			normalized->Contains("back on its wheels") ||
+			normalized->Contains("back on the wheels") ||
+			normalized->Contains("back on my wheels");
 		bool mentionsNonCurrentVehicleTarget =
 			normalized->Contains("another car") ||
 			normalized->Contains("another vehicle") ||
@@ -118,13 +114,7 @@ namespace GTA {
 			normalized->Contains("someone elses car") ||
 			normalized->Contains("nearby car") ||
 			normalized->Contains("parked car");
-		bool mentionsNonVehicleTarget =
-			normalized->Contains("bike") ||
-			normalized->Contains("bicycle") ||
-			normalized->Contains("boat") ||
-			normalized->Contains("heli") ||
-			normalized->Contains("helicopter") ||
-			normalized->Contains("plane") ||
+		bool mentionsOtherWorldTarget =
 			normalized->Contains("ped") ||
 			normalized->Contains("person") ||
 			normalized->Contains("object");
@@ -137,7 +127,7 @@ namespace GTA {
 			failureReason = "The built-in flip command does not repaint, clean, customize, or otherwise change the vehicle beyond reorienting it.";
 			return false;
 		}
-		if (mentionsNonCurrentVehicleTarget || mentionsNonVehicleTarget) {
+		if (mentionsNonCurrentVehicleTarget || mentionsOtherWorldTarget) {
 			failureReason = "The built-in flip command only works on the player's current vehicle, not another target in the world.";
 			return false;
 		}
