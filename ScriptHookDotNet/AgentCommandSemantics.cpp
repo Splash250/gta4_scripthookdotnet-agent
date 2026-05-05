@@ -64,6 +64,13 @@ namespace GTA {
 		return true;
 	}
 
+	bool AgentCommandSemantics::ValidateFlip(AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
+		commandLine = String::Empty;
+		if (!ValidateNoArgumentCommand(result, failureReason)) return false;
+		commandLine = "flip";
+		return true;
+	}
+
 	bool AgentCommandSemantics::ValidateHeal(String^ userInput, AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
 		commandLine = String::Empty;
 		if (!ValidateNoArgumentCommand(result, failureReason)) return false;
@@ -106,6 +113,32 @@ namespace GTA {
 		}
 
 		commandLine = "heal";
+		return true;
+	}
+
+	bool AgentCommandSemantics::ValidateSpawn(AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
+		commandLine = String::Empty;
+		failureReason = String::Empty;
+		if (isNULL(result) || isNULL(result->Arguments)) {
+			failureReason = "spawn requires a readable argument object.";
+			return false;
+		}
+		if (!result->Arguments->ContainsKey("model")) {
+			failureReason = "spawn requires an exact model name.";
+			return false;
+		}
+
+		String^ model = result->Arguments["model"]->Trim();
+		if (String::IsNullOrWhiteSpace(model)) {
+			failureReason = "spawn requires an exact model name.";
+			return false;
+		}
+		if (result->Arguments->Count > 1) {
+			failureReason = "spawn only accepts an exact model name in this milestone.";
+			return false;
+		}
+
+		commandLine = "spawn " + model;
 		return true;
 	}
 
@@ -214,9 +247,35 @@ namespace GTA {
 		return true;
 	}
 
+	bool AgentCommandSemantics::ValidateReloadScripts(AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
+		commandLine = String::Empty;
+		if (!ValidateNoArgumentCommand(result, failureReason)) return false;
+		commandLine = "reloadscripts";
+		return true;
+	}
+
+	bool AgentCommandSemantics::ValidateStartScripts(AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
+		commandLine = String::Empty;
+		if (!ValidateNoArgumentCommand(result, failureReason)) return false;
+		commandLine = "startscripts";
+		return true;
+	}
+
+	bool AgentCommandSemantics::ValidateAbortScripts(AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
+		commandLine = String::Empty;
+		if (!ValidateNoArgumentCommand(result, failureReason)) return false;
+		commandLine = "abortscripts";
+		return true;
+	}
+
 	String^ AgentCommandSemantics::GetArgumentSchema(String^ commandName) {
 		if (String::IsNullOrEmpty(commandName)) return "none";
 		String^ name = commandName->Trim()->ToLowerInvariant();
+		if (name == "abortscripts") return "none";
+		if (name == "flip") return "none";
+		if (name == "reloadscripts") return "none";
+		if (name == "spawn") return "model=exact-model-name";
+		if (name == "startscripts") return "none";
 		if (name == "teleport") return "mode=waypoint | mode=coords,x,y[,z][,heading]";
 		if (name == "setdaytime") return "time=HH:MM";
 		if (name == "settimescale") return "value=positive-float";
@@ -226,16 +285,18 @@ namespace GTA {
 	String^ AgentCommandSemantics::GetSemanticNotes(String^ commandName) {
 		if (String::IsNullOrEmpty(commandName)) return String::Empty;
 		String^ name = commandName->Trim()->ToLowerInvariant();
-		if (name == "flip") return "Flips the current vehicle upright and currently reports the resulting teleport destination on success.";
+		if (name == "abortscripts") return "Stops all loaded .NET scripts. Exact fit for stop or abort all scripts requests, not for pausing or stopping one selected script.";
+		if (name == "flip") return "Flips only the local player's current vehicle upright. Exact fit for overturn or upright-current-vehicle requests only; it does not repair, customize, or affect another vehicle.";
 		if (name == "heal") return "Restores health and armor to full and repairs the current vehicle. Usually silent on success. Cannot remove armor, set an exact numeric health value, or satisfy vehicle-only repair requests exactly.";
-		if (name == "spawn") return "Spawns a ped, vehicle, or object by exact model name. Success is often silent; output is mainly used for invalid models or other error paths.";
+		if (name == "spawn") return "Spawns a ped, vehicle, or object by exact model name only. The runtime resolves that name through the local non-zero GTA::Model hash; it does not support categories, random choices, colors, tuning, or other customization arguments.";
 		if (name == "teleport") return "Supports waypoint teleport or explicit coordinates. Usually emits output when reporting a destination or a missing waypoint. Does not infer destinations from vague location descriptions.";
 		if (name == "setdaytime") return "Sets exact in-game time from HH:MM only.";
 		if (name == "settimescale") return "Sets a positive numeric timescale multiplier only.";
-		if (name == "reloadscripts") return "Reloads .NET scripts from disk. Exact fit for reload requests and normally emits script reload status lines.";
+		if (name == "reloadscripts") return "Reloads all .NET scripts from disk. Exact fit for reload-all-scripts requests only; it does not reload one selected script or edit script contents.";
 		if (name == "scripthelp") return "Displays script-provided console commands and normally emits a help listing.";
 		if (name == "showplayers") return "Lists players in the current game and normally emits player names or identifiers.";
 		if (name == "showposition") return "Shows current player position and heading. Exact fit for position queries and normally emits coordinates.";
+		if (name == "startscripts") return "Starts or resumes all .NET scripts after an earlier abort. Exact fit for start scripts or resume scripts requests; it does not reload scripts from disk or edit script contents.";
 		return String::Empty;
 	}
 
@@ -272,8 +333,18 @@ namespace GTA {
 		}
 
 		String^ name = result->CommandName->Trim()->ToLowerInvariant();
+		if (name == "abortscripts")
+			return ValidateAbortScripts(result, commandLine, failureReason);
+		if (name == "flip")
+			return ValidateFlip(result, commandLine, failureReason);
 		if (name == "heal")
 			return ValidateHeal(userInput, result, commandLine, failureReason);
+		if (name == "reloadscripts")
+			return ValidateReloadScripts(result, commandLine, failureReason);
+		if (name == "spawn")
+			return ValidateSpawn(result, commandLine, failureReason);
+		if (name == "startscripts")
+			return ValidateStartScripts(result, commandLine, failureReason);
 		if (name == "teleport")
 			return ValidateTeleport(result, commandLine, failureReason);
 		if (name == "setdaytime")
