@@ -429,9 +429,8 @@ namespace GTA {
 			return;
 		}
 
-		if (intent->Type == AgentIntentType::UnsupportedAction) {
-			Print("(AGENT STATUS) " + intent->Message);
-			Print("(AGENT STATUS) If you want, I can help design a script for GAME_ROOT/scripts and then reload scripts so it applies.");
+		if (pReasoningWorker->IsBusy) {
+			Print("(AGENT STATUS) Agent is already evaluating another command request.");
 			return;
 		}
 

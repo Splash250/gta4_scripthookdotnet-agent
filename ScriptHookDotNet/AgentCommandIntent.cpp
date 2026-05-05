@@ -57,46 +57,12 @@ namespace GTA {
 		return true;
 	}
 
-	bool AgentCommandIntent::LooksLikeActionRequest(String^ normalized) {
-		if (String::IsNullOrEmpty(normalized)) return false;
-
-		if (normalized->StartsWith("can you ")) return true;
-		if (normalized->StartsWith("could you ")) return true;
-		if (normalized->StartsWith("please ")) return true;
-		if (normalized->StartsWith("i need ")) return true;
-		if (normalized->StartsWith("help me ")) return true;
-
-		if (ContainsAll(normalized, "remove", "armour")) return true;
-		if (ContainsAll(normalized, "remove", "armor")) return true;
-		if (ContainsAll(normalized, "give", "weapon")) return true;
-		if (ContainsAll(normalized, "spawn")) return true;
-		if (ContainsAll(normalized, "teleport")) return true;
-		if (ContainsAll(normalized, "heal")) return true;
-		if (ContainsAll(normalized, "flip")) return true;
-		if (ContainsAll(normalized, "reload", "script")) return true;
-		if (ContainsAll(normalized, "start", "script")) return true;
-		if (ContainsAll(normalized, "abort", "script")) return true;
-		if (ContainsAll(normalized, "set", "time")) return true;
-		if (ContainsAll(normalized, "set", "timescale")) return true;
-		if (ContainsAll(normalized, "save", "game")) return true;
-		if (ContainsAll(normalized, "minimize")) return true;
-		return false;
-	}
-
 	AgentIntent^ AgentCommandIntent::CreateBuiltInIntent(AgentIntentType type, String^ originalInput, String^ commandName, String^ commandLine) {
 		AgentIntent^ intent = gcnew AgentIntent();
 		intent->Type = type;
 		intent->OriginalInput = isNULL(originalInput) ? String::Empty : originalInput;
 		intent->CommandName = isNULL(commandName) ? String::Empty : commandName;
 		intent->CommandLine = isNULL(commandLine) ? String::Empty : commandLine;
-		return intent;
-	}
-
-	AgentIntent^ AgentCommandIntent::CreateUnsupportedActionIntent(String^ originalInput, String^ message) {
-		AgentIntent^ intent = gcnew AgentIntent();
-		intent->Type = AgentIntentType::UnsupportedAction;
-		intent->OriginalInput = isNULL(originalInput) ? String::Empty : originalInput;
-		intent->Message = isNULL(message) ? String::Empty : message;
 		return intent;
 	}
 
@@ -137,46 +103,12 @@ namespace GTA {
 				return CreateBuiltInIntent(AgentIntentType::BuiltInExplain, intent->OriginalInput, spec->Name, spec->Name);
 		}
 
-		if (normalized->Contains("help") && (normalized->Contains("command") || normalized->Contains("console"))) {
-			AgentCommandSpec^ spec = AgentCommandRegistry::Find("help");
-			if isNotNULL(spec)
-				return CreateBuiltInIntent(AgentIntentType::BuiltInExplain, intent->OriginalInput, spec->Name, spec->Name);
-		}
-
-		if (ContainsAll(normalized, "heal"))
+		if (normalized == "heal me up")
 			return CreateBuiltInIntent(AgentIntentType::BuiltInRun, intent->OriginalInput, "heal", "heal");
-		if (ContainsAll(normalized, "flip"))
-			return CreateBuiltInIntent(AgentIntentType::BuiltInRun, intent->OriginalInput, "flip", "flip");
-		if (ContainsAll(normalized, "reload", "script"))
+		if (normalized == "reload the scripts")
 			return CreateBuiltInIntent(AgentIntentType::BuiltInRun, intent->OriginalInput, "reloadscripts", "reloadscripts");
-		if (ContainsAll(normalized, "start", "script"))
-			return CreateBuiltInIntent(AgentIntentType::BuiltInRun, intent->OriginalInput, "startscripts", "startscripts");
-		if (ContainsAll(normalized, "abort", "script"))
-			return CreateBuiltInIntent(AgentIntentType::BuiltInRun, intent->OriginalInput, "abortscripts", "abortscripts");
-		if (ContainsAll(normalized, "show", "position") || ContainsAll(normalized, "where", "position"))
-			return CreateBuiltInIntent(AgentIntentType::BuiltInRun, intent->OriginalInput, "showposition", "showposition");
-		if (ContainsAll(normalized, "show", "player") || ContainsAll(normalized, "list", "player"))
-			return CreateBuiltInIntent(AgentIntentType::BuiltInRun, intent->OriginalInput, "showplayers", "showplayers");
-		if (ContainsAll(normalized, "loaded", "script"))
-			return CreateBuiltInIntent(AgentIntentType::BuiltInRun, intent->OriginalInput, "loadedscripts", "loadedscripts");
-		if (ContainsAll(normalized, "running", "script"))
-			return CreateBuiltInIntent(AgentIntentType::BuiltInRun, intent->OriginalInput, "runningscripts", "runningscripts");
-		if (ContainsAll(normalized, "script", "help"))
-			return CreateBuiltInIntent(AgentIntentType::BuiltInRun, intent->OriginalInput, "scripthelp", "scripthelp");
-		if (ContainsAll(normalized, "save", "game") || (normalized == "autosave"))
-			return CreateBuiltInIntent(AgentIntentType::BuiltInRun, intent->OriginalInput, "autosave", "autosave");
-		if (ContainsAll(normalized, "save", "menu"))
-			return CreateBuiltInIntent(AgentIntentType::BuiltInRun, intent->OriginalInput, "save", "save");
-		if (ContainsAll(normalized, "minimize"))
-			return CreateBuiltInIntent(AgentIntentType::BuiltInRun, intent->OriginalInput, "minimize", "minimize");
 		if (ContainsAll(normalized, "teleport", "waypoint") || ContainsAll(normalized, "teleport", "wp"))
 			return CreateBuiltInIntent(AgentIntentType::BuiltInRun, intent->OriginalInput, "teleport", "teleport wp");
-
-		if (LooksLikeActionRequest(normalized))
-			return CreateUnsupportedActionIntent(
-				intent->OriginalInput,
-				"I do not have a built-in ScriptHookDotNet command for that request."
-			);
 
 		return intent;
 	}

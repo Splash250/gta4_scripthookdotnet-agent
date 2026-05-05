@@ -28,8 +28,7 @@ namespace GTA {
 	public enum class AgentIntentType {
 		NormalPrompt,
 		BuiltInExplain,
-		BuiltInRun,
-		UnsupportedAction
+		BuiltInRun
 	};
 
 	CLASS_ATTRIBUTES
@@ -40,14 +39,12 @@ namespace GTA {
 		String^ OriginalInput;
 		String^ CommandName;
 		String^ CommandLine;
-		String^ Message;
 
 		AgentIntent() {
 			Type = AgentIntentType::NormalPrompt;
 			OriginalInput = String::Empty;
 			CommandName = String::Empty;
 			CommandLine = String::Empty;
-			Message = String::Empty;
 		}
 	};
 
@@ -59,9 +56,7 @@ namespace GTA {
 
 		static String^ Normalize(String^ input);
 		static bool ContainsAll(String^ haystack, ... array<String^>^ needles);
-		static bool LooksLikeActionRequest(String^ normalized);
 		static AgentIntent^ CreateBuiltInIntent(AgentIntentType type, String^ originalInput, String^ commandName, String^ commandLine);
-		static AgentIntent^ CreateUnsupportedActionIntent(String^ originalInput, String^ message);
 
 	public:
 		static AgentIntent^ Resolve(String^ input);
