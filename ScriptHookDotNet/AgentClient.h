@@ -56,4 +56,31 @@ namespace GTA {
 		static AgentResponse^ Send(String^ userInput, String^ previousResponseId);
 	};
 
+	CLASS_ATTRIBUTES
+	private ref class AgentRequestWorker sealed {
+
+	private:
+		ref class AgentRequestContext sealed {
+		public:
+			String^ UserInput;
+			String^ PreviousResponseId;
+		};
+
+		System::Object^ pSyncRoot;
+		bool bBusy;
+		AgentResponse^ pCompletedResponse;
+
+		void WorkerMain(System::Object^ state);
+
+	public:
+		AgentRequestWorker();
+
+		property bool IsBusy {
+			bool get();
+		}
+
+		bool Submit(String^ userInput, String^ previousResponseId);
+		bool TryTakeCompleted([System::Runtime::InteropServices::Out] AgentResponse^% response);
+	};
+
 }

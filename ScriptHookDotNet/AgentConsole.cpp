@@ -40,6 +40,7 @@ namespace GTA {
 	AgentConsole::AgentConsole() {
 		bActive = false;
 		pPreviousResponseId = String::Empty;
+		pWorker = gcnew AgentRequestWorker();
 		pInput = String::Empty;
 		pLog = gcnew List<String^>();
 		pLastCommands = gcnew List<String^>();
@@ -112,6 +113,7 @@ namespace GTA {
 
 	void AgentConsole::PerFrameDrawing(GTA::Graphics^ Graphics) {
 		if (!bActive) return;
+		PollWorker();
 
 		Graphics->Scaling = FontScaling::Pixel;
 
@@ -229,6 +231,7 @@ namespace GTA {
 	void AgentConsole::Open() {
 		if (bActive) return;
 		AgentSettings::Reload();
+		if isNULL(pWorker) pWorker = gcnew AgentRequestWorker();
 		ScrollToEnd();
 		bActive = true;
 		OnOpened();
@@ -243,7 +246,22 @@ namespace GTA {
 		if (!bActive) return;
 		bActive = false;
 		pPreviousResponseId = String::Empty;
+		pWorker = gcnew AgentRequestWorker();
 		OnClosed();
+	}
+
+	void AgentConsole::PollWorker() {
+		if isNULL(pWorker) return;
+		AgentResponse^ response;
+		if (!pWorker->TryTakeCompleted(response)) return;
+		if isNULL(response) return;
+
+		if (response->ResponseId->Length > 0) pPreviousResponseId = response->ResponseId;
+		if (response->Error->Length > 0) {
+			Print("(AGENT ERROR) " + response->Error);
+			return;
+		}
+		Print("(AGENT REPLY) " + response->Text);
 	}
 
 	void AgentConsole::SendCommand() {
@@ -268,14 +286,15 @@ namespace GTA {
 			return;
 		}
 
-		Print("(AGENT STATUS) Contacting OpenAI...");
-		AgentResponse^ response = AgentClient::Send(line, pPreviousResponseId);
-		if (response->ResponseId->Length > 0) pPreviousResponseId = response->ResponseId;
-		if (response->Error->Length > 0) {
-			Print("(AGENT ERROR) " + response->Error);
+		if (pWorker->IsBusy) {
+			Print("(AGENT STATUS) Agent is busy. Wait for the current reply.");
 			return;
 		}
-		Print("(AGENT REPLY) " + response->Text);
+		if (!pWorker->Submit(line, pPreviousResponseId)) {
+			Print("(AGENT STATUS) Agent is busy. Wait for the current reply.");
+			return;
+		}
+		Print("(AGENT STATUS) Thinking...");
 	}
 
 	void AgentConsole::AddOldCommand(String^ CommandLine) {

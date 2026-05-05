@@ -35,6 +35,7 @@ namespace GTA {
 	using namespace System::IO;
 	using namespace System::Net;
 	using namespace System::Text;
+	using namespace System::Threading;
 	using namespace System::Web::Script::Serialization;
 
 	String^ AgentClient::EscapeJson(String^ value) {
@@ -193,6 +194,67 @@ namespace GTA {
 		} catch (Exception^ ex) {
 			result->Error = "OpenAI request failed: " + ex->Message;
 			return result;
+		}
+	}
+
+	AgentRequestWorker::AgentRequestWorker() {
+		pSyncRoot = gcnew System::Object();
+		bBusy = false;
+		pCompletedResponse = nullptr;
+	}
+
+	bool AgentRequestWorker::IsBusy::get() {
+		Monitor::Enter(pSyncRoot);
+		try {
+			return bBusy;
+		} finally {
+			Monitor::Exit(pSyncRoot);
+		}
+	}
+
+	bool AgentRequestWorker::Submit(String^ userInput, String^ previousResponseId) {
+		Monitor::Enter(pSyncRoot);
+		try {
+			if (bBusy) return false;
+			bBusy = true;
+			pCompletedResponse = nullptr;
+		} finally {
+			Monitor::Exit(pSyncRoot);
+		}
+
+		AgentRequestContext^ context = gcnew AgentRequestContext();
+		context->UserInput = userInput;
+		context->PreviousResponseId = previousResponseId;
+
+		Thread^ worker = gcnew Thread(gcnew ParameterizedThreadStart(this, &AgentRequestWorker::WorkerMain));
+		worker->IsBackground = true;
+		worker->Start(context);
+		return true;
+	}
+
+	void AgentRequestWorker::WorkerMain(System::Object^ state) {
+		AgentRequestContext^ context = safe_cast<AgentRequestContext^>(state);
+		AgentResponse^ response = AgentClient::Send(context->UserInput, context->PreviousResponseId);
+
+		Monitor::Enter(pSyncRoot);
+		try {
+			pCompletedResponse = response;
+			bBusy = false;
+		} finally {
+			Monitor::Exit(pSyncRoot);
+		}
+	}
+
+	bool AgentRequestWorker::TryTakeCompleted([System::Runtime::InteropServices::Out] AgentResponse^% response) {
+		response = nullptr;
+		Monitor::Enter(pSyncRoot);
+		try {
+			if (isNULL(pCompletedResponse)) return false;
+			response = pCompletedResponse;
+			pCompletedResponse = nullptr;
+			return true;
+		} finally {
+			Monitor::Exit(pSyncRoot);
 		}
 	}
 

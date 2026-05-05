@@ -155,6 +155,7 @@ namespace GTA {
 	private:
 		bool bActive;
 		String^ pPreviousResponseId;
+		AgentRequestWorker^ pWorker;
 		String^ pInput;
 		Font^ pFont;
 		Drawing::Color pBackColor;
@@ -179,6 +180,7 @@ namespace GTA {
 
 		int ArrayIndexToPos(int Index);
 		int NewestToArrayIndex(int Index);
+		void PollWorker();
 		void SendCommand();
 		void AddPrintLine(String^ Text);
 		int FirstLineOnScreen();
