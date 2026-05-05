@@ -498,6 +498,45 @@ namespace GTA {
 			return;
 		}
 
+		bool looksLikeAction = LooksLikeGameActionRequest(line);
+		bool classifierPreferred = looksLikeAction;
+		if (!classifierPreferred) {
+			array<wchar_t>^ separators = gcnew array<wchar_t>(1);
+			separators[0] = ' ';
+			array<String^>^ words = line->Split(separators, StringSplitOptions::RemoveEmptyEntries);
+			bool isQuestion = line->Contains("?");
+			bool isExplanationQuestion = false;
+			String^ normalized = line->ToLowerInvariant();
+			if (isQuestion) {
+				isExplanationQuestion =
+					normalized->StartsWith("what ") ||
+					normalized->StartsWith("why ") ||
+					normalized->StartsWith("how ");
+			}
+
+			if (!isQuestion && (words->Length <= 8))
+				classifierPreferred = true;
+			else if (isQuestion && !isExplanationQuestion && (words->Length <= 8))
+				classifierPreferred = true;
+		}
+
+		if (classifierPreferred) {
+			if (pReasoningWorker->IsBusy) {
+				Print("(AGENT STATUS) Agent is already evaluating another command request.");
+				return;
+			}
+			if (pWorker->IsBusy) {
+				Print("(AGENT STATUS) Agent is busy. Wait for the current reply.");
+				return;
+			}
+			if (!pReasoningWorker->Submit(line)) {
+				Print("(AGENT STATUS) Agent is already evaluating another command request.");
+				return;
+			}
+			Print("(AGENT STATUS) Evaluating built-in command options...");
+			return;
+		}
+
 		if (pWorker->IsBusy) {
 			Print("(AGENT STATUS) Agent is busy. Wait for the current reply.");
 			return;
