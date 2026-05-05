@@ -26,6 +26,7 @@
 #include "AgentCommandExecution.h"
 #include "AgentCommandIntent.h"
 #include "AgentCommandRegistry.h"
+#include "AgentCommandSemantics.h"
 #include "AgentSettings.h"
 #include "Console.h"
 
@@ -426,6 +427,10 @@ namespace GTA {
 			Print("(AGENT STATUS) Command completed with warnings.");
 		else if (execution->OutputLines->Count > 0)
 			Print("(AGENT STATUS) Command completed with output mirrored above.");
+		else if (AgentCommandSemantics::IsUsuallySilentOnSuccess(spec->Name))
+			Print("(AGENT STATUS) Command completed. This command is usually silent on success.");
+		else if (AgentCommandSemantics::IsExpectedToEmitOutput(spec->Name))
+			Print("(AGENT STATUS) Command completed without visible output, although this command often prints results.");
 		else
 			Print("(AGENT STATUS) Command completed.");
 
