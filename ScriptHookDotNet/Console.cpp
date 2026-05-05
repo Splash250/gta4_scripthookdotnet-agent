@@ -282,7 +282,7 @@ namespace GTA {
 		//}
 		ScrollToEnd();
 		bActive = true;
-		Opened(this, EventArgs::Empty);
+		OnOpened();
 	}
 	void Console::Open(String^ DefaultInput) {
 		if (bActive) return;
@@ -292,7 +292,7 @@ namespace GTA {
 	void Console::Close() {
 		if (!bActive) return;
 		bActive = false;
-		Closed(this, EventArgs::Empty);
+		OnClosed();
 	}
 
 	void Console::SendCommand() {

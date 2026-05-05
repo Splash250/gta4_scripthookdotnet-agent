@@ -26,7 +26,40 @@
 namespace GTA {
 
 	CLASS_ATTRIBUTES
-	private ref class Console sealed : base::Console {
+	private ref class LocalConsoleBase abstract : base::Console {
+
+	internal:
+		LocalConsoleBase() {}
+		virtual void PressKey(WinForms::Keys key) abstract;
+		virtual void PerFrameDrawing(GTA::Graphics^ Graphics) abstract;
+		virtual void AddOldCommand(String^ CommandLine) abstract;
+
+	public:
+		event ConsoleEventHandler^ Command;
+		event EventHandler^ Opened;
+		event EventHandler^ Closed;
+
+		property float Height {
+			virtual float get() abstract;
+		}
+		property WinForms::Keys ActivationKey {
+			virtual WinForms::Keys get() abstract;
+		}
+
+	protected:
+		void OnCommand(ConsoleEventArgs^ e) {
+			Command(this, e);
+		}
+		void OnOpened() {
+			Opened(this, EventArgs::Empty);
+		}
+		void OnClosed() {
+			Closed(this, EventArgs::Empty);
+		}
+	};
+
+	CLASS_ATTRIBUTES
+	private ref class Console sealed : LocalConsoleBase {
 
 	private:
 		bool bActive;
@@ -72,30 +105,26 @@ namespace GTA {
 	internal:
 
 		Console();
-		void PressKey(WinForms::Keys key);
+		virtual void PressKey(WinForms::Keys key) override;
 		void MouseDown(System::Object^ sender, GTA::MouseEventArgs^ e);
 		void MouseUp(System::Object^ sender, GTA::MouseEventArgs^ e);
 		//void Tick();
-		void PerFrameDrawing(GTA::Graphics^ Graphics);
-		void AddOldCommand(String^ CommandLine);
- 
-	public:
-		event ConsoleEventHandler^ Command;
-		event EventHandler^ Opened;
-		event EventHandler^ Closed;
+		virtual void PerFrameDrawing(GTA::Graphics^ Graphics) override;
+		virtual void AddOldCommand(String^ CommandLine) override;
 
+	public:
 		property bool isActive {
 			virtual bool get() override {
 				return bActive;
 			}
 		}
 		property float Height {
-			float get() {
+			virtual float get() override {
 				return pHeight;
 			}
 		}
 		property WinForms::Keys ActivationKey {
-			WinForms::Keys get();
+			virtual WinForms::Keys get() override;
 		}
 		property int LinesOnScreen {
 			int get();
@@ -118,13 +147,85 @@ namespace GTA {
 
 		virtual void SendCommand(String^ CommandLine) override;
 		virtual void Print(String^ Text) override;
+	};
 
-	protected:
+	CLASS_ATTRIBUTES
+	private ref class AgentConsole sealed : LocalConsoleBase {
 
-		virtual void OnCommand(ConsoleEventArgs^ e) {
-			Command(this,e);
+	private:
+		bool bActive;
+		String^ pPreviousResponseId;
+		String^ pInput;
+		Font^ pFont;
+		Drawing::Color pBackColor;
+		Drawing::Color pForeColor;
+		List<String^>^ pLog;
+		List<String^>^ pLastCommands;
+		int OldSelect;
+		int LineOffset;
+		static const int MAX_COMMANDS = 20;
+		static const int MAX_LOG_LINES = 200;
+		static const float WIDTH = 1.0f;
+		static const float MIN_HEIGHT = 0.25f;
+		static const float STEP_HEIGHT = 0.25f;
+		static const float MAX_HEIGHT = 0.75f;
+		float pHeight;
+		float pHeightPercentage;
+		float pBorder;
+		static array<System::Char>^ splitChars = gcnew array<System::Char>(2) {'\n', '\r'};
+
+		Drawing::RectangleF scrollRect;
+		int scrollOffset;
+
+		int ArrayIndexToPos(int Index);
+		int NewestToArrayIndex(int Index);
+		void SendCommand();
+		void AddPrintLine(String^ Text);
+		int FirstLineOnScreen();
+		int LastLineOnScreen();
+		int posToLineOffset(int posY);
+
+	internal:
+		AgentConsole();
+		virtual void PressKey(WinForms::Keys key) override;
+		void MouseDown(System::Object^ sender, GTA::MouseEventArgs^ e);
+		void MouseUp(System::Object^ sender, GTA::MouseEventArgs^ e);
+		virtual void PerFrameDrawing(GTA::Graphics^ Graphics) override;
+		virtual void AddOldCommand(String^ CommandLine) override;
+
+	public:
+		property bool isActive {
+			virtual bool get() override {
+				return bActive;
+			}
 		}
+		property float Height {
+			virtual float get() override {
+				return pHeight;
+			}
+		}
+		property WinForms::Keys ActivationKey {
+			virtual WinForms::Keys get() override;
+		}
+		property int LinesOnScreen {
+			int get();
+		}
+		property int LinesPerScreen {
+			int get();
+		}
+		property int LineCount {
+			int get();
+		}
+		float LineScrollPos(int LineID);
 
+		void ScrollToStart();
+		void ScrollToEnd();
+
+		virtual void Open(String^ DefaultInput) override;
+		virtual void Open() override;
+		virtual void Close() override;
+		virtual void SendCommand(String^ CommandLine) override;
+		virtual void Print(String^ Text) override;
 	};
 
 	CLASS_ATTRIBUTES

@@ -13,6 +13,7 @@
 *.userprefs
 
 # Build results
+agents.ini
 [Dd]ebug/
 [Dd]ebugPublic/
 [Rr]elease/

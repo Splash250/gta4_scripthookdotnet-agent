@@ -65,6 +65,11 @@ namespace GTA {
 	ref class World;
 	ref class Blip;
 	ref class Camera;
+	ref class AgentConsole;
+	ref class AgentClient;
+	ref class AgentResponse;
+	ref class AgentSettings;
+	ref class LocalConsoleBase;
 	ref class Object;
 	ref class Pickup;
 	ref class ScriptedFire;

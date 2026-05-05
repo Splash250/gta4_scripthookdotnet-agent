@@ -22,6 +22,7 @@
 
 #include "stdafx.h"
 
+#include "AgentSettings.h"
 #include "ConsoleCommands.h"
 
 #include "Blip.h"
@@ -39,7 +40,7 @@
 namespace GTA {
 
 	GTA::Console^ ConsoleCommands::Console::get() {
-		return NetHook::LocalConsole;
+		return NetHook::DefaultConsole;
 	}
 	GTA::Player^ ConsoleCommands::Player::get() {
 		return GTA::Game::LocalPlayer;
@@ -50,6 +51,8 @@ namespace GTA {
 
 		if (cmd == "help") { // HELP
 			Console->Print("Commands:\n\
+				Agent              - Opens the dedicated agent console.\n\
+				Agent-Config-Refresh - Reloads and validates agents.ini from the GTA IV root.\n\
 				AbortScripts       - Abort all .Net scripts. Useful if you want to play multiplayer.\n\
 				Autosave           - Trigger an autosave\n\
 				Exit               - Leave the game\n\
@@ -90,6 +93,30 @@ namespace GTA {
 			int dur = e->Parameter->ToInteger(1);
 			if (dur <= 0) dur = 4000;
 			NetHook::DisplayText(e->Parameter->ToString(0),dur);
+			return true;
+
+		} else if (cmd == "agent") { // AGENT
+			bool created = AgentSettings::EnsureConfigFileExists();
+			String^ validationMessage;
+			if (!AgentSettings::IsConfigured(validationMessage)) {
+				if (created)
+					Console->Print("agents.ini was not present. ScriptHook created it at: " + AgentSettings::ConfigPath);
+				Console->Print(validationMessage);
+				return true;
+			}
+			NetHook::EnterAgentConsole();
+			return true;
+
+		} else if (cmd == "agent-config-refresh") { // AGENT-CONFIG-REFRESH
+			bool created = AgentSettings::EnsureConfigFileExists();
+			String^ validationMessage;
+			if (!AgentSettings::IsConfigured(validationMessage)) {
+				if (created)
+					Console->Print("agents.ini was not present. ScriptHook created it at: " + AgentSettings::ConfigPath);
+				Console->Print(validationMessage);
+				return true;
+			}
+			Console->Print("agents.ini reloaded successfully.");
 			return true;
 
 		

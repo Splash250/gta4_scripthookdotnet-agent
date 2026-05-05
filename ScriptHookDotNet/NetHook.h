@@ -65,6 +65,8 @@ namespace GTA{
 	
 		//static GTA::ManagerThread^ ManagerThread;
 		static GTA::base::Console^ pConsole;
+		static GTA::Console^ pDefaultConsole;
+		static GTA::AgentConsole^ pAgentConsole;
 		static GTA::base::Mouse^ pMouse;
 		static GTA::KeyWatchDog^ pKeys;
 		static GTA::KeyboardLayout^ pKeyboardLayout;
@@ -111,9 +113,14 @@ namespace GTA{
 				return pConsole;
 			}
 		}
-		static property GTA::Console^ LocalConsole {
+		static property GTA::LocalConsoleBase^ LocalConsole {
+			GTA::LocalConsoleBase^ get() {
+				return (GTA::LocalConsoleBase^)pConsole;
+			}
+		}
+		static property GTA::Console^ DefaultConsole {
 			GTA::Console^ get() {
-				return (GTA::Console^)pConsole;
+				return pDefaultConsole;
 			}
 		}
 		static property GTA::KeyboardLayout^ KeyboardLayout {
@@ -169,6 +176,8 @@ namespace GTA{
 		}
 
 		static void Initialize(bool isPrimary, int hModule);
+		static void EnterAgentConsole();
+		static void ExitAgentConsole();
 		static void GameEnded();
 		static void Terminate();
 		static void Minimize();

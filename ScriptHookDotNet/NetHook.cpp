@@ -57,7 +57,9 @@ namespace GTA {
 		if (isPrimary) {
 			pKeys = gcnew GTA::KeyWatchDog();
 			pMouse = gcnew GTA::Forms::Mouse();
-			pConsole = gcnew GTA::Console();
+			pDefaultConsole = gcnew GTA::Console();
+			pAgentConsole = gcnew GTA::AgentConsole();
+			pConsole = pDefaultConsole;
 		} else {
 			pMouse = gcnew GTA::Forms::RemoteMouse();
 			pConsole = gcnew GTA::RemoteConsole();
@@ -122,7 +124,7 @@ namespace GTA {
 
 			if (isPrimary) {
 
-				GTA::Console^ cons = (GTA::Console^)pConsole;
+				GTA::LocalConsoleBase^ cons = LocalConsole;
 				pFormHost = gcnew GTA::Forms::FormHost(nullptr);
 
 				AppDomain::CurrentDomain->AssemblyResolve += gcnew ResolveEventHandler(&MyResolveEventHandler);
@@ -140,6 +142,8 @@ namespace GTA {
 				cons->Command += gcnew ConsoleEventHandler(&ConsoleCommand);
 				cons->Opened += gcnew EventHandler(&ConsoleOpened);
 				cons->Closed += gcnew EventHandler(&ConsoleClosed);
+				pAgentConsole->Opened += gcnew EventHandler(&ConsoleOpened);
+				pAgentConsole->Closed += gcnew EventHandler(&ConsoleClosed);
 
 
 				if isNULL(pScriptDomain) pScriptDomain = gcnew GTA::ScriptDomain();
@@ -256,6 +260,23 @@ namespace GTA {
 		//Game::LocalPlayer->CanControlCharacter = true;
 		//Mouse->Enabled = false;
 		TryToDisableMouse();
+	}
+
+	void NetHook::EnterAgentConsole() {
+		if ((!bPrimary) || isNULL(pAgentConsole)) return;
+		if (pConsole == pAgentConsole) return;
+		if (pConsole->isActive) pConsole->Close();
+		pConsole = pAgentConsole;
+		pConsole->Open();
+		pConsole->Print("Agent console active. Type exit to return.");
+	}
+
+	void NetHook::ExitAgentConsole() {
+		if ((!bPrimary) || isNULL(pDefaultConsole)) return;
+		if (pConsole == pDefaultConsole) return;
+		if (pConsole->isActive) pConsole->Close();
+		pConsole = pDefaultConsole;
+		pConsole->Open();
 	}
 
 	void NetHook::ConsoleCommand(Object^ sender, ConsoleEventArgs^ e) {
