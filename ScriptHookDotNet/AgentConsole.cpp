@@ -47,6 +47,7 @@ namespace GTA {
 		bActive = false;
 		pPreviousResponseId = String::Empty;
 		pWorker = gcnew AgentRequestWorker();
+		pActiveCommandExecution = nullptr;
 		pPendingCommandSpec = nullptr;
 		pPendingCommandLine = String::Empty;
 		pInput = String::Empty;
@@ -391,6 +392,7 @@ namespace GTA {
 		bActive = false;
 		pPreviousResponseId = String::Empty;
 		pWorker = gcnew AgentRequestWorker();
+		pActiveCommandExecution = nullptr;
 		ClearPendingAction();
 		OnClosed();
 	}
@@ -404,6 +406,7 @@ namespace GTA {
 		if (String::IsNullOrEmpty(commandLine) || isNULL(spec)) return;
 
 		AgentCommandExecution^ execution = gcnew AgentCommandExecution(commandLine, spec->Name);
+		pActiveCommandExecution = execution;
 
 		Print("(AGENT STATUS) Running command: " + commandLine);
 		Print("(AGENT STATUS) Mirroring built-in command output below when available.");
@@ -425,6 +428,7 @@ namespace GTA {
 		else
 			Print("(AGENT STATUS) Command completed.");
 
+		pActiveCommandExecution = nullptr;
 		ClearPendingAction();
 	}
 
@@ -642,7 +646,12 @@ namespace GTA {
 		}
 		array<String^>^ ary = Text->Replace("\r", "")->Split(splitChars, StringSplitOptions::None);
 		for (int i = 0; i < ary->Length; i++) {
-			AddPrintLine(ary[i]);
+			String^ line = ary[i];
+			AddPrintLine(line);
+			if (isNULL(pActiveCommandExecution)) continue;
+			if (line->StartsWith("(AGENT STATUS)") || line->StartsWith("(AGENT REPLY)") || line->StartsWith("(AGENT ERROR)")) continue;
+			if (line->StartsWith("> ") || line->StartsWith("(COMMAND)")) continue;
+			pActiveCommandExecution->AppendOutputLine(line);
 		}
 	}
 	void AgentConsole::AddPrintLine(String^ Text) {
