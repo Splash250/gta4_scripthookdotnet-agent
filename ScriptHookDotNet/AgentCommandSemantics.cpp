@@ -64,8 +64,9 @@ namespace GTA {
 		return true;
 	}
 
-	bool AgentCommandSemantics::ValidateFlip(AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
+	bool AgentCommandSemantics::ValidateFlip(String^ userInput, AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
 		commandLine = String::Empty;
+		(void)userInput;
 		if (!ValidateNoArgumentCommand(result, failureReason)) return false;
 		commandLine = "flip";
 		return true;
@@ -116,9 +117,10 @@ namespace GTA {
 		return true;
 	}
 
-	bool AgentCommandSemantics::ValidateSpawn(AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
+	bool AgentCommandSemantics::ValidateSpawn(String^ userInput, AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
 		commandLine = String::Empty;
 		failureReason = String::Empty;
+		(void)userInput;
 		if (isNULL(result) || isNULL(result->Arguments)) {
 			failureReason = "spawn requires a readable argument object.";
 			return false;
@@ -247,22 +249,25 @@ namespace GTA {
 		return true;
 	}
 
-	bool AgentCommandSemantics::ValidateReloadScripts(AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
+	bool AgentCommandSemantics::ValidateReloadScripts(String^ userInput, AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
 		commandLine = String::Empty;
+		(void)userInput;
 		if (!ValidateNoArgumentCommand(result, failureReason)) return false;
 		commandLine = "reloadscripts";
 		return true;
 	}
 
-	bool AgentCommandSemantics::ValidateStartScripts(AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
+	bool AgentCommandSemantics::ValidateStartScripts(String^ userInput, AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
 		commandLine = String::Empty;
+		(void)userInput;
 		if (!ValidateNoArgumentCommand(result, failureReason)) return false;
 		commandLine = "startscripts";
 		return true;
 	}
 
-	bool AgentCommandSemantics::ValidateAbortScripts(AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
+	bool AgentCommandSemantics::ValidateAbortScripts(String^ userInput, AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
 		commandLine = String::Empty;
+		(void)userInput;
 		if (!ValidateNoArgumentCommand(result, failureReason)) return false;
 		commandLine = "abortscripts";
 		return true;
@@ -334,17 +339,17 @@ namespace GTA {
 
 		String^ name = result->CommandName->Trim()->ToLowerInvariant();
 		if (name == "abortscripts")
-			return ValidateAbortScripts(result, commandLine, failureReason);
+			return ValidateAbortScripts(userInput, result, commandLine, failureReason);
 		if (name == "flip")
-			return ValidateFlip(result, commandLine, failureReason);
+			return ValidateFlip(userInput, result, commandLine, failureReason);
 		if (name == "heal")
 			return ValidateHeal(userInput, result, commandLine, failureReason);
 		if (name == "reloadscripts")
-			return ValidateReloadScripts(result, commandLine, failureReason);
+			return ValidateReloadScripts(userInput, result, commandLine, failureReason);
 		if (name == "spawn")
-			return ValidateSpawn(result, commandLine, failureReason);
+			return ValidateSpawn(userInput, result, commandLine, failureReason);
 		if (name == "startscripts")
-			return ValidateStartScripts(result, commandLine, failureReason);
+			return ValidateStartScripts(userInput, result, commandLine, failureReason);
 		if (name == "teleport")
 			return ValidateTeleport(result, commandLine, failureReason);
 		if (name == "setdaytime")
