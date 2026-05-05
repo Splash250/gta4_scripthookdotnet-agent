@@ -429,11 +429,6 @@ namespace GTA {
 			return;
 		}
 
-		if (pReasoningWorker->IsBusy) {
-			Print("(AGENT STATUS) Agent is already evaluating another command request.");
-			return;
-		}
-
 		if (pWorker->IsBusy) {
 			Print("(AGENT STATUS) Agent is busy. Wait for the current reply.");
 			return;
