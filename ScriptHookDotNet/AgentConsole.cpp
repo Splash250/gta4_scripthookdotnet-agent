@@ -153,28 +153,71 @@ namespace GTA {
 		if (String::IsNullOrWhiteSpace(input)) return false;
 
 		String^ normalized = input->Trim()->ToLowerInvariant();
+		array<wchar_t>^ chars = normalized->ToCharArray();
+		for (int i = 0; i < chars->Length; i++) {
+			if (!Char::IsLetterOrDigit(chars[i]))
+				chars[i] = ' ';
+		}
+
+		array<wchar_t>^ separators = gcnew array<wchar_t>(1);
+		separators[0] = ' ';
+		String^ tokenSource = gcnew String(chars);
+		array<String^>^ tokens = tokenSource->Split(separators, StringSplitOptions::RemoveEmptyEntries);
+		if (tokens->Length == 0) return false;
+
 		array<String^>^ verbs = gcnew array<String^>{ "make", "change", "paint", "turn", "set", "give", "spawn", "teleport", "fix", "heal", "reload" };
-		array<String^>^ objects = gcnew array<String^>{ "boat", "car", "vehicle", "player", "health", "armor", "armour", "color", "red", "blue", "green", "time", "scripts" };
+		array<String^>^ strongObjects = gcnew array<String^>{ "boat", "car", "vehicle", "player" };
+		array<String^>^ stateObjects = gcnew array<String^>{ "health", "armor", "armour", "scripts" };
 		bool hasVerb = false;
-		bool hasObject = false;
+		bool hasStrongObject = false;
+		bool hasStateObject = false;
+		bool hasTimeTerm = false;
+
+		for each (String^ token in tokens) {
+			if (token == "time")
+				hasTimeTerm = true;
+		}
 
 		for each (String^ verb in verbs) {
-			if (normalized->Contains(verb)) {
+			for each (String^ token in tokens) {
+				if (token != verb) continue;
 				hasVerb = true;
 				break;
 			}
+			if (hasVerb) break;
+		}
+		if (!hasVerb) return false;
+
+		for each (String^ obj in strongObjects) {
+			for each (String^ token in tokens) {
+				if (token != obj) continue;
+				hasStrongObject = true;
+				break;
+			}
+			if (hasStrongObject) break;
 		}
 
-		for each (String^ obj in objects) {
-			if (normalized->Contains(obj)) {
-				hasObject = true;
+		for each (String^ obj in stateObjects) {
+			for each (String^ token in tokens) {
+				if (token != obj) continue;
+				hasStateObject = true;
 				break;
+			}
+			if (hasStateObject) break;
+		}
+
+		if (hasStrongObject || hasStateObject)
+			return true;
+
+		if (hasTimeTerm) {
+			for each (String^ token in tokens) {
+				if ((token == "set") || (token == "change") || (token == "turn"))
+					return true;
 			}
 		}
 
-		return hasVerb && hasObject;
+		return false;
 	}
-
 	int AgentConsole::FirstLineOnScreen() {
 		int res = LastLineOnScreen() - LinesPerScreen + 1;
 		if (res < 0) res = 0;
