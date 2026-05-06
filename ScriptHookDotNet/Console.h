@@ -196,6 +196,7 @@ namespace GTA {
 		System::Collections::Generic::List<String^>^ WrapInputLines(String^ text, int screenWidth, bool includeCaret);
 		void ClearActiveTurn();
 		void ClearPendingAction();
+		void FailActiveTurnFromException(String^ operation, Exception^ ex);
 		void FinishActiveTurn(bool failed, String^ summary);
 		void EmitReplyAndFinishActiveTurn(bool failed, String^ replySummary, String^ jsonPayload, String^ completionSummary);
 		String^ BuildClarificationRequest(String^ clarificationInput);

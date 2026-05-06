@@ -439,6 +439,13 @@ namespace GTA {
 	}
 	void AgentConsole::Close() {
 		if (!bActive) return;
+		if (pActiveTurnId > 0) {
+			EmitReplyAndFinishActiveTurn(
+				false,
+				"Agent console closed before the turn completed.",
+				"{\"mode\":\"console_closed\",\"pending_reasoning_input\":\"" + EscapeAgentConsoleJson(pPendingReasoningInput) + "\",\"had_pending_confirmation\":" + (isNotNULL(pPendingCommandSpec) ? "true" : "false") + ",\"had_pending_clarification\":" + (!String::IsNullOrWhiteSpace(pPendingClarificationInput) ? "true" : "false") + "}",
+				"Reply mode: console_closed");
+		}
 		bActive = false;
 		pPreviousResponseId = String::Empty;
 		pWorker = gcnew AgentRequestWorker();
@@ -462,22 +469,40 @@ namespace GTA {
 		pPendingClarificationInput = String::Empty;
 	}
 
+	void AgentConsole::FailActiveTurnFromException(String^ operation, Exception^ ex) {
+		String^ safeOperation = String::IsNullOrWhiteSpace(operation) ? "agent_console" : operation;
+		String^ detail = isNULL(ex) ? "Unknown exception." : ex->Message;
+		EmitReplyAndFinishActiveTurn(
+			true,
+			safeOperation + " failed: " + detail,
+			"{\"mode\":\"exception\",\"operation\":\"" + EscapeAgentConsoleJson(safeOperation) + "\",\"message\":\"" + EscapeAgentConsoleJson(detail) + "\"}",
+			"Reply mode: exception");
+	}
+
 	void AgentConsole::FinishActiveTurn(bool failed, String^ summary) {
-		if (pActiveTurnId > 0)
-			AgentLogger::EndTurn(pActiveTurnId, failed, summary);
-		ClearActiveTurn();
+		try {
+			if (pActiveTurnId > 0)
+				AgentLogger::EndTurn(pActiveTurnId, failed, summary);
+		}
+		finally {
+			ClearActiveTurn();
+		}
 	}
 
 	void AgentConsole::EmitReplyAndFinishActiveTurn(bool failed, String^ replySummary, String^ jsonPayload, String^ completionSummary) {
-		if (pActiveTurnId > 0) {
-			AgentLogger::LogEvent(
-				pActiveTurnId,
-				AgentLogEventType::ReplyEmitted,
-				"AgentConsole",
-				replySummary,
-				jsonPayload);
+		try {
+			if (pActiveTurnId > 0) {
+				AgentLogger::LogEvent(
+					pActiveTurnId,
+					AgentLogEventType::ReplyEmitted,
+					"AgentConsole",
+					replySummary,
+					jsonPayload);
+			}
 		}
-		FinishActiveTurn(failed, completionSummary);
+		finally {
+			FinishActiveTurn(failed, completionSummary);
+		}
 	}
 
 	String^ AgentConsole::BuildClarificationRequest(String^ clarificationInput) {
@@ -535,57 +560,75 @@ namespace GTA {
 		AgentCommandExecution^ execution = gcnew AgentCommandExecution(commandLine, spec->Name);
 		pActiveCommandExecution = execution;
 
-		Print("(AGENT STATUS) Running command: " + commandLine);
-		Print("(AGENT STATUS) Mirroring built-in command output below when available.");
-		NetHook::BeginAgentCommandCapture(this, execution);
 		try {
-			NetHook::DefaultConsole->SendCommand(commandLine);
+			Print("(AGENT STATUS) Running command: " + commandLine);
+			Print("(AGENT STATUS) Mirroring built-in command output below when available.");
+			NetHook::BeginAgentCommandCapture(this, execution);
+			try {
+				NetHook::DefaultConsole->SendCommand(commandLine);
+			}
+			finally {
+				NetHook::EndAgentCommandCapture();
+				execution->MarkCompleted();
+				pActiveCommandExecution = nullptr;
+			}
+
+			String^ resultCode = "completed";
+			String^ completionSummary = "Command completed.";
+			if (execution->SawErrorLikeOutput) {
+				resultCode = "problem_reported";
+				completionSummary = "Command reported a problem. Review mirrored output above.";
+			}
+			else if (execution->SawWarningLikeOutput) {
+				resultCode = "warning_reported";
+				completionSummary = "Command completed with warnings.";
+			}
+			else if (execution->TotalOutputLineCount > 0) {
+				resultCode = "output_observed";
+				completionSummary = "Command completed with output mirrored above.";
+			}
+			else if (AgentCommandSemantics::IsUsuallySilentOnSuccess(spec->Name)) {
+				resultCode = "silent_success";
+				completionSummary = "Command completed. This command is usually silent on success.";
+			}
+			else if (AgentCommandSemantics::IsExpectedToEmitOutput(spec->Name)) {
+				resultCode = "no_visible_output";
+				completionSummary = "Command completed without visible output, although this command often prints results.";
+			}
+
+			execution->SetCompletionResult(resultCode, completionSummary);
+			RememberCommandExecution(execution);
+			Print("(AGENT STATUS) " + completionSummary);
+
+			ClearPendingAction();
+			EmitReplyAndFinishActiveTurn(
+				false,
+				"Built-in command result emitted for: " + commandLine,
+				"{\"mode\":\"built_in_run\",\"command_line\":\"" + EscapeAgentConsoleJson(commandLine) + "\",\"command_name\":\"" + EscapeAgentConsoleJson(spec->Name) + "\",\"result_code\":\"" + EscapeAgentConsoleJson(resultCode) + "\"}",
+				"Reply mode: built_in_run");
 		}
-		finally {
-			NetHook::EndAgentCommandCapture();
-			execution->MarkCompleted();
+		catch (Exception^ ex) {
 			pActiveCommandExecution = nullptr;
+			ClearPendingAction();
+			FailActiveTurnFromException("built_in_run", ex);
+			throw;
 		}
-
-		String^ resultCode = "completed";
-		String^ completionSummary = "Command completed.";
-		if (execution->SawErrorLikeOutput) {
-			resultCode = "problem_reported";
-			completionSummary = "Command reported a problem. Review mirrored output above.";
+		catch (...) {
+			pActiveCommandExecution = nullptr;
+			ClearPendingAction();
+			EmitReplyAndFinishActiveTurn(
+				true,
+				"built_in_run failed with a native exception.",
+				"{\"mode\":\"exception\",\"operation\":\"built_in_run\",\"native\":true}",
+				"Reply mode: exception");
+			throw;
 		}
-		else if (execution->SawWarningLikeOutput) {
-			resultCode = "warning_reported";
-			completionSummary = "Command completed with warnings.";
-		}
-		else if (execution->TotalOutputLineCount > 0) {
-			resultCode = "output_observed";
-			completionSummary = "Command completed with output mirrored above.";
-		}
-		else if (AgentCommandSemantics::IsUsuallySilentOnSuccess(spec->Name)) {
-			resultCode = "silent_success";
-			completionSummary = "Command completed. This command is usually silent on success.";
-		}
-		else if (AgentCommandSemantics::IsExpectedToEmitOutput(spec->Name)) {
-			resultCode = "no_visible_output";
-			completionSummary = "Command completed without visible output, although this command often prints results.";
-		}
-
-		execution->SetCompletionResult(resultCode, completionSummary);
-		RememberCommandExecution(execution);
-		Print("(AGENT STATUS) " + completionSummary);
-
-		ClearPendingAction();
-		EmitReplyAndFinishActiveTurn(
-			false,
-			"Built-in command result emitted for: " + commandLine,
-			"{\"mode\":\"built_in_run\",\"command_line\":\"" + EscapeAgentConsoleJson(commandLine) + "\",\"command_name\":\"" + EscapeAgentConsoleJson(spec->Name) + "\",\"result_code\":\"" + EscapeAgentConsoleJson(resultCode) + "\"}",
-			"Reply mode: built_in_run");
 	}
 
 	void AgentConsole::PollWorker() {
 		if isNotNULL(pReasoningWorker) {
 			AgentReasoningResult^ reasoningResult;
-			if (pReasoningWorker->TryTakeCompleted(reasoningResult) && isNotNULL(reasoningResult)) {
+			if (pReasoningWorker->TryTakeCompleted(reasoningResult)) {
 				String^ originalInput = pPendingReasoningInput;
 				pPendingReasoningInput = String::Empty;
 				HandleReasoningResult(reasoningResult, originalInput);
