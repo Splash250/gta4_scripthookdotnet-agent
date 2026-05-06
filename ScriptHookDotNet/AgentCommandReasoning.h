@@ -93,10 +93,15 @@ namespace GTA {
 		static String^ GetContractDecisionName(AgentReasoningContractDecision value);
 		static String^ GetLegacyDecisionName(AgentReasoningDecision value);
 		static String^ GetContractFormatName(AgentReasoningContractFormat value);
-		static void LogRoutingStarted(int turnId, String^ userInput, String^ recentCommandTranscriptJson);
-		static AgentReasoningResult^ LogRoutingResult(int turnId, AgentReasoningResult^ result);
+		static void LogRoutingStarted(
+			int turnId,
+			String^ userInput,
+			String^ recentCommandTranscriptJson,
+			String^ logSource);
+		static AgentReasoningResult^ LogRoutingResult(int turnId, AgentReasoningResult^ result, String^ logSource);
 		static void LogSemanticValidation(
 			int turnId,
+			String^ logSource,
 			String^ commandName,
 			bool accepted,
 			String^ validatedCommandLine,
@@ -116,10 +121,26 @@ namespace GTA {
 		static AgentReasoningResult^ ParseResponsePayload(
 			System::Collections::Generic::Dictionary<String^, System::Object^>^ root,
 			AgentReasoningContractFormat expectedFormat);
-		static AgentReasoningResult^ ValidateResult(int turnId, AgentReasoningResult^ result, String^ userInput);
+		static AgentReasoningResult^ ValidateResult(
+			int turnId,
+			AgentReasoningResult^ result,
+			String^ userInput,
+			String^ logSource);
+		static AgentReasoningResult^ NormalizeBuiltInOnlyResult(AgentReasoningResult^ result);
+		static AgentReasoningResult^ ClassifyCommandRequestCore(
+			int turnId,
+			String^ userInput,
+			String^ recentCommandTranscriptJson,
+			String^ logSource,
+			bool builtInOnly);
 
 	public:
 		static AgentReasoningResult^ ClassifyCommandRequest(int turnId, String^ userInput, String^ recentCommandTranscriptJson);
+		static AgentReasoningResult^ ClassifyBuiltInCommandRequest(
+			int turnId,
+			String^ userInput,
+			String^ recentCommandTranscriptJson,
+			String^ logSource);
 	};
 
 	CLASS_ATTRIBUTES

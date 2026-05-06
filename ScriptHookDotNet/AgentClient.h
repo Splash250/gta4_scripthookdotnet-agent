@@ -62,6 +62,7 @@ namespace GTA {
 		static String^ ExtractErrorText(System::Collections::Generic::Dictionary<String^, System::Object^>^ root);
 		static AgentResponse^ SendCore(
 			int turnId,
+			String^ logSource,
 			String^ requestKind,
 			String^ instructions,
 			String^ userInput,
@@ -69,6 +70,14 @@ namespace GTA {
 			String^ textFormatJson);
 
 	public:
+		static AgentResponse^ SendRequest(
+			int turnId,
+			String^ logSource,
+			String^ requestKind,
+			String^ instructions,
+			String^ userInput,
+			String^ previousResponseId,
+			String^ textFormatJson);
 		static AgentResponse^ Send(String^ userInput, String^ previousResponseId);
 		static AgentResponse^ Send(int turnId, String^ userInput, String^ previousResponseId);
 		static AgentResponse^ SendIsolated(String^ instructions, String^ userInput);
@@ -77,6 +86,7 @@ namespace GTA {
 		static AgentResponse^ SendIsolatedStructured(String^ instructions, String^ userInput, String^ textFormatJson);
 		static AgentResponse^ SendIsolatedStructured(String^ requestKind, String^ instructions, String^ userInput, String^ textFormatJson);
 		static AgentResponse^ SendIsolatedStructured(int turnId, String^ requestKind, String^ instructions, String^ userInput, String^ textFormatJson);
+		static void LogAbandonedRequest(int turnId, String^ logSource, AgentResponse^ response);
 	};
 
 	CLASS_ATTRIBUTES

@@ -46,6 +46,11 @@ namespace GTA {
 			return isNULL(value) ? String::Empty : value;
 		}
 
+		String^ NormalizeClientLogSource(String^ source) {
+			String^ safeSource = NormalizeClientLogValue(source)->Trim();
+			return safeSource->Length > 0 ? safeSource : "AgentClient";
+		}
+
 		String^ EscapeClientJson(String^ value) {
 			String^ safeValue = NormalizeClientLogValue(value);
 			StringBuilder^ sb = gcnew StringBuilder(safeValue->Length + 16);
@@ -147,6 +152,7 @@ namespace GTA {
 
 		void LogModelRequestStarted(
 			int turnId,
+			String^ logSource,
 			String^ requestKind,
 			String^ model,
 			String^ previousResponseId,
@@ -155,33 +161,34 @@ namespace GTA {
 			AgentLogger::LogEvent(
 				turnId,
 				AgentLogEventType::ModelRequestStarted,
-				"AgentClient",
+				NormalizeClientLogSource(logSource),
 				"Model request started: " + NormalizeClientLogValue(requestKind),
 				BuildModelRequestStartedPayload(requestKind, model, previousResponseId, textFormatJson, userInput));
 		}
 
-		void LogModelRequestCompleted(int turnId, AgentResponse^ response, String^ rawResponseText) {
+		void LogModelRequestCompleted(int turnId, String^ logSource, AgentResponse^ response, String^ rawResponseText) {
 			if isNULL(response) return;
 			AgentLogger::LogEvent(
 				turnId,
 				AgentLogEventType::ModelRequestCompleted,
-				"AgentClient",
+				NormalizeClientLogSource(logSource),
 				"Model request completed: " + NormalizeClientLogValue(response->RequestKind),
 				BuildModelRequestCompletedPayload(response, rawResponseText));
 		}
 
-		void LogModelRequestAbandoned(int turnId, AgentResponse^ response) {
+		void LogModelRequestAbandoned(int turnId, String^ logSource, AgentResponse^ response) {
 			if isNULL(response) return;
 			AgentLogger::LogEvent(
 				turnId,
 				AgentLogEventType::ModelRequestAbandoned,
-				"AgentClient",
+				NormalizeClientLogSource(logSource),
 				"Model request abandoned after the active turn was closed: " + NormalizeClientLogValue(response->RequestKind),
 				BuildModelRequestAbandonedPayload(response));
 		}
 
 		void LogModelRequestFailed(
 			int turnId,
+			String^ logSource,
 			String^ requestKind,
 			String^ model,
 			String^ error,
@@ -189,7 +196,7 @@ namespace GTA {
 			AgentLogger::LogEvent(
 				turnId,
 				AgentLogEventType::ModelRequestFailed,
-				"AgentClient",
+				NormalizeClientLogSource(logSource),
 				"Model request failed: " + NormalizeClientLogValue(requestKind),
 				BuildModelRequestFailedPayload(requestKind, model, error, rawResponseText));
 		}
@@ -341,6 +348,7 @@ namespace GTA {
 
 	AgentResponse^ AgentClient::SendCore(
 		int turnId,
+		String^ logSource,
 		String^ requestKind,
 		String^ instructions,
 		String^ userInput,
@@ -355,7 +363,7 @@ namespace GTA {
 		result->Model = model;
 		if ((apiKey->Length == 0) || (model->Length == 0) || (prompt->Length == 0)) {
 			result->Error = "agents.ini is missing required OpenAI settings.";
-			LogModelRequestFailed(turnId, result->RequestKind, result->Model, result->Error, String::Empty);
+			LogModelRequestFailed(turnId, logSource, result->RequestKind, result->Model, result->Error, String::Empty);
 			return result;
 		}
 
@@ -386,7 +394,7 @@ namespace GTA {
 			request->ReadWriteTimeout = 120000;
 			request->ContentLength = payload->Length;
 
-			LogModelRequestStarted(turnId, result->RequestKind, model, previousResponseId, textFormatJson, userInput);
+			LogModelRequestStarted(turnId, logSource, result->RequestKind, model, previousResponseId, textFormatJson, userInput);
 
 			Stream^ requestStream = request->GetRequestStream();
 			requestStream->Write(payload, 0, payload->Length);
@@ -399,9 +407,9 @@ namespace GTA {
 			parsed->RequestKind = result->RequestKind;
 			parsed->Model = result->Model;
 			if (String::IsNullOrEmpty(parsed->Error))
-				LogModelRequestCompleted(turnId, parsed, bodyText);
+				LogModelRequestCompleted(turnId, logSource, parsed, bodyText);
 			else
-				LogModelRequestFailed(turnId, parsed->RequestKind, parsed->Model, parsed->Error, bodyText);
+				LogModelRequestFailed(turnId, logSource, parsed->RequestKind, parsed->Model, parsed->Error, bodyText);
 			return parsed;
 		} catch (WebException^ ex) {
 			String^ bodyText = ReadResponseBody(ex->Response);
@@ -410,18 +418,40 @@ namespace GTA {
 				parsed->RequestKind = result->RequestKind;
 				parsed->Model = result->Model;
 				if (parsed->Error->Length > 0) {
-					LogModelRequestFailed(turnId, parsed->RequestKind, parsed->Model, parsed->Error, bodyText);
+					LogModelRequestFailed(turnId, logSource, parsed->RequestKind, parsed->Model, parsed->Error, bodyText);
 					return parsed;
 				}
 			}
 			result->Error = "OpenAI request failed: " + ex->Message;
-			LogModelRequestFailed(turnId, result->RequestKind, result->Model, result->Error, bodyText);
+			LogModelRequestFailed(turnId, logSource, result->RequestKind, result->Model, result->Error, bodyText);
 			return result;
 		} catch (Exception^ ex) {
 			result->Error = "OpenAI request failed: " + ex->Message;
-			LogModelRequestFailed(turnId, result->RequestKind, result->Model, result->Error, String::Empty);
+			LogModelRequestFailed(turnId, logSource, result->RequestKind, result->Model, result->Error, String::Empty);
 			return result;
 		}
+	}
+
+	AgentResponse^ AgentClient::SendRequest(
+		int turnId,
+		String^ logSource,
+		String^ requestKind,
+		String^ instructions,
+		String^ userInput,
+		String^ previousResponseId,
+		String^ textFormatJson) {
+		String^ effectiveRequestKind = String::IsNullOrWhiteSpace(requestKind) ? "chat_reply" : requestKind->Trim();
+		String^ effectiveInstructions = String::IsNullOrWhiteSpace(instructions)
+			? AgentSettings::SystemPrompt
+			: instructions;
+		return SendCore(
+			turnId,
+			logSource,
+			effectiveRequestKind,
+			effectiveInstructions,
+			userInput,
+			previousResponseId,
+			textFormatJson);
 	}
 
 	AgentResponse^ AgentClient::Send(String^ userInput, String^ previousResponseId) {
@@ -429,7 +459,7 @@ namespace GTA {
 	}
 
 	AgentResponse^ AgentClient::Send(int turnId, String^ userInput, String^ previousResponseId) {
-		return SendCore(turnId, "chat_reply", AgentSettings::SystemPrompt, userInput, previousResponseId, String::Empty);
+		return SendRequest(turnId, "AgentClient", "chat_reply", AgentSettings::SystemPrompt, userInput, previousResponseId, String::Empty);
 	}
 
 	AgentResponse^ AgentClient::SendIsolated(String^ instructions, String^ userInput) {
@@ -445,7 +475,7 @@ namespace GTA {
 	}
 
 	AgentResponse^ AgentClient::SendIsolated(int turnId, String^ requestKind, String^ instructions, String^ userInput) {
-		return SendCore(turnId, requestKind, instructions, userInput, String::Empty, String::Empty);
+		return SendRequest(turnId, "AgentClient", requestKind, instructions, userInput, String::Empty, String::Empty);
 	}
 
 	AgentResponse^ AgentClient::SendIsolatedStructured(String^ requestKind, String^ instructions, String^ userInput, String^ textFormatJson) {
@@ -453,7 +483,11 @@ namespace GTA {
 	}
 
 	AgentResponse^ AgentClient::SendIsolatedStructured(int turnId, String^ requestKind, String^ instructions, String^ userInput, String^ textFormatJson) {
-		return SendCore(turnId, requestKind, instructions, userInput, String::Empty, textFormatJson);
+		return SendRequest(turnId, "AgentClient", requestKind, instructions, userInput, String::Empty, textFormatJson);
+	}
+
+	void AgentClient::LogAbandonedRequest(int turnId, String^ logSource, AgentResponse^ response) {
+		LogModelRequestAbandoned(turnId, logSource, response);
 	}
 
 	AgentRequestWorker::AgentRequestWorker() {
@@ -530,7 +564,7 @@ namespace GTA {
 		}
 
 		if (context->Generation != pGeneration)
-			LogModelRequestAbandoned(context->TurnId, response);
+			AgentClient::LogAbandonedRequest(context->TurnId, "AgentClient", response);
 	}
 
 	void AgentRequestWorker::AbandonPendingWork() {

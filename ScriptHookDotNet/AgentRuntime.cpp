@@ -24,6 +24,9 @@
 
 #include "AgentRuntime.h"
 
+#include "AgentClient.h"
+#include "AgentCommandReasoning.h"
+#include "AgentLogger.h"
 #include "NetHook.h"
 #include "RemoteScriptDomain.h"
 #include "Script.h"
@@ -42,6 +45,95 @@ namespace GTA {
 		internal:
 			static AgentRuntime^ ManagedRuntimeInstance = nullptr;
 		};
+
+		ref class AgentRuntimeOwnedTurnState abstract sealed {
+		internal:
+			static initonly Object^ SyncRoot = gcnew Object();
+			static initonly Dictionary<int, int>^ RequestTurnIds = gcnew Dictionary<int, int>();
+		};
+
+		String^ NormalizeRuntimeText(String^ value) {
+			return isNULL(value) ? String::Empty : value;
+		}
+
+		String^ BuildScriptLogSource(Script^ ownerScript) {
+			if (isNULL(ownerScript) || String::IsNullOrWhiteSpace(ownerScript->Name))
+				return "script:unknown";
+			return "script:" + ownerScript->Name->Trim();
+		}
+
+		void RememberOwnedTurn(int requestId, int turnId) {
+			if ((requestId <= 0) || (turnId <= 0))
+				return;
+
+			Monitor::Enter(AgentRuntimeOwnedTurnState::SyncRoot);
+			try {
+				AgentRuntimeOwnedTurnState::RequestTurnIds[requestId] = turnId;
+			} finally {
+				Monitor::Exit(AgentRuntimeOwnedTurnState::SyncRoot);
+			}
+		}
+
+		int TakeOwnedTurn(int requestId) {
+			if (requestId <= 0)
+				return 0;
+
+			Monitor::Enter(AgentRuntimeOwnedTurnState::SyncRoot);
+			try {
+				int turnId;
+				if (!AgentRuntimeOwnedTurnState::RequestTurnIds->TryGetValue(requestId, turnId))
+					return 0;
+				AgentRuntimeOwnedTurnState::RequestTurnIds->Remove(requestId);
+				return turnId;
+			} finally {
+				Monitor::Exit(AgentRuntimeOwnedTurnState::SyncRoot);
+			}
+		}
+
+		String^ GetReasoningDecisionName(AgentReasoningDecision value) {
+			switch (value) {
+				case AgentReasoningDecision::NormalChat:
+					return "normal_chat";
+				case AgentReasoningDecision::BuiltInExplain:
+					return "built_in_explain";
+				case AgentReasoningDecision::BuiltInRun:
+					return "built_in_run";
+				case AgentReasoningDecision::NoExactBuiltInFit:
+					return "no_exact_built_in_fit";
+				default:
+					return "invalid_model_result";
+			}
+		}
+
+		String^ GetReasoningContractDecisionName(AgentReasoningContractDecision value) {
+			switch (value) {
+				case AgentReasoningContractDecision::NormalChat:
+					return "normal_chat";
+				case AgentReasoningContractDecision::BuiltInExplain:
+					return "built_in_explain";
+				case AgentReasoningContractDecision::BuiltInRun:
+					return "built_in_run";
+				case AgentReasoningContractDecision::NoExactBuiltInFit:
+					return "no_exact_built_in_fit";
+				case AgentReasoningContractDecision::NeedsClarification:
+					return "needs_clarification";
+				default:
+					return "invalid_model_result";
+			}
+		}
+
+		String^ GetReasoningContractFormatName(AgentReasoningContractFormat value) {
+			switch (value) {
+				case AgentReasoningContractFormat::StructuredV1:
+					return "structured_v1";
+				case AgentReasoningContractFormat::LegacyJsonFallback:
+					return "legacy_json_fallback";
+				case AgentReasoningContractFormat::Invalid:
+					return "invalid";
+				default:
+					return "none";
+			}
+		}
 
 		int CaptureActiveTurnId() {
 			try {
@@ -356,6 +448,8 @@ namespace GTA {
 		if isNULL(request) return false;
 
 		int generation;
+		int requestId = 0;
+		bool ownsTurn = false;
 		AgentRuntimePromptRequest^ requestSnapshot;
 		Script^ ownerScript = CaptureOwningScript();
 		if isNULL(ownerScript)
@@ -366,8 +460,14 @@ namespace GTA {
 			if (bPromptBusy) return false;
 			generation = pPromptGeneration;
 			request->OwnerScript = ownerScript;
-			int requestId = (request->RequestId > 0) ? request->RequestId : ReserveRequestId();
+			requestId = (request->RequestId > 0) ? request->RequestId : ReserveRequestId();
 			int turnId = (request->TurnId > 0) ? request->TurnId : CaptureActiveTurnId();
+			if (turnId <= 0) {
+				turnId = AgentLogger::BeginTurn(request->UserInput, BuildScriptLogSource(ownerScript));
+				ownsTurn = turnId > 0;
+				if (ownsTurn)
+					RememberOwnedTurn(requestId, turnId);
+			}
 			requestSnapshot = ClonePromptRequest(request, requestId, turnId);
 			bPromptBusy = true;
 			pPromptOwnerScript = requestSnapshot->OwnerScript;
@@ -395,6 +495,11 @@ namespace GTA {
 			} finally {
 				Monitor::Exit(pSyncRoot);
 			}
+			if (ownsTurn) {
+				int ownedTurnId = TakeOwnedTurn(requestId);
+				if (ownedTurnId > 0)
+					AgentLogger::EndTurn(ownedTurnId, true, "Prompt request could not start its background worker.");
+			}
 			return false;
 		} catch (...) {
 			Monitor::Enter(pSyncRoot);
@@ -406,6 +511,11 @@ namespace GTA {
 			} finally {
 				Monitor::Exit(pSyncRoot);
 			}
+			if (ownsTurn) {
+				int ownedTurnId = TakeOwnedTurn(requestId);
+				if (ownedTurnId > 0)
+					AgentLogger::EndTurn(ownedTurnId, true, "Prompt request could not start its background worker.");
+			}
 			return false;
 		}
 	}
@@ -416,6 +526,8 @@ namespace GTA {
 		if isNULL(request) return false;
 
 		int generation;
+		int requestId = 0;
+		bool ownsTurn = false;
 		AgentRuntimeBuiltInClassificationRequest^ requestSnapshot;
 		Script^ ownerScript = CaptureOwningScript();
 		if isNULL(ownerScript)
@@ -426,8 +538,14 @@ namespace GTA {
 			if (bBuiltInClassificationBusy) return false;
 			generation = pBuiltInClassificationGeneration;
 			request->OwnerScript = ownerScript;
-			int requestId = (request->RequestId > 0) ? request->RequestId : ReserveRequestId();
+			requestId = (request->RequestId > 0) ? request->RequestId : ReserveRequestId();
 			int turnId = (request->TurnId > 0) ? request->TurnId : CaptureActiveTurnId();
+			if (turnId <= 0) {
+				turnId = AgentLogger::BeginTurn(request->UserInput, BuildScriptLogSource(ownerScript));
+				ownsTurn = turnId > 0;
+				if (ownsTurn)
+					RememberOwnedTurn(requestId, turnId);
+			}
 			requestSnapshot = CloneBuiltInClassificationRequest(request, requestId, turnId);
 			bBuiltInClassificationBusy = true;
 			pBuiltInClassificationOwnerScript = requestSnapshot->OwnerScript;
@@ -456,6 +574,11 @@ namespace GTA {
 			} finally {
 				Monitor::Exit(pSyncRoot);
 			}
+			if (ownsTurn) {
+				int ownedTurnId = TakeOwnedTurn(requestId);
+				if (ownedTurnId > 0)
+					AgentLogger::EndTurn(ownedTurnId, true, "Built-in classification could not start its background worker.");
+			}
 			return false;
 		} catch (...) {
 			Monitor::Enter(pSyncRoot);
@@ -466,6 +589,11 @@ namespace GTA {
 				}
 			} finally {
 				Monitor::Exit(pSyncRoot);
+			}
+			if (ownsTurn) {
+				int ownedTurnId = TakeOwnedTurn(requestId);
+				if (ownedTurnId > 0)
+					AgentLogger::EndTurn(ownedTurnId, true, "Built-in classification could not start its background worker.");
 			}
 			return false;
 		}
@@ -535,18 +663,44 @@ namespace GTA {
 	void AgentRuntime::PromptWorkerMain(Object^ state) {
 		PromptSubmissionContext^ context = dynamic_cast<PromptSubmissionContext^>(state);
 		AgentRuntimePromptCompletion^ completion = gcnew AgentRuntimePromptCompletion();
+		AgentResponse^ response = nullptr;
 		bool enqueue = false;
+		int ownedTurnId = 0;
 
 		try {
 			completion->Request = isNULL(context) ? nullptr : context->Request;
 			completion->RequestKind = isNULL(context) || isNULL(context->Request) ? String::Empty : context->Request->RequestKind;
 			completion->StoreResponseAsConversationState =
 				(isNULL(context) || isNULL(context->Request)) ? false : context->Request->StoreResponseAsConversationState;
-			completion->Error = "Prompt runtime scaffold is not wired to AgentClient yet.";
+			if ((isNULL(context) || isNULL(context->Request))) {
+				completion->Error = "Prompt request completed without a runtime request context.";
+			} else {
+				ownedTurnId = TakeOwnedTurn(context->Request->RequestId);
+				String^ logSource = BuildScriptLogSource(context->Request->OwnerScript);
+				response = AgentClient::SendRequest(
+					context->Request->TurnId,
+					logSource,
+					context->Request->RequestKind,
+					context->Request->Instructions,
+					context->Request->UserInput,
+					context->Request->PreviousResponseId,
+					context->Request->TextFormatJson);
+				if isNULL(response) {
+					completion->Error = "Prompt request returned no response.";
+				} else {
+					completion->Success = String::IsNullOrEmpty(response->Error);
+					completion->ResponseText = NormalizeRuntimeText(response->Text);
+					completion->ResponseId = NormalizeRuntimeText(response->ResponseId);
+					completion->Error = NormalizeRuntimeText(response->Error);
+					completion->RawResponseText = NormalizeRuntimeText(response->RawResponseText);
+					completion->RequestKind = NormalizeRuntimeText(response->RequestKind);
+					completion->Model = NormalizeRuntimeText(response->Model);
+				}
+			}
 		} catch (Exception^ ex) {
-			completion->Error = "Prompt runtime scaffold failed: " + ex->Message;
+			completion->Error = "Prompt runtime request failed: " + ex->Message;
 		} catch (...) {
-			completion->Error = "Prompt runtime scaffold failed with a native exception.";
+			completion->Error = "Prompt runtime request failed with a native exception.";
 		}
 
 		Monitor::Enter(pSyncRoot);
@@ -555,9 +709,30 @@ namespace GTA {
 				bPromptBusy = false;
 				pPromptOwnerScript = nullptr;
 				enqueue = isNotNULL(context);
+			} else {
+				completion->WasAbandoned = true;
 			}
 		} finally {
 			Monitor::Exit(pSyncRoot);
+		}
+
+		if (completion->WasAbandoned && isNotNULL(context) && isNotNULL(context->Request) && isNotNULL(response))
+			AgentClient::LogAbandonedRequest(
+				context->Request->TurnId,
+				BuildScriptLogSource(context->Request->OwnerScript),
+				response);
+
+		if (completion->WasAbandoned) {
+			if (ownedTurnId > 0)
+				AgentLogger::EndTurn(ownedTurnId, true, "Prompt request was abandoned before callback delivery.");
+			return;
+		}
+
+		if (ownedTurnId > 0) {
+			String^ summary = completion->Success
+				? "Script prompt request completed."
+				: "Script prompt request failed.";
+			AgentLogger::EndTurn(ownedTurnId, !completion->Success, summary);
 		}
 
 		if (enqueue)
@@ -572,16 +747,54 @@ namespace GTA {
 		BuiltInClassificationSubmissionContext^ context = dynamic_cast<BuiltInClassificationSubmissionContext^>(state);
 		AgentRuntimeBuiltInClassificationCompletion^ completion = gcnew AgentRuntimeBuiltInClassificationCompletion();
 		bool enqueue = false;
+		int ownedTurnId = 0;
 
 		try {
 			completion->Request = isNULL(context) ? nullptr : context->Request;
-			completion->FailureReason = "Built-in classification scaffold is not wired to AgentCommandReasoning yet.";
-			completion->Error = completion->FailureReason;
+			if ((isNULL(context) || isNULL(context->Request))) {
+				completion->FailureReason = "Built-in classification completed without a runtime request context.";
+				completion->Error = completion->FailureReason;
+			} else {
+				ownedTurnId = TakeOwnedTurn(context->Request->RequestId);
+				AgentReasoningResult^ result = AgentCommandReasoning::ClassifyBuiltInCommandRequest(
+					context->Request->TurnId,
+					context->Request->UserInput,
+					context->Request->RecentCommandTranscriptJson,
+					BuildScriptLogSource(context->Request->OwnerScript));
+				if isNULL(result) {
+					completion->FailureReason = "Built-in classification returned no result.";
+					completion->Error = completion->FailureReason;
+				} else {
+					completion->Decision = GetReasoningDecisionName(result->Decision);
+					completion->ContractDecision = GetReasoningContractDecisionName(result->ContractDecision);
+					completion->ContractFormat = GetReasoningContractFormatName(result->ContractFormat);
+					completion->ContractSchema = NormalizeRuntimeText(result->ContractSchema);
+					completion->CommandName = NormalizeRuntimeText(result->CommandName);
+					completion->Arguments = CloneStringDictionary(result->Arguments);
+					completion->ValidatedCommandLine = NormalizeRuntimeText(result->ValidatedCommandLine);
+					completion->Explanation = NormalizeRuntimeText(result->Explanation);
+					completion->ResponseText = NormalizeRuntimeText(result->ResponseText);
+					completion->FailureReason = NormalizeRuntimeText(result->FailureReason);
+
+					bool isValidatedRun =
+						(result->Decision == AgentReasoningDecision::BuiltInRun) &&
+						!String::IsNullOrWhiteSpace(result->ValidatedCommandLine);
+					bool isExplainResult = (result->Decision == AgentReasoningDecision::BuiltInExplain);
+					completion->Success = isValidatedRun || isExplainResult;
+					if ((result->Decision == AgentReasoningDecision::BuiltInRun) && !isValidatedRun) {
+						completion->Error = !String::IsNullOrWhiteSpace(completion->FailureReason)
+							? completion->FailureReason
+							: "Built-in classification returned an unvalidated run result.";
+					} else if (!completion->Success && (result->Decision == AgentReasoningDecision::InvalidModelResult)) {
+						completion->Error = completion->FailureReason;
+					}
+				}
+			}
 		} catch (Exception^ ex) {
-			completion->FailureReason = "Built-in classification scaffold failed: " + ex->Message;
+			completion->FailureReason = "Built-in classification failed: " + ex->Message;
 			completion->Error = completion->FailureReason;
 		} catch (...) {
-			completion->FailureReason = "Built-in classification scaffold failed with a native exception.";
+			completion->FailureReason = "Built-in classification failed with a native exception.";
 			completion->Error = completion->FailureReason;
 		}
 
@@ -591,9 +804,25 @@ namespace GTA {
 				bBuiltInClassificationBusy = false;
 				pBuiltInClassificationOwnerScript = nullptr;
 				enqueue = isNotNULL(context);
+			} else {
+				completion->WasAbandoned = true;
 			}
 		} finally {
 			Monitor::Exit(pSyncRoot);
+		}
+
+		if (completion->WasAbandoned) {
+			if (ownedTurnId > 0)
+				AgentLogger::EndTurn(ownedTurnId, true, "Built-in classification was abandoned before callback delivery.");
+			return;
+		}
+
+		if (ownedTurnId > 0) {
+			bool failed = !completion->Success && !String::IsNullOrWhiteSpace(completion->Error);
+			String^ summary = failed
+				? "Script built-in classification failed."
+				: "Script built-in classification completed.";
+			AgentLogger::EndTurn(ownedTurnId, failed, summary);
 		}
 
 		if (enqueue)
