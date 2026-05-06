@@ -63,9 +63,17 @@ namespace GTA {
 		AgentLogger() { }
 
 		static String^ BuildLogPath(String^ filename);
+		static bool TryReserveTurnId([System::Runtime::InteropServices::Out] int% turnId);
+		static bool TryReserveSequence(
+			[System::Runtime::InteropServices::Out] String^% sessionId,
+			[System::Runtime::InteropServices::Out] int% sequence,
+			[System::Runtime::InteropServices::Out] bool% humanEnabled,
+			[System::Runtime::InteropServices::Out] bool% jsonEnabled);
 		static void WriteHumanLine(String^ line, bool truncate);
 		static void WriteJsonLine(String^ jsonLine, bool truncate);
+		static void DisposeQuietly(System::IDisposable^ disposable);
 		static void WarnFailureOnce(String^ detail);
+		static String^ SanitizeJsonPayload(String^ jsonPayload);
 		static String^ EscapeJson(String^ value);
 		static String^ FormatTimestamp(DateTime timestamp);
 
