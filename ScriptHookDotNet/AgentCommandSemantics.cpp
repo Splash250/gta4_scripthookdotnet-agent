@@ -183,10 +183,78 @@ namespace GTA {
 
 	bool AgentCommandSemantics::ValidateSpawn(String^ userInput, AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
 		commandLine = String::Empty;
-		(void)userInput;
-		(void)result;
-		failureReason = "spawn semantic validator is declared but not enabled in this phase step.";
-		return false;
+		failureReason = String::Empty;
+		if (isNULL(result) || isNULL(result->Arguments)) {
+			failureReason = "Spawn requires a structured exact model name.";
+			return false;
+		}
+		if (!result->Arguments->ContainsKey("model")) {
+			failureReason = "Spawn requires an exact model name.";
+			return false;
+		}
+		if (result->Arguments->Count != 1) {
+			failureReason = "Spawn accepts only one structured model argument.";
+			return false;
+		}
+
+		String^ normalized = Normalize(userInput);
+		bool mentionsColorOrTuning =
+			normalized->Contains("red") ||
+			normalized->Contains("blue") ||
+			normalized->Contains("green") ||
+			normalized->Contains("yellow") ||
+			normalized->Contains("black") ||
+			normalized->Contains("white") ||
+			normalized->Contains("paint") ||
+			normalized->Contains("color") ||
+			normalized->Contains("colour") ||
+			normalized->Contains("custom") ||
+			normalized->Contains("upgrade") ||
+			normalized->Contains("upgraded") ||
+			normalized->Contains("tuned") ||
+			normalized->Contains("tuning") ||
+			normalized->Contains("modded");
+		bool mentionsPerformanceOrStyle =
+			normalized->Contains("fast") ||
+			normalized->Contains("faster") ||
+			normalized->Contains("quick") ||
+			normalized->Contains("drift") ||
+			normalized->Contains("sports car") ||
+			normalized->Contains("sport car") ||
+			normalized->Contains("sportscar") ||
+			normalized->Contains("sports vehicle") ||
+			normalized->Contains("performance");
+		bool mentionsGenericCategory =
+			normalized->Contains("something") ||
+			normalized->Contains("anything") ||
+			normalized->Contains("some car") ||
+			normalized->Contains("a car") ||
+			normalized->Contains("any car") ||
+			normalized->Contains("some vehicle") ||
+			normalized->Contains("a vehicle") ||
+			normalized->Contains("any vehicle") ||
+			normalized->Contains("police vehicle");
+
+		if (mentionsColorOrTuning || mentionsPerformanceOrStyle || mentionsGenericCategory) {
+			failureReason = "The built-in spawn command only accepts one exact GTA IV model token; it cannot satisfy vague category, color, tuning, or performance requests exactly.";
+			return false;
+		}
+
+		String^ rawModel = result->Arguments["model"];
+		String^ model = isNULL(rawModel) ? String::Empty : rawModel->Trim()->ToUpperInvariant();
+		if (String::IsNullOrEmpty(model) || !Regex::IsMatch(model, "^[A-Z0-9_]+$")) {
+			failureReason = "Spawn model names must be one exact GTA IV model token.";
+			return false;
+		}
+
+		GTA::Model resolvedModel = model;
+		if (resolvedModel.Hash == 0) {
+			failureReason = "Spawn requires an exact GTA IV model token that resolves locally to a non-zero hash.";
+			return false;
+		}
+
+		commandLine = "spawn " + model;
+		return true;
 	}
 
 	bool AgentCommandSemantics::ValidateTeleport(AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
@@ -387,6 +455,8 @@ namespace GTA {
 			return ValidateFlip(userInput, result, commandLine, failureReason);
 		if (name == "heal")
 			return ValidateHeal(userInput, result, commandLine, failureReason);
+		if (name == "spawn")
+			return ValidateSpawn(userInput, result, commandLine, failureReason);
 		if (name == "teleport")
 			return ValidateTeleport(result, commandLine, failureReason);
 		if (name == "setdaytime")

@@ -77,7 +77,11 @@ namespace GTA {
 			sb->Append("\"risk\":\"")->Append(spec->Risk.ToString())->Append("\",");
 			sb->Append("\"requires_confirmation\":")->Append(spec->RequiresConfirmation ? "true" : "false")->Append(",");
 			sb->Append("\"argument_schema\":\"")->Append(EscapeJson(AgentCommandSemantics::GetArgumentSchema(spec->Name)))->Append("\",");
-			sb->Append("\"semantic_notes\":\"")->Append(EscapeJson(AgentCommandSemantics::GetSemanticNotes(spec->Name)))->Append("\"");
+			String^ semanticNotes = AgentCommandSemantics::GetSemanticNotes(spec->Name);
+			if (!String::IsNullOrEmpty(spec->Name) && (spec->Name->Trim()->ToLowerInvariant() == "spawn")) {
+				semanticNotes += " Spawn requires one exact GTA IV model name token such as TURISMO, FUTO, or INFERNUS. The choice must be locally resolvable to a non-zero model hash. Do not use spawn for vague vehicle categories, colors, tuning, or performance adjectives.";
+			}
+			sb->Append("\"semantic_notes\":\"")->Append(EscapeJson(semanticNotes))->Append("\"");
 			sb->Append("}");
 		}
 
@@ -96,6 +100,7 @@ namespace GTA {
 			"Return JSON only with keys: decision, command_name, arguments, reason." "\n"
 			"Allowed decision values: normal_chat, built_in_explain, built_in_run, no_exact_built_in_fit." "\n"
 			"Do not emit a raw command line. Put only structured string arguments in the arguments object." "\n"
+			"For spawn, built_in_run requires arguments with exactly one key named model whose value is one exact GTA IV model token." "\n"
 			"If uncertain, return no_exact_built_in_fit.";
 	}
 
