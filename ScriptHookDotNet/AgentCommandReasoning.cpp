@@ -28,6 +28,7 @@
 #include "AgentCommandRegistry.h"
 #include "AgentCommandSemantics.h"
 #include "AgentLogger.h"
+#include "NetHook.h"
 
 #pragma managed
 
@@ -54,6 +55,28 @@ namespace GTA {
 				normalized->Contains("unsupported") ||
 				normalized->Contains("not supported") ||
 				normalized->Contains("unknown parameter");
+		}
+
+		int CaptureActiveTurnId() {
+			try {
+				if (!NetHook::isPrimary)
+					return 0;
+
+				System::Object^ console = NetHook::Console;
+				if isNULL(console)
+					return 0;
+
+				System::Reflection::FieldInfo^ field = console->GetType()->GetField(
+					"pActiveTurnId",
+					System::Reflection::BindingFlags::Instance | System::Reflection::BindingFlags::NonPublic);
+				if (isNULL(field) || (field->FieldType != Int32::typeid))
+					return 0;
+
+				System::Object^ value = field->GetValue(console);
+				return isNULL(value) ? 0 : safe_cast<int>(value);
+			} catch (...) {
+				return 0;
+			}
 		}
 
 		String^ BuildClassifierRequest(String^ userInput, String^ recentCommandTranscriptJson) {
@@ -236,11 +259,11 @@ namespace GTA {
 		}
 	}
 
-	void AgentCommandReasoning::LogRoutingStarted(String^ userInput, String^ recentCommandTranscriptJson) {
+	void AgentCommandReasoning::LogRoutingStarted(int turnId, String^ userInput, String^ recentCommandTranscriptJson) {
 		String^ safeUserInput = isNULL(userInput) ? String::Empty : userInput;
 		String^ safeRecentTranscript = isNULL(recentCommandTranscriptJson) ? String::Empty : recentCommandTranscriptJson;
 		AgentLogger::LogEvent(
-			0,
+			turnId,
 			AgentLogEventType::RoutingStarted,
 			"AgentCommandReasoning",
 			"Routing started for agent request.",
@@ -251,7 +274,7 @@ namespace GTA {
 				"}"));
 	}
 
-	AgentReasoningResult^ AgentCommandReasoning::LogRoutingResult(AgentReasoningResult^ result) {
+	AgentReasoningResult^ AgentCommandReasoning::LogRoutingResult(int turnId, AgentReasoningResult^ result) {
 		AgentReasoningResult^ safeResult = isNULL(result) ? gcnew AgentReasoningResult() : result;
 		String^ safeCommandName = isNULL(safeResult->CommandName) ? String::Empty : safeResult->CommandName;
 		String^ humanSummary = "Routing decision: " + GetLegacyDecisionName(safeResult->Decision);
@@ -261,7 +284,7 @@ namespace GTA {
 			humanSummary += " (" + safeResult->FailureReason + ")";
 
 		AgentLogger::LogEvent(
-			0,
+			turnId,
 			AgentLogEventType::RoutingResult,
 			"AgentCommandReasoning",
 			humanSummary,
@@ -278,6 +301,7 @@ namespace GTA {
 	}
 
 	void AgentCommandReasoning::LogSemanticValidation(
+		int turnId,
 		String^ commandName,
 		bool accepted,
 		String^ validatedCommandLine,
@@ -291,7 +315,7 @@ namespace GTA {
 			: "Semantic validation rejected: " + safeCommandName;
 
 		AgentLogger::LogEvent(
-			0,
+			turnId,
 			AgentLogEventType::SemanticValidation,
 			"AgentCommandReasoning",
 			humanSummary,
@@ -495,7 +519,7 @@ namespace GTA {
 		}
 	}
 
-	AgentReasoningResult^ AgentCommandReasoning::ValidateResult(AgentReasoningResult^ result, String^ userInput) {
+	AgentReasoningResult^ AgentCommandReasoning::ValidateResult(int turnId, AgentReasoningResult^ result, String^ userInput) {
 		if isNULL(result) {
 			result = gcnew AgentReasoningResult();
 			result->FailureReason = "No reasoning result was produced.";
@@ -516,6 +540,7 @@ namespace GTA {
 			AgentCommandSpec^ spec = AgentCommandRegistry::Find(result->CommandName);
 			if isNULL(spec) {
 				LogSemanticValidation(
+					turnId,
 					result->CommandName,
 					false,
 					String::Empty,
@@ -528,6 +553,7 @@ namespace GTA {
 			}
 			if ((result->ContractDecision == AgentReasoningContractDecision::BuiltInRun) && !spec->AgentAccessible) {
 				LogSemanticValidation(
+					turnId,
 					result->CommandName,
 					false,
 					String::Empty,
@@ -540,6 +566,7 @@ namespace GTA {
 			}
 			if isNULL(result->Arguments) {
 				LogSemanticValidation(
+					turnId,
 					result->CommandName,
 					false,
 					String::Empty,
@@ -555,6 +582,7 @@ namespace GTA {
 				String^ failureReason;
 				if (!AgentCommandSemantics::TryBuildValidatedCommandLine(userInput, result, commandLine, failureReason)) {
 					LogSemanticValidation(
+						turnId,
 						result->CommandName,
 						false,
 						String::Empty,
@@ -568,6 +596,7 @@ namespace GTA {
 				}
 				result->ValidatedCommandLine = commandLine;
 				LogSemanticValidation(
+					turnId,
 					result->CommandName,
 					true,
 					result->ValidatedCommandLine,
@@ -575,6 +604,7 @@ namespace GTA {
 					result->ContractDecision);
 			} else {
 				LogSemanticValidation(
+					turnId,
 					result->CommandName,
 					true,
 					String::Empty,
@@ -595,39 +625,40 @@ namespace GTA {
 		return result;
 	}
 
-	AgentReasoningResult^ AgentCommandReasoning::ClassifyCommandRequest(String^ userInput, String^ recentCommandTranscriptJson) {
+	AgentReasoningResult^ AgentCommandReasoning::ClassifyCommandRequest(int turnId, String^ userInput, String^ recentCommandTranscriptJson) {
 		AgentReasoningResult^ result = gcnew AgentReasoningResult();
 		if (String::IsNullOrWhiteSpace(userInput)) {
 			result->FailureReason = "No user input was provided for classification.";
-			return LogRoutingResult(result);
+			return LogRoutingResult(turnId, result);
 		}
 
-		LogRoutingStarted(userInput, recentCommandTranscriptJson);
+		LogRoutingStarted(turnId, userInput, recentCommandTranscriptJson);
 		String^ request = BuildClassifierRequest(userInput, recentCommandTranscriptJson);
 
 		AgentReasoningContractFormat responseFormat = AgentReasoningContractFormat::StructuredV1;
 		AgentResponse^ response = AgentClient::SendIsolatedStructured(
+			turnId,
 			"routing_classifier_structured_v1",
 			BuildClassifierInstructions(),
 			request,
 			BuildStructuredOutputFormatJson());
 		if (isNotNULL(response) && !String::IsNullOrEmpty(response->Error) && ShouldRetryWithoutStructuredOutput(response->Error)) {
 			responseFormat = AgentReasoningContractFormat::LegacyJsonFallback;
-			response = AgentClient::SendIsolated("routing_classifier_legacy_json_fallback", BuildLegacyFallbackInstructions(), request);
+			response = AgentClient::SendIsolated(turnId, "routing_classifier_legacy_json_fallback", BuildLegacyFallbackInstructions(), request);
 		}
 		if isNULL(response) {
 			result->FailureReason = "Classifier returned no response.";
-			return LogRoutingResult(result);
+			return LogRoutingResult(turnId, result);
 		}
 		if (!String::IsNullOrEmpty(response->Error)) {
 			result->FailureReason = response->Error;
-			return LogRoutingResult(result);
+			return LogRoutingResult(turnId, result);
 		}
 
 		String^ json = StripJsonFences(response->Text);
 		if (String::IsNullOrEmpty(json)) {
 			result->FailureReason = "Classifier returned no JSON payload.";
-			return LogRoutingResult(result);
+			return LogRoutingResult(turnId, result);
 		}
 
 		try {
@@ -639,7 +670,7 @@ namespace GTA {
 			result->FailureReason = "Classifier response parse failed: " + ex->Message;
 		}
 
-		return LogRoutingResult(ValidateResult(result, userInput));
+		return LogRoutingResult(turnId, ValidateResult(turnId, result, userInput));
 	}
 
 	AgentReasoningWorker::AgentReasoningWorker() {
@@ -668,6 +699,7 @@ namespace GTA {
 		}
 
 		AgentReasoningContext^ context = gcnew AgentReasoningContext();
+		context->TurnId = CaptureActiveTurnId();
 		context->UserInput = userInput;
 		context->RecentCommandTranscriptJson = recentCommandTranscriptJson;
 
@@ -681,6 +713,7 @@ namespace GTA {
 	void AgentReasoningWorker::WorkerMain(System::Object^ state) {
 		AgentReasoningContext^ context = safe_cast<AgentReasoningContext^>(state);
 		AgentReasoningResult^ result = AgentCommandReasoning::ClassifyCommandRequest(
+			context->TurnId,
 			context->UserInput,
 			context->RecentCommandTranscriptJson);
 

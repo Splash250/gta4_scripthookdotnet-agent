@@ -61,6 +61,7 @@ namespace GTA {
 		static String^ ExtractRefusalText(System::Collections::Generic::Dictionary<String^, System::Object^>^ root);
 		static String^ ExtractErrorText(System::Collections::Generic::Dictionary<String^, System::Object^>^ root);
 		static AgentResponse^ SendCore(
+			int turnId,
 			String^ requestKind,
 			String^ instructions,
 			String^ userInput,
@@ -69,10 +70,13 @@ namespace GTA {
 
 	public:
 		static AgentResponse^ Send(String^ userInput, String^ previousResponseId);
+		static AgentResponse^ Send(int turnId, String^ userInput, String^ previousResponseId);
 		static AgentResponse^ SendIsolated(String^ instructions, String^ userInput);
 		static AgentResponse^ SendIsolated(String^ requestKind, String^ instructions, String^ userInput);
+		static AgentResponse^ SendIsolated(int turnId, String^ requestKind, String^ instructions, String^ userInput);
 		static AgentResponse^ SendIsolatedStructured(String^ instructions, String^ userInput, String^ textFormatJson);
 		static AgentResponse^ SendIsolatedStructured(String^ requestKind, String^ instructions, String^ userInput, String^ textFormatJson);
+		static AgentResponse^ SendIsolatedStructured(int turnId, String^ requestKind, String^ instructions, String^ userInput, String^ textFormatJson);
 	};
 
 	CLASS_ATTRIBUTES
@@ -81,6 +85,7 @@ namespace GTA {
 	private:
 		ref class AgentRequestContext sealed {
 		public:
+			int TurnId;
 			String^ UserInput;
 			String^ PreviousResponseId;
 			bool StoreResponseAsConversationState;

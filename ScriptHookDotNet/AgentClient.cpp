@@ -25,6 +25,7 @@
 #include "AgentClient.h"
 
 #include "AgentLogger.h"
+#include "NetHook.h"
 #include "AgentSettings.h"
 
 #pragma managed
@@ -66,6 +67,28 @@ namespace GTA {
 				}
 			}
 			return sb->ToString();
+		}
+
+		int CaptureActiveTurnId() {
+			try {
+				if (!NetHook::isPrimary)
+					return 0;
+
+				System::Object^ console = NetHook::Console;
+				if isNULL(console)
+					return 0;
+
+				System::Reflection::FieldInfo^ field = console->GetType()->GetField(
+					"pActiveTurnId",
+					System::Reflection::BindingFlags::Instance | System::Reflection::BindingFlags::NonPublic);
+				if (isNULL(field) || (field->FieldType != Int32::typeid))
+					return 0;
+
+				System::Object^ value = field->GetValue(console);
+				return isNULL(value) ? 0 : safe_cast<int>(value);
+			} catch (...) {
+				return 0;
+			}
 		}
 
 		String^ BuildModelRequestStartedPayload(
@@ -111,23 +134,24 @@ namespace GTA {
 		}
 
 		void LogModelRequestStarted(
+			int turnId,
 			String^ requestKind,
 			String^ model,
 			String^ previousResponseId,
 			String^ textFormatJson,
 			String^ userInput) {
 			AgentLogger::LogEvent(
-				0,
+				turnId,
 				AgentLogEventType::ModelRequestStarted,
 				"AgentClient",
 				"Model request started: " + NormalizeClientLogValue(requestKind),
 				BuildModelRequestStartedPayload(requestKind, model, previousResponseId, textFormatJson, userInput));
 		}
 
-		void LogModelRequestCompleted(AgentResponse^ response, String^ rawResponseText) {
+		void LogModelRequestCompleted(int turnId, AgentResponse^ response, String^ rawResponseText) {
 			if isNULL(response) return;
 			AgentLogger::LogEvent(
-				0,
+				turnId,
 				AgentLogEventType::ModelRequestCompleted,
 				"AgentClient",
 				"Model request completed: " + NormalizeClientLogValue(response->RequestKind),
@@ -135,12 +159,13 @@ namespace GTA {
 		}
 
 		void LogModelRequestFailed(
+			int turnId,
 			String^ requestKind,
 			String^ model,
 			String^ error,
 			String^ rawResponseText) {
 			AgentLogger::LogEvent(
-				0,
+				turnId,
 				AgentLogEventType::ModelRequestFailed,
 				"AgentClient",
 				"Model request failed: " + NormalizeClientLogValue(requestKind),
@@ -293,6 +318,7 @@ namespace GTA {
 	}
 
 	AgentResponse^ AgentClient::SendCore(
+		int turnId,
 		String^ requestKind,
 		String^ instructions,
 		String^ userInput,
@@ -307,7 +333,7 @@ namespace GTA {
 		result->Model = model;
 		if ((apiKey->Length == 0) || (model->Length == 0) || (prompt->Length == 0)) {
 			result->Error = "agents.ini is missing required OpenAI settings.";
-			LogModelRequestFailed(result->RequestKind, result->Model, result->Error, String::Empty);
+			LogModelRequestFailed(turnId, result->RequestKind, result->Model, result->Error, String::Empty);
 			return result;
 		}
 
@@ -338,7 +364,7 @@ namespace GTA {
 			request->ReadWriteTimeout = 120000;
 			request->ContentLength = payload->Length;
 
-			LogModelRequestStarted(result->RequestKind, model, previousResponseId, textFormatJson, userInput);
+			LogModelRequestStarted(turnId, result->RequestKind, model, previousResponseId, textFormatJson, userInput);
 
 			Stream^ requestStream = request->GetRequestStream();
 			requestStream->Write(payload, 0, payload->Length);
@@ -351,9 +377,9 @@ namespace GTA {
 			parsed->RequestKind = result->RequestKind;
 			parsed->Model = result->Model;
 			if (String::IsNullOrEmpty(parsed->Error))
-				LogModelRequestCompleted(parsed, bodyText);
+				LogModelRequestCompleted(turnId, parsed, bodyText);
 			else
-				LogModelRequestFailed(parsed->RequestKind, parsed->Model, parsed->Error, bodyText);
+				LogModelRequestFailed(turnId, parsed->RequestKind, parsed->Model, parsed->Error, bodyText);
 			return parsed;
 		} catch (WebException^ ex) {
 			String^ bodyText = ReadResponseBody(ex->Response);
@@ -362,38 +388,50 @@ namespace GTA {
 				parsed->RequestKind = result->RequestKind;
 				parsed->Model = result->Model;
 				if (parsed->Error->Length > 0) {
-					LogModelRequestFailed(parsed->RequestKind, parsed->Model, parsed->Error, bodyText);
+					LogModelRequestFailed(turnId, parsed->RequestKind, parsed->Model, parsed->Error, bodyText);
 					return parsed;
 				}
 			}
 			result->Error = "OpenAI request failed: " + ex->Message;
-			LogModelRequestFailed(result->RequestKind, result->Model, result->Error, bodyText);
+			LogModelRequestFailed(turnId, result->RequestKind, result->Model, result->Error, bodyText);
 			return result;
 		} catch (Exception^ ex) {
 			result->Error = "OpenAI request failed: " + ex->Message;
-			LogModelRequestFailed(result->RequestKind, result->Model, result->Error, String::Empty);
+			LogModelRequestFailed(turnId, result->RequestKind, result->Model, result->Error, String::Empty);
 			return result;
 		}
 	}
 
 	AgentResponse^ AgentClient::Send(String^ userInput, String^ previousResponseId) {
-		return SendCore("chat_reply", AgentSettings::SystemPrompt, userInput, previousResponseId, String::Empty);
+		return Send(0, userInput, previousResponseId);
+	}
+
+	AgentResponse^ AgentClient::Send(int turnId, String^ userInput, String^ previousResponseId) {
+		return SendCore(turnId, "chat_reply", AgentSettings::SystemPrompt, userInput, previousResponseId, String::Empty);
 	}
 
 	AgentResponse^ AgentClient::SendIsolated(String^ instructions, String^ userInput) {
-		return SendIsolated("isolated_request", instructions, userInput);
+		return SendIsolated(0, "isolated_request", instructions, userInput);
 	}
 
 	AgentResponse^ AgentClient::SendIsolatedStructured(String^ instructions, String^ userInput, String^ textFormatJson) {
-		return SendIsolatedStructured("isolated_structured_request", instructions, userInput, textFormatJson);
+		return SendIsolatedStructured(0, "isolated_structured_request", instructions, userInput, textFormatJson);
 	}
 
 	AgentResponse^ AgentClient::SendIsolated(String^ requestKind, String^ instructions, String^ userInput) {
-		return SendCore(requestKind, instructions, userInput, String::Empty, String::Empty);
+		return SendIsolated(0, requestKind, instructions, userInput);
+	}
+
+	AgentResponse^ AgentClient::SendIsolated(int turnId, String^ requestKind, String^ instructions, String^ userInput) {
+		return SendCore(turnId, requestKind, instructions, userInput, String::Empty, String::Empty);
 	}
 
 	AgentResponse^ AgentClient::SendIsolatedStructured(String^ requestKind, String^ instructions, String^ userInput, String^ textFormatJson) {
-		return SendCore(requestKind, instructions, userInput, String::Empty, textFormatJson);
+		return SendIsolatedStructured(0, requestKind, instructions, userInput, textFormatJson);
+	}
+
+	AgentResponse^ AgentClient::SendIsolatedStructured(int turnId, String^ requestKind, String^ instructions, String^ userInput, String^ textFormatJson) {
+		return SendCore(turnId, requestKind, instructions, userInput, String::Empty, textFormatJson);
 	}
 
 	AgentRequestWorker::AgentRequestWorker() {
@@ -422,6 +460,7 @@ namespace GTA {
 		}
 
 		AgentRequestContext^ context = gcnew AgentRequestContext();
+		context->TurnId = CaptureActiveTurnId();
 		context->UserInput = userInput;
 		context->PreviousResponseId = previousResponseId;
 		context->StoreResponseAsConversationState = storeResponseAsConversationState;
@@ -434,7 +473,7 @@ namespace GTA {
 
 	void AgentRequestWorker::WorkerMain(System::Object^ state) {
 		AgentRequestContext^ context = safe_cast<AgentRequestContext^>(state);
-		AgentResponse^ response = AgentClient::Send(context->UserInput, context->PreviousResponseId);
+		AgentResponse^ response = AgentClient::Send(context->TurnId, context->UserInput, context->PreviousResponseId);
 		if isNotNULL(response)
 			response->StoreAsPreviousResponse = context->StoreResponseAsConversationState;
 

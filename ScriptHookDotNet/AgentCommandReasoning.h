@@ -93,9 +93,10 @@ namespace GTA {
 		static String^ GetContractDecisionName(AgentReasoningContractDecision value);
 		static String^ GetLegacyDecisionName(AgentReasoningDecision value);
 		static String^ GetContractFormatName(AgentReasoningContractFormat value);
-		static void LogRoutingStarted(String^ userInput, String^ recentCommandTranscriptJson);
-		static AgentReasoningResult^ LogRoutingResult(AgentReasoningResult^ result);
+		static void LogRoutingStarted(int turnId, String^ userInput, String^ recentCommandTranscriptJson);
+		static AgentReasoningResult^ LogRoutingResult(int turnId, AgentReasoningResult^ result);
 		static void LogSemanticValidation(
+			int turnId,
 			String^ commandName,
 			bool accepted,
 			String^ validatedCommandLine,
@@ -115,10 +116,10 @@ namespace GTA {
 		static AgentReasoningResult^ ParseResponsePayload(
 			System::Collections::Generic::Dictionary<String^, System::Object^>^ root,
 			AgentReasoningContractFormat expectedFormat);
-		static AgentReasoningResult^ ValidateResult(AgentReasoningResult^ result, String^ userInput);
+		static AgentReasoningResult^ ValidateResult(int turnId, AgentReasoningResult^ result, String^ userInput);
 
 	public:
-		static AgentReasoningResult^ ClassifyCommandRequest(String^ userInput, String^ recentCommandTranscriptJson);
+		static AgentReasoningResult^ ClassifyCommandRequest(int turnId, String^ userInput, String^ recentCommandTranscriptJson);
 	};
 
 	CLASS_ATTRIBUTES
@@ -127,6 +128,7 @@ namespace GTA {
 	private:
 		ref class AgentReasoningContext sealed {
 		public:
+			int TurnId;
 			String^ UserInput;
 			String^ RecentCommandTranscriptJson;
 		};
