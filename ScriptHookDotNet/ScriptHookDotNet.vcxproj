@@ -239,6 +239,7 @@
     <ClCompile Include="AgentActionCatalog.cpp" />
     <ClCompile Include="AgentCommandExecution.cpp" />
     <ClCompile Include="AgentCommandIntent.cpp" />
+    <ClCompile Include="AgentLogger.cpp" />
     <ClCompile Include="AgentCommandReasoning.cpp" />
     <ClCompile Include="AgentCommandRegistry.cpp" />
     <ClCompile Include="AgentCommandSemantics.cpp" />
@@ -292,6 +293,7 @@
     <ClInclude Include="AgentActionCatalog.h" />
     <ClInclude Include="AgentCommandExecution.h" />
     <ClInclude Include="AgentCommandIntent.h" />
+    <ClInclude Include="AgentLogger.h" />
     <ClInclude Include="AgentCommandReasoning.h" />
     <ClInclude Include="AgentCommandRegistry.h" />
     <ClInclude Include="AgentCommandSemantics.h" />
