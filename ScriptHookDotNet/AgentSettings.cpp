@@ -58,6 +58,14 @@ namespace GTA {
 		return Config->GetValueString("SystemPrompt", "OpenAI", String::Empty);
 	}
 
+	bool AgentSettings::EnableAgentLogging::get() {
+		return Config->GetValueBool("EnableAgentLogging", "OpenAI", true);
+	}
+
+	bool AgentSettings::EnableAgentJsonLogging::get() {
+		return Config->GetValueBool("EnableAgentJsonLogging", "OpenAI", true);
+	}
+
 	bool AgentSettings::EnsureConfigFileExists() {
 		if (IO::File::Exists(ConfigPath)) return false;
 
@@ -66,6 +74,8 @@ namespace GTA {
 		cfg->SetValue("ApiKey", "OpenAI", String::Empty);
 		cfg->SetValue("Model", "OpenAI", "gpt-5.5");
 		cfg->SetValue("SystemPrompt", "OpenAI", "You are a helpful in-game agent.");
+		cfg->SetValue("EnableAgentLogging", "OpenAI", true);
+		cfg->SetValue("EnableAgentJsonLogging", "OpenAI", true);
 		cfg->Save();
 		pConfig = cfg;
 		return true;

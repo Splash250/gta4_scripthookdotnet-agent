@@ -50,6 +50,12 @@ namespace GTA {
 		static property String^ SystemPrompt {
 			String^ get();
 		}
+		static property bool EnableAgentLogging {
+			bool get();
+		}
+		static property bool EnableAgentJsonLogging {
+			bool get();
+		}
 
 		static bool EnsureConfigFileExists();
 		static bool IsConfigured([System::Runtime::InteropServices::Out] String^% message);
