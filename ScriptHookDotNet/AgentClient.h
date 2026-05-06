@@ -50,12 +50,14 @@ namespace GTA {
 		static String^ ReadResponseBody(System::Net::WebResponse^ response);
 		static AgentResponse^ ParseResponse(String^ json);
 		static String^ ExtractOutputText(System::Collections::Generic::Dictionary<String^, System::Object^>^ root);
+		static String^ ExtractRefusalText(System::Collections::Generic::Dictionary<String^, System::Object^>^ root);
 		static String^ ExtractErrorText(System::Collections::Generic::Dictionary<String^, System::Object^>^ root);
-		static AgentResponse^ SendCore(String^ instructions, String^ userInput, String^ previousResponseId);
+		static AgentResponse^ SendCore(String^ instructions, String^ userInput, String^ previousResponseId, String^ textFormatJson);
 
 	public:
 		static AgentResponse^ Send(String^ userInput, String^ previousResponseId);
 		static AgentResponse^ SendIsolated(String^ instructions, String^ userInput);
+		static AgentResponse^ SendIsolatedStructured(String^ instructions, String^ userInput, String^ textFormatJson);
 	};
 
 	CLASS_ATTRIBUTES

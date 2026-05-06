@@ -103,6 +103,14 @@ namespace GTA {
 		sb->Append("},");
 
 		sb->Append("{");
+		sb->Append("\"id\":\"no_exact_built_in_fit\",");
+		sb->Append("\"kind\":\"no_exact_built_in_fit\",");
+		sb->Append("\"summary\":\"")->Append(EscapeJson("Decline built-in execution when no exact built-in command can satisfy the request without stretching semantics or inventing behavior."))->Append("\",");
+		sb->Append("\"command_sources\":[\"built_in_commands\",\"built_in_explain_only_commands\"],");
+		sb->Append("\"requires_exact_semantic_fit\":true");
+		sb->Append("},");
+
+		sb->Append("{");
 		sb->Append("\"id\":\"normal_chat\",");
 		sb->Append("\"kind\":\"normal_chat\",");
 		sb->Append("\"summary\":\"")->Append(EscapeJson("Handle conversational requests that should not be routed into a GTA action."))->Append("\"");

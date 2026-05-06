@@ -78,6 +78,41 @@ namespace GTA {
 		return error["message"]->ToString();
 	}
 
+	String^ AgentClient::ExtractRefusalText(Dictionary<String^, Object^>^ root) {
+		if (isNULL(root) || !root->ContainsKey("output") || isNULL(root["output"])) return String::Empty;
+
+		array<Object^>^ output = dynamic_cast<array<Object^>^>(root["output"]);
+		if isNULL(output) return String::Empty;
+
+		StringBuilder^ sb = gcnew StringBuilder();
+		for each (Object^ itemObj in output) {
+			Dictionary<String^, Object^>^ item = dynamic_cast<Dictionary<String^, Object^>^>(itemObj);
+			if (isNULL(item) || !item->ContainsKey("content") || isNULL(item["content"])) continue;
+
+			array<Object^>^ content = dynamic_cast<array<Object^>^>(item["content"]);
+			if isNULL(content) continue;
+
+			for each (Object^ contentObj in content) {
+				Dictionary<String^, Object^>^ contentItem = dynamic_cast<Dictionary<String^, Object^>^>(contentObj);
+				if (isNULL(contentItem)) continue;
+
+				bool isRefusalItem =
+					(contentItem->ContainsKey("type") && isNotNULL(contentItem["type"]) && (contentItem["type"]->ToString() == "refusal")) ||
+					(contentItem->ContainsKey("refusal") && isNotNULL(contentItem["refusal"]));
+				if (!isRefusalItem) continue;
+
+				String^ refusalText = contentItem->ContainsKey("refusal") && isNotNULL(contentItem["refusal"])
+					? contentItem["refusal"]->ToString()
+					: String::Empty;
+				if (String::IsNullOrEmpty(refusalText)) continue;
+				if (sb->Length > 0) sb->Append(Environment::NewLine);
+				sb->Append(refusalText);
+			}
+		}
+
+		return sb->ToString();
+	}
+
 	String^ AgentClient::ExtractOutputText(Dictionary<String^, Object^>^ root) {
 		if isNULL(root) return String::Empty;
 
@@ -128,6 +163,11 @@ namespace GTA {
 			}
 
 			result->Error = ExtractErrorText(root);
+			if (result->Error->Length == 0) {
+				String^ refusal = ExtractRefusalText(root);
+				if (refusal->Length > 0)
+					result->Error = refusal;
+			}
 			result->Text = ExtractOutputText(root);
 
 			if ((result->Text->Length == 0) && (result->Error->Length == 0)) {
@@ -140,7 +180,7 @@ namespace GTA {
 		return result;
 	}
 
-	AgentResponse^ AgentClient::SendCore(String^ instructions, String^ userInput, String^ previousResponseId) {
+	AgentResponse^ AgentClient::SendCore(String^ instructions, String^ userInput, String^ previousResponseId, String^ textFormatJson) {
 		AgentResponse^ result = gcnew AgentResponse();
 
 		String^ apiKey = AgentSettings::ApiKey->Trim();
@@ -160,6 +200,9 @@ namespace GTA {
 			body->Append("\"model\":\"")->Append(EscapeJson(model))->Append("\",");
 			body->Append("\"instructions\":\"")->Append(EscapeJson(prompt))->Append("\",");
 			body->Append("\"input\":[{\"role\":\"user\",\"content\":[{\"type\":\"input_text\",\"text\":\"")->Append(EscapeJson(userInput))->Append("\"}]}]");
+			if (!String::IsNullOrEmpty(textFormatJson)) {
+				body->Append(",\"text\":{\"format\":")->Append(textFormatJson)->Append("}");
+			}
 			if (!String::IsNullOrEmpty(previousResponseId)) {
 				body->Append(",\"previous_response_id\":\"")->Append(EscapeJson(previousResponseId))->Append("\"");
 			}
@@ -198,11 +241,15 @@ namespace GTA {
 	}
 
 	AgentResponse^ AgentClient::Send(String^ userInput, String^ previousResponseId) {
-		return SendCore(AgentSettings::SystemPrompt, userInput, previousResponseId);
+		return SendCore(AgentSettings::SystemPrompt, userInput, previousResponseId, String::Empty);
 	}
 
 	AgentResponse^ AgentClient::SendIsolated(String^ instructions, String^ userInput) {
-		return SendCore(instructions, userInput, String::Empty);
+		return SendCore(instructions, userInput, String::Empty, String::Empty);
+	}
+
+	AgentResponse^ AgentClient::SendIsolatedStructured(String^ instructions, String^ userInput, String^ textFormatJson) {
+		return SendCore(instructions, userInput, String::Empty, textFormatJson);
 	}
 
 	AgentRequestWorker::AgentRequestWorker() {

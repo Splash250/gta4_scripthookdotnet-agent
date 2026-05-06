@@ -33,23 +33,47 @@ namespace GTA {
 		InvalidModelResult
 	};
 
+	public enum class AgentReasoningContractDecision {
+		NormalChat,
+		BuiltInExplain,
+		BuiltInRun,
+		NoExactBuiltInFit,
+		NeedsClarification,
+		InvalidModelResult
+	};
+
+	public enum class AgentReasoningContractFormat {
+		None,
+		StructuredV1,
+		LegacyJsonFallback,
+		Invalid
+	};
+
 	CLASS_ATTRIBUTES
 	public ref class AgentReasoningResult sealed {
 
 	public:
 		AgentReasoningDecision Decision;
+		AgentReasoningContractDecision ContractDecision;
+		AgentReasoningContractFormat ContractFormat;
+		String^ ContractSchema;
 		String^ CommandName;
 		System::Collections::Generic::Dictionary<String^, String^>^ Arguments;
 		String^ ValidatedCommandLine;
 		String^ Explanation;
+		String^ ResponseText;
 		String^ FailureReason;
 
 		AgentReasoningResult() {
 			Decision = AgentReasoningDecision::InvalidModelResult;
+			ContractDecision = AgentReasoningContractDecision::InvalidModelResult;
+			ContractFormat = AgentReasoningContractFormat::None;
+			ContractSchema = String::Empty;
 			CommandName = String::Empty;
 			Arguments = gcnew System::Collections::Generic::Dictionary<String^, String^>();
 			ValidatedCommandLine = String::Empty;
 			Explanation = String::Empty;
+			ResponseText = String::Empty;
 			FailureReason = String::Empty;
 		}
 	};
@@ -61,11 +85,25 @@ namespace GTA {
 		AgentCommandReasoning() { }
 
 		static String^ EscapeJson(String^ value);
-		static String^ BuildCommandCatalogJson();
+		static String^ BuildActionCatalogJson();
 		static String^ BuildClassifierInstructions();
+		static String^ BuildLegacyFallbackInstructions();
+		static String^ BuildStructuredOutputFormatJson();
 		static String^ StripJsonFences(String^ text);
-		static AgentReasoningDecision ParseDecision(String^ value);
-		static System::Collections::Generic::Dictionary<String^, String^>^ ParseArguments(System::Object^ value);
+		static AgentReasoningContractDecision ParseDecision(String^ value);
+		static AgentReasoningDecision MapContractDecisionToLegacyDecision(AgentReasoningResult^ result);
+		static bool HasOnlyAllowedKeys(
+			System::Collections::Generic::Dictionary<String^, System::Object^>^ root,
+			... array<String^>^ allowedKeys);
+		static System::Collections::Generic::Dictionary<String^, String^>^ ParseStructuredArguments(
+			System::Object^ value,
+			[System::Runtime::InteropServices::Out] String^% failureReason);
+		static System::Collections::Generic::Dictionary<String^, String^>^ ParseLegacyArguments(
+			System::Object^ value,
+			[System::Runtime::InteropServices::Out] String^% failureReason);
+		static AgentReasoningResult^ ParseResponsePayload(
+			System::Collections::Generic::Dictionary<String^, System::Object^>^ root,
+			AgentReasoningContractFormat expectedFormat);
 		static AgentReasoningResult^ ValidateResult(AgentReasoningResult^ result, String^ userInput);
 
 	public:
