@@ -105,11 +105,10 @@ namespace GTA {
 			normalized->Contains("back on its wheels") ||
 			normalized->Contains("back on the wheels") ||
 			normalized->Contains("back on my wheels");
-		String^ vehicleNounPattern = "(?:car|vehicle|bike|bicycle|boat|truck|van|taxi|motorcycle|heli|helicopter|plane)";
-		bool mentionsNonCurrentVehicleTarget =
-			Regex::IsMatch(normalized, "\\b(?:that|another|his|her|their)\\s+" + vehicleNounPattern + "\\b") ||
-			Regex::IsMatch(normalized, "\\bsomeone\\s+else'?s\\s+" + vehicleNounPattern + "\\b") ||
-			Regex::IsMatch(normalized, "\\b(?:the\\s+)?(?:nearby|parked)\\s+" + vehicleNounPattern + "\\b");
+		bool mentionsOtherTargetPhrasing =
+			Regex::IsMatch(normalized, "\\b(?:that|another|his|her|their)\\s+\\w+") ||
+			Regex::IsMatch(normalized, "\\bsomeone\\s+else'?s\\s+\\w+") ||
+			Regex::IsMatch(normalized, "\\b(?:the\\s+)?(?:nearby|parked)\\s+\\w+");
 		bool mentionsOtherWorldTarget =
 			normalized->Contains("ped") ||
 			normalized->Contains("person") ||
@@ -123,7 +122,7 @@ namespace GTA {
 			failureReason = "The built-in flip command does not repaint, clean, customize, or otherwise change the vehicle beyond reorienting it.";
 			return false;
 		}
-		if (mentionsNonCurrentVehicleTarget || mentionsOtherWorldTarget) {
+		if ((mentionsOrientation && mentionsOtherTargetPhrasing) || mentionsOtherWorldTarget) {
 			failureReason = "The built-in flip command only works on the player's current vehicle, not another target in the world.";
 			return false;
 		}
