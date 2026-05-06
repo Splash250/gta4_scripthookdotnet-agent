@@ -251,6 +251,13 @@ namespace GTA {
 			normalized->Contains("mod") ||
 			normalized->Contains("tune");
 		bool mentionsOrientation =
+			normalized->Contains("upside down") ||
+			normalized->Contains("upside-down") ||
+			normalized->Contains("turned over") ||
+			normalized->Contains("rolled over") ||
+			normalized->Contains("on the roof") ||
+			normalized->Contains("on my roof") ||
+			normalized->Contains("on its roof") ||
 			normalized->Contains("upright") ||
 			normalized->Contains("right side up") ||
 			normalized->Contains("right-side up") ||
@@ -263,6 +270,10 @@ namespace GTA {
 			normalized->Contains("back on the wheels") ||
 			normalized->Contains("back on my wheels");
 		String^ vehicleNounPattern = "(?:car|vehicle|bike|bicycle|motorbike|boat|truck|van|taxi|motorcycle|heli|helicopter|plane)";
+		bool mentionsCurrentVehicleTarget =
+			Regex::IsMatch(normalized, "\\b(?:my|the|current)\\s+" + vehicleNounPattern + "\\b") ||
+			Regex::IsMatch(normalized, "^flip\\s+" + vehicleNounPattern + "\\b") ||
+			Regex::IsMatch(normalized, "\\bflip\\s+my\\s+" + vehicleNounPattern + "\\b");
 		bool mentionsOtherTargetVehiclePhrase =
 			Regex::IsMatch(normalized, "\\b(?:that|another|his|her|their)\\s+" + vehicleNounPattern + "\\b") ||
 			Regex::IsMatch(normalized, "\\bsomeone\\s+else'?s\\s+" + vehicleNounPattern + "\\b") ||
@@ -284,7 +295,7 @@ namespace GTA {
 			failureReason = "The built-in flip command only works on the player's current vehicle, not another target in the world.";
 			return false;
 		}
-		if (!mentionsOrientation) {
+		if (!mentionsOrientation && !(normalized->Contains("flip") && mentionsCurrentVehicleTarget)) {
 			failureReason = "The built-in flip command is only an exact fit for requests to put the current vehicle upright.";
 			return false;
 		}
