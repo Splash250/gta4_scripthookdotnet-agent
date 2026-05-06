@@ -237,7 +237,7 @@ namespace GTA {
 
 	void Agent::PromptAsync(AgentPromptRequest^ request, AgentPromptCallback^ callback) {
 		if isNULL(callback)
-			return;
+			throw gcnew ArgumentNullException("callback");
 
 		if isNULL(request) {
 			DeliverPromptFailure(callback, "Prompt request is required.");
@@ -267,7 +267,7 @@ namespace GTA {
 
 	void Agent::ClassifyBuiltInAsync(BuiltInCommandRequest^ request, BuiltInCommandCallback^ callback) {
 		if isNULL(callback)
-			return;
+			throw gcnew ArgumentNullException("callback");
 
 		if isNULL(request) {
 			DeliverBuiltInCommandFailure(callback, "Built-in command request is required.");
@@ -297,7 +297,7 @@ namespace GTA {
 		BuiltInCommandResult^ validatedResult,
 		BuiltInExecutionCallback^ callback) {
 		if isNULL(callback)
-			return;
+			throw gcnew ArgumentNullException("callback");
 
 		if isNULL(validatedResult) {
 			DeliverBuiltInExecutionFailure(callback, "Validated built-in result is required.", validatedResult);
