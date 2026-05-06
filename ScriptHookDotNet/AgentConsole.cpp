@@ -448,8 +448,8 @@ namespace GTA {
 		}
 		bActive = false;
 		pPreviousResponseId = String::Empty;
-		pWorker = gcnew AgentRequestWorker();
-		pReasoningWorker = gcnew AgentReasoningWorker();
+		if isNotNULL(pWorker) pWorker->AbandonPendingWork();
+		if isNotNULL(pReasoningWorker) pReasoningWorker->AbandonPendingWork();
 		pActiveCommandExecution = nullptr;
 		if isNotNULL(pRecentCommandExecutions) pRecentCommandExecutions->Clear();
 		pPendingReasoningInput = String::Empty;

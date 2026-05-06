@@ -32,6 +32,7 @@ namespace GTA {
 		RoutingStarted,
 		RoutingResult,
 		ModelRequestStarted,
+		ModelRequestAbandoned,
 		ModelRequestCompleted,
 		ModelRequestFailed,
 		SemanticValidation,

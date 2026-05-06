@@ -85,6 +85,7 @@ namespace GTA {
 	private:
 		ref class AgentRequestContext sealed {
 		public:
+			int Generation;
 			int TurnId;
 			String^ UserInput;
 			String^ PreviousResponseId;
@@ -93,6 +94,7 @@ namespace GTA {
 
 		System::Object^ pSyncRoot;
 		bool bBusy;
+		int pGeneration;
 		AgentResponse^ pCompletedResponse;
 
 		void WorkerMain(System::Object^ state);
@@ -105,6 +107,7 @@ namespace GTA {
 		}
 
 		bool Submit(String^ userInput, String^ previousResponseId, bool storeResponseAsConversationState);
+		void AbandonPendingWork();
 		bool TryTakeCompleted([System::Runtime::InteropServices::Out] AgentResponse^% response);
 	};
 

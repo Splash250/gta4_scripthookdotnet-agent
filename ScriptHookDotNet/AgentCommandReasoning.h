@@ -128,6 +128,7 @@ namespace GTA {
 	private:
 		ref class AgentReasoningContext sealed {
 		public:
+			int Generation;
 			int TurnId;
 			String^ UserInput;
 			String^ RecentCommandTranscriptJson;
@@ -135,6 +136,7 @@ namespace GTA {
 
 		System::Object^ pSyncRoot;
 		bool bBusy;
+		int pGeneration;
 		AgentReasoningResult^ pCompletedResult;
 
 		void WorkerMain(System::Object^ state);
@@ -147,6 +149,7 @@ namespace GTA {
 		}
 
 		bool Submit(String^ userInput, String^ recentCommandTranscriptJson);
+		void AbandonPendingWork();
 		bool TryTakeCompleted([System::Runtime::InteropServices::Out] AgentReasoningResult^% result);
 	};
 

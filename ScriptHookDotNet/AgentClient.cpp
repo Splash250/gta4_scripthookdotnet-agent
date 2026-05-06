@@ -120,6 +120,18 @@ namespace GTA {
 				"\"}");
 		}
 
+		String^ BuildModelRequestAbandonedPayload(AgentResponse^ response) {
+			if isNULL(response) return "{}";
+			return String::Concat(
+				"{\"request_kind\":\"", EscapeClientJson(NormalizeClientLogValue(response->RequestKind)),
+				"\",\"model\":\"", EscapeClientJson(NormalizeClientLogValue(response->Model)),
+				"\",\"response_id\":\"", EscapeClientJson(NormalizeClientLogValue(response->ResponseId)),
+				"\",\"error\":\"", EscapeClientJson(NormalizeClientLogValue(response->Error)),
+				"\",\"response_text\":\"", EscapeClientJson(NormalizeClientLogValue(response->Text)),
+				"\",\"store_as_previous_response\":", response->StoreAsPreviousResponse ? "true" : "false",
+				"}");
+		}
+
 		String^ BuildModelRequestFailedPayload(
 			String^ requestKind,
 			String^ model,
@@ -156,6 +168,16 @@ namespace GTA {
 				"AgentClient",
 				"Model request completed: " + NormalizeClientLogValue(response->RequestKind),
 				BuildModelRequestCompletedPayload(response, rawResponseText));
+		}
+
+		void LogModelRequestAbandoned(int turnId, AgentResponse^ response) {
+			if isNULL(response) return;
+			AgentLogger::LogEvent(
+				turnId,
+				AgentLogEventType::ModelRequestAbandoned,
+				"AgentClient",
+				"Model request abandoned after the active turn was closed: " + NormalizeClientLogValue(response->RequestKind),
+				BuildModelRequestAbandonedPayload(response));
 		}
 
 		void LogModelRequestFailed(
@@ -437,6 +459,7 @@ namespace GTA {
 	AgentRequestWorker::AgentRequestWorker() {
 		pSyncRoot = gcnew System::Object();
 		bBusy = false;
+		pGeneration = 0;
 		pCompletedResponse = nullptr;
 	}
 
@@ -450,16 +473,19 @@ namespace GTA {
 	}
 
 	bool AgentRequestWorker::Submit(String^ userInput, String^ previousResponseId, bool storeResponseAsConversationState) {
+		int generation;
 		Monitor::Enter(pSyncRoot);
 		try {
 			if (bBusy) return false;
 			bBusy = true;
 			pCompletedResponse = nullptr;
+			generation = pGeneration;
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}
 
 		AgentRequestContext^ context = gcnew AgentRequestContext();
+		context->Generation = generation;
 		context->TurnId = CaptureActiveTurnId();
 		context->UserInput = userInput;
 		context->PreviousResponseId = previousResponseId;
@@ -473,14 +499,46 @@ namespace GTA {
 
 	void AgentRequestWorker::WorkerMain(System::Object^ state) {
 		AgentRequestContext^ context = safe_cast<AgentRequestContext^>(state);
-		AgentResponse^ response = AgentClient::Send(context->TurnId, context->UserInput, context->PreviousResponseId);
-		if isNotNULL(response)
-			response->StoreAsPreviousResponse = context->StoreResponseAsConversationState;
+		AgentResponse^ response = nullptr;
+		try {
+			response = AgentClient::Send(context->TurnId, context->UserInput, context->PreviousResponseId);
+			if isNotNULL(response)
+				response->StoreAsPreviousResponse = context->StoreResponseAsConversationState;
+		} catch (Exception^ ex) {
+			response = gcnew AgentResponse();
+			response->RequestKind = "chat_reply";
+			response->Error = "Agent request worker failed: " + ex->Message;
+			response->StoreAsPreviousResponse = false;
+		} catch (...) {
+			response = gcnew AgentResponse();
+			response->RequestKind = "chat_reply";
+			response->Error = "Agent request worker failed with a native exception.";
+			response->StoreAsPreviousResponse = false;
+		}
 
 		Monitor::Enter(pSyncRoot);
 		try {
-			pCompletedResponse = response;
+			if (context->Generation == pGeneration) {
+				pCompletedResponse = response;
+				bBusy = false;
+			}
+			else {
+				bBusy = false;
+			}
+		} finally {
+			Monitor::Exit(pSyncRoot);
+		}
+
+		if (context->Generation != pGeneration)
+			LogModelRequestAbandoned(context->TurnId, response);
+	}
+
+	void AgentRequestWorker::AbandonPendingWork() {
+		Monitor::Enter(pSyncRoot);
+		try {
+			pGeneration++;
 			bBusy = false;
+			pCompletedResponse = nullptr;
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}

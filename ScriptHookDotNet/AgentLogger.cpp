@@ -49,6 +49,8 @@ namespace GTA {
 					return "routing_result";
 				case AgentLogEventType::ModelRequestStarted:
 					return "model_request_started";
+				case AgentLogEventType::ModelRequestAbandoned:
+					return "model_request_abandoned";
 				case AgentLogEventType::ModelRequestCompleted:
 					return "model_request_completed";
 				case AgentLogEventType::ModelRequestFailed:

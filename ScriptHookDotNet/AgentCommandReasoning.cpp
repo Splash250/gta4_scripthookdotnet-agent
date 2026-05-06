@@ -676,6 +676,7 @@ namespace GTA {
 	AgentReasoningWorker::AgentReasoningWorker() {
 		pSyncRoot = gcnew System::Object();
 		bBusy = false;
+		pGeneration = 0;
 		pCompletedResult = nullptr;
 	}
 
@@ -689,16 +690,19 @@ namespace GTA {
 	}
 
 	bool AgentReasoningWorker::Submit(String^ userInput, String^ recentCommandTranscriptJson) {
+		int generation;
 		System::Threading::Monitor::Enter(pSyncRoot);
 		try {
 			if (bBusy) return false;
 			bBusy = true;
 			pCompletedResult = nullptr;
+			generation = pGeneration;
 		} finally {
 			System::Threading::Monitor::Exit(pSyncRoot);
 		}
 
 		AgentReasoningContext^ context = gcnew AgentReasoningContext();
+		context->Generation = generation;
 		context->TurnId = CaptureActiveTurnId();
 		context->UserInput = userInput;
 		context->RecentCommandTranscriptJson = recentCommandTranscriptJson;
@@ -712,15 +716,41 @@ namespace GTA {
 
 	void AgentReasoningWorker::WorkerMain(System::Object^ state) {
 		AgentReasoningContext^ context = safe_cast<AgentReasoningContext^>(state);
-		AgentReasoningResult^ result = AgentCommandReasoning::ClassifyCommandRequest(
-			context->TurnId,
-			context->UserInput,
-			context->RecentCommandTranscriptJson);
+		AgentReasoningResult^ result = nullptr;
+		try {
+			result = AgentCommandReasoning::ClassifyCommandRequest(
+				context->TurnId,
+				context->UserInput,
+				context->RecentCommandTranscriptJson);
+		} catch (Exception^ ex) {
+			result = gcnew AgentReasoningResult();
+			result->Decision = AgentReasoningDecision::InvalidModelResult;
+			result->ContractDecision = AgentReasoningContractDecision::InvalidModelResult;
+			result->FailureReason = "Agent reasoning worker failed: " + ex->Message;
+		} catch (...) {
+			result = gcnew AgentReasoningResult();
+			result->Decision = AgentReasoningDecision::InvalidModelResult;
+			result->ContractDecision = AgentReasoningContractDecision::InvalidModelResult;
+			result->FailureReason = "Agent reasoning worker failed with a native exception.";
+		}
 
 		System::Threading::Monitor::Enter(pSyncRoot);
 		try {
-			pCompletedResult = result;
+			if (context->Generation == pGeneration) {
+				pCompletedResult = result;
+				bBusy = false;
+			}
+		} finally {
+			System::Threading::Monitor::Exit(pSyncRoot);
+		}
+	}
+
+	void AgentReasoningWorker::AbandonPendingWork() {
+		System::Threading::Monitor::Enter(pSyncRoot);
+		try {
+			pGeneration++;
 			bBusy = false;
+			pCompletedResult = nullptr;
 		} finally {
 			System::Threading::Monitor::Exit(pSyncRoot);
 		}
