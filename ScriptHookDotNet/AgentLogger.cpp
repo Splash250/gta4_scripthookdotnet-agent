@@ -106,32 +106,6 @@ namespace GTA {
 		}
 	}
 
-	bool AgentLogger::TryReserveSequence(
-		[System::Runtime::InteropServices::Out] String^% sessionId,
-		[System::Runtime::InteropServices::Out] int% sequence,
-		[System::Runtime::InteropServices::Out] bool% humanEnabled,
-		[System::Runtime::InteropServices::Out] bool% jsonEnabled) {
-		sessionId = String::Empty;
-		sequence = 0;
-		humanEnabled = false;
-		jsonEnabled = false;
-
-		System::Threading::Monitor::Enter(pSyncRoot);
-		try {
-			if (!bInitialized)
-				return false;
-
-			sessionId = pSessionId;
-			sequence = pNextSequence;
-			pNextSequence++;
-			humanEnabled = bHumanEnabled;
-			jsonEnabled = bJsonEnabled;
-			return true;
-		} finally {
-			System::Threading::Monitor::Exit(pSyncRoot);
-		}
-	}
-
 	void AgentLogger::WriteHumanLine(String^ line, bool truncate) {
 		String^ path = BuildLogPath("agent.log");
 		FileStream^ fs = nullptr;
@@ -154,8 +128,13 @@ namespace GTA {
 		} catch (...) {
 			failureDetail = String::Concat("Unable to write ", path, ".");
 		} finally {
-			DisposeQuietly(sw);
-			DisposeQuietly(fs);
+			String^ disposeFailure = DisposeWithFailureDetail(sw, path, "flush");
+			if (String::IsNullOrEmpty(failureDetail) && !String::IsNullOrEmpty(disposeFailure))
+				failureDetail = disposeFailure;
+
+			disposeFailure = DisposeWithFailureDetail(fs, path, "close");
+			if (String::IsNullOrEmpty(failureDetail) && !String::IsNullOrEmpty(disposeFailure))
+				failureDetail = disposeFailure;
 		}
 
 		if (!String::IsNullOrEmpty(failureDetail))
@@ -178,21 +157,29 @@ namespace GTA {
 		} catch (...) {
 			failureDetail = String::Concat("Unable to write ", path, ".");
 		} finally {
-			DisposeQuietly(sw);
-			DisposeQuietly(fs);
+			String^ disposeFailure = DisposeWithFailureDetail(sw, path, "flush");
+			if (String::IsNullOrEmpty(failureDetail) && !String::IsNullOrEmpty(disposeFailure))
+				failureDetail = disposeFailure;
+
+			disposeFailure = DisposeWithFailureDetail(fs, path, "close");
+			if (String::IsNullOrEmpty(failureDetail) && !String::IsNullOrEmpty(disposeFailure))
+				failureDetail = disposeFailure;
 		}
 
 		if (!String::IsNullOrEmpty(failureDetail))
 			WarnFailureOnce(failureDetail);
 	}
 
-	void AgentLogger::DisposeQuietly(System::IDisposable^ disposable) {
-		if isNULL(disposable) return;
+	String^ AgentLogger::DisposeWithFailureDetail(System::IDisposable^ disposable, String^ path, String^ stage) {
+		if isNULL(disposable) return String::Empty;
 
 		try {
 			delete disposable;
 		} catch (...) {
+			return String::Concat("Unable to ", NormalizeText(stage), " ", path, ".");
 		}
+
+		return String::Empty;
 	}
 
 	void AgentLogger::WarnFailureOnce(String^ detail) {
@@ -362,38 +349,45 @@ namespace GTA {
 		String^ safeHumanSummary = NormalizeText(humanSummary);
 		String^ safeJsonPayload = SanitizeJsonPayload(jsonPayload);
 
-		String^ sessionId = String::Empty;
-		int sequence = 0;
-		bool humanEnabled = false;
-		bool jsonEnabled = false;
-		if (!TryReserveSequence(sessionId, sequence, humanEnabled, jsonEnabled))
-			return;
+		System::Threading::Monitor::Enter(pSyncRoot);
+		try {
+			if (!bInitialized)
+				return;
 
-		String^ eventTypeName = GetEventTypeName(eventType);
-		if (humanEnabled) {
-			String^ line = String::Concat(
-				"[session ", sessionId,
-				"] turn=", turnId.ToString(Globalization::CultureInfo::InvariantCulture),
-				" seq=", sequence.ToString(Globalization::CultureInfo::InvariantCulture),
-				" ", safeSource,
-				" ", eventTypeName,
-				": ", safeHumanSummary
-			);
-			WriteHumanLine(line, false);
-		}
+			String^ sessionId = pSessionId;
+			int sequence = pNextSequence;
+			pNextSequence++;
+			bool humanEnabled = bHumanEnabled;
+			bool jsonEnabled = bJsonEnabled;
 
-		if (jsonEnabled) {
-			System::Text::StringBuilder^ sb = gcnew System::Text::StringBuilder();
-			sb->Append("{\"timestamp\":\"")->Append(EscapeJson(FormatTimestamp(DateTime::Now)));
-			sb->Append("\",\"session_id\":\"")->Append(EscapeJson(sessionId));
-			sb->Append("\",\"turn_id\":")->Append(turnId.ToString(Globalization::CultureInfo::InvariantCulture));
-			sb->Append(",\"event_type\":\"")->Append(eventTypeName);
-			sb->Append("\",\"source\":\"")->Append(EscapeJson(safeSource));
-			sb->Append("\",\"sequence\":")->Append(sequence.ToString(Globalization::CultureInfo::InvariantCulture));
-			if (safeHumanSummary->Length > 0)
-				sb->Append(",\"summary\":\"")->Append(EscapeJson(safeHumanSummary))->Append("\"");
-			sb->Append(",\"payload\":")->Append(safeJsonPayload)->Append("}");
-			WriteJsonLine(sb->ToString(), false);
+			String^ eventTypeName = GetEventTypeName(eventType);
+			if (humanEnabled) {
+				String^ line = String::Concat(
+					"[session ", sessionId,
+					"] turn=", turnId.ToString(Globalization::CultureInfo::InvariantCulture),
+					" seq=", sequence.ToString(Globalization::CultureInfo::InvariantCulture),
+					" ", safeSource,
+					" ", eventTypeName,
+					": ", safeHumanSummary
+				);
+				WriteHumanLine(line, false);
+			}
+
+			if (jsonEnabled) {
+				System::Text::StringBuilder^ sb = gcnew System::Text::StringBuilder();
+				sb->Append("{\"timestamp\":\"")->Append(EscapeJson(FormatTimestamp(DateTime::Now)));
+				sb->Append("\",\"session_id\":\"")->Append(EscapeJson(sessionId));
+				sb->Append("\",\"turn_id\":")->Append(turnId.ToString(Globalization::CultureInfo::InvariantCulture));
+				sb->Append(",\"event_type\":\"")->Append(eventTypeName);
+				sb->Append("\",\"source\":\"")->Append(EscapeJson(safeSource));
+				sb->Append("\",\"sequence\":")->Append(sequence.ToString(Globalization::CultureInfo::InvariantCulture));
+				if (safeHumanSummary->Length > 0)
+					sb->Append(",\"summary\":\"")->Append(EscapeJson(safeHumanSummary))->Append("\"");
+				sb->Append(",\"payload\":")->Append(safeJsonPayload)->Append("}");
+				WriteJsonLine(sb->ToString(), false);
+			}
+		} finally {
+			System::Threading::Monitor::Exit(pSyncRoot);
 		}
 	}
 
