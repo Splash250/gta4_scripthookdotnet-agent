@@ -99,21 +99,48 @@ namespace GTA {
 			normalized->Contains("right-side up") ||
 			normalized->Contains("back over") ||
 			normalized->Contains("back upright") ||
+			normalized->Contains("on its wheels again") ||
+			normalized->Contains("on the wheels again") ||
+			normalized->Contains("on my wheels again") ||
 			normalized->Contains("back on its wheels") ||
 			normalized->Contains("back on the wheels") ||
 			normalized->Contains("back on my wheels");
 		bool mentionsNonCurrentVehicleTarget =
 			normalized->Contains("another car") ||
 			normalized->Contains("another vehicle") ||
+			normalized->Contains("another bike") ||
+			normalized->Contains("another bicycle") ||
+			normalized->Contains("another boat") ||
+			normalized->Contains("another heli") ||
+			normalized->Contains("another helicopter") ||
+			normalized->Contains("another plane") ||
 			normalized->Contains("that car") ||
 			normalized->Contains("that vehicle") ||
+			normalized->Contains("that bike") ||
+			normalized->Contains("that bicycle") ||
+			normalized->Contains("that boat") ||
+			normalized->Contains("that heli") ||
+			normalized->Contains("that helicopter") ||
+			normalized->Contains("that plane") ||
 			normalized->Contains("his car") ||
 			normalized->Contains("her car") ||
 			normalized->Contains("their car") ||
 			normalized->Contains("someone else's car") ||
 			normalized->Contains("someone elses car") ||
 			normalized->Contains("nearby car") ||
-			normalized->Contains("parked car");
+			normalized->Contains("nearby bike") ||
+			normalized->Contains("nearby bicycle") ||
+			normalized->Contains("nearby boat") ||
+			normalized->Contains("nearby heli") ||
+			normalized->Contains("nearby helicopter") ||
+			normalized->Contains("nearby plane") ||
+			normalized->Contains("parked car") ||
+			normalized->Contains("parked bike") ||
+			normalized->Contains("parked bicycle") ||
+			normalized->Contains("parked boat") ||
+			normalized->Contains("parked heli") ||
+			normalized->Contains("parked helicopter") ||
+			normalized->Contains("parked plane");
 		bool mentionsOtherWorldTarget =
 			normalized->Contains("ped") ||
 			normalized->Contains("person") ||
