@@ -264,6 +264,7 @@ namespace GTA {
 			int requestId,
 			int turnId);
 		static bool IsSameScript(Script^ left, Script^ right);
+		bool IsCallbackGenerationCurrentLocked(AgentRuntimeQueuedCallback^ callback);
 		bool ShouldDeliverCallback(AgentRuntimeQueuedCallback^ callback);
 		void EnqueueCallback(AgentRuntimeQueuedCallback^ callback);
 		void AbandonScriptOwnedWorkCore(Script^ ownerScript);

@@ -385,6 +385,22 @@ namespace GTA {
 		return Object::ReferenceEquals(left, right);
 	}
 
+	bool AgentRuntime::IsCallbackGenerationCurrentLocked(AgentRuntimeQueuedCallback^ callback) {
+		if isNULL(callback)
+			return false;
+
+		switch (callback->Lane) {
+			case AgentRuntimeLane::Prompt:
+				return callback->Generation == pPromptGeneration;
+			case AgentRuntimeLane::BuiltInClassification:
+				return callback->Generation == pBuiltInClassificationGeneration;
+			case AgentRuntimeLane::ValidatedBuiltInExecution:
+				return callback->Generation == pValidatedBuiltInExecutionGeneration;
+			default:
+				return false;
+		}
+	}
+
 	bool AgentRuntime::ShouldDeliverCallback(AgentRuntimeQueuedCallback^ callback) {
 		return isNotNULL(callback);
 	}
@@ -419,11 +435,20 @@ namespace GTA {
 	void AgentRuntime::EnqueueCallback(AgentRuntimeQueuedCallback^ callback) {
 		if isNULL(callback) return;
 
-		Monitor::Enter(pCallbackSyncRoot);
+		Monitor::Enter(pSyncRoot);
 		try {
-			pCallbackQueue->Enqueue(callback);
+			if (!IsCallbackGenerationCurrentLocked(callback))
+				return;
+
+			Monitor::Enter(pCallbackSyncRoot);
+			try {
+				if (IsCallbackGenerationCurrentLocked(callback))
+					pCallbackQueue->Enqueue(callback);
+			} finally {
+				Monitor::Exit(pCallbackSyncRoot);
+			}
 		} finally {
-			Monitor::Exit(pCallbackSyncRoot);
+			Monitor::Exit(pSyncRoot);
 		}
 	}
 
