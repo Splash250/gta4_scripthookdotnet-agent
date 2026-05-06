@@ -25,6 +25,8 @@
 
 #include "NetHook.h"
 
+#include "AgentLogger.h"
+#include "AgentSettings.h"
 #include "Console.h"
 #include "AgentCommandExecution.h"
 #include "ConsoleCommands.h"
@@ -61,6 +63,10 @@ namespace GTA {
 			pDefaultConsole = gcnew GTA::Console();
 			pAgentConsole = gcnew GTA::AgentConsole();
 			pConsole = pDefaultConsole;
+			AgentLogger::Initialize(
+				AgentSettings::EnableAgentLogging,
+				AgentSettings::EnableAgentJsonLogging
+			);
 		} else {
 			pMouse = gcnew GTA::Forms::RemoteMouse();
 			pConsole = gcnew GTA::RemoteConsole();
