@@ -33,6 +33,51 @@ namespace GTA {
 	using namespace System::Globalization;
 	using namespace System::Text::RegularExpressions;
 
+	namespace {
+
+		bool IsCommonSpawnNonModelToken(String^ token) {
+			if (String::IsNullOrEmpty(token)) return true;
+
+			String^ normalized = token->Trim()->ToLowerInvariant();
+			return
+				(normalized == "spawn") ||
+				(normalized == "please") ||
+				(normalized == "the") ||
+				(normalized == "a") ||
+				(normalized == "an") ||
+				(normalized == "that") ||
+				(normalized == "this") ||
+				(normalized == "me") ||
+				(normalized == "my") ||
+				(normalized == "or") ||
+				(normalized == "not") ||
+				(normalized == "instead") ||
+				(normalized == "rather") ||
+				(normalized == "than") ||
+				(normalized == "another") ||
+				(normalized == "some") ||
+				(normalized == "something") ||
+				(normalized == "anything") ||
+				(normalized == "vehicle") ||
+				(normalized == "car");
+		}
+
+		bool IsPlausibleSpawnModelToken(String^ token) {
+			if (String::IsNullOrWhiteSpace(token)) return false;
+			String^ trimmed = token->Trim();
+			if ((trimmed->Length < 3) || (trimmed->Length > 24)) return false;
+			if (IsCommonSpawnNonModelToken(trimmed)) return false;
+			return Regex::IsMatch(trimmed, "^[A-Za-z][A-Za-z0-9_]*$");
+		}
+
+		bool IsValidSpawnModelToken(String^ token) {
+			if (!IsPlausibleSpawnModelToken(token)) return false;
+			GTA::Model candidateModel = token->Trim()->ToUpperInvariant();
+			return candidateModel.isValid;
+		}
+
+	}
+
 	String^ AgentCommandSemantics::Normalize(String^ input) {
 		if (String::IsNullOrEmpty(input)) return String::Empty;
 		String^ normalized = input->Trim()->ToLowerInvariant();
@@ -205,8 +250,8 @@ namespace GTA {
 		}
 
 		GTA::Model resolvedModel = model;
-		if (resolvedModel.Hash == 0) {
-			failureReason = "Spawn requires an exact GTA IV model token that resolves locally to a non-zero hash.";
+		if (!resolvedModel.isValid) {
+			failureReason = "Spawn requires an exact GTA IV model token that resolves locally to a valid model.";
 			return false;
 		}
 
@@ -269,14 +314,11 @@ namespace GTA {
 			normalized->Contains("sportscar") ||
 			normalized->Contains("sports vehicle");
 		HashSet<String^>^ resolvedMentionedModels = gcnew HashSet<String^>();
-		MatchCollection^ wordMatches = Regex::Matches(normalized, "[a-z0-9_]+");
+		MatchCollection^ wordMatches = Regex::Matches(userInput, "[A-Za-z][A-Za-z0-9_]*");
 		for each (Match^ wordMatch in wordMatches) {
 			if (isNULL(wordMatch) || !wordMatch->Success) continue;
-			String^ candidate = wordMatch->Value->ToUpperInvariant();
-			if (String::IsNullOrEmpty(candidate) || (candidate->Length < 3)) continue;
-
-			GTA::Model candidateModel = candidate;
-			if (candidateModel.Hash != 0) {
+			String^ candidate = wordMatch->Value->Trim()->ToUpperInvariant();
+			if (IsValidSpawnModelToken(candidate)) {
 				resolvedMentionedModels->Add(candidate);
 			}
 		}
@@ -459,7 +501,7 @@ namespace GTA {
 		if (name == "abortscripts") return "Stops all loaded .NET scripts. Exact fit for stop or abort all scripts requests, not for pausing or stopping one selected script.";
 		if (name == "flip") return "Flips only the local player's current vehicle upright. Exact fit for overturn or upright-current-vehicle requests only; it does not repair, customize, or affect another vehicle.";
 		if (name == "heal") return "Restores health and armor to full and repairs the current vehicle. Usually silent on success. Cannot remove armor, set an exact numeric health value, or satisfy vehicle-only repair requests exactly.";
-		if (name == "spawn") return "Spawns a ped, vehicle, or object by one exact model token only. The user request must explicitly contain that exact GTA IV model token, and the local validator only accepts it when it resolves to a non-zero GTA::Model hash. It does not support categories, random choices, aliases, colors, tuning, performance adjectives, or other customization arguments.";
+		if (name == "spawn") return "Spawns a ped, vehicle, or object by one exact model token only. The user request must explicitly contain that exact GTA IV model token, and the local validator only accepts it when it resolves to a valid GTA::Model locally. It does not support categories, random choices, aliases, colors, tuning, performance adjectives, or other customization arguments.";
 		if (name == "teleport") return "Supports waypoint teleport or explicit coordinates. Usually emits output when reporting a destination or a missing waypoint. Does not infer destinations from vague location descriptions.";
 		if (name == "setdaytime") return "Sets exact in-game time from HH:MM only.";
 		if (name == "settimescale") return "Sets a positive numeric timescale multiplier only.";
