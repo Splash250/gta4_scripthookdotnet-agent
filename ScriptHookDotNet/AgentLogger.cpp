@@ -90,19 +90,49 @@ namespace GTA {
 		return IO::Path::Combine(Game::InstallFolder, filename);
 	}
 
-	bool AgentLogger::TryReserveTurnId([System::Runtime::InteropServices::Out] int% turnId) {
-		turnId = 0;
+	void AgentLogger::LogEventCoreLocked(
+		int turnId,
+		AgentLogEventType eventType,
+		String^ source,
+		String^ humanSummary,
+		String^ jsonPayload) {
+		String^ safeSource = NormalizeText(source);
+		if (safeSource->Length == 0) safeSource = "AgentLogger";
 
-		System::Threading::Monitor::Enter(pSyncRoot);
-		try {
-			if (!bInitialized)
-				return false;
+		String^ safeHumanSummary = NormalizeText(humanSummary);
+		String^ safeJsonPayload = SanitizeJsonPayload(jsonPayload);
 
-			turnId = pNextTurnId;
-			pNextTurnId++;
-			return true;
-		} finally {
-			System::Threading::Monitor::Exit(pSyncRoot);
+		String^ sessionId = pSessionId;
+		int sequence = pNextSequence;
+		pNextSequence++;
+		bool humanEnabled = bHumanEnabled;
+		bool jsonEnabled = bJsonEnabled;
+
+		String^ eventTypeName = GetEventTypeName(eventType);
+		if (humanEnabled) {
+			String^ line = String::Concat(
+				"[session ", sessionId,
+				"] turn=", turnId.ToString(Globalization::CultureInfo::InvariantCulture),
+				" seq=", sequence.ToString(Globalization::CultureInfo::InvariantCulture),
+				" ", safeSource,
+				" ", eventTypeName,
+				": ", safeHumanSummary
+			);
+			WriteHumanLine(line, false);
+		}
+
+		if (jsonEnabled) {
+			System::Text::StringBuilder^ sb = gcnew System::Text::StringBuilder();
+			sb->Append("{\"timestamp\":\"")->Append(EscapeJson(FormatTimestamp(DateTime::Now)));
+			sb->Append("\",\"session_id\":\"")->Append(EscapeJson(sessionId));
+			sb->Append("\",\"turn_id\":")->Append(turnId.ToString(Globalization::CultureInfo::InvariantCulture));
+			sb->Append(",\"event_type\":\"")->Append(eventTypeName);
+			sb->Append("\",\"source\":\"")->Append(EscapeJson(safeSource));
+			sb->Append("\",\"sequence\":")->Append(sequence.ToString(Globalization::CultureInfo::InvariantCulture));
+			if (safeHumanSummary->Length > 0)
+				sb->Append(",\"summary\":\"")->Append(EscapeJson(safeHumanSummary))->Append("\"");
+			sb->Append(",\"payload\":")->Append(safeJsonPayload)->Append("}");
+			WriteJsonLine(sb->ToString(), false);
 		}
 	}
 
@@ -266,6 +296,9 @@ namespace GTA {
 	}
 
 	void AgentLogger::Initialize(bool enableHumanLog, bool enableJsonLog) {
+		if (!NetHook::isPrimary)
+			return;
+
 		System::Threading::Monitor::Enter(pSyncRoot);
 		try {
 			bInitialized = false;
@@ -295,22 +328,34 @@ namespace GTA {
 	}
 
 	int AgentLogger::BeginTurn(String^ userInput, String^ inputMode) {
-		int turnId = 0;
-		if (!TryReserveTurnId(turnId))
+		if (!NetHook::isPrimary)
 			return 0;
 
 		String^ safeInputMode = NormalizeText(inputMode);
 		String^ safeUserInput = NormalizeText(userInput);
-		LogEvent(
-			turnId,
-			AgentLogEventType::TurnStarted,
-			"AgentLogger",
-			String::Concat("Turn started (", safeInputMode, "): ", safeUserInput),
-			String::Concat(
-				"{\"input_mode\":\"", EscapeJson(safeInputMode),
-				"\",\"user_input\":\"", EscapeJson(safeUserInput), "\"}"
-			)
-		);
+
+		int turnId = 0;
+		System::Threading::Monitor::Enter(pSyncRoot);
+		try {
+			if (!bInitialized)
+				return 0;
+
+			turnId = pNextTurnId;
+			pNextTurnId++;
+			LogEventCoreLocked(
+				turnId,
+				AgentLogEventType::TurnStarted,
+				"AgentLogger",
+				String::Concat("Turn started (", safeInputMode, "): ", safeUserInput),
+				String::Concat(
+					"{\"input_mode\":\"", EscapeJson(safeInputMode),
+					"\",\"user_input\":\"", EscapeJson(safeUserInput), "\"}"
+				)
+			);
+		} finally {
+			System::Threading::Monitor::Exit(pSyncRoot);
+		}
+
 		return turnId;
 	}
 
@@ -340,52 +385,16 @@ namespace GTA {
 		String^ source,
 		String^ humanSummary,
 		String^ jsonPayload) {
+		if (!NetHook::isPrimary)
+			return;
 		if (turnId < 0)
 			return;
-
-		String^ safeSource = NormalizeText(source);
-		if (safeSource->Length == 0) safeSource = "AgentLogger";
-
-		String^ safeHumanSummary = NormalizeText(humanSummary);
-		String^ safeJsonPayload = SanitizeJsonPayload(jsonPayload);
 
 		System::Threading::Monitor::Enter(pSyncRoot);
 		try {
 			if (!bInitialized)
 				return;
-
-			String^ sessionId = pSessionId;
-			int sequence = pNextSequence;
-			pNextSequence++;
-			bool humanEnabled = bHumanEnabled;
-			bool jsonEnabled = bJsonEnabled;
-
-			String^ eventTypeName = GetEventTypeName(eventType);
-			if (humanEnabled) {
-				String^ line = String::Concat(
-					"[session ", sessionId,
-					"] turn=", turnId.ToString(Globalization::CultureInfo::InvariantCulture),
-					" seq=", sequence.ToString(Globalization::CultureInfo::InvariantCulture),
-					" ", safeSource,
-					" ", eventTypeName,
-					": ", safeHumanSummary
-				);
-				WriteHumanLine(line, false);
-			}
-
-			if (jsonEnabled) {
-				System::Text::StringBuilder^ sb = gcnew System::Text::StringBuilder();
-				sb->Append("{\"timestamp\":\"")->Append(EscapeJson(FormatTimestamp(DateTime::Now)));
-				sb->Append("\",\"session_id\":\"")->Append(EscapeJson(sessionId));
-				sb->Append("\",\"turn_id\":")->Append(turnId.ToString(Globalization::CultureInfo::InvariantCulture));
-				sb->Append(",\"event_type\":\"")->Append(eventTypeName);
-				sb->Append("\",\"source\":\"")->Append(EscapeJson(safeSource));
-				sb->Append("\",\"sequence\":")->Append(sequence.ToString(Globalization::CultureInfo::InvariantCulture));
-				if (safeHumanSummary->Length > 0)
-					sb->Append(",\"summary\":\"")->Append(EscapeJson(safeHumanSummary))->Append("\"");
-				sb->Append(",\"payload\":")->Append(safeJsonPayload)->Append("}");
-				WriteJsonLine(sb->ToString(), false);
-			}
+			LogEventCoreLocked(turnId, eventType, source, humanSummary, jsonPayload);
 		} finally {
 			System::Threading::Monitor::Exit(pSyncRoot);
 		}

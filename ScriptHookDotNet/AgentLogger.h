@@ -63,7 +63,12 @@ namespace GTA {
 		AgentLogger() { }
 
 		static String^ BuildLogPath(String^ filename);
-		static bool TryReserveTurnId([System::Runtime::InteropServices::Out] int% turnId);
+		static void LogEventCoreLocked(
+			int turnId,
+			AgentLogEventType eventType,
+			String^ source,
+			String^ humanSummary,
+			String^ jsonPayload);
 		static void WriteHumanLine(String^ line, bool truncate);
 		static void WriteJsonLine(String^ jsonLine, bool truncate);
 		static String^ DisposeWithFailureDetail(System::IDisposable^ disposable, String^ path, String^ stage);
