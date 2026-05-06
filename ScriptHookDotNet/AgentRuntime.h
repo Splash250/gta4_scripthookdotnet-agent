@@ -138,8 +138,28 @@ namespace GTA {
 	private ref class AgentRuntime sealed {
 
 	private:
+		enum class AgentRuntimeLane {
+			Prompt,
+			BuiltInClassification,
+			ValidatedBuiltInExecution
+		};
+
 		ref class AgentRuntimeQueuedCallback abstract {
+		private:
+			AgentRuntimeLane pLane;
+			int pGeneration;
+
 		public:
+			AgentRuntimeQueuedCallback(AgentRuntimeLane lane, int generation);
+
+			property AgentRuntimeLane Lane {
+				AgentRuntimeLane get();
+			}
+
+			property int Generation {
+				int get();
+			}
+
 			virtual void Invoke() = 0;
 		};
 
@@ -149,7 +169,10 @@ namespace GTA {
 			AgentRuntimePromptCompletion^ pCompletion;
 
 		public:
-			PromptQueuedCallback(AgentRuntimePromptCompletedCallback^ callback, AgentRuntimePromptCompletion^ completion);
+			PromptQueuedCallback(
+				int generation,
+				AgentRuntimePromptCompletedCallback^ callback,
+				AgentRuntimePromptCompletion^ completion);
 			virtual void Invoke() override;
 		};
 
@@ -160,6 +183,7 @@ namespace GTA {
 
 		public:
 			BuiltInClassificationQueuedCallback(
+				int generation,
 				AgentRuntimeBuiltInClassificationCompletedCallback^ callback,
 				AgentRuntimeBuiltInClassificationCompletion^ completion);
 			virtual void Invoke() override;
@@ -172,6 +196,7 @@ namespace GTA {
 
 		public:
 			ValidatedBuiltInExecutionQueuedCallback(
+				int generation,
 				AgentRuntimeValidatedBuiltInExecutionCompletedCallback^ callback,
 				AgentRuntimeValidatedBuiltInExecutionCompletion^ completion);
 			virtual void Invoke() override;
@@ -203,12 +228,30 @@ namespace GTA {
 		bool bPromptBusy;
 		bool bBuiltInClassificationBusy;
 		bool bValidatedBuiltInExecutionBusy;
-		int pGeneration;
+		int pPromptGeneration;
+		int pBuiltInClassificationGeneration;
+		int pValidatedBuiltInExecutionGeneration;
 		int pNextRequestId;
 		System::Collections::Generic::Queue<AgentRuntimeQueuedCallback^>^ pCallbackQueue;
 
 		int ReserveRequestId();
+		static System::Collections::Generic::Dictionary<String^, String^>^ CloneStringDictionary(
+			System::Collections::Generic::Dictionary<String^, String^>^ source);
+		static AgentRuntimePromptRequest^ ClonePromptRequest(AgentRuntimePromptRequest^ request, int requestId, int turnId);
+		static AgentRuntimeBuiltInClassificationRequest^ CloneBuiltInClassificationRequest(
+			AgentRuntimeBuiltInClassificationRequest^ request,
+			int requestId,
+			int turnId);
+		static AgentRuntimeValidatedBuiltInExecutionRequest^ CloneValidatedBuiltInExecutionRequest(
+			AgentRuntimeValidatedBuiltInExecutionRequest^ request,
+			int requestId,
+			int turnId);
+		int GetLaneGeneration(AgentRuntimeLane lane);
+		bool ShouldDeliverCallback(AgentRuntimeQueuedCallback^ callback);
 		void EnqueueCallback(AgentRuntimeQueuedCallback^ callback);
+		void AbandonPromptWorkCore();
+		void AbandonBuiltInClassificationWorkCore();
+		void AbandonValidatedBuiltInExecutionWorkCore();
 		void PromptWorkerMain(System::Object^ state);
 		void BuiltInClassificationWorkerMain(System::Object^ state);
 		void ValidatedBuiltInExecutionWorkerMain(System::Object^ state);
@@ -235,6 +278,9 @@ namespace GTA {
 		bool SubmitValidatedBuiltInExecution(
 			AgentRuntimeValidatedBuiltInExecutionRequest^ request,
 			AgentRuntimeValidatedBuiltInExecutionCompletedCallback^ callback);
+		void AbandonPromptWork();
+		void AbandonBuiltInClassificationWork();
+		void AbandonValidatedBuiltInExecutionWork();
 		void AbandonPendingWork();
 		int DrainCallbacks(int maxCallbacks);
 	};

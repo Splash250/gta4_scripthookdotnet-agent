@@ -135,9 +135,24 @@ namespace GTA {
 		Error = String::Empty;
 	}
 
+	AgentRuntime::AgentRuntimeQueuedCallback::AgentRuntimeQueuedCallback(AgentRuntimeLane lane, int generation) {
+		pLane = lane;
+		pGeneration = generation;
+	}
+
+	AgentRuntime::AgentRuntimeLane AgentRuntime::AgentRuntimeQueuedCallback::Lane::get() {
+		return pLane;
+	}
+
+	int AgentRuntime::AgentRuntimeQueuedCallback::Generation::get() {
+		return pGeneration;
+	}
+
 	AgentRuntime::PromptQueuedCallback::PromptQueuedCallback(
+		int generation,
 		AgentRuntimePromptCompletedCallback^ callback,
-		AgentRuntimePromptCompletion^ completion) {
+		AgentRuntimePromptCompletion^ completion)
+		: AgentRuntimeQueuedCallback(AgentRuntimeLane::Prompt, generation) {
 		pCallback = callback;
 		pCompletion = completion;
 	}
@@ -148,8 +163,10 @@ namespace GTA {
 	}
 
 	AgentRuntime::BuiltInClassificationQueuedCallback::BuiltInClassificationQueuedCallback(
+		int generation,
 		AgentRuntimeBuiltInClassificationCompletedCallback^ callback,
-		AgentRuntimeBuiltInClassificationCompletion^ completion) {
+		AgentRuntimeBuiltInClassificationCompletion^ completion)
+		: AgentRuntimeQueuedCallback(AgentRuntimeLane::BuiltInClassification, generation) {
 		pCallback = callback;
 		pCompletion = completion;
 	}
@@ -160,8 +177,10 @@ namespace GTA {
 	}
 
 	AgentRuntime::ValidatedBuiltInExecutionQueuedCallback::ValidatedBuiltInExecutionQueuedCallback(
+		int generation,
 		AgentRuntimeValidatedBuiltInExecutionCompletedCallback^ callback,
-		AgentRuntimeValidatedBuiltInExecutionCompletion^ completion) {
+		AgentRuntimeValidatedBuiltInExecutionCompletion^ completion)
+		: AgentRuntimeQueuedCallback(AgentRuntimeLane::ValidatedBuiltInExecution, generation) {
 		pCallback = callback;
 		pCompletion = completion;
 	}
@@ -177,13 +196,101 @@ namespace GTA {
 		bPromptBusy = false;
 		bBuiltInClassificationBusy = false;
 		bValidatedBuiltInExecutionBusy = false;
-		pGeneration = 0;
+		pPromptGeneration = 0;
+		pBuiltInClassificationGeneration = 0;
+		pValidatedBuiltInExecutionGeneration = 0;
 		pNextRequestId = 0;
 		pCallbackQueue = gcnew Queue<AgentRuntimeQueuedCallback^>();
 	}
 
 	int AgentRuntime::ReserveRequestId() {
 		return Interlocked::Increment(pNextRequestId);
+	}
+
+	Dictionary<String^, String^>^ AgentRuntime::CloneStringDictionary(Dictionary<String^, String^>^ source) {
+		Dictionary<String^, String^>^ clone = gcnew Dictionary<String^, String^>();
+		if isNULL(source)
+			return clone;
+
+		for each (KeyValuePair<String^, String^> kvp in source) {
+			String^ key = isNULL(kvp.Key) ? String::Empty : String::Copy(kvp.Key);
+			String^ value = isNULL(kvp.Value) ? String::Empty : String::Copy(kvp.Value);
+			clone[key] = value;
+		}
+		return clone;
+	}
+
+	AgentRuntimePromptRequest^ AgentRuntime::ClonePromptRequest(
+		AgentRuntimePromptRequest^ request,
+		int requestId,
+		int turnId) {
+		AgentRuntimePromptRequest^ clone = gcnew AgentRuntimePromptRequest();
+		clone->RequestId = requestId;
+		clone->TurnId = turnId;
+		clone->RequestKind = isNULL(request) || isNULL(request->RequestKind) ? String::Empty : String::Copy(request->RequestKind);
+		clone->Instructions = isNULL(request) || isNULL(request->Instructions) ? String::Empty : String::Copy(request->Instructions);
+		clone->UserInput = isNULL(request) || isNULL(request->UserInput) ? String::Empty : String::Copy(request->UserInput);
+		clone->PreviousResponseId = isNULL(request) || isNULL(request->PreviousResponseId)
+			? String::Empty
+			: String::Copy(request->PreviousResponseId);
+		clone->TextFormatJson = isNULL(request) || isNULL(request->TextFormatJson) ? String::Empty : String::Copy(request->TextFormatJson);
+		clone->StoreResponseAsConversationState = isNotNULL(request) && request->StoreResponseAsConversationState;
+		return clone;
+	}
+
+	AgentRuntimeBuiltInClassificationRequest^ AgentRuntime::CloneBuiltInClassificationRequest(
+		AgentRuntimeBuiltInClassificationRequest^ request,
+		int requestId,
+		int turnId) {
+		AgentRuntimeBuiltInClassificationRequest^ clone = gcnew AgentRuntimeBuiltInClassificationRequest();
+		clone->RequestId = requestId;
+		clone->TurnId = turnId;
+		clone->UserInput = isNULL(request) || isNULL(request->UserInput) ? String::Empty : String::Copy(request->UserInput);
+		clone->RecentCommandTranscriptJson = isNULL(request) || isNULL(request->RecentCommandTranscriptJson)
+			? String::Empty
+			: String::Copy(request->RecentCommandTranscriptJson);
+		return clone;
+	}
+
+	AgentRuntimeValidatedBuiltInExecutionRequest^ AgentRuntime::CloneValidatedBuiltInExecutionRequest(
+		AgentRuntimeValidatedBuiltInExecutionRequest^ request,
+		int requestId,
+		int turnId) {
+		AgentRuntimeValidatedBuiltInExecutionRequest^ clone = gcnew AgentRuntimeValidatedBuiltInExecutionRequest();
+		clone->RequestId = requestId;
+		clone->TurnId = turnId;
+		clone->UserInput = isNULL(request) || isNULL(request->UserInput) ? String::Empty : String::Copy(request->UserInput);
+		clone->CommandName = isNULL(request) || isNULL(request->CommandName) ? String::Empty : String::Copy(request->CommandName);
+		clone->Arguments = CloneStringDictionary(isNULL(request) ? nullptr : request->Arguments);
+		clone->ValidatedCommandLine = isNULL(request) || isNULL(request->ValidatedCommandLine)
+			? String::Empty
+			: String::Copy(request->ValidatedCommandLine);
+		return clone;
+	}
+
+	int AgentRuntime::GetLaneGeneration(AgentRuntimeLane lane) {
+		switch (lane) {
+			case AgentRuntimeLane::Prompt:
+				return pPromptGeneration;
+			case AgentRuntimeLane::BuiltInClassification:
+				return pBuiltInClassificationGeneration;
+			case AgentRuntimeLane::ValidatedBuiltInExecution:
+				return pValidatedBuiltInExecutionGeneration;
+			default:
+				return 0;
+		}
+	}
+
+	bool AgentRuntime::ShouldDeliverCallback(AgentRuntimeQueuedCallback^ callback) {
+		if isNULL(callback)
+			return false;
+
+		Monitor::Enter(pSyncRoot);
+		try {
+			return callback->Generation == GetLaneGeneration(callback->Lane);
+		} finally {
+			Monitor::Exit(pSyncRoot);
+		}
 	}
 
 	bool AgentRuntime::IsPromptBusy::get() {
@@ -230,28 +337,48 @@ namespace GTA {
 		if isNULL(request) return false;
 
 		int generation;
+		AgentRuntimePromptRequest^ requestSnapshot;
 		Monitor::Enter(pSyncRoot);
 		try {
 			if (bPromptBusy) return false;
+			generation = pPromptGeneration;
+			int requestId = (request->RequestId > 0) ? request->RequestId : ReserveRequestId();
+			int turnId = (request->TurnId > 0) ? request->TurnId : CaptureActiveTurnId();
+			requestSnapshot = ClonePromptRequest(request, requestId, turnId);
 			bPromptBusy = true;
-			generation = pGeneration;
-			if (request->RequestId <= 0)
-				request->RequestId = ReserveRequestId();
-			if (request->TurnId <= 0)
-				request->TurnId = CaptureActiveTurnId();
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}
 
 		PromptSubmissionContext^ context = gcnew PromptSubmissionContext();
 		context->Generation = generation;
-		context->Request = request;
+		context->Request = requestSnapshot;
 		context->Callback = callback;
 
-		Thread^ worker = gcnew Thread(gcnew ParameterizedThreadStart(this, &AgentRuntime::PromptWorkerMain));
-		worker->IsBackground = true;
-		worker->Start(context);
-		return true;
+		try {
+			Thread^ worker = gcnew Thread(gcnew ParameterizedThreadStart(this, &AgentRuntime::PromptWorkerMain));
+			worker->IsBackground = true;
+			worker->Start(context);
+			return true;
+		} catch (Exception^) {
+			Monitor::Enter(pSyncRoot);
+			try {
+				if (generation == pPromptGeneration)
+					bPromptBusy = false;
+			} finally {
+				Monitor::Exit(pSyncRoot);
+			}
+			return false;
+		} catch (...) {
+			Monitor::Enter(pSyncRoot);
+			try {
+				if (generation == pPromptGeneration)
+					bPromptBusy = false;
+			} finally {
+				Monitor::Exit(pSyncRoot);
+			}
+			return false;
+		}
 	}
 
 	bool AgentRuntime::SubmitBuiltInClassification(
@@ -260,29 +387,49 @@ namespace GTA {
 		if isNULL(request) return false;
 
 		int generation;
+		AgentRuntimeBuiltInClassificationRequest^ requestSnapshot;
 		Monitor::Enter(pSyncRoot);
 		try {
 			if (bBuiltInClassificationBusy) return false;
+			generation = pBuiltInClassificationGeneration;
+			int requestId = (request->RequestId > 0) ? request->RequestId : ReserveRequestId();
+			int turnId = (request->TurnId > 0) ? request->TurnId : CaptureActiveTurnId();
+			requestSnapshot = CloneBuiltInClassificationRequest(request, requestId, turnId);
 			bBuiltInClassificationBusy = true;
-			generation = pGeneration;
-			if (request->RequestId <= 0)
-				request->RequestId = ReserveRequestId();
-			if (request->TurnId <= 0)
-				request->TurnId = CaptureActiveTurnId();
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}
 
 		BuiltInClassificationSubmissionContext^ context = gcnew BuiltInClassificationSubmissionContext();
 		context->Generation = generation;
-		context->Request = request;
+		context->Request = requestSnapshot;
 		context->Callback = callback;
 
-		Thread^ worker = gcnew Thread(
-			gcnew ParameterizedThreadStart(this, &AgentRuntime::BuiltInClassificationWorkerMain));
-		worker->IsBackground = true;
-		worker->Start(context);
-		return true;
+		try {
+			Thread^ worker = gcnew Thread(
+				gcnew ParameterizedThreadStart(this, &AgentRuntime::BuiltInClassificationWorkerMain));
+			worker->IsBackground = true;
+			worker->Start(context);
+			return true;
+		} catch (Exception^) {
+			Monitor::Enter(pSyncRoot);
+			try {
+				if (generation == pBuiltInClassificationGeneration)
+					bBuiltInClassificationBusy = false;
+			} finally {
+				Monitor::Exit(pSyncRoot);
+			}
+			return false;
+		} catch (...) {
+			Monitor::Enter(pSyncRoot);
+			try {
+				if (generation == pBuiltInClassificationGeneration)
+					bBuiltInClassificationBusy = false;
+			} finally {
+				Monitor::Exit(pSyncRoot);
+			}
+			return false;
+		}
 	}
 
 	bool AgentRuntime::SubmitValidatedBuiltInExecution(
@@ -291,117 +438,204 @@ namespace GTA {
 		if isNULL(request) return false;
 
 		int generation;
+		AgentRuntimeValidatedBuiltInExecutionRequest^ requestSnapshot;
 		Monitor::Enter(pSyncRoot);
 		try {
 			if (bValidatedBuiltInExecutionBusy) return false;
+			generation = pValidatedBuiltInExecutionGeneration;
+			int requestId = (request->RequestId > 0) ? request->RequestId : ReserveRequestId();
+			int turnId = (request->TurnId > 0) ? request->TurnId : CaptureActiveTurnId();
+			requestSnapshot = CloneValidatedBuiltInExecutionRequest(request, requestId, turnId);
 			bValidatedBuiltInExecutionBusy = true;
-			generation = pGeneration;
-			if (request->RequestId <= 0)
-				request->RequestId = ReserveRequestId();
-			if (request->TurnId <= 0)
-				request->TurnId = CaptureActiveTurnId();
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}
 
 		ValidatedBuiltInExecutionSubmissionContext^ context = gcnew ValidatedBuiltInExecutionSubmissionContext();
 		context->Generation = generation;
-		context->Request = request;
+		context->Request = requestSnapshot;
 		context->Callback = callback;
 
-		Thread^ worker = gcnew Thread(
-			gcnew ParameterizedThreadStart(this, &AgentRuntime::ValidatedBuiltInExecutionWorkerMain));
-		worker->IsBackground = true;
-		worker->Start(context);
-		return true;
+		try {
+			Thread^ worker = gcnew Thread(
+				gcnew ParameterizedThreadStart(this, &AgentRuntime::ValidatedBuiltInExecutionWorkerMain));
+			worker->IsBackground = true;
+			worker->Start(context);
+			return true;
+		} catch (Exception^) {
+			Monitor::Enter(pSyncRoot);
+			try {
+				if (generation == pValidatedBuiltInExecutionGeneration)
+					bValidatedBuiltInExecutionBusy = false;
+			} finally {
+				Monitor::Exit(pSyncRoot);
+			}
+			return false;
+		} catch (...) {
+			Monitor::Enter(pSyncRoot);
+			try {
+				if (generation == pValidatedBuiltInExecutionGeneration)
+					bValidatedBuiltInExecutionBusy = false;
+			} finally {
+				Monitor::Exit(pSyncRoot);
+			}
+			return false;
+		}
 	}
 
 	void AgentRuntime::PromptWorkerMain(Object^ state) {
-		PromptSubmissionContext^ context = safe_cast<PromptSubmissionContext^>(state);
+		PromptSubmissionContext^ context = dynamic_cast<PromptSubmissionContext^>(state);
 		AgentRuntimePromptCompletion^ completion = gcnew AgentRuntimePromptCompletion();
-		completion->Request = context->Request;
-		completion->RequestKind = isNULL(context->Request) ? String::Empty : context->Request->RequestKind;
-		completion->StoreResponseAsConversationState =
-			(isNULL(context->Request) ? false : context->Request->StoreResponseAsConversationState);
-		completion->Error = "Prompt runtime scaffold is not wired to AgentClient yet.";
-
 		bool enqueue = false;
+
+		try {
+			completion->Request = isNULL(context) ? nullptr : context->Request;
+			completion->RequestKind = isNULL(context) || isNULL(context->Request) ? String::Empty : context->Request->RequestKind;
+			completion->StoreResponseAsConversationState =
+				(isNULL(context) || isNULL(context->Request)) ? false : context->Request->StoreResponseAsConversationState;
+			completion->Error = "Prompt runtime scaffold is not wired to AgentClient yet.";
+		} catch (Exception^ ex) {
+			completion->Error = "Prompt runtime scaffold failed: " + ex->Message;
+		} catch (...) {
+			completion->Error = "Prompt runtime scaffold failed with a native exception.";
+		}
+
 		Monitor::Enter(pSyncRoot);
 		try {
-			if (context->Generation == pGeneration) {
+			if (isNULL(context) || (context->Generation == pPromptGeneration)) {
 				bPromptBusy = false;
-				enqueue = true;
+				enqueue = isNotNULL(context);
 			}
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}
 
 		if (enqueue)
-			EnqueueCallback(gcnew PromptQueuedCallback(context->Callback, completion));
+			EnqueueCallback(gcnew PromptQueuedCallback(context->Generation, context->Callback, completion));
 	}
 
 	void AgentRuntime::BuiltInClassificationWorkerMain(Object^ state) {
-		BuiltInClassificationSubmissionContext^ context = safe_cast<BuiltInClassificationSubmissionContext^>(state);
+		BuiltInClassificationSubmissionContext^ context = dynamic_cast<BuiltInClassificationSubmissionContext^>(state);
 		AgentRuntimeBuiltInClassificationCompletion^ completion = gcnew AgentRuntimeBuiltInClassificationCompletion();
-		completion->Request = context->Request;
-		completion->FailureReason = "Built-in classification scaffold is not wired to AgentCommandReasoning yet.";
-		completion->Error = completion->FailureReason;
-
 		bool enqueue = false;
+
+		try {
+			completion->Request = isNULL(context) ? nullptr : context->Request;
+			completion->FailureReason = "Built-in classification scaffold is not wired to AgentCommandReasoning yet.";
+			completion->Error = completion->FailureReason;
+		} catch (Exception^ ex) {
+			completion->FailureReason = "Built-in classification scaffold failed: " + ex->Message;
+			completion->Error = completion->FailureReason;
+		} catch (...) {
+			completion->FailureReason = "Built-in classification scaffold failed with a native exception.";
+			completion->Error = completion->FailureReason;
+		}
+
 		Monitor::Enter(pSyncRoot);
 		try {
-			if (context->Generation == pGeneration) {
+			if (isNULL(context) || (context->Generation == pBuiltInClassificationGeneration)) {
 				bBuiltInClassificationBusy = false;
-				enqueue = true;
+				enqueue = isNotNULL(context);
 			}
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}
 
 		if (enqueue)
-			EnqueueCallback(gcnew BuiltInClassificationQueuedCallback(context->Callback, completion));
+			EnqueueCallback(gcnew BuiltInClassificationQueuedCallback(
+				context->Generation,
+				context->Callback,
+				completion));
 	}
 
 	void AgentRuntime::ValidatedBuiltInExecutionWorkerMain(Object^ state) {
-		ValidatedBuiltInExecutionSubmissionContext^ context = safe_cast<ValidatedBuiltInExecutionSubmissionContext^>(state);
+		ValidatedBuiltInExecutionSubmissionContext^ context = dynamic_cast<ValidatedBuiltInExecutionSubmissionContext^>(state);
 		AgentRuntimeValidatedBuiltInExecutionCompletion^ completion =
 			gcnew AgentRuntimeValidatedBuiltInExecutionCompletion();
-		completion->Request = context->Request;
-		completion->ResultCode = "not_implemented";
-		completion->CompletionSummary = "Validated built-in execution scaffold is not wired yet.";
-		completion->Error = completion->CompletionSummary;
-
 		bool enqueue = false;
+
+		try {
+			completion->Request = isNULL(context) ? nullptr : context->Request;
+			completion->ResultCode = "not_implemented";
+			completion->CompletionSummary = "Validated built-in execution scaffold is not wired yet.";
+			completion->Error = completion->CompletionSummary;
+		} catch (Exception^ ex) {
+			completion->ResultCode = "runtime_error";
+			completion->CompletionSummary = "Validated built-in execution scaffold failed: " + ex->Message;
+			completion->Error = completion->CompletionSummary;
+		} catch (...) {
+			completion->ResultCode = "runtime_error";
+			completion->CompletionSummary = "Validated built-in execution scaffold failed with a native exception.";
+			completion->Error = completion->CompletionSummary;
+		}
+
 		Monitor::Enter(pSyncRoot);
 		try {
-			if (context->Generation == pGeneration) {
+			if (isNULL(context) || (context->Generation == pValidatedBuiltInExecutionGeneration)) {
 				bValidatedBuiltInExecutionBusy = false;
-				enqueue = true;
+				enqueue = isNotNULL(context);
 			}
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}
 
 		if (enqueue)
-			EnqueueCallback(gcnew ValidatedBuiltInExecutionQueuedCallback(context->Callback, completion));
+			EnqueueCallback(gcnew ValidatedBuiltInExecutionQueuedCallback(
+				context->Generation,
+				context->Callback,
+				completion));
+	}
+
+	void AgentRuntime::AbandonPromptWorkCore() {
+		pPromptGeneration++;
+		bPromptBusy = false;
+	}
+
+	void AgentRuntime::AbandonBuiltInClassificationWorkCore() {
+		pBuiltInClassificationGeneration++;
+		bBuiltInClassificationBusy = false;
+	}
+
+	void AgentRuntime::AbandonValidatedBuiltInExecutionWorkCore() {
+		pValidatedBuiltInExecutionGeneration++;
+		bValidatedBuiltInExecutionBusy = false;
+	}
+
+	void AgentRuntime::AbandonPromptWork() {
+		Monitor::Enter(pSyncRoot);
+		try {
+			AbandonPromptWorkCore();
+		} finally {
+			Monitor::Exit(pSyncRoot);
+		}
+	}
+
+	void AgentRuntime::AbandonBuiltInClassificationWork() {
+		Monitor::Enter(pSyncRoot);
+		try {
+			AbandonBuiltInClassificationWorkCore();
+		} finally {
+			Monitor::Exit(pSyncRoot);
+		}
+	}
+
+	void AgentRuntime::AbandonValidatedBuiltInExecutionWork() {
+		Monitor::Enter(pSyncRoot);
+		try {
+			AbandonValidatedBuiltInExecutionWorkCore();
+		} finally {
+			Monitor::Exit(pSyncRoot);
+		}
 	}
 
 	void AgentRuntime::AbandonPendingWork() {
 		Monitor::Enter(pSyncRoot);
 		try {
-			pGeneration++;
-			bPromptBusy = false;
-			bBuiltInClassificationBusy = false;
-			bValidatedBuiltInExecutionBusy = false;
+			AbandonPromptWorkCore();
+			AbandonBuiltInClassificationWorkCore();
+			AbandonValidatedBuiltInExecutionWorkCore();
 		} finally {
 			Monitor::Exit(pSyncRoot);
-		}
-
-		Monitor::Enter(pCallbackSyncRoot);
-		try {
-			pCallbackQueue->Clear();
-		} finally {
-			Monitor::Exit(pCallbackSyncRoot);
 		}
 	}
 
@@ -422,8 +656,13 @@ namespace GTA {
 				Monitor::Exit(pCallbackSyncRoot);
 			}
 
-			if isNotNULL(callback)
-				callback->Invoke();
+			if (ShouldDeliverCallback(callback)) {
+				try {
+					callback->Invoke();
+				} catch (Exception^) {
+				} catch (...) {
+				}
+			}
 			drained++;
 		}
 
