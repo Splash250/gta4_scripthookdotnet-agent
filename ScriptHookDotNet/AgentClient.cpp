@@ -24,6 +24,7 @@
 
 #include "AgentClient.h"
 
+#include "AgentLogger.h"
 #include "AgentSettings.h"
 
 #pragma managed
@@ -37,6 +38,116 @@ namespace GTA {
 	using namespace System::Text;
 	using namespace System::Threading;
 	using namespace System::Web::Script::Serialization;
+
+	namespace {
+
+		String^ NormalizeClientLogValue(String^ value) {
+			return isNULL(value) ? String::Empty : value;
+		}
+
+		String^ EscapeClientJson(String^ value) {
+			String^ safeValue = NormalizeClientLogValue(value);
+			StringBuilder^ sb = gcnew StringBuilder(safeValue->Length + 16);
+			for each (wchar_t ch in safeValue) {
+				switch (ch) {
+					case L'\\': sb->Append("\\\\"); break;
+					case L'"': sb->Append("\\\""); break;
+					case L'\b': sb->Append("\\b"); break;
+					case L'\f': sb->Append("\\f"); break;
+					case L'\n': sb->Append("\\n"); break;
+					case L'\r': sb->Append("\\r"); break;
+					case L'\t': sb->Append("\\t"); break;
+					default:
+						if (ch < 32)
+							sb->AppendFormat("\\u{0:x4}", (int)ch);
+						else
+							sb->Append(ch);
+						break;
+				}
+			}
+			return sb->ToString();
+		}
+
+		String^ BuildModelRequestStartedPayload(
+			String^ requestKind,
+			String^ model,
+			String^ previousResponseId,
+			String^ textFormatJson,
+			String^ userInput) {
+			return String::Concat(
+				"{\"request_kind\":\"", EscapeClientJson(NormalizeClientLogValue(requestKind)),
+				"\",\"model\":\"", EscapeClientJson(NormalizeClientLogValue(model)),
+				"\",\"previous_response_id\":\"", EscapeClientJson(NormalizeClientLogValue(previousResponseId)),
+				"\",\"has_previous_response_id\":", String::IsNullOrEmpty(previousResponseId) ? "false" : "true",
+				",\"uses_structured_output\":", String::IsNullOrEmpty(textFormatJson) ? "false" : "true",
+				",\"input_length\":", NormalizeClientLogValue(userInput)->Length.ToString(Globalization::CultureInfo::InvariantCulture),
+				"}");
+		}
+
+		String^ BuildModelRequestCompletedPayload(AgentResponse^ response, String^ rawResponseText) {
+			String^ safeRawResponseText = String::IsNullOrEmpty(rawResponseText)
+				? NormalizeClientLogValue(response->RawResponseText)
+				: rawResponseText;
+			return String::Concat(
+				"{\"request_kind\":\"", EscapeClientJson(NormalizeClientLogValue(response->RequestKind)),
+				"\",\"model\":\"", EscapeClientJson(NormalizeClientLogValue(response->Model)),
+				"\",\"response_id\":\"", EscapeClientJson(NormalizeClientLogValue(response->ResponseId)),
+				"\",\"response_text\":\"", EscapeClientJson(NormalizeClientLogValue(response->Text)),
+				"\",\"raw_response_text\":\"", EscapeClientJson(safeRawResponseText),
+				"\"}");
+		}
+
+		String^ BuildModelRequestFailedPayload(
+			String^ requestKind,
+			String^ model,
+			String^ error,
+			String^ rawResponseText) {
+			return String::Concat(
+				"{\"request_kind\":\"", EscapeClientJson(NormalizeClientLogValue(requestKind)),
+				"\",\"model\":\"", EscapeClientJson(NormalizeClientLogValue(model)),
+				"\",\"error\":\"", EscapeClientJson(NormalizeClientLogValue(error)),
+				"\",\"raw_response_text\":\"", EscapeClientJson(NormalizeClientLogValue(rawResponseText)),
+				"\"}");
+		}
+
+		void LogModelRequestStarted(
+			String^ requestKind,
+			String^ model,
+			String^ previousResponseId,
+			String^ textFormatJson,
+			String^ userInput) {
+			AgentLogger::LogEvent(
+				0,
+				AgentLogEventType::ModelRequestStarted,
+				"AgentClient",
+				"Model request started: " + NormalizeClientLogValue(requestKind),
+				BuildModelRequestStartedPayload(requestKind, model, previousResponseId, textFormatJson, userInput));
+		}
+
+		void LogModelRequestCompleted(AgentResponse^ response, String^ rawResponseText) {
+			if isNULL(response) return;
+			AgentLogger::LogEvent(
+				0,
+				AgentLogEventType::ModelRequestCompleted,
+				"AgentClient",
+				"Model request completed: " + NormalizeClientLogValue(response->RequestKind),
+				BuildModelRequestCompletedPayload(response, rawResponseText));
+		}
+
+		void LogModelRequestFailed(
+			String^ requestKind,
+			String^ model,
+			String^ error,
+			String^ rawResponseText) {
+			AgentLogger::LogEvent(
+				0,
+				AgentLogEventType::ModelRequestFailed,
+				"AgentClient",
+				"Model request failed: " + NormalizeClientLogValue(requestKind),
+				BuildModelRequestFailedPayload(requestKind, model, error, rawResponseText));
+		}
+
+	}
 
 	String^ AgentClient::EscapeJson(String^ value) {
 		if (isNULL(value)) return String::Empty;
@@ -144,6 +255,7 @@ namespace GTA {
 
 	AgentResponse^ AgentClient::ParseResponse(String^ json) {
 		AgentResponse^ result = gcnew AgentResponse();
+		result->RawResponseText = isNULL(json) ? String::Empty : json;
 		if (String::IsNullOrEmpty(json)) {
 			result->Error = "OpenAI returned an empty response.";
 			return result;
@@ -180,14 +292,22 @@ namespace GTA {
 		return result;
 	}
 
-	AgentResponse^ AgentClient::SendCore(String^ instructions, String^ userInput, String^ previousResponseId, String^ textFormatJson) {
+	AgentResponse^ AgentClient::SendCore(
+		String^ requestKind,
+		String^ instructions,
+		String^ userInput,
+		String^ previousResponseId,
+		String^ textFormatJson) {
 		AgentResponse^ result = gcnew AgentResponse();
 
 		String^ apiKey = AgentSettings::ApiKey->Trim();
 		String^ model = AgentSettings::Model->Trim();
 		String^ prompt = isNULL(instructions) ? String::Empty : instructions->Trim();
+		result->RequestKind = isNULL(requestKind) ? String::Empty : requestKind->Trim();
+		result->Model = model;
 		if ((apiKey->Length == 0) || (model->Length == 0) || (prompt->Length == 0)) {
 			result->Error = "agents.ini is missing required OpenAI settings.";
+			LogModelRequestFailed(result->RequestKind, result->Model, result->Error, String::Empty);
 			return result;
 		}
 
@@ -218,6 +338,8 @@ namespace GTA {
 			request->ReadWriteTimeout = 120000;
 			request->ContentLength = payload->Length;
 
+			LogModelRequestStarted(result->RequestKind, model, previousResponseId, textFormatJson, userInput);
+
 			Stream^ requestStream = request->GetRequestStream();
 			requestStream->Write(payload, 0, payload->Length);
 			requestStream->Close();
@@ -225,31 +347,53 @@ namespace GTA {
 			HttpWebResponse^ response = dynamic_cast<HttpWebResponse^>(request->GetResponse());
 			String^ bodyText = ReadResponseBody(response);
 			response->Close();
-			return ParseResponse(bodyText);
+			AgentResponse^ parsed = ParseResponse(bodyText);
+			parsed->RequestKind = result->RequestKind;
+			parsed->Model = result->Model;
+			if (String::IsNullOrEmpty(parsed->Error))
+				LogModelRequestCompleted(parsed, bodyText);
+			else
+				LogModelRequestFailed(parsed->RequestKind, parsed->Model, parsed->Error, bodyText);
+			return parsed;
 		} catch (WebException^ ex) {
 			String^ bodyText = ReadResponseBody(ex->Response);
 			if (!String::IsNullOrEmpty(bodyText)) {
 				AgentResponse^ parsed = ParseResponse(bodyText);
-				if (parsed->Error->Length > 0) return parsed;
+				parsed->RequestKind = result->RequestKind;
+				parsed->Model = result->Model;
+				if (parsed->Error->Length > 0) {
+					LogModelRequestFailed(parsed->RequestKind, parsed->Model, parsed->Error, bodyText);
+					return parsed;
+				}
 			}
 			result->Error = "OpenAI request failed: " + ex->Message;
+			LogModelRequestFailed(result->RequestKind, result->Model, result->Error, bodyText);
 			return result;
 		} catch (Exception^ ex) {
 			result->Error = "OpenAI request failed: " + ex->Message;
+			LogModelRequestFailed(result->RequestKind, result->Model, result->Error, String::Empty);
 			return result;
 		}
 	}
 
 	AgentResponse^ AgentClient::Send(String^ userInput, String^ previousResponseId) {
-		return SendCore(AgentSettings::SystemPrompt, userInput, previousResponseId, String::Empty);
+		return SendCore("chat_reply", AgentSettings::SystemPrompt, userInput, previousResponseId, String::Empty);
 	}
 
 	AgentResponse^ AgentClient::SendIsolated(String^ instructions, String^ userInput) {
-		return SendCore(instructions, userInput, String::Empty, String::Empty);
+		return SendIsolated("isolated_request", instructions, userInput);
 	}
 
 	AgentResponse^ AgentClient::SendIsolatedStructured(String^ instructions, String^ userInput, String^ textFormatJson) {
-		return SendCore(instructions, userInput, String::Empty, textFormatJson);
+		return SendIsolatedStructured("isolated_structured_request", instructions, userInput, textFormatJson);
+	}
+
+	AgentResponse^ AgentClient::SendIsolated(String^ requestKind, String^ instructions, String^ userInput) {
+		return SendCore(requestKind, instructions, userInput, String::Empty, String::Empty);
+	}
+
+	AgentResponse^ AgentClient::SendIsolatedStructured(String^ requestKind, String^ instructions, String^ userInput, String^ textFormatJson) {
+		return SendCore(requestKind, instructions, userInput, String::Empty, textFormatJson);
 	}
 
 	AgentRequestWorker::AgentRequestWorker() {

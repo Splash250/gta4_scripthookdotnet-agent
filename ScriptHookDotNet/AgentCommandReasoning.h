@@ -90,6 +90,17 @@ namespace GTA {
 		static String^ BuildLegacyFallbackInstructions();
 		static String^ BuildStructuredOutputFormatJson();
 		static String^ StripJsonFences(String^ text);
+		static String^ GetContractDecisionName(AgentReasoningContractDecision value);
+		static String^ GetLegacyDecisionName(AgentReasoningDecision value);
+		static String^ GetContractFormatName(AgentReasoningContractFormat value);
+		static void LogRoutingStarted(String^ userInput, String^ recentCommandTranscriptJson);
+		static AgentReasoningResult^ LogRoutingResult(AgentReasoningResult^ result);
+		static void LogSemanticValidation(
+			String^ commandName,
+			bool accepted,
+			String^ validatedCommandLine,
+			String^ rejectionReason,
+			AgentReasoningContractDecision decision);
 		static AgentReasoningContractDecision ParseDecision(String^ value);
 		static AgentReasoningDecision MapContractDecisionToLegacyDecision(AgentReasoningResult^ result);
 		static bool HasOnlyAllowedKeys(

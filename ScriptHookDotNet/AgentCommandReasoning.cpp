@@ -27,6 +27,7 @@
 #include "AgentCommandReasoning.h"
 #include "AgentCommandRegistry.h"
 #include "AgentCommandSemantics.h"
+#include "AgentLogger.h"
 
 #pragma managed
 
@@ -188,6 +189,119 @@ namespace GTA {
 		int lastFence = trimmed->LastIndexOf("```");
 		if (lastFence <= firstLine) return trimmed;
 		return trimmed->Substring(firstLine + 1, lastFence - firstLine - 1)->Trim();
+	}
+
+	String^ AgentCommandReasoning::GetContractDecisionName(AgentReasoningContractDecision value) {
+		switch (value) {
+			case AgentReasoningContractDecision::NormalChat:
+				return "normal_chat";
+			case AgentReasoningContractDecision::BuiltInExplain:
+				return "built_in_explain";
+			case AgentReasoningContractDecision::BuiltInRun:
+				return "built_in_run";
+			case AgentReasoningContractDecision::NoExactBuiltInFit:
+				return "no_exact_built_in_fit";
+			case AgentReasoningContractDecision::NeedsClarification:
+				return "needs_clarification";
+			default:
+				return "invalid_model_result";
+		}
+	}
+
+	String^ AgentCommandReasoning::GetLegacyDecisionName(AgentReasoningDecision value) {
+		switch (value) {
+			case AgentReasoningDecision::NormalChat:
+				return "normal_chat";
+			case AgentReasoningDecision::BuiltInExplain:
+				return "built_in_explain";
+			case AgentReasoningDecision::BuiltInRun:
+				return "built_in_run";
+			case AgentReasoningDecision::NoExactBuiltInFit:
+				return "no_exact_built_in_fit";
+			default:
+				return "invalid_model_result";
+		}
+	}
+
+	String^ AgentCommandReasoning::GetContractFormatName(AgentReasoningContractFormat value) {
+		switch (value) {
+			case AgentReasoningContractFormat::StructuredV1:
+				return "structured_v1";
+			case AgentReasoningContractFormat::LegacyJsonFallback:
+				return "legacy_json_fallback";
+			case AgentReasoningContractFormat::Invalid:
+				return "invalid";
+			default:
+				return "none";
+		}
+	}
+
+	void AgentCommandReasoning::LogRoutingStarted(String^ userInput, String^ recentCommandTranscriptJson) {
+		String^ safeUserInput = isNULL(userInput) ? String::Empty : userInput;
+		String^ safeRecentTranscript = isNULL(recentCommandTranscriptJson) ? String::Empty : recentCommandTranscriptJson;
+		AgentLogger::LogEvent(
+			0,
+			AgentLogEventType::RoutingStarted,
+			"AgentCommandReasoning",
+			"Routing started for agent request.",
+			String::Concat(
+				"{\"input_length\":", safeUserInput->Length.ToString(Globalization::CultureInfo::InvariantCulture),
+				",\"has_recent_command_transcript\":", String::IsNullOrWhiteSpace(safeRecentTranscript) ? "false" : "true",
+				",\"recent_command_transcript_length\":", safeRecentTranscript->Length.ToString(Globalization::CultureInfo::InvariantCulture),
+				"}"));
+	}
+
+	AgentReasoningResult^ AgentCommandReasoning::LogRoutingResult(AgentReasoningResult^ result) {
+		AgentReasoningResult^ safeResult = isNULL(result) ? gcnew AgentReasoningResult() : result;
+		String^ safeCommandName = isNULL(safeResult->CommandName) ? String::Empty : safeResult->CommandName;
+		String^ humanSummary = "Routing decision: " + GetLegacyDecisionName(safeResult->Decision);
+		if (!String::IsNullOrEmpty(safeCommandName))
+			humanSummary += " -> " + safeCommandName;
+		if (!String::IsNullOrEmpty(safeResult->FailureReason))
+			humanSummary += " (" + safeResult->FailureReason + ")";
+
+		AgentLogger::LogEvent(
+			0,
+			AgentLogEventType::RoutingResult,
+			"AgentCommandReasoning",
+			humanSummary,
+			String::Concat(
+				"{\"decision\":\"", EscapeJson(GetLegacyDecisionName(safeResult->Decision)),
+				"\",\"contract_decision\":\"", EscapeJson(GetContractDecisionName(safeResult->ContractDecision)),
+				"\",\"command_name\":\"", EscapeJson(safeCommandName),
+				"\",\"contract_format\":\"", EscapeJson(GetContractFormatName(safeResult->ContractFormat)),
+				"\",\"contract_schema\":\"", EscapeJson(isNULL(safeResult->ContractSchema) ? String::Empty : safeResult->ContractSchema),
+				"\",\"failure_reason\":\"", EscapeJson(isNULL(safeResult->FailureReason) ? String::Empty : safeResult->FailureReason),
+				"\",\"reason\":\"", EscapeJson(isNULL(safeResult->Explanation) ? String::Empty : safeResult->Explanation),
+				"\"}"));
+		return safeResult;
+	}
+
+	void AgentCommandReasoning::LogSemanticValidation(
+		String^ commandName,
+		bool accepted,
+		String^ validatedCommandLine,
+		String^ rejectionReason,
+		AgentReasoningContractDecision decision) {
+		String^ safeCommandName = isNULL(commandName) ? String::Empty : commandName;
+		String^ safeValidatedCommandLine = isNULL(validatedCommandLine) ? String::Empty : validatedCommandLine;
+		String^ safeRejectionReason = isNULL(rejectionReason) ? String::Empty : rejectionReason;
+		String^ humanSummary = accepted
+			? "Semantic validation accepted: " + safeCommandName
+			: "Semantic validation rejected: " + safeCommandName;
+
+		AgentLogger::LogEvent(
+			0,
+			AgentLogEventType::SemanticValidation,
+			"AgentCommandReasoning",
+			humanSummary,
+			String::Concat(
+				"{\"accepted\":", accepted ? "true" : "false",
+				",\"considered_command\":\"", EscapeJson(safeCommandName),
+				"\",\"validated_command_line\":\"", EscapeJson(safeValidatedCommandLine),
+				"\",\"rejection_reason\":\"", EscapeJson(safeRejectionReason),
+				"\",\"decision\":\"", EscapeJson(GetContractDecisionName(decision)),
+				"\"}"));
 	}
 
 	AgentReasoningContractDecision AgentCommandReasoning::ParseDecision(String^ value) {
@@ -401,18 +515,36 @@ namespace GTA {
 			(result->ContractDecision == AgentReasoningContractDecision::BuiltInRun)) {
 			AgentCommandSpec^ spec = AgentCommandRegistry::Find(result->CommandName);
 			if isNULL(spec) {
+				LogSemanticValidation(
+					result->CommandName,
+					false,
+					String::Empty,
+					"Classifier returned an unknown command.",
+					result->ContractDecision);
 				result->Decision = AgentReasoningDecision::InvalidModelResult;
 				result->ContractDecision = AgentReasoningContractDecision::InvalidModelResult;
 				result->FailureReason = "Classifier returned an unknown command.";
 				return result;
 			}
 			if ((result->ContractDecision == AgentReasoningContractDecision::BuiltInRun) && !spec->AgentAccessible) {
+				LogSemanticValidation(
+					result->CommandName,
+					false,
+					String::Empty,
+					"Classifier returned a non-executable command.",
+					result->ContractDecision);
 				result->Decision = AgentReasoningDecision::InvalidModelResult;
 				result->ContractDecision = AgentReasoningContractDecision::InvalidModelResult;
 				result->FailureReason = "Classifier returned a non-executable command.";
 				return result;
 			}
 			if isNULL(result->Arguments) {
+				LogSemanticValidation(
+					result->CommandName,
+					false,
+					String::Empty,
+					"Classifier returned unreadable arguments.",
+					result->ContractDecision);
 				result->Decision = AgentReasoningDecision::InvalidModelResult;
 				result->ContractDecision = AgentReasoningContractDecision::InvalidModelResult;
 				result->FailureReason = "Classifier returned unreadable arguments.";
@@ -422,6 +554,12 @@ namespace GTA {
 				String^ commandLine;
 				String^ failureReason;
 				if (!AgentCommandSemantics::TryBuildValidatedCommandLine(userInput, result, commandLine, failureReason)) {
+					LogSemanticValidation(
+						result->CommandName,
+						false,
+						String::Empty,
+						failureReason,
+						result->ContractDecision);
 					result->Decision = AgentReasoningDecision::NoExactBuiltInFit;
 					result->ContractDecision = AgentReasoningContractDecision::NoExactBuiltInFit;
 					result->FailureReason = failureReason;
@@ -429,6 +567,19 @@ namespace GTA {
 					return result;
 				}
 				result->ValidatedCommandLine = commandLine;
+				LogSemanticValidation(
+					result->CommandName,
+					true,
+					result->ValidatedCommandLine,
+					String::Empty,
+					result->ContractDecision);
+			} else {
+				LogSemanticValidation(
+					result->CommandName,
+					true,
+					String::Empty,
+					String::Empty,
+					result->ContractDecision);
 			}
 		} else if (!String::IsNullOrEmpty(result->CommandName)) {
 			AgentCommandSpec^ spec = AgentCommandRegistry::Find(result->CommandName);
@@ -448,33 +599,35 @@ namespace GTA {
 		AgentReasoningResult^ result = gcnew AgentReasoningResult();
 		if (String::IsNullOrWhiteSpace(userInput)) {
 			result->FailureReason = "No user input was provided for classification.";
-			return result;
+			return LogRoutingResult(result);
 		}
 
+		LogRoutingStarted(userInput, recentCommandTranscriptJson);
 		String^ request = BuildClassifierRequest(userInput, recentCommandTranscriptJson);
 
 		AgentReasoningContractFormat responseFormat = AgentReasoningContractFormat::StructuredV1;
 		AgentResponse^ response = AgentClient::SendIsolatedStructured(
+			"routing_classifier_structured_v1",
 			BuildClassifierInstructions(),
 			request,
 			BuildStructuredOutputFormatJson());
 		if (isNotNULL(response) && !String::IsNullOrEmpty(response->Error) && ShouldRetryWithoutStructuredOutput(response->Error)) {
 			responseFormat = AgentReasoningContractFormat::LegacyJsonFallback;
-			response = AgentClient::SendIsolated(BuildLegacyFallbackInstructions(), request);
+			response = AgentClient::SendIsolated("routing_classifier_legacy_json_fallback", BuildLegacyFallbackInstructions(), request);
 		}
 		if isNULL(response) {
 			result->FailureReason = "Classifier returned no response.";
-			return result;
+			return LogRoutingResult(result);
 		}
 		if (!String::IsNullOrEmpty(response->Error)) {
 			result->FailureReason = response->Error;
-			return result;
+			return LogRoutingResult(result);
 		}
 
 		String^ json = StripJsonFences(response->Text);
 		if (String::IsNullOrEmpty(json)) {
 			result->FailureReason = "Classifier returned no JSON payload.";
-			return result;
+			return LogRoutingResult(result);
 		}
 
 		try {
@@ -486,7 +639,7 @@ namespace GTA {
 			result->FailureReason = "Classifier response parse failed: " + ex->Message;
 		}
 
-		return ValidateResult(result, userInput);
+		return LogRoutingResult(ValidateResult(result, userInput));
 	}
 
 	AgentReasoningWorker::AgentReasoningWorker() {
