@@ -107,7 +107,7 @@ namespace GTA {
 			normalized->Contains("back on my wheels");
 		String^ vehicleNounPattern = "(?:car|vehicle|bike|bicycle|motorbike|boat|truck|van|taxi|motorcycle|heli|helicopter|plane)";
 		bool mentionsOtherTargetVehiclePhrase =
-			Regex::IsMatch(normalized, "\\b(?:that|the|another|his|her|their)\\s+" + vehicleNounPattern + "\\b") ||
+			Regex::IsMatch(normalized, "\\b(?:that|another|his|her|their)\\s+" + vehicleNounPattern + "\\b") ||
 			Regex::IsMatch(normalized, "\\bsomeone\\s+else'?s\\s+" + vehicleNounPattern + "\\b") ||
 			Regex::IsMatch(normalized, "\\b(?:nearby|parked)\\s+" + vehicleNounPattern + "\\b");
 		bool mentionsOtherWorldTarget =
