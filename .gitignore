@@ -9,6 +9,7 @@
 *.userosscache
 *.sln.docstates
 .superpowers/
+.worktrees/
 AGENTS.md
 
 # User-specific files (MonoDevelop/Xamarin Studio)
