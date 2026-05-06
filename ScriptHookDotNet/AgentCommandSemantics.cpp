@@ -215,6 +215,12 @@ namespace GTA {
 		bool hasExactModelEvidence = Regex::IsMatch(
 			normalized,
 			"(^|[^a-z0-9_])" + Regex::Escape(normalizedModel) + "($|[^a-z0-9_])");
+		bool mentionsAlternativeChoice =
+			Regex::IsMatch(normalized, "\\bor\\b") ||
+			Regex::IsMatch(normalized, "\\bnot\\b") ||
+			normalized->Contains("instead") ||
+			normalized->Contains("instead of") ||
+			normalized->Contains("rather than");
 
 		bool mentionsColorOrTuning =
 			normalized->Contains("red") ||
@@ -262,6 +268,25 @@ namespace GTA {
 			normalized->Contains("sport car") ||
 			normalized->Contains("sportscar") ||
 			normalized->Contains("sports vehicle");
+		HashSet<String^>^ resolvedMentionedModels = gcnew HashSet<String^>();
+		MatchCollection^ wordMatches = Regex::Matches(normalized, "[a-z0-9_]+");
+		for each (Match^ wordMatch in wordMatches) {
+			if (isNULL(wordMatch) || !wordMatch->Success) continue;
+			String^ candidate = wordMatch->Value->ToUpperInvariant();
+			if (String::IsNullOrEmpty(candidate) || (candidate->Length < 3)) continue;
+
+			GTA::Model candidateModel = candidate;
+			if (candidateModel.Hash != 0) {
+				resolvedMentionedModels->Add(candidate);
+			}
+		}
+		bool mentionsDifferentResolvedModel = false;
+		for each (String^ candidate in resolvedMentionedModels) {
+			if (candidate != model) {
+				mentionsDifferentResolvedModel = true;
+				break;
+			}
+		}
 
 		if (!hasExactModelEvidence) {
 			if (mentionsColorOrTuning || mentionsUnsupportedPerformance || mentionsBrandOrAliasRequirement || mentionsGenericCategory) {
@@ -274,6 +299,10 @@ namespace GTA {
 		}
 		if (mentionsColorOrTuning || mentionsUnsupportedPerformance || mentionsBrandOrAliasRequirement) {
 			failureReason = "The built-in spawn command only accepts one exact GTA IV model token; it cannot satisfy extra color, tuning, performance, or brand-mapping requirements exactly.";
+			return false;
+		}
+		if (mentionsDifferentResolvedModel || (mentionsAlternativeChoice && (mentionsGenericCategory || resolvedMentionedModels->Count > 0))) {
+			failureReason = "The built-in spawn command requires one unambiguous exact GTA IV model token, not multiple options, contradictions, or alternatives.";
 			return false;
 		}
 
@@ -430,7 +459,7 @@ namespace GTA {
 		if (name == "abortscripts") return "Stops all loaded .NET scripts. Exact fit for stop or abort all scripts requests, not for pausing or stopping one selected script.";
 		if (name == "flip") return "Flips only the local player's current vehicle upright. Exact fit for overturn or upright-current-vehicle requests only; it does not repair, customize, or affect another vehicle.";
 		if (name == "heal") return "Restores health and armor to full and repairs the current vehicle. Usually silent on success. Cannot remove armor, set an exact numeric health value, or satisfy vehicle-only repair requests exactly.";
-		if (name == "spawn") return "Spawns a ped, vehicle, or object by exact model name only. The user request must explicitly contain the exact GTA IV model token, and the runtime must resolve that token through the local non-zero GTA::Model hash. It does not support categories, random choices, aliases, colors, tuning, performance adjectives, or other customization arguments.";
+		if (name == "spawn") return "Spawns a ped, vehicle, or object by one exact model token only. The user request must explicitly contain that exact GTA IV model token, and the local validator only accepts it when it resolves to a non-zero GTA::Model hash. It does not support categories, random choices, aliases, colors, tuning, performance adjectives, or other customization arguments.";
 		if (name == "teleport") return "Supports waypoint teleport or explicit coordinates. Usually emits output when reporting a destination or a missing waypoint. Does not infer destinations from vague location descriptions.";
 		if (name == "setdaytime") return "Sets exact in-game time from HH:MM only.";
 		if (name == "settimescale") return "Sets a positive numeric timescale multiplier only.";
