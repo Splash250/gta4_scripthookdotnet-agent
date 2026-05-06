@@ -9,6 +9,7 @@
 *.userosscache
 *.sln.docstates
 .superpowers/
+.future/
 .worktrees/
 AGENTS.md
 
