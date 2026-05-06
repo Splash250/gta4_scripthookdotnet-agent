@@ -556,9 +556,6 @@ namespace GTA {
 				pCompletedResponse = response;
 				bBusy = false;
 			}
-			else {
-				bBusy = false;
-			}
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}

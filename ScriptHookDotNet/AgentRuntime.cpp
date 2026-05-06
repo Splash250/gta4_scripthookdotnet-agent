@@ -90,21 +90,6 @@ namespace GTA {
 			}
 		}
 
-		String^ GetReasoningDecisionName(AgentReasoningDecision value) {
-			switch (value) {
-				case AgentReasoningDecision::NormalChat:
-					return "normal_chat";
-				case AgentReasoningDecision::BuiltInExplain:
-					return "built_in_explain";
-				case AgentReasoningDecision::BuiltInRun:
-					return "built_in_run";
-				case AgentReasoningDecision::NoExactBuiltInFit:
-					return "no_exact_built_in_fit";
-				default:
-					return "invalid_model_result";
-			}
-		}
-
 		String^ GetReasoningContractDecisionName(AgentReasoningContractDecision value) {
 			switch (value) {
 				case AgentReasoningContractDecision::NormalChat:
@@ -765,8 +750,9 @@ namespace GTA {
 					completion->FailureReason = "Built-in classification returned no result.";
 					completion->Error = completion->FailureReason;
 				} else {
-					completion->Decision = GetReasoningDecisionName(result->Decision);
-					completion->ContractDecision = GetReasoningContractDecisionName(result->ContractDecision);
+					String^ outcomeDecision = GetReasoningContractDecisionName(result->ContractDecision);
+					completion->Decision = outcomeDecision;
+					completion->ContractDecision = outcomeDecision;
 					completion->ContractFormat = GetReasoningContractFormatName(result->ContractFormat);
 					completion->ContractSchema = NormalizeRuntimeText(result->ContractSchema);
 					completion->CommandName = NormalizeRuntimeText(result->CommandName);
@@ -780,7 +766,11 @@ namespace GTA {
 						(result->Decision == AgentReasoningDecision::BuiltInRun) &&
 						!String::IsNullOrWhiteSpace(result->ValidatedCommandLine);
 					bool isExplainResult = (result->Decision == AgentReasoningDecision::BuiltInExplain);
-					completion->Success = isValidatedRun || isExplainResult;
+					bool isNoExactFit =
+						result->ContractDecision == AgentReasoningContractDecision::NoExactBuiltInFit;
+					bool isNeedsClarification =
+						result->ContractDecision == AgentReasoningContractDecision::NeedsClarification;
+					completion->Success = isValidatedRun || isExplainResult || isNoExactFit || isNeedsClarification;
 					if ((result->Decision == AgentReasoningDecision::BuiltInRun) && !isValidatedRun) {
 						completion->Error = !String::IsNullOrWhiteSpace(completion->FailureReason)
 							? completion->FailureReason
