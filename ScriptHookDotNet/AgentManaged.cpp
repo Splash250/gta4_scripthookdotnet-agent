@@ -312,14 +312,6 @@ namespace GTA {
 			return;
 		}
 
-		if (String::IsNullOrWhiteSpace(validatedResult->ValidatedCommandLine)) {
-			DeliverBuiltInExecutionFailure(
-				callback,
-				"Built-in execution requires a non-empty ValidatedCommandLine.",
-				validatedResult);
-			return;
-		}
-
 		AgentRuntimeValidatedBuiltInExecutionRequest^ runtimeRequest =
 			gcnew AgentRuntimeValidatedBuiltInExecutionRequest();
 		runtimeRequest->UserInput = String::Empty;
