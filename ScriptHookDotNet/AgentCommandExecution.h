@@ -35,11 +35,16 @@ namespace GTA {
 		DateTime CompletedAt;
 		bool Completed;
 		System::Collections::Generic::List<String^>^ OutputLines;
+		int TotalOutputLineCount;
+		String^ ResultCode;
+		String^ CompletionSummary;
 		bool SawErrorLikeOutput;
 		bool SawWarningLikeOutput;
 
 		AgentCommandExecution(String^ commandLine, String^ commandName);
 		void AppendOutputLine(String^ line);
+		void SetCompletionResult(String^ resultCode, String^ completionSummary);
+		String^ BuildStructuredTranscript(int maxOutputLines);
 		void MarkCompleted();
 	};
 

@@ -118,6 +118,7 @@ namespace GTA {
 		pWorker = gcnew AgentRequestWorker();
 		pReasoningWorker = gcnew AgentReasoningWorker();
 		pActiveCommandExecution = nullptr;
+		pRecentCommandExecutions = gcnew List<AgentCommandExecution^>();
 		pPendingCommandSpec = nullptr;
 		pPendingCommandLine = String::Empty;
 		pPendingClarificationInput = String::Empty;
@@ -398,6 +399,7 @@ namespace GTA {
 		pWorker = gcnew AgentRequestWorker();
 		pReasoningWorker = gcnew AgentReasoningWorker();
 		pActiveCommandExecution = nullptr;
+		if isNotNULL(pRecentCommandExecutions) pRecentCommandExecutions->Clear();
 		pPendingReasoningInput = String::Empty;
 		ClearPendingAction();
 		OnClosed();
@@ -415,6 +417,47 @@ namespace GTA {
 		if (String::IsNullOrWhiteSpace(clarificationInput))
 			return pPendingClarificationInput;
 		return pPendingClarificationInput + "\nClarification: " + clarificationInput->Trim();
+	}
+
+	String^ AgentConsole::BuildRecentCommandTranscriptJson() {
+		if isNULL(pRecentCommandExecutions) return String::Empty;
+		if (pRecentCommandExecutions->Count == 0) return String::Empty;
+
+		System::Text::StringBuilder^ sb = gcnew System::Text::StringBuilder();
+		sb->Append("[");
+		for (int i = 0; i < pRecentCommandExecutions->Count; i++) {
+			AgentCommandExecution^ execution = pRecentCommandExecutions[i];
+			if isNULL(execution) continue;
+			if (sb->Length > 1) sb->Append(",");
+			sb->Append(execution->BuildStructuredTranscript(MAX_CONTEXT_OUTPUT_LINES_PER_COMMAND));
+		}
+		sb->Append("]");
+		return sb->ToString();
+	}
+
+	String^ AgentConsole::BuildModelRequestWithRecentCommandContext(String^ userInput, String^ recentTranscriptJson) {
+		String^ request = String::IsNullOrWhiteSpace(userInput) ? String::Empty : userInput->Trim();
+		if (String::IsNullOrWhiteSpace(recentTranscriptJson))
+			return request;
+
+		System::Text::StringBuilder^ sb = gcnew System::Text::StringBuilder();
+		sb->Append("Recent built-in command transcript/results JSON: ")
+			->Append(recentTranscriptJson)
+			->Append("\n");
+		sb->Append("Use that transcript as observed prior command output when answering the next user message.")
+			->Append("\n\n");
+		sb->Append("Follow-up user message: ")
+			->Append(request);
+		return sb->ToString();
+	}
+
+	void AgentConsole::RememberCommandExecution(AgentCommandExecution^ execution) {
+		if isNULL(execution) return;
+		if isNULL(pRecentCommandExecutions)
+			pRecentCommandExecutions = gcnew List<AgentCommandExecution^>();
+		pRecentCommandExecutions->Add(execution);
+		while (pRecentCommandExecutions->Count > MAX_RECENT_COMMAND_EXECUTIONS)
+			pRecentCommandExecutions->RemoveAt(0);
 	}
 
 	void AgentConsole::ExecuteBuiltInCommand(String^ commandLine, AgentCommandSpec^ spec) {
@@ -435,18 +478,32 @@ namespace GTA {
 			pActiveCommandExecution = nullptr;
 		}
 
-		if (execution->SawErrorLikeOutput)
-			Print("(AGENT STATUS) Command reported a problem. Review mirrored output above.");
-		else if (execution->SawWarningLikeOutput)
-			Print("(AGENT STATUS) Command completed with warnings.");
-		else if (execution->OutputLines->Count > 0)
-			Print("(AGENT STATUS) Command completed with output mirrored above.");
-		else if (AgentCommandSemantics::IsUsuallySilentOnSuccess(spec->Name))
-			Print("(AGENT STATUS) Command completed. This command is usually silent on success.");
-		else if (AgentCommandSemantics::IsExpectedToEmitOutput(spec->Name))
-			Print("(AGENT STATUS) Command completed without visible output, although this command often prints results.");
-		else
-			Print("(AGENT STATUS) Command completed.");
+		String^ resultCode = "completed";
+		String^ completionSummary = "Command completed.";
+		if (execution->SawErrorLikeOutput) {
+			resultCode = "problem_reported";
+			completionSummary = "Command reported a problem. Review mirrored output above.";
+		}
+		else if (execution->SawWarningLikeOutput) {
+			resultCode = "warning_reported";
+			completionSummary = "Command completed with warnings.";
+		}
+		else if (execution->TotalOutputLineCount > 0) {
+			resultCode = "output_observed";
+			completionSummary = "Command completed with output mirrored above.";
+		}
+		else if (AgentCommandSemantics::IsUsuallySilentOnSuccess(spec->Name)) {
+			resultCode = "silent_success";
+			completionSummary = "Command completed. This command is usually silent on success.";
+		}
+		else if (AgentCommandSemantics::IsExpectedToEmitOutput(spec->Name)) {
+			resultCode = "no_visible_output";
+			completionSummary = "Command completed without visible output, although this command often prints results.";
+		}
+
+		execution->SetCompletionResult(resultCode, completionSummary);
+		RememberCommandExecution(execution);
+		Print("(AGENT STATUS) " + completionSummary);
 
 		ClearPendingAction();
 	}
@@ -466,7 +523,8 @@ namespace GTA {
 		if (!pWorker->TryTakeCompleted(response)) return;
 		if isNULL(response) return;
 
-		if (response->ResponseId->Length > 0) pPreviousResponseId = response->ResponseId;
+		if (response->StoreAsPreviousResponse && (response->ResponseId->Length > 0))
+			pPreviousResponseId = response->ResponseId;
 		if (response->Error->Length > 0) {
 			Print("(AGENT ERROR) " + response->Error);
 			return;
@@ -541,7 +599,11 @@ namespace GTA {
 				Print("(AGENT STATUS) Agent is busy. Wait for the current reply.");
 				return;
 			}
-			if (!pWorker->Submit(originalInput, pPreviousResponseId)) {
+			String^ recentTranscriptJson = BuildRecentCommandTranscriptJson();
+			String^ requestWithContext = BuildModelRequestWithRecentCommandContext(originalInput, recentTranscriptJson);
+			bool useConversationChain = String::IsNullOrWhiteSpace(recentTranscriptJson);
+			String^ previousResponseId = useConversationChain ? pPreviousResponseId : String::Empty;
+			if (!pWorker->Submit(requestWithContext, previousResponseId, useConversationChain)) {
 				Print("(AGENT STATUS) Agent is busy. Wait for the current reply.");
 				return;
 			}
@@ -617,7 +679,7 @@ namespace GTA {
 			}
 
 			pPendingReasoningInput = clarificationRequest;
-			if (!pReasoningWorker->Submit(clarificationRequest)) {
+			if (!pReasoningWorker->Submit(clarificationRequest, BuildRecentCommandTranscriptJson())) {
 				pPendingReasoningInput = String::Empty;
 				Print("(AGENT STATUS) Agent is already evaluating another request.");
 				return;
@@ -690,7 +752,7 @@ namespace GTA {
 			return;
 		}
 		pPendingReasoningInput = line;
-		if (!pReasoningWorker->Submit(line)) {
+		if (!pReasoningWorker->Submit(line, BuildRecentCommandTranscriptJson())) {
 			pPendingReasoningInput = String::Empty;
 			Print("(AGENT STATUS) Agent is already evaluating another request.");
 			return;

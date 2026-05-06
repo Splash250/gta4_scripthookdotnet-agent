@@ -32,11 +32,13 @@ namespace GTA {
 		String^ Text;
 		String^ ResponseId;
 		String^ Error;
+		bool StoreAsPreviousResponse;
 
 		AgentResponse() {
 			Text = String::Empty;
 			ResponseId = String::Empty;
 			Error = String::Empty;
+			StoreAsPreviousResponse = true;
 		}
 	};
 
@@ -68,6 +70,7 @@ namespace GTA {
 		public:
 			String^ UserInput;
 			String^ PreviousResponseId;
+			bool StoreResponseAsConversationState;
 		};
 
 		System::Object^ pSyncRoot;
@@ -83,7 +86,7 @@ namespace GTA {
 			bool get();
 		}
 
-		bool Submit(String^ userInput, String^ previousResponseId);
+		bool Submit(String^ userInput, String^ previousResponseId, bool storeResponseAsConversationState);
 		bool TryTakeCompleted([System::Runtime::InteropServices::Out] AgentResponse^% response);
 	};
 

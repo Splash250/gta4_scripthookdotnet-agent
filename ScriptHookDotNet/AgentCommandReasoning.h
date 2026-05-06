@@ -107,7 +107,7 @@ namespace GTA {
 		static AgentReasoningResult^ ValidateResult(AgentReasoningResult^ result, String^ userInput);
 
 	public:
-		static AgentReasoningResult^ ClassifyCommandRequest(String^ userInput);
+		static AgentReasoningResult^ ClassifyCommandRequest(String^ userInput, String^ recentCommandTranscriptJson);
 	};
 
 	CLASS_ATTRIBUTES
@@ -117,6 +117,7 @@ namespace GTA {
 		ref class AgentReasoningContext sealed {
 		public:
 			String^ UserInput;
+			String^ RecentCommandTranscriptJson;
 		};
 
 		System::Object^ pSyncRoot;
@@ -132,7 +133,7 @@ namespace GTA {
 			bool get();
 		}
 
-		bool Submit(String^ userInput);
+		bool Submit(String^ userInput, String^ recentCommandTranscriptJson);
 		bool TryTakeCompleted([System::Runtime::InteropServices::Out] AgentReasoningResult^% result);
 	};
 

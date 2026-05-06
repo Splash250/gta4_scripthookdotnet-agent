@@ -267,7 +267,7 @@ namespace GTA {
 		}
 	}
 
-	bool AgentRequestWorker::Submit(String^ userInput, String^ previousResponseId) {
+	bool AgentRequestWorker::Submit(String^ userInput, String^ previousResponseId, bool storeResponseAsConversationState) {
 		Monitor::Enter(pSyncRoot);
 		try {
 			if (bBusy) return false;
@@ -280,6 +280,7 @@ namespace GTA {
 		AgentRequestContext^ context = gcnew AgentRequestContext();
 		context->UserInput = userInput;
 		context->PreviousResponseId = previousResponseId;
+		context->StoreResponseAsConversationState = storeResponseAsConversationState;
 
 		Thread^ worker = gcnew Thread(gcnew ParameterizedThreadStart(this, &AgentRequestWorker::WorkerMain));
 		worker->IsBackground = true;
@@ -290,6 +291,8 @@ namespace GTA {
 	void AgentRequestWorker::WorkerMain(System::Object^ state) {
 		AgentRequestContext^ context = safe_cast<AgentRequestContext^>(state);
 		AgentResponse^ response = AgentClient::Send(context->UserInput, context->PreviousResponseId);
+		if isNotNULL(response)
+			response->StoreAsPreviousResponse = context->StoreResponseAsConversationState;
 
 		Monitor::Enter(pSyncRoot);
 		try {

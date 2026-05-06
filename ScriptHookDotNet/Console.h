@@ -158,6 +158,7 @@ namespace GTA {
 		AgentRequestWorker^ pWorker;
 		AgentReasoningWorker^ pReasoningWorker;
 		AgentCommandExecution^ pActiveCommandExecution;
+		List<AgentCommandExecution^>^ pRecentCommandExecutions;
 		AgentCommandSpec^ pPendingCommandSpec;
 		String^ pPendingCommandLine;
 		String^ pPendingClarificationInput;
@@ -173,6 +174,8 @@ namespace GTA {
 		static const int MAX_INPUT_LINES = 6;
 		static const int MAX_COMMANDS = 20;
 		static const int MAX_LOG_LINES = 200;
+		static const int MAX_RECENT_COMMAND_EXECUTIONS = 3;
+		static const int MAX_CONTEXT_OUTPUT_LINES_PER_COMMAND = 12;
 		static const float WIDTH = 1.0f;
 		static const float MIN_HEIGHT = 0.25f;
 		static const float STEP_HEIGHT = 0.25f;
@@ -191,6 +194,9 @@ namespace GTA {
 		System::Collections::Generic::List<String^>^ WrapInputLines(String^ text, int screenWidth, bool includeCaret);
 		void ClearPendingAction();
 		String^ BuildClarificationRequest(String^ clarificationInput);
+		String^ BuildRecentCommandTranscriptJson();
+		String^ BuildModelRequestWithRecentCommandContext(String^ userInput, String^ recentTranscriptJson);
+		void RememberCommandExecution(AgentCommandExecution^ execution);
 		void ExecuteBuiltInCommand(String^ commandLine, AgentCommandSpec^ spec);
 		void HandleReasoningResult(AgentReasoningResult^ result, String^ originalInput);
 		void PollWorker();

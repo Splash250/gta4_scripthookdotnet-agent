@@ -55,6 +55,20 @@ namespace GTA {
 				normalized->Contains("unknown parameter");
 		}
 
+		String^ BuildClassifierRequest(String^ userInput, String^ recentCommandTranscriptJson) {
+			StringBuilder^ request = gcnew StringBuilder();
+			if (!String::IsNullOrWhiteSpace(recentCommandTranscriptJson)) {
+				request->Append("Recent built-in command transcript/results JSON: ")
+					->Append(recentCommandTranscriptJson->Trim())
+					->Append("\n");
+				request->Append("Use that transcript as observed prior command output when routing the next user request.")
+					->Append("\n");
+			}
+			request->Append("User request: ")->Append(userInput->Trim())->Append("\n");
+			request->Append("Action catalog: ")->Append(AgentActionCatalog::BuildModelVisibleJson());
+			return request->ToString();
+		}
+
 	}
 
 	String^ AgentCommandReasoning::EscapeJson(String^ value) {
@@ -430,25 +444,23 @@ namespace GTA {
 		return result;
 	}
 
-	AgentReasoningResult^ AgentCommandReasoning::ClassifyCommandRequest(String^ userInput) {
+	AgentReasoningResult^ AgentCommandReasoning::ClassifyCommandRequest(String^ userInput, String^ recentCommandTranscriptJson) {
 		AgentReasoningResult^ result = gcnew AgentReasoningResult();
 		if (String::IsNullOrWhiteSpace(userInput)) {
 			result->FailureReason = "No user input was provided for classification.";
 			return result;
 		}
 
-		StringBuilder^ request = gcnew StringBuilder();
-		request->Append("User request: ")->Append(userInput->Trim())->Append("\n");
-		request->Append("Action catalog: ")->Append(BuildActionCatalogJson());
+		String^ request = BuildClassifierRequest(userInput, recentCommandTranscriptJson);
 
 		AgentReasoningContractFormat responseFormat = AgentReasoningContractFormat::StructuredV1;
 		AgentResponse^ response = AgentClient::SendIsolatedStructured(
 			BuildClassifierInstructions(),
-			request->ToString(),
+			request,
 			BuildStructuredOutputFormatJson());
 		if (isNotNULL(response) && !String::IsNullOrEmpty(response->Error) && ShouldRetryWithoutStructuredOutput(response->Error)) {
 			responseFormat = AgentReasoningContractFormat::LegacyJsonFallback;
-			response = AgentClient::SendIsolated(BuildLegacyFallbackInstructions(), request->ToString());
+			response = AgentClient::SendIsolated(BuildLegacyFallbackInstructions(), request);
 		}
 		if isNULL(response) {
 			result->FailureReason = "Classifier returned no response.";
@@ -492,7 +504,7 @@ namespace GTA {
 		}
 	}
 
-	bool AgentReasoningWorker::Submit(String^ userInput) {
+	bool AgentReasoningWorker::Submit(String^ userInput, String^ recentCommandTranscriptJson) {
 		System::Threading::Monitor::Enter(pSyncRoot);
 		try {
 			if (bBusy) return false;
@@ -504,6 +516,7 @@ namespace GTA {
 
 		AgentReasoningContext^ context = gcnew AgentReasoningContext();
 		context->UserInput = userInput;
+		context->RecentCommandTranscriptJson = recentCommandTranscriptJson;
 
 		System::Threading::Thread^ worker = gcnew System::Threading::Thread(
 			gcnew System::Threading::ParameterizedThreadStart(this, &AgentReasoningWorker::WorkerMain));
@@ -514,7 +527,9 @@ namespace GTA {
 
 	void AgentReasoningWorker::WorkerMain(System::Object^ state) {
 		AgentReasoningContext^ context = safe_cast<AgentReasoningContext^>(state);
-		AgentReasoningResult^ result = AgentCommandReasoning::ClassifyCommandRequest(context->UserInput);
+		AgentReasoningResult^ result = AgentCommandReasoning::ClassifyCommandRequest(
+			context->UserInput,
+			context->RecentCommandTranscriptJson);
 
 		System::Threading::Monitor::Enter(pSyncRoot);
 		try {
