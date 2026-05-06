@@ -67,6 +67,7 @@ namespace GTA {
 	ref class Camera;
 	ref class AgentConsole;
 	ref class AgentClient;
+	ref class AgentActionCatalog;
 	ref class AgentCommandExecution;
 	ref class AgentCommandIntent;
 	ref class AgentCommandReasoning;
