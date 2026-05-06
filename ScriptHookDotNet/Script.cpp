@@ -186,6 +186,7 @@ namespace GTA{
 	void Script::Abort() {
 		BlockWait = true;
 		bRunning = false;
+		AgentRuntime::AbandonScriptOwnedWork(this);
 		if isNotNULL(myThread) {
 			myThread->Abort();
 		//	myThread = nullptr;

@@ -25,6 +25,8 @@
 #include "AgentRuntime.h"
 
 #include "NetHook.h"
+#include "RemoteScriptDomain.h"
+#include "Script.h"
 
 #pragma managed
 
@@ -68,6 +70,7 @@ namespace GTA {
 	AgentRuntimePromptRequest::AgentRuntimePromptRequest() {
 		RequestId = 0;
 		TurnId = 0;
+		OwnerScript = nullptr;
 		RequestKind = String::Empty;
 		Instructions = String::Empty;
 		UserInput = String::Empty;
@@ -92,6 +95,7 @@ namespace GTA {
 	AgentRuntimeBuiltInClassificationRequest::AgentRuntimeBuiltInClassificationRequest() {
 		RequestId = 0;
 		TurnId = 0;
+		OwnerScript = nullptr;
 		UserInput = String::Empty;
 		RecentCommandTranscriptJson = String::Empty;
 	}
@@ -116,6 +120,7 @@ namespace GTA {
 	AgentRuntimeValidatedBuiltInExecutionRequest::AgentRuntimeValidatedBuiltInExecutionRequest() {
 		RequestId = 0;
 		TurnId = 0;
+		OwnerScript = nullptr;
 		UserInput = String::Empty;
 		CommandName = String::Empty;
 		Arguments = gcnew Dictionary<String^, String^>();
@@ -140,9 +145,13 @@ namespace GTA {
 		Error = String::Empty;
 	}
 
-	AgentRuntime::AgentRuntimeQueuedCallback::AgentRuntimeQueuedCallback(AgentRuntimeLane lane, int generation) {
+	AgentRuntime::AgentRuntimeQueuedCallback::AgentRuntimeQueuedCallback(
+		AgentRuntimeLane lane,
+		int generation,
+		Script^ ownerScript) {
 		pLane = lane;
 		pGeneration = generation;
+		pOwnerScript = ownerScript;
 	}
 
 	AgentRuntime::AgentRuntimeLane AgentRuntime::AgentRuntimeQueuedCallback::Lane::get() {
@@ -153,11 +162,16 @@ namespace GTA {
 		return pGeneration;
 	}
 
+	Script^ AgentRuntime::AgentRuntimeQueuedCallback::OwnerScript::get() {
+		return pOwnerScript;
+	}
+
 	AgentRuntime::PromptQueuedCallback::PromptQueuedCallback(
 		int generation,
+		Script^ ownerScript,
 		AgentRuntimePromptCompletedCallback^ callback,
 		AgentRuntimePromptCompletion^ completion)
-		: AgentRuntimeQueuedCallback(AgentRuntimeLane::Prompt, generation) {
+		: AgentRuntimeQueuedCallback(AgentRuntimeLane::Prompt, generation, ownerScript) {
 		pCallback = callback;
 		pCompletion = completion;
 	}
@@ -169,9 +183,10 @@ namespace GTA {
 
 	AgentRuntime::BuiltInClassificationQueuedCallback::BuiltInClassificationQueuedCallback(
 		int generation,
+		Script^ ownerScript,
 		AgentRuntimeBuiltInClassificationCompletedCallback^ callback,
 		AgentRuntimeBuiltInClassificationCompletion^ completion)
-		: AgentRuntimeQueuedCallback(AgentRuntimeLane::BuiltInClassification, generation) {
+		: AgentRuntimeQueuedCallback(AgentRuntimeLane::BuiltInClassification, generation, ownerScript) {
 		pCallback = callback;
 		pCompletion = completion;
 	}
@@ -183,9 +198,10 @@ namespace GTA {
 
 	AgentRuntime::ValidatedBuiltInExecutionQueuedCallback::ValidatedBuiltInExecutionQueuedCallback(
 		int generation,
+		Script^ ownerScript,
 		AgentRuntimeValidatedBuiltInExecutionCompletedCallback^ callback,
 		AgentRuntimeValidatedBuiltInExecutionCompletion^ completion)
-		: AgentRuntimeQueuedCallback(AgentRuntimeLane::ValidatedBuiltInExecution, generation) {
+		: AgentRuntimeQueuedCallback(AgentRuntimeLane::ValidatedBuiltInExecution, generation, ownerScript) {
 		pCallback = callback;
 		pCompletion = completion;
 	}
@@ -204,9 +220,20 @@ namespace GTA {
 		pPromptGeneration = 0;
 		pBuiltInClassificationGeneration = 0;
 		pValidatedBuiltInExecutionGeneration = 0;
+		pPromptOwnerScript = nullptr;
+		pBuiltInClassificationOwnerScript = nullptr;
+		pValidatedBuiltInExecutionOwnerScript = nullptr;
 		pNextRequestId = 0;
 		pCallbackQueue = gcnew Queue<AgentRuntimeQueuedCallback^>();
 		AgentRuntimePumpState::ManagedRuntimeInstance = this;
+	}
+
+	Script^ AgentRuntime::CaptureOwningScript() {
+		RemoteScriptDomain^ domain = RemoteScriptDomain::Instance;
+		if isNULL(domain)
+			return nullptr;
+
+		return domain->CurrentScript;
 	}
 
 	int AgentRuntime::ReserveRequestId() {
@@ -233,6 +260,7 @@ namespace GTA {
 		AgentRuntimePromptRequest^ clone = gcnew AgentRuntimePromptRequest();
 		clone->RequestId = requestId;
 		clone->TurnId = turnId;
+		clone->OwnerScript = isNULL(request) ? nullptr : request->OwnerScript;
 		clone->RequestKind = isNULL(request) || isNULL(request->RequestKind) ? String::Empty : String::Copy(request->RequestKind);
 		clone->Instructions = isNULL(request) || isNULL(request->Instructions) ? String::Empty : String::Copy(request->Instructions);
 		clone->UserInput = isNULL(request) || isNULL(request->UserInput) ? String::Empty : String::Copy(request->UserInput);
@@ -251,6 +279,7 @@ namespace GTA {
 		AgentRuntimeBuiltInClassificationRequest^ clone = gcnew AgentRuntimeBuiltInClassificationRequest();
 		clone->RequestId = requestId;
 		clone->TurnId = turnId;
+		clone->OwnerScript = isNULL(request) ? nullptr : request->OwnerScript;
 		clone->UserInput = isNULL(request) || isNULL(request->UserInput) ? String::Empty : String::Copy(request->UserInput);
 		clone->RecentCommandTranscriptJson = isNULL(request) || isNULL(request->RecentCommandTranscriptJson)
 			? String::Empty
@@ -265,6 +294,7 @@ namespace GTA {
 		AgentRuntimeValidatedBuiltInExecutionRequest^ clone = gcnew AgentRuntimeValidatedBuiltInExecutionRequest();
 		clone->RequestId = requestId;
 		clone->TurnId = turnId;
+		clone->OwnerScript = isNULL(request) ? nullptr : request->OwnerScript;
 		clone->UserInput = isNULL(request) || isNULL(request->UserInput) ? String::Empty : String::Copy(request->UserInput);
 		clone->CommandName = isNULL(request) || isNULL(request->CommandName) ? String::Empty : String::Copy(request->CommandName);
 		clone->Arguments = CloneStringDictionary(isNULL(request) ? nullptr : request->Arguments);
@@ -274,29 +304,12 @@ namespace GTA {
 		return clone;
 	}
 
-	int AgentRuntime::GetLaneGeneration(AgentRuntimeLane lane) {
-		switch (lane) {
-			case AgentRuntimeLane::Prompt:
-				return pPromptGeneration;
-			case AgentRuntimeLane::BuiltInClassification:
-				return pBuiltInClassificationGeneration;
-			case AgentRuntimeLane::ValidatedBuiltInExecution:
-				return pValidatedBuiltInExecutionGeneration;
-			default:
-				return 0;
-		}
+	bool AgentRuntime::IsSameScript(Script^ left, Script^ right) {
+		return Object::ReferenceEquals(left, right);
 	}
 
 	bool AgentRuntime::ShouldDeliverCallback(AgentRuntimeQueuedCallback^ callback) {
-		if isNULL(callback)
-			return false;
-
-		Monitor::Enter(pSyncRoot);
-		try {
-			return callback->Generation == GetLaneGeneration(callback->Lane);
-		} finally {
-			Monitor::Exit(pSyncRoot);
-		}
+		return isNotNULL(callback);
 	}
 
 	bool AgentRuntime::IsPromptBusy::get() {
@@ -344,14 +357,20 @@ namespace GTA {
 
 		int generation;
 		AgentRuntimePromptRequest^ requestSnapshot;
+		Script^ ownerScript = CaptureOwningScript();
+		if isNULL(ownerScript)
+			return false;
+
 		Monitor::Enter(pSyncRoot);
 		try {
 			if (bPromptBusy) return false;
 			generation = pPromptGeneration;
+			request->OwnerScript = ownerScript;
 			int requestId = (request->RequestId > 0) ? request->RequestId : ReserveRequestId();
 			int turnId = (request->TurnId > 0) ? request->TurnId : CaptureActiveTurnId();
 			requestSnapshot = ClonePromptRequest(request, requestId, turnId);
 			bPromptBusy = true;
+			pPromptOwnerScript = requestSnapshot->OwnerScript;
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}
@@ -369,8 +388,10 @@ namespace GTA {
 		} catch (Exception^) {
 			Monitor::Enter(pSyncRoot);
 			try {
-				if (generation == pPromptGeneration)
+				if (generation == pPromptGeneration) {
 					bPromptBusy = false;
+					pPromptOwnerScript = nullptr;
+				}
 			} finally {
 				Monitor::Exit(pSyncRoot);
 			}
@@ -378,8 +399,10 @@ namespace GTA {
 		} catch (...) {
 			Monitor::Enter(pSyncRoot);
 			try {
-				if (generation == pPromptGeneration)
+				if (generation == pPromptGeneration) {
 					bPromptBusy = false;
+					pPromptOwnerScript = nullptr;
+				}
 			} finally {
 				Monitor::Exit(pSyncRoot);
 			}
@@ -394,14 +417,20 @@ namespace GTA {
 
 		int generation;
 		AgentRuntimeBuiltInClassificationRequest^ requestSnapshot;
+		Script^ ownerScript = CaptureOwningScript();
+		if isNULL(ownerScript)
+			return false;
+
 		Monitor::Enter(pSyncRoot);
 		try {
 			if (bBuiltInClassificationBusy) return false;
 			generation = pBuiltInClassificationGeneration;
+			request->OwnerScript = ownerScript;
 			int requestId = (request->RequestId > 0) ? request->RequestId : ReserveRequestId();
 			int turnId = (request->TurnId > 0) ? request->TurnId : CaptureActiveTurnId();
 			requestSnapshot = CloneBuiltInClassificationRequest(request, requestId, turnId);
 			bBuiltInClassificationBusy = true;
+			pBuiltInClassificationOwnerScript = requestSnapshot->OwnerScript;
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}
@@ -420,8 +449,10 @@ namespace GTA {
 		} catch (Exception^) {
 			Monitor::Enter(pSyncRoot);
 			try {
-				if (generation == pBuiltInClassificationGeneration)
+				if (generation == pBuiltInClassificationGeneration) {
 					bBuiltInClassificationBusy = false;
+					pBuiltInClassificationOwnerScript = nullptr;
+				}
 			} finally {
 				Monitor::Exit(pSyncRoot);
 			}
@@ -429,8 +460,10 @@ namespace GTA {
 		} catch (...) {
 			Monitor::Enter(pSyncRoot);
 			try {
-				if (generation == pBuiltInClassificationGeneration)
+				if (generation == pBuiltInClassificationGeneration) {
 					bBuiltInClassificationBusy = false;
+					pBuiltInClassificationOwnerScript = nullptr;
+				}
 			} finally {
 				Monitor::Exit(pSyncRoot);
 			}
@@ -445,14 +478,20 @@ namespace GTA {
 
 		int generation;
 		AgentRuntimeValidatedBuiltInExecutionRequest^ requestSnapshot;
+		Script^ ownerScript = CaptureOwningScript();
+		if isNULL(ownerScript)
+			return false;
+
 		Monitor::Enter(pSyncRoot);
 		try {
 			if (bValidatedBuiltInExecutionBusy) return false;
 			generation = pValidatedBuiltInExecutionGeneration;
+			request->OwnerScript = ownerScript;
 			int requestId = (request->RequestId > 0) ? request->RequestId : ReserveRequestId();
 			int turnId = (request->TurnId > 0) ? request->TurnId : CaptureActiveTurnId();
 			requestSnapshot = CloneValidatedBuiltInExecutionRequest(request, requestId, turnId);
 			bValidatedBuiltInExecutionBusy = true;
+			pValidatedBuiltInExecutionOwnerScript = requestSnapshot->OwnerScript;
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}
@@ -471,8 +510,10 @@ namespace GTA {
 		} catch (Exception^) {
 			Monitor::Enter(pSyncRoot);
 			try {
-				if (generation == pValidatedBuiltInExecutionGeneration)
+				if (generation == pValidatedBuiltInExecutionGeneration) {
 					bValidatedBuiltInExecutionBusy = false;
+					pValidatedBuiltInExecutionOwnerScript = nullptr;
+				}
 			} finally {
 				Monitor::Exit(pSyncRoot);
 			}
@@ -480,8 +521,10 @@ namespace GTA {
 		} catch (...) {
 			Monitor::Enter(pSyncRoot);
 			try {
-				if (generation == pValidatedBuiltInExecutionGeneration)
+				if (generation == pValidatedBuiltInExecutionGeneration) {
 					bValidatedBuiltInExecutionBusy = false;
+					pValidatedBuiltInExecutionOwnerScript = nullptr;
+				}
 			} finally {
 				Monitor::Exit(pSyncRoot);
 			}
@@ -510,6 +553,7 @@ namespace GTA {
 		try {
 			if (isNULL(context) || (context->Generation == pPromptGeneration)) {
 				bPromptBusy = false;
+				pPromptOwnerScript = nullptr;
 				enqueue = isNotNULL(context);
 			}
 		} finally {
@@ -517,7 +561,11 @@ namespace GTA {
 		}
 
 		if (enqueue)
-			EnqueueCallback(gcnew PromptQueuedCallback(context->Generation, context->Callback, completion));
+			EnqueueCallback(gcnew PromptQueuedCallback(
+				context->Generation,
+				context->Request->OwnerScript,
+				context->Callback,
+				completion));
 	}
 
 	void AgentRuntime::BuiltInClassificationWorkerMain(Object^ state) {
@@ -541,6 +589,7 @@ namespace GTA {
 		try {
 			if (isNULL(context) || (context->Generation == pBuiltInClassificationGeneration)) {
 				bBuiltInClassificationBusy = false;
+				pBuiltInClassificationOwnerScript = nullptr;
 				enqueue = isNotNULL(context);
 			}
 		} finally {
@@ -550,6 +599,7 @@ namespace GTA {
 		if (enqueue)
 			EnqueueCallback(gcnew BuiltInClassificationQueuedCallback(
 				context->Generation,
+				context->Request->OwnerScript,
 				context->Callback,
 				completion));
 	}
@@ -579,6 +629,7 @@ namespace GTA {
 		try {
 			if (isNULL(context) || (context->Generation == pValidatedBuiltInExecutionGeneration)) {
 				bValidatedBuiltInExecutionBusy = false;
+				pValidatedBuiltInExecutionOwnerScript = nullptr;
 				enqueue = isNotNULL(context);
 			}
 		} finally {
@@ -588,6 +639,7 @@ namespace GTA {
 		if (enqueue)
 			EnqueueCallback(gcnew ValidatedBuiltInExecutionQueuedCallback(
 				context->Generation,
+				context->Request->OwnerScript,
 				context->Callback,
 				completion));
 	}
@@ -595,16 +647,28 @@ namespace GTA {
 	void AgentRuntime::AbandonPromptWorkCore() {
 		pPromptGeneration++;
 		bPromptBusy = false;
+		pPromptOwnerScript = nullptr;
 	}
 
 	void AgentRuntime::AbandonBuiltInClassificationWorkCore() {
 		pBuiltInClassificationGeneration++;
 		bBuiltInClassificationBusy = false;
+		pBuiltInClassificationOwnerScript = nullptr;
 	}
 
 	void AgentRuntime::AbandonValidatedBuiltInExecutionWorkCore() {
 		pValidatedBuiltInExecutionGeneration++;
 		bValidatedBuiltInExecutionBusy = false;
+		pValidatedBuiltInExecutionOwnerScript = nullptr;
+	}
+
+	void AgentRuntime::AbandonScriptOwnedWorkCore(Script^ ownerScript) {
+		if (IsSameScript(pPromptOwnerScript, ownerScript))
+			AbandonPromptWorkCore();
+		if (IsSameScript(pBuiltInClassificationOwnerScript, ownerScript))
+			AbandonBuiltInClassificationWorkCore();
+		if (IsSameScript(pValidatedBuiltInExecutionOwnerScript, ownerScript))
+			AbandonValidatedBuiltInExecutionWorkCore();
 	}
 
 	void AgentRuntime::AbandonPromptWork() {
@@ -643,6 +707,13 @@ namespace GTA {
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}
+
+		Monitor::Enter(pCallbackSyncRoot);
+		try {
+			pCallbackQueue->Clear();
+		} finally {
+			Monitor::Exit(pCallbackSyncRoot);
+		}
 	}
 
 	void AgentRuntime::PumpCallbacks() {
@@ -650,30 +721,79 @@ namespace GTA {
 		if isNULL(runtime)
 			return;
 
-		runtime->DrainCallbacks(0);
+		Script^ ownerScript = CaptureOwningScript();
+		if isNULL(ownerScript)
+			return;
+
+		runtime->DrainCallbacksForScript(ownerScript, 0);
+	}
+
+	void AgentRuntime::AbandonScriptOwnedWork(Script^ ownerScript) {
+		AgentRuntime^ runtime = AgentRuntimePumpState::ManagedRuntimeInstance;
+		if (isNULL(runtime) || isNULL(ownerScript))
+			return;
+
+		Monitor::Enter(runtime->pSyncRoot);
+		try {
+			runtime->AbandonScriptOwnedWorkCore(ownerScript);
+		} finally {
+			Monitor::Exit(runtime->pSyncRoot);
+		}
+
+		Monitor::Enter(runtime->pCallbackSyncRoot);
+		try {
+			Queue<AgentRuntimeQueuedCallback^>^ retained = gcnew Queue<AgentRuntimeQueuedCallback^>();
+			while (runtime->pCallbackQueue->Count > 0) {
+				AgentRuntimeQueuedCallback^ callback = runtime->pCallbackQueue->Dequeue();
+				if (!IsSameScript(callback->OwnerScript, ownerScript))
+					retained->Enqueue(callback);
+			}
+
+			runtime->pCallbackQueue = retained;
+		} finally {
+			Monitor::Exit(runtime->pCallbackSyncRoot);
+		}
 	}
 
 	int AgentRuntime::DrainCallbacks(int maxCallbacks) {
+		return DrainCallbacksForScript(CaptureOwningScript(), maxCallbacks);
+	}
+
+	int AgentRuntime::DrainCallbacksForScript(Script^ ownerScript, int maxCallbacks) {
+		if isNULL(ownerScript)
+			return 0;
+
 		if (maxCallbacks <= 0)
 			maxCallbacks = Int32::MaxValue;
 
 		int drained = 0;
-		while (drained < maxCallbacks) {
-			AgentRuntimeQueuedCallback^ callback = nullptr;
+		List<AgentRuntimeQueuedCallback^>^ readyCallbacks = gcnew List<AgentRuntimeQueuedCallback^>();
 
-			Monitor::Enter(pCallbackSyncRoot);
-			try {
-				if (pCallbackQueue->Count == 0)
-					break;
-				callback = pCallbackQueue->Dequeue();
-			} finally {
-				Monitor::Exit(pCallbackSyncRoot);
+		Monitor::Enter(pCallbackSyncRoot);
+		try {
+			Queue<AgentRuntimeQueuedCallback^>^ retainedCallbacks = gcnew Queue<AgentRuntimeQueuedCallback^>();
+			while (pCallbackQueue->Count > 0) {
+				AgentRuntimeQueuedCallback^ callback = pCallbackQueue->Dequeue();
+				if (!ShouldDeliverCallback(callback))
+					continue;
+
+				if ((drained < maxCallbacks) && IsSameScript(callback->OwnerScript, ownerScript)) {
+					readyCallbacks->Add(callback);
+					drained++;
+				} else {
+					retainedCallbacks->Enqueue(callback);
+				}
 			}
 
-			if (ShouldDeliverCallback(callback)) {
-				try {
-					callback->Invoke();
-				} catch (Exception^ ex) {
+			pCallbackQueue = retainedCallbacks;
+		} finally {
+			Monitor::Exit(pCallbackSyncRoot);
+		}
+
+		for each (AgentRuntimeQueuedCallback^ callback in readyCallbacks) {
+			try {
+				callback->Invoke();
+			} catch (Exception^ ex) {
 					String^ laneName = "unknown";
 					if isNotNULL(callback) {
 						switch (callback->Lane) {
@@ -695,11 +815,9 @@ namespace GTA {
 						laneName,
 						"': ",
 						details));
-				} catch (...) {
-					NetHook::Log("AgentRuntime callback pump swallowed a native exception.");
-				}
+			} catch (...) {
+				NetHook::Log("AgentRuntime callback pump swallowed a native exception.");
 			}
-			drained++;
 		}
 
 		return drained;

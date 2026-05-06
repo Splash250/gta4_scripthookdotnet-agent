@@ -25,12 +25,15 @@
 
 namespace GTA {
 
+	ref class Script;
+
 	CLASS_ATTRIBUTES
 	private ref class AgentRuntimePromptRequest sealed {
 
 	public:
 		int RequestId;
 		int TurnId;
+		Script^ OwnerScript;
 		String^ RequestKind;
 		String^ Instructions;
 		String^ UserInput;
@@ -65,6 +68,7 @@ namespace GTA {
 	public:
 		int RequestId;
 		int TurnId;
+		Script^ OwnerScript;
 		String^ UserInput;
 		String^ RecentCommandTranscriptJson;
 
@@ -99,6 +103,7 @@ namespace GTA {
 	public:
 		int RequestId;
 		int TurnId;
+		Script^ OwnerScript;
 		String^ UserInput;
 		String^ CommandName;
 		System::Collections::Generic::Dictionary<String^, String^>^ Arguments;
@@ -148,9 +153,10 @@ namespace GTA {
 		private:
 			AgentRuntimeLane pLane;
 			int pGeneration;
+			Script^ pOwnerScript;
 
 		public:
-			AgentRuntimeQueuedCallback(AgentRuntimeLane lane, int generation);
+			AgentRuntimeQueuedCallback(AgentRuntimeLane lane, int generation, Script^ ownerScript);
 
 			property AgentRuntimeLane Lane {
 				AgentRuntimeLane get();
@@ -158,6 +164,10 @@ namespace GTA {
 
 			property int Generation {
 				int get();
+			}
+
+			property Script^ OwnerScript {
+				Script^ get();
 			}
 
 			virtual void Invoke() = 0;
@@ -171,6 +181,7 @@ namespace GTA {
 		public:
 			PromptQueuedCallback(
 				int generation,
+				Script^ ownerScript,
 				AgentRuntimePromptCompletedCallback^ callback,
 				AgentRuntimePromptCompletion^ completion);
 			virtual void Invoke() override;
@@ -184,6 +195,7 @@ namespace GTA {
 		public:
 			BuiltInClassificationQueuedCallback(
 				int generation,
+				Script^ ownerScript,
 				AgentRuntimeBuiltInClassificationCompletedCallback^ callback,
 				AgentRuntimeBuiltInClassificationCompletion^ completion);
 			virtual void Invoke() override;
@@ -197,6 +209,7 @@ namespace GTA {
 		public:
 			ValidatedBuiltInExecutionQueuedCallback(
 				int generation,
+				Script^ ownerScript,
 				AgentRuntimeValidatedBuiltInExecutionCompletedCallback^ callback,
 				AgentRuntimeValidatedBuiltInExecutionCompletion^ completion);
 			virtual void Invoke() override;
@@ -231,9 +244,13 @@ namespace GTA {
 		int pPromptGeneration;
 		int pBuiltInClassificationGeneration;
 		int pValidatedBuiltInExecutionGeneration;
+		Script^ pPromptOwnerScript;
+		Script^ pBuiltInClassificationOwnerScript;
+		Script^ pValidatedBuiltInExecutionOwnerScript;
 		int pNextRequestId;
 		System::Collections::Generic::Queue<AgentRuntimeQueuedCallback^>^ pCallbackQueue;
 
+		static Script^ CaptureOwningScript();
 		int ReserveRequestId();
 		static System::Collections::Generic::Dictionary<String^, String^>^ CloneStringDictionary(
 			System::Collections::Generic::Dictionary<String^, String^>^ source);
@@ -246,15 +263,17 @@ namespace GTA {
 			AgentRuntimeValidatedBuiltInExecutionRequest^ request,
 			int requestId,
 			int turnId);
-		int GetLaneGeneration(AgentRuntimeLane lane);
+		static bool IsSameScript(Script^ left, Script^ right);
 		bool ShouldDeliverCallback(AgentRuntimeQueuedCallback^ callback);
 		void EnqueueCallback(AgentRuntimeQueuedCallback^ callback);
+		void AbandonScriptOwnedWorkCore(Script^ ownerScript);
 		void AbandonPromptWorkCore();
 		void AbandonBuiltInClassificationWorkCore();
 		void AbandonValidatedBuiltInExecutionWorkCore();
 		void PromptWorkerMain(System::Object^ state);
 		void BuiltInClassificationWorkerMain(System::Object^ state);
 		void ValidatedBuiltInExecutionWorkerMain(System::Object^ state);
+		int DrainCallbacksForScript(Script^ ownerScript, int maxCallbacks);
 
 	public:
 		AgentRuntime();
@@ -279,6 +298,7 @@ namespace GTA {
 			AgentRuntimeValidatedBuiltInExecutionRequest^ request,
 			AgentRuntimeValidatedBuiltInExecutionCompletedCallback^ callback);
 		static void PumpCallbacks();
+		static void AbandonScriptOwnedWork(Script^ ownerScript);
 		void AbandonPromptWork();
 		void AbandonBuiltInClassificationWork();
 		void AbandonValidatedBuiltInExecutionWork();
