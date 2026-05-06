@@ -441,8 +441,8 @@ namespace GTA {
 		if (!bActive) return;
 		if (pActiveTurnId > 0) {
 			EmitReplyAndFinishActiveTurn(
-				false,
-				"Agent console closed before the turn completed.",
+				true,
+				"Agent console closed before the turn completed; aborting the active turn.",
 				"{\"mode\":\"console_closed\",\"pending_reasoning_input\":\"" + EscapeAgentConsoleJson(pPendingReasoningInput) + "\",\"had_pending_confirmation\":" + (isNotNULL(pPendingCommandSpec) ? "true" : "false") + ",\"had_pending_clarification\":" + (!String::IsNullOrWhiteSpace(pPendingClarificationInput) ? "true" : "false") + "}",
 				"Reply mode: console_closed");
 		}
