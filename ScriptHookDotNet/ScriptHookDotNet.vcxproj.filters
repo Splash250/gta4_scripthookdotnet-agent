@@ -361,6 +361,9 @@
     <ClCompile Include="bObject.cpp">
       <Filter>Objects\ScriptingObjects\abstract</Filter>
     </ClCompile>
+    <ClCompile Include="AgentRuntime.cpp">
+      <Filter>Objects\LocalObjects\general</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Blip.h">
@@ -785,6 +788,9 @@
     </ClInclude>
     <ClInclude Include="include_defines.h">
       <Filter>Objects\_includes</Filter>
+    </ClInclude>
+    <ClInclude Include="AgentRuntime.h">
+      <Filter>Objects\LocalObjects\general</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -243,6 +243,7 @@
     <ClCompile Include="AgentCommandReasoning.cpp" />
     <ClCompile Include="AgentCommandRegistry.cpp" />
     <ClCompile Include="AgentCommandSemantics.cpp" />
+    <ClCompile Include="AgentRuntime.cpp" />
     <ClCompile Include="AgentSettings.cpp" />
     <ClCompile Include="AgentConsole.cpp" />
     <ClCompile Include="Console.cpp" />
@@ -297,6 +298,7 @@
     <ClInclude Include="AgentCommandReasoning.h" />
     <ClInclude Include="AgentCommandRegistry.h" />
     <ClInclude Include="AgentCommandSemantics.h" />
+    <ClInclude Include="AgentRuntime.h" />
     <ClInclude Include="AgentSettings.h" />
     <ClInclude Include="Blip.h" />
     <ClInclude Include="Camera.h" />
