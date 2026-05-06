@@ -36,6 +36,11 @@ namespace GTA {
 
 	namespace {
 
+		ref class AgentRuntimePumpState abstract sealed {
+		internal:
+			static AgentRuntime^ ManagedRuntimeInstance = nullptr;
+		};
+
 		int CaptureActiveTurnId() {
 			try {
 				if (!NetHook::isPrimary)
@@ -201,6 +206,7 @@ namespace GTA {
 		pValidatedBuiltInExecutionGeneration = 0;
 		pNextRequestId = 0;
 		pCallbackQueue = gcnew Queue<AgentRuntimeQueuedCallback^>();
+		AgentRuntimePumpState::ManagedRuntimeInstance = this;
 	}
 
 	int AgentRuntime::ReserveRequestId() {
@@ -659,14 +665,44 @@ namespace GTA {
 			if (ShouldDeliverCallback(callback)) {
 				try {
 					callback->Invoke();
-				} catch (Exception^) {
+				} catch (Exception^ ex) {
+					String^ laneName = "unknown";
+					if isNotNULL(callback) {
+						switch (callback->Lane) {
+							case AgentRuntimeLane::Prompt:
+								laneName = "prompt";
+								break;
+							case AgentRuntimeLane::BuiltInClassification:
+								laneName = "built_in_classification";
+								break;
+							case AgentRuntimeLane::ValidatedBuiltInExecution:
+								laneName = "validated_built_in_execution";
+								break;
+						}
+					}
+
+					String^ details = isNULL(ex) ? "Unknown managed exception." : ex->ToString();
+					NetHook::Log(String::Concat(
+						"AgentRuntime callback pump swallowed an exception in lane '",
+						laneName,
+						"': ",
+						details));
 				} catch (...) {
+					NetHook::Log("AgentRuntime callback pump swallowed a native exception.");
 				}
 			}
 			drained++;
 		}
 
 		return drained;
+	}
+
+	int PumpManagedAgentRuntimeCallbacks(int maxCallbacks) {
+		AgentRuntime^ runtime = AgentRuntimePumpState::ManagedRuntimeInstance;
+		if isNULL(runtime)
+			return 0;
+
+		return runtime->DrainCallbacks(maxCallbacks);
 	}
 
 }

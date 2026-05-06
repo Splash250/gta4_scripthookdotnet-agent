@@ -24,6 +24,8 @@
 
 #include "Script.h"
 
+#include "AgentRuntime.h"
+
 #include "Game.h"
 #include "RemoteScriptDomain.h"
 #include "NetThread.h"
@@ -36,6 +38,8 @@
 #pragma managed
 
 namespace GTA{
+
+	int PumpManagedAgentRuntimeCallbacks(int maxCallbacks);
 
 	Script::Script(){
 		BlockWait = true;
@@ -418,10 +422,15 @@ namespace GTA{
 		}
 	}
 
+	void Script::PumpAgentRuntimeCallbacks() {
+		PumpManagedAgentRuntimeCallbacks(0);
+	}
+
 	void Script::DoTick(){
 		BlockWait = false;
 
 		ProcessEvents();
+		PumpAgentRuntimeCallbacks();
 		TryTick();
 		EachTick(this, EventArgs::Empty);
 

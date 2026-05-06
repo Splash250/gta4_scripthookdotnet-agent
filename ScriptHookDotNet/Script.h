@@ -62,6 +62,7 @@ namespace GTA{
 		Guid pGUID;
 		String^ pGeneralInfo;
 
+		void PumpAgentRuntimeCallbacks();
 		void TryTick();
 
 		void ProcessBoundKey(System::Windows::Forms::Keys Key);
