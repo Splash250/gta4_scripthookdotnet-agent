@@ -46,17 +46,6 @@ namespace GTA {
 		return normalized;
 	}
 
-	bool AgentCommandIntent::ContainsAll(String^ haystack, ... array<String^>^ needles) {
-		if (String::IsNullOrEmpty(haystack) || isNULL(needles) || (needles->Length == 0)) return false;
-
-		for each (String^ needle in needles) {
-			if (String::IsNullOrEmpty(needle)) continue;
-			if (!haystack->Contains(needle->ToLowerInvariant()))
-				return false;
-		}
-		return true;
-	}
-
 	bool AgentCommandIntent::LooksLikeNaturalLanguageTail(String^ normalizedTail) {
 		if (String::IsNullOrEmpty(normalizedTail)) return false;
 
@@ -134,13 +123,6 @@ namespace GTA {
 			if isNotNULL(spec)
 				return CreateBuiltInIntent(AgentIntentType::BuiltInExplain, intent->OriginalInput, spec->Name, spec->Name);
 		}
-
-		if (normalized == "heal me up")
-			return CreateBuiltInIntent(AgentIntentType::BuiltInRun, intent->OriginalInput, "heal", "heal");
-		if (normalized == "reload the scripts")
-			return CreateBuiltInIntent(AgentIntentType::BuiltInRun, intent->OriginalInput, "reloadscripts", "reloadscripts");
-		if (ContainsAll(normalized, "teleport", "waypoint") || ContainsAll(normalized, "teleport", "wp"))
-			return CreateBuiltInIntent(AgentIntentType::BuiltInRun, intent->OriginalInput, "teleport", "teleport wp");
 
 		return intent;
 	}

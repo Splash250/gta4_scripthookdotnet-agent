@@ -120,6 +120,8 @@ namespace GTA {
 		pActiveCommandExecution = nullptr;
 		pPendingCommandSpec = nullptr;
 		pPendingCommandLine = String::Empty;
+		pPendingClarificationInput = String::Empty;
+		pPendingReasoningInput = String::Empty;
 		pInput = String::Empty;
 		pLog = gcnew List<String^>();
 		pLastCommands = gcnew List<String^>();
@@ -219,77 +221,6 @@ namespace GTA {
 		if (lines->Count == 0) lines->Add(prefixFirst);
 		while (lines->Count > MAX_INPUT_LINES) lines->RemoveAt(0);
 		return lines;
-	}
-
-	bool AgentConsole::LooksLikeGameActionRequest(String^ input) {
-		if (String::IsNullOrWhiteSpace(input)) return false;
-
-		String^ normalized = input->Trim()->ToLowerInvariant();
-		array<wchar_t>^ chars = normalized->ToCharArray();
-		for (int i = 0; i < chars->Length; i++) {
-			if (!Char::IsLetterOrDigit(chars[i]))
-				chars[i] = ' ';
-		}
-
-		array<wchar_t>^ separators = gcnew array<wchar_t>(1);
-		separators[0] = ' ';
-		String^ tokenSource = gcnew String(chars);
-		array<String^>^ tokens = tokenSource->Split(separators, StringSplitOptions::RemoveEmptyEntries);
-		if (tokens->Length == 0) return false;
-
-		array<String^>^ verbs = gcnew array<String^>{ "make", "change", "paint", "turn", "set", "give", "spawn", "teleport", "fix", "heal", "reload" };
-		array<String^>^ strongObjects = gcnew array<String^>{ "boat", "car", "vehicle", "player" };
-		array<String^>^ stateObjects = gcnew array<String^>{ "health", "armor", "armour", "scripts" };
-
-		bool hasVerb = false;
-		bool hasStrongObject = false;
-		bool hasStateObject = false;
-		bool hasTimeTerm = false;
-
-		for each (String^ token in tokens) {
-			if (token == "time")
-				hasTimeTerm = true;
-		}
-
-		for each (String^ verb in verbs) {
-			for each (String^ token in tokens) {
-				if (token != verb) continue;
-				hasVerb = true;
-				break;
-			}
-			if (hasVerb) break;
-		}
-		if (!hasVerb) return false;
-
-		for each (String^ obj in strongObjects) {
-			for each (String^ token in tokens) {
-				if (token != obj) continue;
-				hasStrongObject = true;
-				break;
-			}
-			if (hasStrongObject) break;
-		}
-
-		for each (String^ obj in stateObjects) {
-			for each (String^ token in tokens) {
-				if (token != obj) continue;
-				hasStateObject = true;
-				break;
-			}
-			if (hasStateObject) break;
-		}
-
-		if (hasStrongObject || hasStateObject)
-			return true;
-
-		if (hasTimeTerm) {
-			for each (String^ token in tokens) {
-				if ((token == "set") || (token == "change") || (token == "turn"))
-					return true;
-			}
-		}
-
-		return false;
 	}
 
 	int AgentConsole::FirstLineOnScreen() {
@@ -467,6 +398,7 @@ namespace GTA {
 		pWorker = gcnew AgentRequestWorker();
 		pReasoningWorker = gcnew AgentReasoningWorker();
 		pActiveCommandExecution = nullptr;
+		pPendingReasoningInput = String::Empty;
 		ClearPendingAction();
 		OnClosed();
 	}
@@ -474,6 +406,15 @@ namespace GTA {
 	void AgentConsole::ClearPendingAction() {
 		pPendingCommandSpec = nullptr;
 		pPendingCommandLine = String::Empty;
+		pPendingClarificationInput = String::Empty;
+	}
+
+	String^ AgentConsole::BuildClarificationRequest(String^ clarificationInput) {
+		if (String::IsNullOrWhiteSpace(pPendingClarificationInput))
+			return String::IsNullOrWhiteSpace(clarificationInput) ? String::Empty : clarificationInput->Trim();
+		if (String::IsNullOrWhiteSpace(clarificationInput))
+			return pPendingClarificationInput;
+		return pPendingClarificationInput + "\nClarification: " + clarificationInput->Trim();
 	}
 
 	void AgentConsole::ExecuteBuiltInCommand(String^ commandLine, AgentCommandSpec^ spec) {
@@ -514,7 +455,9 @@ namespace GTA {
 		if isNotNULL(pReasoningWorker) {
 			AgentReasoningResult^ reasoningResult;
 			if (pReasoningWorker->TryTakeCompleted(reasoningResult) && isNotNULL(reasoningResult)) {
-				HandleReasoningResult(reasoningResult);
+				String^ originalInput = pPendingReasoningInput;
+				pPendingReasoningInput = String::Empty;
+				HandleReasoningResult(reasoningResult, originalInput);
 			}
 		}
 
@@ -531,7 +474,7 @@ namespace GTA {
 		Print("(AGENT REPLY) " + response->Text);
 	}
 
-	void AgentConsole::HandleReasoningResult(AgentReasoningResult^ result) {
+	void AgentConsole::HandleReasoningResult(AgentReasoningResult^ result, String^ originalInput) {
 		if isNULL(result) return;
 
 		if (result->Decision == AgentReasoningDecision::BuiltInExplain) {
@@ -570,22 +513,39 @@ namespace GTA {
 		}
 
 		if (result->Decision == AgentReasoningDecision::NoExactBuiltInFit) {
+			bool needsClarification = (result->ContractDecision == AgentReasoningContractDecision::NeedsClarification);
 			AgentCommandSpec^ consideredSpec = AgentCommandRegistry::Find(result->CommandName);
 			if (isNotNULL(consideredSpec))
 				Print("(AGENT STATUS) Considered built-in command: " + consideredSpec->Name);
 			if (!String::IsNullOrEmpty(result->FailureReason))
 				Print("(AGENT STATUS) " + result->FailureReason);
-			if (FailureReasonPointsToDifferentBuiltInIntent(result->FailureReason))
+			if (needsClarification) {
+				pPendingClarificationInput = String::IsNullOrWhiteSpace(originalInput) ? String::Empty : originalInput->Trim();
+				Print("(AGENT STATUS) Clarify the request and ask again so I can classify one exact built-in command.");
+			} else if (FailureReasonPointsToDifferentBuiltInIntent(result->FailureReason)) {
 				Print("(AGENT STATUS) The considered built-in command was not the right exact fit for that request.");
-			else
+			} else {
 				Print("(AGENT STATUS) No exact built-in ScriptHookDotNet command can satisfy that request.");
-			Print("(AGENT STATUS) If you want, I can help design a script for GAME_ROOT/scripts and then reload scripts so it applies.");
+			}
+			if (!needsClarification)
+				Print("(AGENT STATUS) If you want, I can help design a script for GAME_ROOT/scripts and then reload scripts so it applies.");
 			return;
 		}
 
 		if (result->Decision == AgentReasoningDecision::NormalChat) {
-			Print("(AGENT STATUS) That request looks action-oriented, but no verified built-in command path was approved.");
-			Print("(AGENT STATUS) If you want, I can help design a script for GAME_ROOT/scripts and then reload scripts so it applies.");
+			if (String::IsNullOrWhiteSpace(originalInput)) {
+				Print("(AGENT ERROR) Chat routing did not preserve the original request.");
+				return;
+			}
+			if (pWorker->IsBusy) {
+				Print("(AGENT STATUS) Agent is busy. Wait for the current reply.");
+				return;
+			}
+			if (!pWorker->Submit(originalInput, pPreviousResponseId)) {
+				Print("(AGENT STATUS) Agent is busy. Wait for the current reply.");
+				return;
+			}
+			Print("(AGENT STATUS) Thinking...");
 			return;
 		}
 
@@ -633,6 +593,41 @@ namespace GTA {
 			return;
 		}
 
+		if (!String::IsNullOrWhiteSpace(pPendingClarificationInput)) {
+			String^ answer = line->ToLowerInvariant();
+			if ((answer == "no") || (answer == "cancel")) {
+				Print("(AGENT STATUS) Clarification cancelled.");
+				ClearPendingAction();
+				return;
+			}
+
+			if (pReasoningWorker->IsBusy) {
+				Print("(AGENT STATUS) Agent is already evaluating another request.");
+				return;
+			}
+			if (pWorker->IsBusy) {
+				Print("(AGENT STATUS) Agent is busy. Wait for the current reply.");
+				return;
+			}
+
+			String^ clarificationRequest = BuildClarificationRequest(line);
+			if (String::IsNullOrWhiteSpace(clarificationRequest)) {
+				Print("(AGENT STATUS) Clarify the request and ask again so I can classify one exact built-in command.");
+				return;
+			}
+
+			pPendingReasoningInput = clarificationRequest;
+			if (!pReasoningWorker->Submit(clarificationRequest)) {
+				pPendingReasoningInput = String::Empty;
+				Print("(AGENT STATUS) Agent is already evaluating another request.");
+				return;
+			}
+
+			pPendingClarificationInput = String::Empty;
+			Print("(AGENT STATUS) Reclassifying with your clarification...");
+			return;
+		}
+
 		AgentIntent^ intent = AgentCommandIntent::Resolve(line);
 		if (intent->Type == AgentIntentType::BuiltInExplain) {
 			AgentCommandSpec^ spec = AgentCommandRegistry::Find(intent->CommandName);
@@ -663,7 +658,7 @@ namespace GTA {
 
 			AgentReasoningResult^ directResult = BuildDirectBuiltInReasoningResult(intent);
 			if (directResult->Decision == AgentReasoningDecision::NoExactBuiltInFit) {
-				HandleReasoningResult(directResult);
+				HandleReasoningResult(directResult, String::Empty);
 				return;
 			}
 			if (String::IsNullOrEmpty(directResult->ValidatedCommandLine)) {
@@ -686,116 +681,21 @@ namespace GTA {
 			return;
 		}
 
-		bool looksLikeAction = LooksLikeGameActionRequest(line);
-		String^ normalized = line->ToLowerInvariant()->Trim();
-		String^ paddedNormalized = " " + normalized + " ";
-		bool isQuestion = line->Contains("?");
-		bool looksLikeCreativeChat =
-			normalized->StartsWith("tell me ") ||
-			normalized->StartsWith("write me ") ||
-			normalized->StartsWith("write ") ||
-			normalized->StartsWith("tell ") ||
-			normalized->Contains(" joke ") ||
-			normalized->EndsWith(" joke") ||
-			normalized->Contains(" haiku ") ||
-			normalized->EndsWith(" haiku") ||
-			normalized->Contains(" poem ") ||
-			normalized->EndsWith(" poem") ||
-			normalized->Contains(" story ") ||
-			normalized->EndsWith(" story");
-		bool looksLikeExplanationQuestion =
-			normalized->StartsWith("what ") ||
-			normalized->StartsWith("why ") ||
-			normalized->StartsWith("how ") ||
-			normalized->StartsWith("should i ") ||
-			normalized->StartsWith("should we ") ||
-			normalized->StartsWith("can you explain ") ||
-			normalized->StartsWith("could you explain ") ||
-			normalized->StartsWith("explain ") ||
-			normalized->Contains(" explain ") ||
-			normalized->Contains(" should i use ") ||
-			normalized->Contains(" help me understand ") ||
-			normalized->Contains(" what does ");
-		bool hasDirectCommandVerb =
-			normalized->StartsWith("make ") ||
-			normalized->StartsWith("change ") ||
-			normalized->StartsWith("paint ") ||
-			normalized->StartsWith("turn ") ||
-			normalized->StartsWith("set ") ||
-			normalized->StartsWith("give ") ||
-			normalized->StartsWith("spawn ") ||
-			normalized->StartsWith("teleport ") ||
-			normalized->StartsWith("fix ") ||
-			normalized->StartsWith("heal ") ||
-			normalized->StartsWith("reload ") ||
-			normalized->StartsWith("remove ") ||
-			paddedNormalized->Contains(" make ") ||
-			paddedNormalized->Contains(" change ") ||
-			paddedNormalized->Contains(" paint ") ||
-			paddedNormalized->Contains(" turn ") ||
-			paddedNormalized->Contains(" set ") ||
-			paddedNormalized->Contains(" give ") ||
-			paddedNormalized->Contains(" spawn ") ||
-			paddedNormalized->Contains(" teleport ") ||
-			paddedNormalized->Contains(" fix ") ||
-			paddedNormalized->Contains(" heal ") ||
-			paddedNormalized->Contains(" reload ") ||
-			paddedNormalized->Contains(" remove ");
-		bool hasGameNounOrState =
-			paddedNormalized->Contains(" boat ") ||
-			paddedNormalized->Contains(" car ") ||
-			paddedNormalized->Contains(" vehicle ") ||
-			paddedNormalized->Contains(" player ") ||
-			paddedNormalized->Contains(" health ") ||
-			paddedNormalized->Contains(" armor ") ||
-			paddedNormalized->Contains(" armour ") ||
-			paddedNormalized->Contains(" scripts ") ||
-			paddedNormalized->Contains(" waypoint ") ||
-			paddedNormalized->Contains(" wp ") ||
-			paddedNormalized->Contains(" time ") ||
-			paddedNormalized->Contains(" color ") ||
-			paddedNormalized->Contains(" red ") ||
-			paddedNormalized->Contains(" blue ") ||
-			paddedNormalized->Contains(" green ");
-		bool hasConversationalActionPrefix =
-			normalized->StartsWith("can you ") ||
-			normalized->StartsWith("could you ") ||
-			normalized->StartsWith("please ") ||
-			normalized->StartsWith("i want ") ||
-			normalized->StartsWith("i need ");
-		bool looksLikeCommandStyleRequest =
-			hasDirectCommandVerb ||
-			(hasConversationalActionPrefix && (looksLikeAction || hasGameNounOrState));
-		bool classifierPreferred =
-			looksLikeAction ||
-			(!looksLikeCreativeChat && !looksLikeExplanationQuestion && looksLikeCommandStyleRequest);
-
-		if (classifierPreferred) {
-			if (pReasoningWorker->IsBusy) {
-				Print("(AGENT STATUS) Agent is already evaluating another command request.");
-				return;
-			}
-			if (pWorker->IsBusy) {
-				Print("(AGENT STATUS) Agent is busy. Wait for the current reply.");
-				return;
-			}
-			if (!pReasoningWorker->Submit(line)) {
-				Print("(AGENT STATUS) Agent is already evaluating another command request.");
-				return;
-			}
-			Print("(AGENT STATUS) Evaluating built-in command options...");
+		if (pReasoningWorker->IsBusy) {
+			Print("(AGENT STATUS) Agent is already evaluating another request.");
 			return;
 		}
-
 		if (pWorker->IsBusy) {
 			Print("(AGENT STATUS) Agent is busy. Wait for the current reply.");
 			return;
 		}
-		if (!pWorker->Submit(line, pPreviousResponseId)) {
-			Print("(AGENT STATUS) Agent is busy. Wait for the current reply.");
+		pPendingReasoningInput = line;
+		if (!pReasoningWorker->Submit(line)) {
+			pPendingReasoningInput = String::Empty;
+			Print("(AGENT STATUS) Agent is already evaluating another request.");
 			return;
 		}
-		Print("(AGENT STATUS) Thinking...");
+		Print("(AGENT STATUS) Classifying request...");
 	}
 
 	void AgentConsole::AddOldCommand(String^ CommandLine) {
