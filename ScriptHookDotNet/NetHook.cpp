@@ -63,10 +63,6 @@ namespace GTA {
 			pDefaultConsole = gcnew GTA::Console();
 			pAgentConsole = gcnew GTA::AgentConsole();
 			pConsole = pDefaultConsole;
-			AgentLogger::Initialize(
-				AgentSettings::EnableAgentLogging,
-				AgentSettings::EnableAgentJsonLogging
-			);
 		} else {
 			pMouse = gcnew GTA::Forms::RemoteMouse();
 			pConsole = gcnew GTA::RemoteConsole();
@@ -155,6 +151,10 @@ namespace GTA {
 
 				if isNULL(pScriptDomain) pScriptDomain = gcnew GTA::ScriptDomain();
 				//pScriptDomain->Create();
+				AgentLogger::Initialize(
+					AgentSettings::EnableAgentLogging,
+					AgentSettings::EnableAgentJsonLogging
+				);
 
 				pScriptDomain->RequestAction(ScriptAction::LoadScripts);
 
