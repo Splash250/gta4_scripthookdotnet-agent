@@ -31,9 +31,12 @@ namespace GTA {
 	public:
 		String^ CommandLine;
 		String^ CommandName;
+		int TurnId;
 		DateTime StartedAt;
 		DateTime CompletedAt;
 		bool Completed;
+		bool HasLoggedOutput;
+		bool CompletionLogged;
 		System::Collections::Generic::List<String^>^ OutputLines;
 		int TotalOutputLineCount;
 		String^ ResultCode;

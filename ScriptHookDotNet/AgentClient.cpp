@@ -24,6 +24,8 @@
 
 #include "AgentClient.h"
 
+#include "AgentLogger.h"
+#include "NetHook.h"
 #include "AgentSettings.h"
 
 #pragma managed
@@ -37,6 +39,162 @@ namespace GTA {
 	using namespace System::Text;
 	using namespace System::Threading;
 	using namespace System::Web::Script::Serialization;
+
+	namespace {
+
+		String^ NormalizeClientLogValue(String^ value) {
+			return isNULL(value) ? String::Empty : value;
+		}
+
+		String^ EscapeClientJson(String^ value) {
+			String^ safeValue = NormalizeClientLogValue(value);
+			StringBuilder^ sb = gcnew StringBuilder(safeValue->Length + 16);
+			for each (wchar_t ch in safeValue) {
+				switch (ch) {
+					case L'\\': sb->Append("\\\\"); break;
+					case L'"': sb->Append("\\\""); break;
+					case L'\b': sb->Append("\\b"); break;
+					case L'\f': sb->Append("\\f"); break;
+					case L'\n': sb->Append("\\n"); break;
+					case L'\r': sb->Append("\\r"); break;
+					case L'\t': sb->Append("\\t"); break;
+					default:
+						if (ch < 32)
+							sb->AppendFormat("\\u{0:x4}", (int)ch);
+						else
+							sb->Append(ch);
+						break;
+				}
+			}
+			return sb->ToString();
+		}
+
+		int CaptureActiveTurnId() {
+			try {
+				if (!NetHook::isPrimary)
+					return 0;
+
+				System::Object^ console = NetHook::Console;
+				if isNULL(console)
+					return 0;
+
+				System::Reflection::FieldInfo^ field = console->GetType()->GetField(
+					"pActiveTurnId",
+					System::Reflection::BindingFlags::Instance | System::Reflection::BindingFlags::NonPublic);
+				if (isNULL(field) || (field->FieldType != Int32::typeid))
+					return 0;
+
+				System::Object^ value = field->GetValue(console);
+				return isNULL(value) ? 0 : safe_cast<int>(value);
+			} catch (...) {
+				return 0;
+			}
+		}
+
+		String^ BuildModelRequestStartedPayload(
+			String^ requestKind,
+			String^ model,
+			String^ previousResponseId,
+			String^ textFormatJson,
+			String^ userInput) {
+			return String::Concat(
+				"{\"request_kind\":\"", EscapeClientJson(NormalizeClientLogValue(requestKind)),
+				"\",\"model\":\"", EscapeClientJson(NormalizeClientLogValue(model)),
+				"\",\"previous_response_id\":\"", EscapeClientJson(NormalizeClientLogValue(previousResponseId)),
+				"\",\"has_previous_response_id\":", String::IsNullOrEmpty(previousResponseId) ? "false" : "true",
+				",\"uses_structured_output\":", String::IsNullOrEmpty(textFormatJson) ? "false" : "true",
+				",\"input_length\":", NormalizeClientLogValue(userInput)->Length.ToString(Globalization::CultureInfo::InvariantCulture),
+				"}");
+		}
+
+		String^ BuildModelRequestCompletedPayload(AgentResponse^ response, String^ rawResponseText) {
+			String^ safeRawResponseText = String::IsNullOrEmpty(rawResponseText)
+				? NormalizeClientLogValue(response->RawResponseText)
+				: rawResponseText;
+			return String::Concat(
+				"{\"request_kind\":\"", EscapeClientJson(NormalizeClientLogValue(response->RequestKind)),
+				"\",\"model\":\"", EscapeClientJson(NormalizeClientLogValue(response->Model)),
+				"\",\"response_id\":\"", EscapeClientJson(NormalizeClientLogValue(response->ResponseId)),
+				"\",\"response_text\":\"", EscapeClientJson(NormalizeClientLogValue(response->Text)),
+				"\",\"raw_response_text\":\"", EscapeClientJson(safeRawResponseText),
+				"\"}");
+		}
+
+		String^ BuildModelRequestAbandonedPayload(AgentResponse^ response) {
+			if isNULL(response) return "{}";
+			return String::Concat(
+				"{\"request_kind\":\"", EscapeClientJson(NormalizeClientLogValue(response->RequestKind)),
+				"\",\"model\":\"", EscapeClientJson(NormalizeClientLogValue(response->Model)),
+				"\",\"response_id\":\"", EscapeClientJson(NormalizeClientLogValue(response->ResponseId)),
+				"\",\"error\":\"", EscapeClientJson(NormalizeClientLogValue(response->Error)),
+				"\",\"response_text\":\"", EscapeClientJson(NormalizeClientLogValue(response->Text)),
+				"\",\"store_as_previous_response\":", response->StoreAsPreviousResponse ? "true" : "false",
+				"}");
+		}
+
+		String^ BuildModelRequestFailedPayload(
+			String^ requestKind,
+			String^ model,
+			String^ error,
+			String^ rawResponseText) {
+			return String::Concat(
+				"{\"request_kind\":\"", EscapeClientJson(NormalizeClientLogValue(requestKind)),
+				"\",\"model\":\"", EscapeClientJson(NormalizeClientLogValue(model)),
+				"\",\"error\":\"", EscapeClientJson(NormalizeClientLogValue(error)),
+				"\",\"raw_response_text\":\"", EscapeClientJson(NormalizeClientLogValue(rawResponseText)),
+				"\"}");
+		}
+
+		void LogModelRequestStarted(
+			int turnId,
+			String^ requestKind,
+			String^ model,
+			String^ previousResponseId,
+			String^ textFormatJson,
+			String^ userInput) {
+			AgentLogger::LogEvent(
+				turnId,
+				AgentLogEventType::ModelRequestStarted,
+				"AgentClient",
+				"Model request started: " + NormalizeClientLogValue(requestKind),
+				BuildModelRequestStartedPayload(requestKind, model, previousResponseId, textFormatJson, userInput));
+		}
+
+		void LogModelRequestCompleted(int turnId, AgentResponse^ response, String^ rawResponseText) {
+			if isNULL(response) return;
+			AgentLogger::LogEvent(
+				turnId,
+				AgentLogEventType::ModelRequestCompleted,
+				"AgentClient",
+				"Model request completed: " + NormalizeClientLogValue(response->RequestKind),
+				BuildModelRequestCompletedPayload(response, rawResponseText));
+		}
+
+		void LogModelRequestAbandoned(int turnId, AgentResponse^ response) {
+			if isNULL(response) return;
+			AgentLogger::LogEvent(
+				turnId,
+				AgentLogEventType::ModelRequestAbandoned,
+				"AgentClient",
+				"Model request abandoned after the active turn was closed: " + NormalizeClientLogValue(response->RequestKind),
+				BuildModelRequestAbandonedPayload(response));
+		}
+
+		void LogModelRequestFailed(
+			int turnId,
+			String^ requestKind,
+			String^ model,
+			String^ error,
+			String^ rawResponseText) {
+			AgentLogger::LogEvent(
+				turnId,
+				AgentLogEventType::ModelRequestFailed,
+				"AgentClient",
+				"Model request failed: " + NormalizeClientLogValue(requestKind),
+				BuildModelRequestFailedPayload(requestKind, model, error, rawResponseText));
+		}
+
+	}
 
 	String^ AgentClient::EscapeJson(String^ value) {
 		if (isNULL(value)) return String::Empty;
@@ -144,6 +302,7 @@ namespace GTA {
 
 	AgentResponse^ AgentClient::ParseResponse(String^ json) {
 		AgentResponse^ result = gcnew AgentResponse();
+		result->RawResponseText = isNULL(json) ? String::Empty : json;
 		if (String::IsNullOrEmpty(json)) {
 			result->Error = "OpenAI returned an empty response.";
 			return result;
@@ -180,14 +339,23 @@ namespace GTA {
 		return result;
 	}
 
-	AgentResponse^ AgentClient::SendCore(String^ instructions, String^ userInput, String^ previousResponseId, String^ textFormatJson) {
+	AgentResponse^ AgentClient::SendCore(
+		int turnId,
+		String^ requestKind,
+		String^ instructions,
+		String^ userInput,
+		String^ previousResponseId,
+		String^ textFormatJson) {
 		AgentResponse^ result = gcnew AgentResponse();
 
 		String^ apiKey = AgentSettings::ApiKey->Trim();
 		String^ model = AgentSettings::Model->Trim();
 		String^ prompt = isNULL(instructions) ? String::Empty : instructions->Trim();
+		result->RequestKind = isNULL(requestKind) ? String::Empty : requestKind->Trim();
+		result->Model = model;
 		if ((apiKey->Length == 0) || (model->Length == 0) || (prompt->Length == 0)) {
 			result->Error = "agents.ini is missing required OpenAI settings.";
+			LogModelRequestFailed(turnId, result->RequestKind, result->Model, result->Error, String::Empty);
 			return result;
 		}
 
@@ -218,6 +386,8 @@ namespace GTA {
 			request->ReadWriteTimeout = 120000;
 			request->ContentLength = payload->Length;
 
+			LogModelRequestStarted(turnId, result->RequestKind, model, previousResponseId, textFormatJson, userInput);
+
 			Stream^ requestStream = request->GetRequestStream();
 			requestStream->Write(payload, 0, payload->Length);
 			requestStream->Close();
@@ -225,36 +395,71 @@ namespace GTA {
 			HttpWebResponse^ response = dynamic_cast<HttpWebResponse^>(request->GetResponse());
 			String^ bodyText = ReadResponseBody(response);
 			response->Close();
-			return ParseResponse(bodyText);
+			AgentResponse^ parsed = ParseResponse(bodyText);
+			parsed->RequestKind = result->RequestKind;
+			parsed->Model = result->Model;
+			if (String::IsNullOrEmpty(parsed->Error))
+				LogModelRequestCompleted(turnId, parsed, bodyText);
+			else
+				LogModelRequestFailed(turnId, parsed->RequestKind, parsed->Model, parsed->Error, bodyText);
+			return parsed;
 		} catch (WebException^ ex) {
 			String^ bodyText = ReadResponseBody(ex->Response);
 			if (!String::IsNullOrEmpty(bodyText)) {
 				AgentResponse^ parsed = ParseResponse(bodyText);
-				if (parsed->Error->Length > 0) return parsed;
+				parsed->RequestKind = result->RequestKind;
+				parsed->Model = result->Model;
+				if (parsed->Error->Length > 0) {
+					LogModelRequestFailed(turnId, parsed->RequestKind, parsed->Model, parsed->Error, bodyText);
+					return parsed;
+				}
 			}
 			result->Error = "OpenAI request failed: " + ex->Message;
+			LogModelRequestFailed(turnId, result->RequestKind, result->Model, result->Error, bodyText);
 			return result;
 		} catch (Exception^ ex) {
 			result->Error = "OpenAI request failed: " + ex->Message;
+			LogModelRequestFailed(turnId, result->RequestKind, result->Model, result->Error, String::Empty);
 			return result;
 		}
 	}
 
 	AgentResponse^ AgentClient::Send(String^ userInput, String^ previousResponseId) {
-		return SendCore(AgentSettings::SystemPrompt, userInput, previousResponseId, String::Empty);
+		return Send(0, userInput, previousResponseId);
+	}
+
+	AgentResponse^ AgentClient::Send(int turnId, String^ userInput, String^ previousResponseId) {
+		return SendCore(turnId, "chat_reply", AgentSettings::SystemPrompt, userInput, previousResponseId, String::Empty);
 	}
 
 	AgentResponse^ AgentClient::SendIsolated(String^ instructions, String^ userInput) {
-		return SendCore(instructions, userInput, String::Empty, String::Empty);
+		return SendIsolated(0, "isolated_request", instructions, userInput);
 	}
 
 	AgentResponse^ AgentClient::SendIsolatedStructured(String^ instructions, String^ userInput, String^ textFormatJson) {
-		return SendCore(instructions, userInput, String::Empty, textFormatJson);
+		return SendIsolatedStructured(0, "isolated_structured_request", instructions, userInput, textFormatJson);
+	}
+
+	AgentResponse^ AgentClient::SendIsolated(String^ requestKind, String^ instructions, String^ userInput) {
+		return SendIsolated(0, requestKind, instructions, userInput);
+	}
+
+	AgentResponse^ AgentClient::SendIsolated(int turnId, String^ requestKind, String^ instructions, String^ userInput) {
+		return SendCore(turnId, requestKind, instructions, userInput, String::Empty, String::Empty);
+	}
+
+	AgentResponse^ AgentClient::SendIsolatedStructured(String^ requestKind, String^ instructions, String^ userInput, String^ textFormatJson) {
+		return SendIsolatedStructured(0, requestKind, instructions, userInput, textFormatJson);
+	}
+
+	AgentResponse^ AgentClient::SendIsolatedStructured(int turnId, String^ requestKind, String^ instructions, String^ userInput, String^ textFormatJson) {
+		return SendCore(turnId, requestKind, instructions, userInput, String::Empty, textFormatJson);
 	}
 
 	AgentRequestWorker::AgentRequestWorker() {
 		pSyncRoot = gcnew System::Object();
 		bBusy = false;
+		pGeneration = 0;
 		pCompletedResponse = nullptr;
 	}
 
@@ -268,16 +473,20 @@ namespace GTA {
 	}
 
 	bool AgentRequestWorker::Submit(String^ userInput, String^ previousResponseId, bool storeResponseAsConversationState) {
+		int generation;
 		Monitor::Enter(pSyncRoot);
 		try {
 			if (bBusy) return false;
 			bBusy = true;
 			pCompletedResponse = nullptr;
+			generation = pGeneration;
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}
 
 		AgentRequestContext^ context = gcnew AgentRequestContext();
+		context->Generation = generation;
+		context->TurnId = CaptureActiveTurnId();
 		context->UserInput = userInput;
 		context->PreviousResponseId = previousResponseId;
 		context->StoreResponseAsConversationState = storeResponseAsConversationState;
@@ -290,14 +499,46 @@ namespace GTA {
 
 	void AgentRequestWorker::WorkerMain(System::Object^ state) {
 		AgentRequestContext^ context = safe_cast<AgentRequestContext^>(state);
-		AgentResponse^ response = AgentClient::Send(context->UserInput, context->PreviousResponseId);
-		if isNotNULL(response)
-			response->StoreAsPreviousResponse = context->StoreResponseAsConversationState;
+		AgentResponse^ response = nullptr;
+		try {
+			response = AgentClient::Send(context->TurnId, context->UserInput, context->PreviousResponseId);
+			if isNotNULL(response)
+				response->StoreAsPreviousResponse = context->StoreResponseAsConversationState;
+		} catch (Exception^ ex) {
+			response = gcnew AgentResponse();
+			response->RequestKind = "chat_reply";
+			response->Error = "Agent request worker failed: " + ex->Message;
+			response->StoreAsPreviousResponse = false;
+		} catch (...) {
+			response = gcnew AgentResponse();
+			response->RequestKind = "chat_reply";
+			response->Error = "Agent request worker failed with a native exception.";
+			response->StoreAsPreviousResponse = false;
+		}
 
 		Monitor::Enter(pSyncRoot);
 		try {
-			pCompletedResponse = response;
+			if (context->Generation == pGeneration) {
+				pCompletedResponse = response;
+				bBusy = false;
+			}
+			else {
+				bBusy = false;
+			}
+		} finally {
+			Monitor::Exit(pSyncRoot);
+		}
+
+		if (context->Generation != pGeneration)
+			LogModelRequestAbandoned(context->TurnId, response);
+	}
+
+	void AgentRequestWorker::AbandonPendingWork() {
+		Monitor::Enter(pSyncRoot);
+		try {
+			pGeneration++;
 			bBusy = false;
+			pCompletedResponse = nullptr;
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}

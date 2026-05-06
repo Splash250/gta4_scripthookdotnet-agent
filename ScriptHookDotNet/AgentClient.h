@@ -32,12 +32,18 @@ namespace GTA {
 		String^ Text;
 		String^ ResponseId;
 		String^ Error;
+		String^ RawResponseText;
+		String^ RequestKind;
+		String^ Model;
 		bool StoreAsPreviousResponse;
 
 		AgentResponse() {
 			Text = String::Empty;
 			ResponseId = String::Empty;
 			Error = String::Empty;
+			RawResponseText = String::Empty;
+			RequestKind = String::Empty;
+			Model = String::Empty;
 			StoreAsPreviousResponse = true;
 		}
 	};
@@ -54,12 +60,23 @@ namespace GTA {
 		static String^ ExtractOutputText(System::Collections::Generic::Dictionary<String^, System::Object^>^ root);
 		static String^ ExtractRefusalText(System::Collections::Generic::Dictionary<String^, System::Object^>^ root);
 		static String^ ExtractErrorText(System::Collections::Generic::Dictionary<String^, System::Object^>^ root);
-		static AgentResponse^ SendCore(String^ instructions, String^ userInput, String^ previousResponseId, String^ textFormatJson);
+		static AgentResponse^ SendCore(
+			int turnId,
+			String^ requestKind,
+			String^ instructions,
+			String^ userInput,
+			String^ previousResponseId,
+			String^ textFormatJson);
 
 	public:
 		static AgentResponse^ Send(String^ userInput, String^ previousResponseId);
+		static AgentResponse^ Send(int turnId, String^ userInput, String^ previousResponseId);
 		static AgentResponse^ SendIsolated(String^ instructions, String^ userInput);
+		static AgentResponse^ SendIsolated(String^ requestKind, String^ instructions, String^ userInput);
+		static AgentResponse^ SendIsolated(int turnId, String^ requestKind, String^ instructions, String^ userInput);
 		static AgentResponse^ SendIsolatedStructured(String^ instructions, String^ userInput, String^ textFormatJson);
+		static AgentResponse^ SendIsolatedStructured(String^ requestKind, String^ instructions, String^ userInput, String^ textFormatJson);
+		static AgentResponse^ SendIsolatedStructured(int turnId, String^ requestKind, String^ instructions, String^ userInput, String^ textFormatJson);
 	};
 
 	CLASS_ATTRIBUTES
@@ -68,6 +85,8 @@ namespace GTA {
 	private:
 		ref class AgentRequestContext sealed {
 		public:
+			int Generation;
+			int TurnId;
 			String^ UserInput;
 			String^ PreviousResponseId;
 			bool StoreResponseAsConversationState;
@@ -75,6 +94,7 @@ namespace GTA {
 
 		System::Object^ pSyncRoot;
 		bool bBusy;
+		int pGeneration;
 		AgentResponse^ pCompletedResponse;
 
 		void WorkerMain(System::Object^ state);
@@ -87,6 +107,7 @@ namespace GTA {
 		}
 
 		bool Submit(String^ userInput, String^ previousResponseId, bool storeResponseAsConversationState);
+		void AbandonPendingWork();
 		bool TryTakeCompleted([System::Runtime::InteropServices::Out] AgentResponse^% response);
 	};
 

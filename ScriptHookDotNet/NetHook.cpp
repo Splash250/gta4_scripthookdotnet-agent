@@ -25,6 +25,8 @@
 
 #include "NetHook.h"
 
+#include "AgentLogger.h"
+#include "AgentSettings.h"
 #include "Console.h"
 #include "AgentCommandExecution.h"
 #include "ConsoleCommands.h"
@@ -149,6 +151,10 @@ namespace GTA {
 
 				if isNULL(pScriptDomain) pScriptDomain = gcnew GTA::ScriptDomain();
 				//pScriptDomain->Create();
+				AgentLogger::Initialize(
+					AgentSettings::EnableAgentLogging,
+					AgentSettings::EnableAgentJsonLogging
+				);
 
 				pScriptDomain->RequestAction(ScriptAction::LoadScripts);
 

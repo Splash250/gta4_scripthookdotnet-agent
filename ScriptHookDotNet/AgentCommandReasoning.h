@@ -90,6 +90,18 @@ namespace GTA {
 		static String^ BuildLegacyFallbackInstructions();
 		static String^ BuildStructuredOutputFormatJson();
 		static String^ StripJsonFences(String^ text);
+		static String^ GetContractDecisionName(AgentReasoningContractDecision value);
+		static String^ GetLegacyDecisionName(AgentReasoningDecision value);
+		static String^ GetContractFormatName(AgentReasoningContractFormat value);
+		static void LogRoutingStarted(int turnId, String^ userInput, String^ recentCommandTranscriptJson);
+		static AgentReasoningResult^ LogRoutingResult(int turnId, AgentReasoningResult^ result);
+		static void LogSemanticValidation(
+			int turnId,
+			String^ commandName,
+			bool accepted,
+			String^ validatedCommandLine,
+			String^ rejectionReason,
+			AgentReasoningContractDecision decision);
 		static AgentReasoningContractDecision ParseDecision(String^ value);
 		static AgentReasoningDecision MapContractDecisionToLegacyDecision(AgentReasoningResult^ result);
 		static bool HasOnlyAllowedKeys(
@@ -104,10 +116,10 @@ namespace GTA {
 		static AgentReasoningResult^ ParseResponsePayload(
 			System::Collections::Generic::Dictionary<String^, System::Object^>^ root,
 			AgentReasoningContractFormat expectedFormat);
-		static AgentReasoningResult^ ValidateResult(AgentReasoningResult^ result, String^ userInput);
+		static AgentReasoningResult^ ValidateResult(int turnId, AgentReasoningResult^ result, String^ userInput);
 
 	public:
-		static AgentReasoningResult^ ClassifyCommandRequest(String^ userInput, String^ recentCommandTranscriptJson);
+		static AgentReasoningResult^ ClassifyCommandRequest(int turnId, String^ userInput, String^ recentCommandTranscriptJson);
 	};
 
 	CLASS_ATTRIBUTES
@@ -116,12 +128,15 @@ namespace GTA {
 	private:
 		ref class AgentReasoningContext sealed {
 		public:
+			int Generation;
+			int TurnId;
 			String^ UserInput;
 			String^ RecentCommandTranscriptJson;
 		};
 
 		System::Object^ pSyncRoot;
 		bool bBusy;
+		int pGeneration;
 		AgentReasoningResult^ pCompletedResult;
 
 		void WorkerMain(System::Object^ state);
@@ -134,6 +149,7 @@ namespace GTA {
 		}
 
 		bool Submit(String^ userInput, String^ recentCommandTranscriptJson);
+		void AbandonPendingWork();
 		bool TryTakeCompleted([System::Runtime::InteropServices::Out] AgentReasoningResult^% result);
 	};
 

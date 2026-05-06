@@ -27,6 +27,8 @@
 #include "AgentCommandReasoning.h"
 #include "AgentCommandRegistry.h"
 #include "AgentCommandSemantics.h"
+#include "AgentLogger.h"
+#include "NetHook.h"
 
 #pragma managed
 
@@ -53,6 +55,28 @@ namespace GTA {
 				normalized->Contains("unsupported") ||
 				normalized->Contains("not supported") ||
 				normalized->Contains("unknown parameter");
+		}
+
+		int CaptureActiveTurnId() {
+			try {
+				if (!NetHook::isPrimary)
+					return 0;
+
+				System::Object^ console = NetHook::Console;
+				if isNULL(console)
+					return 0;
+
+				System::Reflection::FieldInfo^ field = console->GetType()->GetField(
+					"pActiveTurnId",
+					System::Reflection::BindingFlags::Instance | System::Reflection::BindingFlags::NonPublic);
+				if (isNULL(field) || (field->FieldType != Int32::typeid))
+					return 0;
+
+				System::Object^ value = field->GetValue(console);
+				return isNULL(value) ? 0 : safe_cast<int>(value);
+			} catch (...) {
+				return 0;
+			}
 		}
 
 		String^ BuildClassifierRequest(String^ userInput, String^ recentCommandTranscriptJson) {
@@ -188,6 +212,120 @@ namespace GTA {
 		int lastFence = trimmed->LastIndexOf("```");
 		if (lastFence <= firstLine) return trimmed;
 		return trimmed->Substring(firstLine + 1, lastFence - firstLine - 1)->Trim();
+	}
+
+	String^ AgentCommandReasoning::GetContractDecisionName(AgentReasoningContractDecision value) {
+		switch (value) {
+			case AgentReasoningContractDecision::NormalChat:
+				return "normal_chat";
+			case AgentReasoningContractDecision::BuiltInExplain:
+				return "built_in_explain";
+			case AgentReasoningContractDecision::BuiltInRun:
+				return "built_in_run";
+			case AgentReasoningContractDecision::NoExactBuiltInFit:
+				return "no_exact_built_in_fit";
+			case AgentReasoningContractDecision::NeedsClarification:
+				return "needs_clarification";
+			default:
+				return "invalid_model_result";
+		}
+	}
+
+	String^ AgentCommandReasoning::GetLegacyDecisionName(AgentReasoningDecision value) {
+		switch (value) {
+			case AgentReasoningDecision::NormalChat:
+				return "normal_chat";
+			case AgentReasoningDecision::BuiltInExplain:
+				return "built_in_explain";
+			case AgentReasoningDecision::BuiltInRun:
+				return "built_in_run";
+			case AgentReasoningDecision::NoExactBuiltInFit:
+				return "no_exact_built_in_fit";
+			default:
+				return "invalid_model_result";
+		}
+	}
+
+	String^ AgentCommandReasoning::GetContractFormatName(AgentReasoningContractFormat value) {
+		switch (value) {
+			case AgentReasoningContractFormat::StructuredV1:
+				return "structured_v1";
+			case AgentReasoningContractFormat::LegacyJsonFallback:
+				return "legacy_json_fallback";
+			case AgentReasoningContractFormat::Invalid:
+				return "invalid";
+			default:
+				return "none";
+		}
+	}
+
+	void AgentCommandReasoning::LogRoutingStarted(int turnId, String^ userInput, String^ recentCommandTranscriptJson) {
+		String^ safeUserInput = isNULL(userInput) ? String::Empty : userInput;
+		String^ safeRecentTranscript = isNULL(recentCommandTranscriptJson) ? String::Empty : recentCommandTranscriptJson;
+		AgentLogger::LogEvent(
+			turnId,
+			AgentLogEventType::RoutingStarted,
+			"AgentCommandReasoning",
+			"Routing started for agent request.",
+			String::Concat(
+				"{\"input_length\":", safeUserInput->Length.ToString(Globalization::CultureInfo::InvariantCulture),
+				",\"has_recent_command_transcript\":", String::IsNullOrWhiteSpace(safeRecentTranscript) ? "false" : "true",
+				",\"recent_command_transcript_length\":", safeRecentTranscript->Length.ToString(Globalization::CultureInfo::InvariantCulture),
+				"}"));
+	}
+
+	AgentReasoningResult^ AgentCommandReasoning::LogRoutingResult(int turnId, AgentReasoningResult^ result) {
+		AgentReasoningResult^ safeResult = isNULL(result) ? gcnew AgentReasoningResult() : result;
+		String^ safeCommandName = isNULL(safeResult->CommandName) ? String::Empty : safeResult->CommandName;
+		String^ humanSummary = "Routing decision: " + GetLegacyDecisionName(safeResult->Decision);
+		if (!String::IsNullOrEmpty(safeCommandName))
+			humanSummary += " -> " + safeCommandName;
+		if (!String::IsNullOrEmpty(safeResult->FailureReason))
+			humanSummary += " (" + safeResult->FailureReason + ")";
+
+		AgentLogger::LogEvent(
+			turnId,
+			AgentLogEventType::RoutingResult,
+			"AgentCommandReasoning",
+			humanSummary,
+			String::Concat(
+				"{\"decision\":\"", EscapeJson(GetLegacyDecisionName(safeResult->Decision)),
+				"\",\"contract_decision\":\"", EscapeJson(GetContractDecisionName(safeResult->ContractDecision)),
+				"\",\"command_name\":\"", EscapeJson(safeCommandName),
+				"\",\"contract_format\":\"", EscapeJson(GetContractFormatName(safeResult->ContractFormat)),
+				"\",\"contract_schema\":\"", EscapeJson(isNULL(safeResult->ContractSchema) ? String::Empty : safeResult->ContractSchema),
+				"\",\"failure_reason\":\"", EscapeJson(isNULL(safeResult->FailureReason) ? String::Empty : safeResult->FailureReason),
+				"\",\"reason\":\"", EscapeJson(isNULL(safeResult->Explanation) ? String::Empty : safeResult->Explanation),
+				"\"}"));
+		return safeResult;
+	}
+
+	void AgentCommandReasoning::LogSemanticValidation(
+		int turnId,
+		String^ commandName,
+		bool accepted,
+		String^ validatedCommandLine,
+		String^ rejectionReason,
+		AgentReasoningContractDecision decision) {
+		String^ safeCommandName = isNULL(commandName) ? String::Empty : commandName;
+		String^ safeValidatedCommandLine = isNULL(validatedCommandLine) ? String::Empty : validatedCommandLine;
+		String^ safeRejectionReason = isNULL(rejectionReason) ? String::Empty : rejectionReason;
+		String^ humanSummary = accepted
+			? "Semantic validation accepted: " + safeCommandName
+			: "Semantic validation rejected: " + safeCommandName;
+
+		AgentLogger::LogEvent(
+			turnId,
+			AgentLogEventType::SemanticValidation,
+			"AgentCommandReasoning",
+			humanSummary,
+			String::Concat(
+				"{\"accepted\":", accepted ? "true" : "false",
+				",\"considered_command\":\"", EscapeJson(safeCommandName),
+				"\",\"validated_command_line\":\"", EscapeJson(safeValidatedCommandLine),
+				"\",\"rejection_reason\":\"", EscapeJson(safeRejectionReason),
+				"\",\"decision\":\"", EscapeJson(GetContractDecisionName(decision)),
+				"\"}"));
 	}
 
 	AgentReasoningContractDecision AgentCommandReasoning::ParseDecision(String^ value) {
@@ -381,7 +519,7 @@ namespace GTA {
 		}
 	}
 
-	AgentReasoningResult^ AgentCommandReasoning::ValidateResult(AgentReasoningResult^ result, String^ userInput) {
+	AgentReasoningResult^ AgentCommandReasoning::ValidateResult(int turnId, AgentReasoningResult^ result, String^ userInput) {
 		if isNULL(result) {
 			result = gcnew AgentReasoningResult();
 			result->FailureReason = "No reasoning result was produced.";
@@ -401,18 +539,39 @@ namespace GTA {
 			(result->ContractDecision == AgentReasoningContractDecision::BuiltInRun)) {
 			AgentCommandSpec^ spec = AgentCommandRegistry::Find(result->CommandName);
 			if isNULL(spec) {
+				LogSemanticValidation(
+					turnId,
+					result->CommandName,
+					false,
+					String::Empty,
+					"Classifier returned an unknown command.",
+					result->ContractDecision);
 				result->Decision = AgentReasoningDecision::InvalidModelResult;
 				result->ContractDecision = AgentReasoningContractDecision::InvalidModelResult;
 				result->FailureReason = "Classifier returned an unknown command.";
 				return result;
 			}
 			if ((result->ContractDecision == AgentReasoningContractDecision::BuiltInRun) && !spec->AgentAccessible) {
+				LogSemanticValidation(
+					turnId,
+					result->CommandName,
+					false,
+					String::Empty,
+					"Classifier returned a non-executable command.",
+					result->ContractDecision);
 				result->Decision = AgentReasoningDecision::InvalidModelResult;
 				result->ContractDecision = AgentReasoningContractDecision::InvalidModelResult;
 				result->FailureReason = "Classifier returned a non-executable command.";
 				return result;
 			}
 			if isNULL(result->Arguments) {
+				LogSemanticValidation(
+					turnId,
+					result->CommandName,
+					false,
+					String::Empty,
+					"Classifier returned unreadable arguments.",
+					result->ContractDecision);
 				result->Decision = AgentReasoningDecision::InvalidModelResult;
 				result->ContractDecision = AgentReasoningContractDecision::InvalidModelResult;
 				result->FailureReason = "Classifier returned unreadable arguments.";
@@ -422,6 +581,13 @@ namespace GTA {
 				String^ commandLine;
 				String^ failureReason;
 				if (!AgentCommandSemantics::TryBuildValidatedCommandLine(userInput, result, commandLine, failureReason)) {
+					LogSemanticValidation(
+						turnId,
+						result->CommandName,
+						false,
+						String::Empty,
+						failureReason,
+						result->ContractDecision);
 					result->Decision = AgentReasoningDecision::NoExactBuiltInFit;
 					result->ContractDecision = AgentReasoningContractDecision::NoExactBuiltInFit;
 					result->FailureReason = failureReason;
@@ -429,6 +595,21 @@ namespace GTA {
 					return result;
 				}
 				result->ValidatedCommandLine = commandLine;
+				LogSemanticValidation(
+					turnId,
+					result->CommandName,
+					true,
+					result->ValidatedCommandLine,
+					String::Empty,
+					result->ContractDecision);
+			} else {
+				LogSemanticValidation(
+					turnId,
+					result->CommandName,
+					true,
+					String::Empty,
+					String::Empty,
+					result->ContractDecision);
 			}
 		} else if (!String::IsNullOrEmpty(result->CommandName)) {
 			AgentCommandSpec^ spec = AgentCommandRegistry::Find(result->CommandName);
@@ -444,37 +625,40 @@ namespace GTA {
 		return result;
 	}
 
-	AgentReasoningResult^ AgentCommandReasoning::ClassifyCommandRequest(String^ userInput, String^ recentCommandTranscriptJson) {
+	AgentReasoningResult^ AgentCommandReasoning::ClassifyCommandRequest(int turnId, String^ userInput, String^ recentCommandTranscriptJson) {
 		AgentReasoningResult^ result = gcnew AgentReasoningResult();
 		if (String::IsNullOrWhiteSpace(userInput)) {
 			result->FailureReason = "No user input was provided for classification.";
-			return result;
+			return LogRoutingResult(turnId, result);
 		}
 
+		LogRoutingStarted(turnId, userInput, recentCommandTranscriptJson);
 		String^ request = BuildClassifierRequest(userInput, recentCommandTranscriptJson);
 
 		AgentReasoningContractFormat responseFormat = AgentReasoningContractFormat::StructuredV1;
 		AgentResponse^ response = AgentClient::SendIsolatedStructured(
+			turnId,
+			"routing_classifier_structured_v1",
 			BuildClassifierInstructions(),
 			request,
 			BuildStructuredOutputFormatJson());
 		if (isNotNULL(response) && !String::IsNullOrEmpty(response->Error) && ShouldRetryWithoutStructuredOutput(response->Error)) {
 			responseFormat = AgentReasoningContractFormat::LegacyJsonFallback;
-			response = AgentClient::SendIsolated(BuildLegacyFallbackInstructions(), request);
+			response = AgentClient::SendIsolated(turnId, "routing_classifier_legacy_json_fallback", BuildLegacyFallbackInstructions(), request);
 		}
 		if isNULL(response) {
 			result->FailureReason = "Classifier returned no response.";
-			return result;
+			return LogRoutingResult(turnId, result);
 		}
 		if (!String::IsNullOrEmpty(response->Error)) {
 			result->FailureReason = response->Error;
-			return result;
+			return LogRoutingResult(turnId, result);
 		}
 
 		String^ json = StripJsonFences(response->Text);
 		if (String::IsNullOrEmpty(json)) {
 			result->FailureReason = "Classifier returned no JSON payload.";
-			return result;
+			return LogRoutingResult(turnId, result);
 		}
 
 		try {
@@ -486,12 +670,13 @@ namespace GTA {
 			result->FailureReason = "Classifier response parse failed: " + ex->Message;
 		}
 
-		return ValidateResult(result, userInput);
+		return LogRoutingResult(turnId, ValidateResult(turnId, result, userInput));
 	}
 
 	AgentReasoningWorker::AgentReasoningWorker() {
 		pSyncRoot = gcnew System::Object();
 		bBusy = false;
+		pGeneration = 0;
 		pCompletedResult = nullptr;
 	}
 
@@ -505,16 +690,20 @@ namespace GTA {
 	}
 
 	bool AgentReasoningWorker::Submit(String^ userInput, String^ recentCommandTranscriptJson) {
+		int generation;
 		System::Threading::Monitor::Enter(pSyncRoot);
 		try {
 			if (bBusy) return false;
 			bBusy = true;
 			pCompletedResult = nullptr;
+			generation = pGeneration;
 		} finally {
 			System::Threading::Monitor::Exit(pSyncRoot);
 		}
 
 		AgentReasoningContext^ context = gcnew AgentReasoningContext();
+		context->Generation = generation;
+		context->TurnId = CaptureActiveTurnId();
 		context->UserInput = userInput;
 		context->RecentCommandTranscriptJson = recentCommandTranscriptJson;
 
@@ -527,14 +716,41 @@ namespace GTA {
 
 	void AgentReasoningWorker::WorkerMain(System::Object^ state) {
 		AgentReasoningContext^ context = safe_cast<AgentReasoningContext^>(state);
-		AgentReasoningResult^ result = AgentCommandReasoning::ClassifyCommandRequest(
-			context->UserInput,
-			context->RecentCommandTranscriptJson);
+		AgentReasoningResult^ result = nullptr;
+		try {
+			result = AgentCommandReasoning::ClassifyCommandRequest(
+				context->TurnId,
+				context->UserInput,
+				context->RecentCommandTranscriptJson);
+		} catch (Exception^ ex) {
+			result = gcnew AgentReasoningResult();
+			result->Decision = AgentReasoningDecision::InvalidModelResult;
+			result->ContractDecision = AgentReasoningContractDecision::InvalidModelResult;
+			result->FailureReason = "Agent reasoning worker failed: " + ex->Message;
+		} catch (...) {
+			result = gcnew AgentReasoningResult();
+			result->Decision = AgentReasoningDecision::InvalidModelResult;
+			result->ContractDecision = AgentReasoningContractDecision::InvalidModelResult;
+			result->FailureReason = "Agent reasoning worker failed with a native exception.";
+		}
 
 		System::Threading::Monitor::Enter(pSyncRoot);
 		try {
-			pCompletedResult = result;
+			if (context->Generation == pGeneration) {
+				pCompletedResult = result;
+				bBusy = false;
+			}
+		} finally {
+			System::Threading::Monitor::Exit(pSyncRoot);
+		}
+	}
+
+	void AgentReasoningWorker::AbandonPendingWork() {
+		System::Threading::Monitor::Enter(pSyncRoot);
+		try {
+			pGeneration++;
 			bBusy = false;
+			pCompletedResult = nullptr;
 		} finally {
 			System::Threading::Monitor::Exit(pSyncRoot);
 		}
