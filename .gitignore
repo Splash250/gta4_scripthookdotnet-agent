@@ -10,7 +10,6 @@
 *.sln.docstates
 .superpowers/
 .worktrees/
-worktrees/
 AGENTS.md
 
 # User-specific files (MonoDevelop/Xamarin Studio)
