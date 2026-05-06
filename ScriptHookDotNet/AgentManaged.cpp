@@ -38,6 +38,13 @@ namespace GTA {
 			static initonly AgentRuntime^ Instance = gcnew AgentRuntime();
 		};
 
+		ref class NoOpCallbacks abstract sealed {
+		public:
+			static void Prompt(AgentPromptResult^ result) { UNREFERENCED_PARAMETER(result); }
+			static void BuiltInCommand(BuiltInCommandResult^ result) { UNREFERENCED_PARAMETER(result); }
+			static void BuiltInExecution(BuiltInExecutionResult^ result) { UNREFERENCED_PARAMETER(result); }
+		};
+
 		AgentRuntime^ GetManagedRuntime() {
 			return ManagedRuntimeHolder::Instance;
 		}
@@ -97,6 +104,24 @@ namespace GTA {
 			BuiltInCommandResult^ validatedResult) {
 			if isNotNULL(callback)
 				callback(CreateBuiltInExecutionFailureResult(errorText, validatedResult));
+		}
+
+		AgentPromptCallback^ NormalizePromptCallback(AgentPromptCallback^ callback) {
+			return isNULL(callback)
+				? gcnew AgentPromptCallback(&NoOpCallbacks::Prompt)
+				: callback;
+		}
+
+		BuiltInCommandCallback^ NormalizeBuiltInCommandCallback(BuiltInCommandCallback^ callback) {
+			return isNULL(callback)
+				? gcnew BuiltInCommandCallback(&NoOpCallbacks::BuiltInCommand)
+				: callback;
+		}
+
+		BuiltInExecutionCallback^ NormalizeBuiltInExecutionCallback(BuiltInExecutionCallback^ callback) {
+			return isNULL(callback)
+				? gcnew BuiltInExecutionCallback(&NoOpCallbacks::BuiltInExecution)
+				: callback;
 		}
 
 		AgentPromptResult^ MapPromptResult(AgentRuntimePromptCompletion^ completion) {
@@ -236,8 +261,7 @@ namespace GTA {
 	}
 
 	void Agent::PromptAsync(AgentPromptRequest^ request, AgentPromptCallback^ callback) {
-		if isNULL(callback)
-			throw gcnew ArgumentNullException("callback");
+		callback = NormalizePromptCallback(callback);
 
 		if isNULL(request) {
 			DeliverPromptFailure(callback, "Prompt request is required.");
@@ -266,8 +290,7 @@ namespace GTA {
 	}
 
 	void Agent::ClassifyBuiltInAsync(BuiltInCommandRequest^ request, BuiltInCommandCallback^ callback) {
-		if isNULL(callback)
-			throw gcnew ArgumentNullException("callback");
+		callback = NormalizeBuiltInCommandCallback(callback);
 
 		if isNULL(request) {
 			DeliverBuiltInCommandFailure(callback, "Built-in command request is required.");
@@ -296,8 +319,7 @@ namespace GTA {
 	void Agent::ExecuteBuiltInAsync(
 		BuiltInCommandResult^ validatedResult,
 		BuiltInExecutionCallback^ callback) {
-		if isNULL(callback)
-			throw gcnew ArgumentNullException("callback");
+		callback = NormalizeBuiltInExecutionCallback(callback);
 
 		if isNULL(validatedResult) {
 			DeliverBuiltInExecutionFailure(callback, "Validated built-in result is required.", validatedResult);
