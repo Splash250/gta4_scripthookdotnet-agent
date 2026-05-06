@@ -28,6 +28,7 @@
 #include "AgentCommandReasoning.h"
 #include "AgentCommandRegistry.h"
 #include "AgentCommandSemantics.h"
+#include "AgentLogger.h"
 #include "AgentSettings.h"
 #include "Console.h"
 
@@ -46,6 +47,48 @@ namespace GTA {
 	using namespace System::Windows::Forms;
 
 	namespace {
+
+		String^ EscapeAgentConsoleJson(String^ value) {
+			if (isNULL(value)) return String::Empty;
+
+			System::Text::StringBuilder^ sb = gcnew System::Text::StringBuilder(value->Length + 16);
+			for (int i = 0; i < value->Length; i++) {
+				wchar_t ch = value[i];
+				switch (ch) {
+					case L'\\':
+						sb->Append("\\\\");
+						break;
+					case L'"':
+						sb->Append("\\\"");
+						break;
+					case L'\b':
+						sb->Append("\\b");
+						break;
+					case L'\f':
+						sb->Append("\\f");
+						break;
+					case L'\n':
+						sb->Append("\\n");
+						break;
+					case L'\r':
+						sb->Append("\\r");
+						break;
+					case L'\t':
+						sb->Append("\\t");
+						break;
+					default:
+						if (ch < 0x20) {
+							sb->Append("\\u");
+							sb->Append(((int)ch).ToString("x4", Globalization::CultureInfo::InvariantCulture));
+						} else {
+							sb->Append(ch);
+						}
+						break;
+				}
+			}
+
+			return sb->ToString();
+		}
 
 		bool FailureReasonPointsToDifferentBuiltInIntent(String^ failureReason) {
 			return !String::IsNullOrEmpty(failureReason) && failureReason->Contains(" intent, not ");
@@ -123,6 +166,8 @@ namespace GTA {
 		pPendingCommandLine = String::Empty;
 		pPendingClarificationInput = String::Empty;
 		pPendingReasoningInput = String::Empty;
+		pActiveTurnId = 0;
+		pActiveTurnInput = String::Empty;
 		pInput = String::Empty;
 		pLog = gcnew List<String^>();
 		pLastCommands = gcnew List<String^>();
@@ -401,14 +446,38 @@ namespace GTA {
 		pActiveCommandExecution = nullptr;
 		if isNotNULL(pRecentCommandExecutions) pRecentCommandExecutions->Clear();
 		pPendingReasoningInput = String::Empty;
+		ClearActiveTurn();
 		ClearPendingAction();
 		OnClosed();
+	}
+
+	void AgentConsole::ClearActiveTurn() {
+		pActiveTurnId = 0;
+		pActiveTurnInput = String::Empty;
 	}
 
 	void AgentConsole::ClearPendingAction() {
 		pPendingCommandSpec = nullptr;
 		pPendingCommandLine = String::Empty;
 		pPendingClarificationInput = String::Empty;
+	}
+
+	void AgentConsole::FinishActiveTurn(bool failed, String^ summary) {
+		if (pActiveTurnId > 0)
+			AgentLogger::EndTurn(pActiveTurnId, failed, summary);
+		ClearActiveTurn();
+	}
+
+	void AgentConsole::EmitReplyAndFinishActiveTurn(bool failed, String^ replySummary, String^ jsonPayload, String^ completionSummary) {
+		if (pActiveTurnId > 0) {
+			AgentLogger::LogEvent(
+				pActiveTurnId,
+				AgentLogEventType::ReplyEmitted,
+				"AgentConsole",
+				replySummary,
+				jsonPayload);
+		}
+		FinishActiveTurn(failed, completionSummary);
 	}
 
 	String^ AgentConsole::BuildClarificationRequest(String^ clarificationInput) {
@@ -506,6 +575,11 @@ namespace GTA {
 		Print("(AGENT STATUS) " + completionSummary);
 
 		ClearPendingAction();
+		EmitReplyAndFinishActiveTurn(
+			false,
+			"Built-in command result emitted for: " + commandLine,
+			"{\"mode\":\"built_in_run\",\"command_line\":\"" + EscapeAgentConsoleJson(commandLine) + "\",\"command_name\":\"" + EscapeAgentConsoleJson(spec->Name) + "\",\"result_code\":\"" + EscapeAgentConsoleJson(resultCode) + "\"}",
+			"Reply mode: built_in_run");
 	}
 
 	void AgentConsole::PollWorker() {
@@ -527,13 +601,31 @@ namespace GTA {
 			pPreviousResponseId = response->ResponseId;
 		if (response->Error->Length > 0) {
 			Print("(AGENT ERROR) " + response->Error);
+			EmitReplyAndFinishActiveTurn(
+				true,
+				"Model request failed: " + response->Error,
+				"{\"mode\":\"model_request_failed\",\"error\":\"" + EscapeAgentConsoleJson(response->Error) + "\"}",
+				"Reply mode: model_request_failed");
 			return;
 		}
 		Print("(AGENT REPLY) " + response->Text);
+		EmitReplyAndFinishActiveTurn(
+			false,
+			"Chat reply emitted.",
+			"{\"mode\":\"normal_chat\",\"response_id\":\"" + EscapeAgentConsoleJson(response->ResponseId) + "\"}",
+			"Reply mode: normal_chat");
 	}
 
 	void AgentConsole::HandleReasoningResult(AgentReasoningResult^ result, String^ originalInput) {
-		if isNULL(result) return;
+		if isNULL(result) {
+			Print("(AGENT ERROR) Agent reasoning returned no result.");
+			EmitReplyAndFinishActiveTurn(
+				true,
+				"Reasoning failed because no result was returned.",
+				"{\"mode\":\"reasoning_failed\",\"reason\":\"no_result\"}",
+				"Reply mode: reasoning_failed");
+			return;
+		}
 
 		if (result->Decision == AgentReasoningDecision::BuiltInExplain) {
 			AgentCommandSpec^ spec = AgentCommandRegistry::Find(result->CommandName);
@@ -543,6 +635,19 @@ namespace GTA {
 				String^ semanticNotes = AgentCommandSemantics::GetSemanticNotes(spec->Name);
 				if (!String::IsNullOrEmpty(semanticNotes))
 					Print("(AGENT REPLY) Notes: " + semanticNotes);
+				EmitReplyAndFinishActiveTurn(
+					false,
+					"Built-in help emitted for: " + spec->Name,
+					"{\"mode\":\"built_in_explain\",\"command_name\":\"" + EscapeAgentConsoleJson(spec->Name) + "\"}",
+					"Reply mode: built_in_explain");
+			}
+			else {
+				Print("(AGENT ERROR) Reasoning asked for help on an unknown built-in command.");
+				EmitReplyAndFinishActiveTurn(
+					true,
+					"Reasoning produced an unknown built-in help target.",
+					"{\"mode\":\"reasoning_failed\",\"reason\":\"unknown_built_in_explain_target\"}",
+					"Reply mode: reasoning_failed");
 			}
 			return;
 		}
@@ -552,6 +657,11 @@ namespace GTA {
 			if (isNULL(spec) || String::IsNullOrEmpty(result->ValidatedCommandLine)) {
 				Print("(AGENT ERROR) Reasoning did not produce a valid built-in command.");
 				Print("(AGENT STATUS) If you want, I can help design a script for GAME_ROOT/scripts and then reload scripts so it applies.");
+				EmitReplyAndFinishActiveTurn(
+					true,
+					"Reasoning failed to produce a valid built-in command.",
+					"{\"mode\":\"reasoning_failed\",\"reason\":\"invalid_built_in_command\"}",
+					"Reply mode: reasoning_failed");
 				return;
 			}
 
@@ -562,6 +672,14 @@ namespace GTA {
 			if (spec->RequiresConfirmation) {
 				pPendingCommandSpec = spec;
 				pPendingCommandLine = result->ValidatedCommandLine;
+				if (pActiveTurnId > 0) {
+					AgentLogger::LogEvent(
+						pActiveTurnId,
+						AgentLogEventType::ConfirmationRequested,
+						"AgentConsole",
+						"Confirmation requested for built-in command: " + pPendingCommandLine,
+						"{\"command_line\":\"" + EscapeAgentConsoleJson(pPendingCommandLine) + "\",\"command_name\":\"" + EscapeAgentConsoleJson(spec->Name) + "\"}");
+				}
 				Print("(AGENT STATUS) Reply yes/confirm or no/cancel.");
 				return;
 			}
@@ -579,24 +697,48 @@ namespace GTA {
 				Print("(AGENT STATUS) " + result->FailureReason);
 			if (needsClarification) {
 				pPendingClarificationInput = String::IsNullOrWhiteSpace(originalInput) ? String::Empty : originalInput->Trim();
+				if (pActiveTurnId > 0) {
+					AgentLogger::LogEvent(
+						pActiveTurnId,
+						AgentLogEventType::ClarificationRequested,
+						"AgentConsole",
+						"Clarification requested for current turn.",
+						"{\"input\":\"" + EscapeAgentConsoleJson(pActiveTurnInput) + "\",\"failure_reason\":\"" + EscapeAgentConsoleJson(result->FailureReason) + "\"}");
+				}
 				Print("(AGENT STATUS) Clarify the request and ask again so I can classify one exact built-in command.");
 			} else if (FailureReasonPointsToDifferentBuiltInIntent(result->FailureReason)) {
 				Print("(AGENT STATUS) The considered built-in command was not the right exact fit for that request.");
 			} else {
 				Print("(AGENT STATUS) No exact built-in ScriptHookDotNet command can satisfy that request.");
 			}
-			if (!needsClarification)
+			if (!needsClarification) {
 				Print("(AGENT STATUS) If you want, I can help design a script for GAME_ROOT/scripts and then reload scripts so it applies.");
+				EmitReplyAndFinishActiveTurn(
+					false,
+					"No exact built-in command reply emitted.",
+					"{\"mode\":\"no_exact_built_in_fit\",\"failure_reason\":\"" + EscapeAgentConsoleJson(result->FailureReason) + "\"}",
+					"Reply mode: no_exact_built_in_fit");
+			}
 			return;
 		}
 
 		if (result->Decision == AgentReasoningDecision::NormalChat) {
 			if (String::IsNullOrWhiteSpace(originalInput)) {
 				Print("(AGENT ERROR) Chat routing did not preserve the original request.");
+				EmitReplyAndFinishActiveTurn(
+					true,
+					"Chat routing lost the original request.",
+					"{\"mode\":\"reasoning_failed\",\"reason\":\"missing_original_input\"}",
+					"Reply mode: reasoning_failed");
 				return;
 			}
 			if (pWorker->IsBusy) {
 				Print("(AGENT STATUS) Agent is busy. Wait for the current reply.");
+				EmitReplyAndFinishActiveTurn(
+					false,
+					"Agent was busy before chat submission.",
+					"{\"mode\":\"busy\",\"phase\":\"normal_chat_submit\"}",
+					"Reply mode: busy");
 				return;
 			}
 			String^ recentTranscriptJson = BuildRecentCommandTranscriptJson();
@@ -605,6 +747,11 @@ namespace GTA {
 			String^ previousResponseId = useConversationChain ? pPreviousResponseId : String::Empty;
 			if (!pWorker->Submit(requestWithContext, previousResponseId, useConversationChain)) {
 				Print("(AGENT STATUS) Agent is busy. Wait for the current reply.");
+				EmitReplyAndFinishActiveTurn(
+					false,
+					"Agent rejected chat submission because it was busy.",
+					"{\"mode\":\"busy\",\"phase\":\"normal_chat_submit\"}",
+					"Reply mode: busy");
 				return;
 			}
 			Print("(AGENT STATUS) Thinking...");
@@ -616,6 +763,11 @@ namespace GTA {
 		else
 			Print("(AGENT ERROR) Built-in command reasoning failed.");
 		Print("(AGENT STATUS) If you want, I can help design a script for GAME_ROOT/scripts and then reload scripts so it applies.");
+		EmitReplyAndFinishActiveTurn(
+			true,
+			"Built-in command reasoning failed.",
+			"{\"mode\":\"reasoning_failed\",\"failure_reason\":\"" + EscapeAgentConsoleJson(result->FailureReason) + "\"}",
+			"Reply mode: reasoning_failed");
 	}
 
 	void AgentConsole::SendCommand() {
@@ -630,36 +782,102 @@ namespace GTA {
 		if (isNULL(CommandLine) || (CommandLine->Length == 0)) return;
 		String^ line = CommandLine->Trim();
 		if (line->Length == 0) return;
+		bool hasPendingConfirmation = isNotNULL(pPendingCommandSpec);
+		bool hasPendingClarification = !String::IsNullOrWhiteSpace(pPendingClarificationInput);
+		bool isTurnContinuation = hasPendingConfirmation || hasPendingClarification;
+		bool isExitCommand =
+			line->Equals("exit", StringComparison::InvariantCultureIgnoreCase) ||
+			line->Equals("/exit", StringComparison::InvariantCultureIgnoreCase);
+		bool rejectedActiveTurn = false;
+		int rejectedTurnId = 0;
+
+		if (!isTurnContinuation && !isExitCommand) {
+			if (!String::IsNullOrWhiteSpace(pActiveTurnInput)) {
+				rejectedActiveTurn = true;
+				rejectedTurnId = AgentLogger::BeginTurn(line, "agent_console");
+			}
+			else {
+				pActiveTurnId = AgentLogger::BeginTurn(line, "agent_console");
+				pActiveTurnInput = line;
+			}
+		}
 
 		AddOldCommand(line);
 		Print("> " + line);
 
-		if (line->Equals("exit", StringComparison::InvariantCultureIgnoreCase) ||
-			line->Equals("/exit", StringComparison::InvariantCultureIgnoreCase)) {
+		if (isExitCommand) {
 			NetHook::ExitAgentConsole();
 			return;
 		}
 
-		if isNotNULL(pPendingCommandSpec) {
+		if (rejectedActiveTurn) {
+			Print("(AGENT STATUS) Agent is busy. Wait for the current reply.");
+			if (rejectedTurnId > 0) {
+				AgentLogger::LogEvent(
+					rejectedTurnId,
+					AgentLogEventType::ReplyEmitted,
+					"AgentConsole",
+					"Agent rejected a new prompt because another turn is already active.",
+					"{\"mode\":\"busy\",\"message\":\"another_turn_active\"}");
+				AgentLogger::EndTurn(rejectedTurnId, false, "Reply mode: busy");
+			}
+			return;
+		}
+
+		if (hasPendingConfirmation) {
 			String^ answer = line->ToLowerInvariant();
 			if ((answer == "yes") || (answer == "confirm")) {
+				if (pActiveTurnId > 0) {
+					AgentLogger::LogEvent(
+						pActiveTurnId,
+						AgentLogEventType::ConfirmationReceived,
+						"AgentConsole",
+						"Confirmation received: " + answer,
+						"{\"response\":\"" + EscapeAgentConsoleJson(answer) + "\",\"command_line\":\"" + EscapeAgentConsoleJson(pPendingCommandLine) + "\",\"cancelled\":false}");
+				}
 				ExecuteBuiltInCommand(pPendingCommandLine, pPendingCommandSpec);
 				return;
 			}
 			if ((answer == "no") || (answer == "cancel")) {
+				if (pActiveTurnId > 0) {
+					AgentLogger::LogEvent(
+						pActiveTurnId,
+						AgentLogEventType::ConfirmationReceived,
+						"AgentConsole",
+						"Confirmation cancelled: " + answer,
+						"{\"response\":\"" + EscapeAgentConsoleJson(answer) + "\",\"command_line\":\"" + EscapeAgentConsoleJson(pPendingCommandLine) + "\",\"cancelled\":true}");
+				}
 				Print("(AGENT STATUS) Command cancelled.");
 				ClearPendingAction();
+				EmitReplyAndFinishActiveTurn(
+					false,
+					"Command cancellation reply emitted.",
+					"{\"mode\":\"confirmation_cancelled\",\"response\":\"" + EscapeAgentConsoleJson(answer) + "\"}",
+					"Reply mode: confirmation_cancelled");
 				return;
 			}
 			Print("(AGENT STATUS) Reply yes/confirm or no/cancel.");
 			return;
 		}
 
-		if (!String::IsNullOrWhiteSpace(pPendingClarificationInput)) {
+		if (hasPendingClarification) {
 			String^ answer = line->ToLowerInvariant();
 			if ((answer == "no") || (answer == "cancel")) {
+				if (pActiveTurnId > 0) {
+					AgentLogger::LogEvent(
+						pActiveTurnId,
+						AgentLogEventType::ClarificationReceived,
+						"AgentConsole",
+						"Clarification cancelled: " + answer,
+						"{\"response\":\"" + EscapeAgentConsoleJson(answer) + "\",\"cancelled\":true}");
+				}
 				Print("(AGENT STATUS) Clarification cancelled.");
 				ClearPendingAction();
+				EmitReplyAndFinishActiveTurn(
+					false,
+					"Clarification cancellation reply emitted.",
+					"{\"mode\":\"clarification_cancelled\",\"response\":\"" + EscapeAgentConsoleJson(answer) + "\"}",
+					"Reply mode: clarification_cancelled");
 				return;
 			}
 
@@ -676,6 +894,15 @@ namespace GTA {
 			if (String::IsNullOrWhiteSpace(clarificationRequest)) {
 				Print("(AGENT STATUS) Clarify the request and ask again so I can classify one exact built-in command.");
 				return;
+			}
+
+			if (pActiveTurnId > 0) {
+				AgentLogger::LogEvent(
+					pActiveTurnId,
+					AgentLogEventType::ClarificationReceived,
+					"AgentConsole",
+					"Clarification received for current turn.",
+					"{\"response\":\"" + EscapeAgentConsoleJson(line) + "\",\"request\":\"" + EscapeAgentConsoleJson(clarificationRequest) + "\",\"cancelled\":false}");
 			}
 
 			pPendingReasoningInput = clarificationRequest;
@@ -703,6 +930,19 @@ namespace GTA {
 					Print("(AGENT STATUS) This command exists, but agent mode does not execute it directly.");
 				else if (spec->RequiresConfirmation)
 					Print("(AGENT STATUS) This command requires confirmation before agent mode will run it.");
+				EmitReplyAndFinishActiveTurn(
+					false,
+					"Built-in help emitted for: " + spec->Name,
+					"{\"mode\":\"built_in_explain\",\"command_name\":\"" + EscapeAgentConsoleJson(spec->Name) + "\"}",
+					"Reply mode: built_in_explain");
+			}
+			else {
+				Print("(AGENT ERROR) That is not a supported built-in ScriptHookDotNet command.");
+				EmitReplyAndFinishActiveTurn(
+					false,
+					"Unknown built-in help target rejected.",
+					"{\"mode\":\"built_in_explain_unknown\",\"command_name\":\"" + EscapeAgentConsoleJson(intent->CommandName) + "\"}",
+					"Reply mode: built_in_explain_unknown");
 			}
 			return;
 		}
@@ -711,10 +951,20 @@ namespace GTA {
 			AgentCommandSpec^ spec = AgentCommandRegistry::Find(intent->CommandName);
 			if isNULL(spec) {
 				Print("(AGENT ERROR) That is not a supported built-in ScriptHookDotNet command.");
+				EmitReplyAndFinishActiveTurn(
+					false,
+					"Unsupported built-in command rejected.",
+					"{\"mode\":\"unsupported_built_in\",\"command_name\":\"" + EscapeAgentConsoleJson(intent->CommandName) + "\"}",
+					"Reply mode: unsupported_built_in");
 				return;
 			}
 			if (!spec->AgentAccessible) {
 				Print("(AGENT ERROR) Agent mode is not allowed to run that built-in command.");
+				EmitReplyAndFinishActiveTurn(
+					false,
+					"Built-in command rejected because agent mode cannot execute it.",
+					"{\"mode\":\"agent_access_denied\",\"command_name\":\"" + EscapeAgentConsoleJson(spec->Name) + "\"}",
+					"Reply mode: agent_access_denied");
 				return;
 			}
 
@@ -728,6 +978,11 @@ namespace GTA {
 					Print("(AGENT ERROR) " + directResult->FailureReason);
 				else
 					Print("(AGENT ERROR) Local semantic validation failed for that built-in command.");
+				EmitReplyAndFinishActiveTurn(
+					false,
+					"Local semantic validation rejected a built-in command.",
+					"{\"mode\":\"local_semantic_validation_failed\",\"failure_reason\":\"" + EscapeAgentConsoleJson(directResult->FailureReason) + "\"}",
+					"Reply mode: local_semantic_validation_failed");
 				return;
 			}
 
@@ -735,6 +990,14 @@ namespace GTA {
 			if (spec->RequiresConfirmation) {
 				pPendingCommandSpec = spec;
 				pPendingCommandLine = directResult->ValidatedCommandLine;
+				if (pActiveTurnId > 0) {
+					AgentLogger::LogEvent(
+						pActiveTurnId,
+						AgentLogEventType::ConfirmationRequested,
+						"AgentConsole",
+						"Confirmation requested for built-in command: " + pPendingCommandLine,
+						"{\"command_line\":\"" + EscapeAgentConsoleJson(pPendingCommandLine) + "\",\"command_name\":\"" + EscapeAgentConsoleJson(spec->Name) + "\"}");
+				}
 				Print("(AGENT STATUS) Reply yes/confirm or no/cancel.");
 				return;
 			}
@@ -745,16 +1008,31 @@ namespace GTA {
 
 		if (pReasoningWorker->IsBusy) {
 			Print("(AGENT STATUS) Agent is already evaluating another request.");
+			EmitReplyAndFinishActiveTurn(
+				false,
+				"Agent rejected the prompt because reasoning is already in progress.",
+				"{\"mode\":\"busy\",\"phase\":\"reasoning_start\"}",
+				"Reply mode: busy");
 			return;
 		}
 		if (pWorker->IsBusy) {
 			Print("(AGENT STATUS) Agent is busy. Wait for the current reply.");
+			EmitReplyAndFinishActiveTurn(
+				false,
+				"Agent rejected the prompt because a reply is already in progress.",
+				"{\"mode\":\"busy\",\"phase\":\"reply_in_progress\"}",
+				"Reply mode: busy");
 			return;
 		}
 		pPendingReasoningInput = line;
 		if (!pReasoningWorker->Submit(line, BuildRecentCommandTranscriptJson())) {
 			pPendingReasoningInput = String::Empty;
 			Print("(AGENT STATUS) Agent is already evaluating another request.");
+			EmitReplyAndFinishActiveTurn(
+				false,
+				"Agent rejected the prompt because reasoning submission was busy.",
+				"{\"mode\":\"busy\",\"phase\":\"reasoning_submit\"}",
+				"Reply mode: busy");
 			return;
 		}
 		Print("(AGENT STATUS) Classifying request...");

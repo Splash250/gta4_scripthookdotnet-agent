@@ -163,6 +163,8 @@ namespace GTA {
 		String^ pPendingCommandLine;
 		String^ pPendingClarificationInput;
 		String^ pPendingReasoningInput;
+		int pActiveTurnId;
+		String^ pActiveTurnInput;
 		String^ pInput;
 		Font^ pFont;
 		Drawing::Color pBackColor;
@@ -192,7 +194,10 @@ namespace GTA {
 		int NewestToArrayIndex(int Index);
 		int GetInputLineCount(int screenWidth);
 		System::Collections::Generic::List<String^>^ WrapInputLines(String^ text, int screenWidth, bool includeCaret);
+		void ClearActiveTurn();
 		void ClearPendingAction();
+		void FinishActiveTurn(bool failed, String^ summary);
+		void EmitReplyAndFinishActiveTurn(bool failed, String^ replySummary, String^ jsonPayload, String^ completionSummary);
 		String^ BuildClarificationRequest(String^ clarificationInput);
 		String^ BuildRecentCommandTranscriptJson();
 		String^ BuildModelRequestWithRecentCommandContext(String^ userInput, String^ recentTranscriptJson);
