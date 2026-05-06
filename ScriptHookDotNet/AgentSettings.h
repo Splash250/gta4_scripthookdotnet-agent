@@ -33,6 +33,9 @@ namespace GTA {
 
 		AgentSettings() { }
 		static void EnsureLoaded();
+		static bool HasOption(SettingsFile^ config, String^ category, String^ optionName);
+		static bool EnsureOption(SettingsFile^ config, String^ category, String^ optionName, bool value);
+		static void SeedDefaultConfig(SettingsFile^ config);
 
 	public:
 		static property String^ ConfigPath {

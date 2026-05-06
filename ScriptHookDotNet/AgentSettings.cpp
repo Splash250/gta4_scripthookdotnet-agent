@@ -37,8 +37,31 @@ namespace GTA {
 
 	void AgentSettings::EnsureLoaded() {
 		if isNotNULL(pConfig) return;
-		pConfig = SettingsFile::Open(ConfigPath);
-		pConfig->Load();
+		EnsureConfigFileExists();
+	}
+
+	bool AgentSettings::HasOption(SettingsFile^ config, String^ category, String^ optionName) {
+		array<String^>^ optionNames = config->GetValueNames(category);
+		for each (String^ existingOptionName in optionNames) {
+			if (String::Compare(existingOptionName, optionName, true) == 0)
+				return true;
+		}
+		return false;
+	}
+
+	bool AgentSettings::EnsureOption(SettingsFile^ config, String^ category, String^ optionName, bool value) {
+		if (HasOption(config, category, optionName)) return false;
+		config->SetValue(optionName, category, value);
+		return true;
+	}
+
+	void AgentSettings::SeedDefaultConfig(SettingsFile^ config) {
+		config->Clear();
+		config->SetValue("ApiKey", "OpenAI", String::Empty);
+		config->SetValue("Model", "OpenAI", "gpt-5.5");
+		config->SetValue("SystemPrompt", "OpenAI", "You are a helpful in-game agent.");
+		config->SetValue("EnableAgentLogging", "OpenAI", true);
+		config->SetValue("EnableAgentJsonLogging", "OpenAI", true);
 	}
 
 	SettingsFile^ AgentSettings::Config::get() {
@@ -59,26 +82,30 @@ namespace GTA {
 	}
 
 	bool AgentSettings::EnableAgentLogging::get() {
-		return Config->GetValueBool("EnableAgentLogging", "OpenAI", true);
+		return Config->GetValueBool("EnableAgentLogging", "OpenAI", false);
 	}
 
 	bool AgentSettings::EnableAgentJsonLogging::get() {
-		return Config->GetValueBool("EnableAgentJsonLogging", "OpenAI", true);
+		return Config->GetValueBool("EnableAgentJsonLogging", "OpenAI", false);
 	}
 
 	bool AgentSettings::EnsureConfigFileExists() {
-		if (IO::File::Exists(ConfigPath)) return false;
-
 		SettingsFile^ cfg = SettingsFile::Open(ConfigPath);
-		cfg->Clear();
-		cfg->SetValue("ApiKey", "OpenAI", String::Empty);
-		cfg->SetValue("Model", "OpenAI", "gpt-5.5");
-		cfg->SetValue("SystemPrompt", "OpenAI", "You are a helpful in-game agent.");
-		cfg->SetValue("EnableAgentLogging", "OpenAI", true);
-		cfg->SetValue("EnableAgentJsonLogging", "OpenAI", true);
-		cfg->Save();
+		if (!IO::File::Exists(ConfigPath)) {
+			SeedDefaultConfig(cfg);
+			cfg->Save();
+			pConfig = cfg;
+			return true;
+		}
+
+		cfg->Load();
+		bool changed = false;
+		changed = EnsureOption(cfg, "OpenAI", "EnableAgentLogging", false) || changed;
+		changed = EnsureOption(cfg, "OpenAI", "EnableAgentJsonLogging", false) || changed;
+		if (changed) cfg->Save();
+
 		pConfig = cfg;
-		return true;
+		return false;
 	}
 
 	bool AgentSettings::IsConfigured([System::Runtime::InteropServices::Out] String^% message) {
@@ -103,8 +130,8 @@ namespace GTA {
 	}
 
 	void AgentSettings::Reload() {
-		pConfig = SettingsFile::Open(ConfigPath);
-		pConfig->Load();
+		pConfig = nullptr;
+		EnsureLoaded();
 	}
 
 }
