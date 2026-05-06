@@ -77,11 +77,7 @@ namespace GTA {
 			sb->Append("\"risk\":\"")->Append(spec->Risk.ToString())->Append("\",");
 			sb->Append("\"requires_confirmation\":")->Append(spec->RequiresConfirmation ? "true" : "false")->Append(",");
 			sb->Append("\"argument_schema\":\"")->Append(EscapeJson(AgentCommandSemantics::GetArgumentSchema(spec->Name)))->Append("\",");
-			String^ semanticNotes = AgentCommandSemantics::GetSemanticNotes(spec->Name);
-			if (!String::IsNullOrEmpty(spec->Name) && (spec->Name->Trim()->ToLowerInvariant() == "spawn")) {
-				semanticNotes += " Spawn requires one exact GTA IV model name token such as TURISMO, FUTO, or INFERNUS. The choice must be locally resolvable to a non-zero model hash. Do not use spawn for vague vehicle categories, colors, tuning, or performance adjectives.";
-			}
-			sb->Append("\"semantic_notes\":\"")->Append(EscapeJson(semanticNotes))->Append("\"");
+			sb->Append("\"semantic_notes\":\"")->Append(EscapeJson(AgentCommandSemantics::GetSemanticNotes(spec->Name)))->Append("\"");
 			sb->Append("}");
 		}
 

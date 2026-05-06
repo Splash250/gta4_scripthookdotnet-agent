@@ -197,7 +197,25 @@ namespace GTA {
 			return false;
 		}
 
+		String^ rawModel = result->Arguments["model"];
+		String^ model = isNULL(rawModel) ? String::Empty : rawModel->Trim()->ToUpperInvariant();
+		if (String::IsNullOrEmpty(model) || !Regex::IsMatch(model, "^[A-Z0-9_]+$")) {
+			failureReason = "Spawn model names must be one exact GTA IV model token.";
+			return false;
+		}
+
+		GTA::Model resolvedModel = model;
+		if (resolvedModel.Hash == 0) {
+			failureReason = "Spawn requires an exact GTA IV model token that resolves locally to a non-zero hash.";
+			return false;
+		}
+
 		String^ normalized = Normalize(userInput);
+		String^ normalizedModel = model->ToLowerInvariant();
+		bool hasExactModelEvidence = Regex::IsMatch(
+			normalized,
+			"(^|[^a-z0-9_])" + Regex::Escape(normalizedModel) + "($|[^a-z0-9_])");
+
 		bool mentionsColorOrTuning =
 			normalized->Contains("red") ||
 			normalized->Contains("blue") ||
@@ -233,23 +251,18 @@ namespace GTA {
 			normalized->Contains("some vehicle") ||
 			normalized->Contains("a vehicle") ||
 			normalized->Contains("any vehicle") ||
-			normalized->Contains("police vehicle");
+			normalized->Contains("police vehicle") ||
+			normalized->Contains("helicopter") ||
+			normalized->Contains("cop car") ||
+			normalized->Contains("ferrari");
 
-		if (mentionsColorOrTuning || mentionsPerformanceOrStyle || mentionsGenericCategory) {
-			failureReason = "The built-in spawn command only accepts one exact GTA IV model token; it cannot satisfy vague category, color, tuning, or performance requests exactly.";
-			return false;
-		}
+		if (!hasExactModelEvidence) {
+			if (mentionsColorOrTuning || mentionsPerformanceOrStyle || mentionsGenericCategory) {
+				failureReason = "The built-in spawn command only accepts one exact GTA IV model token; it cannot satisfy vague category, color, tuning, or performance requests exactly.";
+				return false;
+			}
 
-		String^ rawModel = result->Arguments["model"];
-		String^ model = isNULL(rawModel) ? String::Empty : rawModel->Trim()->ToUpperInvariant();
-		if (String::IsNullOrEmpty(model) || !Regex::IsMatch(model, "^[A-Z0-9_]+$")) {
-			failureReason = "Spawn model names must be one exact GTA IV model token.";
-			return false;
-		}
-
-		GTA::Model resolvedModel = model;
-		if (resolvedModel.Hash == 0) {
-			failureReason = "Spawn requires an exact GTA IV model token that resolves locally to a non-zero hash.";
+			failureReason = "Spawn requires the exact GTA IV model token to appear in the user request.";
 			return false;
 		}
 
@@ -406,7 +419,7 @@ namespace GTA {
 		if (name == "abortscripts") return "Stops all loaded .NET scripts. Exact fit for stop or abort all scripts requests, not for pausing or stopping one selected script.";
 		if (name == "flip") return "Flips only the local player's current vehicle upright. Exact fit for overturn or upright-current-vehicle requests only; it does not repair, customize, or affect another vehicle.";
 		if (name == "heal") return "Restores health and armor to full and repairs the current vehicle. Usually silent on success. Cannot remove armor, set an exact numeric health value, or satisfy vehicle-only repair requests exactly.";
-		if (name == "spawn") return "Spawns a ped, vehicle, or object by exact model name only. The runtime resolves that name through the local non-zero GTA::Model hash; it does not support categories, random choices, colors, tuning, or other customization arguments.";
+		if (name == "spawn") return "Spawns a ped, vehicle, or object by exact model name only. The user request must explicitly contain the exact GTA IV model token, and the runtime must resolve that token through the local non-zero GTA::Model hash. It does not support categories, random choices, aliases, colors, tuning, performance adjectives, or other customization arguments.";
 		if (name == "teleport") return "Supports waypoint teleport or explicit coordinates. Usually emits output when reporting a destination or a missing waypoint. Does not infer destinations from vague location descriptions.";
 		if (name == "setdaytime") return "Sets exact in-game time from HH:MM only.";
 		if (name == "settimescale") return "Sets a positive numeric timescale multiplier only.";
