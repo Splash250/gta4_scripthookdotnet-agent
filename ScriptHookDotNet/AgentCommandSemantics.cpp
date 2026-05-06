@@ -232,16 +232,21 @@ namespace GTA {
 			normalized->Contains("tuned") ||
 			normalized->Contains("tuning") ||
 			normalized->Contains("modded");
-		bool mentionsPerformanceOrStyle =
+		bool mentionsUnsupportedPerformance =
 			normalized->Contains("fast") ||
+			normalized->Contains("fastest") ||
 			normalized->Contains("faster") ||
 			normalized->Contains("quick") ||
 			normalized->Contains("drift") ||
-			normalized->Contains("sports car") ||
-			normalized->Contains("sport car") ||
-			normalized->Contains("sportscar") ||
-			normalized->Contains("sports vehicle") ||
 			normalized->Contains("performance");
+		bool mentionsBrandOrAliasRequirement =
+			normalized->Contains("ferrari") ||
+			normalized->Contains("lamborghini") ||
+			normalized->Contains("porsche") ||
+			normalized->Contains("bmw") ||
+			normalized->Contains("mercedes") ||
+			normalized->Contains("audi") ||
+			normalized->Contains("cop car");
 		bool mentionsGenericCategory =
 			normalized->Contains("something") ||
 			normalized->Contains("anything") ||
@@ -253,16 +258,22 @@ namespace GTA {
 			normalized->Contains("any vehicle") ||
 			normalized->Contains("police vehicle") ||
 			normalized->Contains("helicopter") ||
-			normalized->Contains("cop car") ||
-			normalized->Contains("ferrari");
+			normalized->Contains("sports car") ||
+			normalized->Contains("sport car") ||
+			normalized->Contains("sportscar") ||
+			normalized->Contains("sports vehicle");
 
 		if (!hasExactModelEvidence) {
-			if (mentionsColorOrTuning || mentionsPerformanceOrStyle || mentionsGenericCategory) {
+			if (mentionsColorOrTuning || mentionsUnsupportedPerformance || mentionsBrandOrAliasRequirement || mentionsGenericCategory) {
 				failureReason = "The built-in spawn command only accepts one exact GTA IV model token; it cannot satisfy vague category, color, tuning, or performance requests exactly.";
 				return false;
 			}
 
 			failureReason = "Spawn requires the exact GTA IV model token to appear in the user request.";
+			return false;
+		}
+		if (mentionsColorOrTuning || mentionsUnsupportedPerformance || mentionsBrandOrAliasRequirement) {
+			failureReason = "The built-in spawn command only accepts one exact GTA IV model token; it cannot satisfy extra color, tuning, performance, or brand-mapping requirements exactly.";
 			return false;
 		}
 
