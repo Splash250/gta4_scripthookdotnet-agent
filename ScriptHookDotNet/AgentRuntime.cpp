@@ -645,6 +645,14 @@ namespace GTA {
 		}
 	}
 
+	void AgentRuntime::PumpCallbacks() {
+		AgentRuntime^ runtime = AgentRuntimePumpState::ManagedRuntimeInstance;
+		if isNULL(runtime)
+			return;
+
+		runtime->DrainCallbacks(0);
+	}
+
 	int AgentRuntime::DrainCallbacks(int maxCallbacks) {
 		if (maxCallbacks <= 0)
 			maxCallbacks = Int32::MaxValue;
@@ -695,14 +703,6 @@ namespace GTA {
 		}
 
 		return drained;
-	}
-
-	int PumpManagedAgentRuntimeCallbacks(int maxCallbacks) {
-		AgentRuntime^ runtime = AgentRuntimePumpState::ManagedRuntimeInstance;
-		if isNULL(runtime)
-			return 0;
-
-		return runtime->DrainCallbacks(maxCallbacks);
 	}
 
 }

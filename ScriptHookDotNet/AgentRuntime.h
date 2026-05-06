@@ -278,6 +278,7 @@ namespace GTA {
 		bool SubmitValidatedBuiltInExecution(
 			AgentRuntimeValidatedBuiltInExecutionRequest^ request,
 			AgentRuntimeValidatedBuiltInExecutionCompletedCallback^ callback);
+		static void PumpCallbacks();
 		void AbandonPromptWork();
 		void AbandonBuiltInClassificationWork();
 		void AbandonValidatedBuiltInExecutionWork();

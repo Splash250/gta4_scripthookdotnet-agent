@@ -39,8 +39,6 @@
 
 namespace GTA{
 
-	int PumpManagedAgentRuntimeCallbacks(int maxCallbacks);
-
 	Script::Script(){
 		BlockWait = true;
 		bWaiting = false;
@@ -423,7 +421,7 @@ namespace GTA{
 	}
 
 	void Script::PumpAgentRuntimeCallbacks() {
-		PumpManagedAgentRuntimeCallbacks(0);
+		AgentRuntime::PumpCallbacks();
 	}
 
 	void Script::DoTick(){
