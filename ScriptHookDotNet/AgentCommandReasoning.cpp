@@ -97,6 +97,12 @@ namespace GTA {
 			"Allowed decision values: normal_chat, built_in_explain, built_in_run, no_exact_built_in_fit." "\n"
 			"Do not emit a raw command line. Put only structured string arguments in the arguments object." "\n"
 			"For spawn, built_in_run requires arguments with exactly one key named model whose value is one exact GTA IV model token." "\n"
+			"reloadscripts means reload all scripts from disk and start them again, for exact all-scripts phrasing such as reload scripts, reload all scripts, or please reload scripts." "\n"
+			"startscripts means start all scripts again after they were stopped, or resume all scripts, for exact all-scripts phrasing such as start scripts again or please resume scripts." "\n"
+			"abortscripts means stop or abort all scripts immediately, for exact all-scripts phrasing such as stop all scripts or abort the scripts." "\n"
+			"These three commands are all-scripts-only. Do not map subset or selective requests like reload these scripts, start this script again, resume these scripts, pause one script, or disable one script into them." "\n"
+			"Do not map wrong-scope requests like stop the game or stop the mod into abortscripts." "\n"
+			"Do not collapse reload one script, refresh one script, restart one script, or edit this script file into reloadscripts, startscripts, or abortscripts." "\n"
 			"If uncertain, return no_exact_built_in_fit.";
 	}
 

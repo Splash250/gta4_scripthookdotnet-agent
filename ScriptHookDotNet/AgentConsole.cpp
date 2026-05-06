@@ -45,6 +45,73 @@ namespace GTA {
 	using namespace System::Collections::Generic;
 	using namespace System::Windows::Forms;
 
+	namespace {
+
+		bool FailureReasonPointsToDifferentBuiltInIntent(String^ failureReason) {
+			return !String::IsNullOrEmpty(failureReason) && failureReason->Contains(" intent, not ");
+		}
+
+		AgentReasoningResult^ BuildDirectBuiltInReasoningResult(AgentIntent^ intent) {
+			AgentReasoningResult^ result = gcnew AgentReasoningResult();
+			if (isNULL(intent)) {
+				result->FailureReason = "No built-in intent was available for local semantic validation.";
+				return result;
+			}
+
+			result->Decision = AgentReasoningDecision::BuiltInRun;
+			result->CommandName = isNULL(intent->CommandName) ? String::Empty : intent->CommandName;
+
+			String^ commandLine = isNULL(intent->CommandLine) ? String::Empty : intent->CommandLine->Trim();
+			array<String^>^ parts = commandLine->Split(gcnew array<wchar_t>{' '}, 2, StringSplitOptions::RemoveEmptyEntries);
+			String^ tail = (parts->Length > 1) ? parts[1]->Trim() : String::Empty;
+			String^ commandName = result->CommandName->Trim()->ToLowerInvariant();
+			String^ argumentSchema = AgentCommandSemantics::GetArgumentSchema(commandName);
+
+			// Exact literal entry of a no-argument built-in command is an explicit manual command path.
+			if (String::IsNullOrEmpty(tail) && (argumentSchema == "none")) {
+				result->ValidatedCommandLine = commandName;
+				return result;
+			}
+
+			if (!String::IsNullOrEmpty(tail)) {
+				if (commandName == "spawn") {
+					result->Arguments["model"] = tail;
+				} else if (commandName == "teleport") {
+					String^ lowerTail = tail->ToLowerInvariant();
+					if ((lowerTail == "wp") || (lowerTail == "waypoint")) {
+						result->Arguments["mode"] = "waypoint";
+					} else {
+						array<String^>^ coordParts = tail->Split(gcnew array<wchar_t>{' '}, StringSplitOptions::RemoveEmptyEntries);
+						result->Arguments["mode"] = "coords";
+						if (coordParts->Length > 0) result->Arguments["x"] = coordParts[0];
+						if (coordParts->Length > 1) result->Arguments["y"] = coordParts[1];
+						if (coordParts->Length > 2) result->Arguments["z"] = coordParts[2];
+						if (coordParts->Length > 3) result->Arguments["heading"] = coordParts[3];
+					}
+				} else if (commandName == "setdaytime") {
+					result->Arguments["time"] = tail;
+				} else if (commandName == "settimescale") {
+					result->Arguments["value"] = tail;
+				} else {
+					result->Arguments["raw"] = tail;
+				}
+			}
+
+			String^ validatedCommandLine;
+			String^ failureReason;
+			if (!AgentCommandSemantics::TryBuildValidatedCommandLine(intent->OriginalInput, result, validatedCommandLine, failureReason)) {
+				result->Decision = AgentReasoningDecision::NoExactBuiltInFit;
+				result->ValidatedCommandLine = String::Empty;
+				result->FailureReason = failureReason;
+				return result;
+			}
+
+			result->ValidatedCommandLine = validatedCommandLine;
+			return result;
+		}
+
+	}
+
 	AgentConsole::AgentConsole() {
 		bActive = false;
 		pPreviousResponseId = String::Empty;
@@ -472,6 +539,9 @@ namespace GTA {
 			if isNotNULL(spec) {
 				Print("(AGENT REPLY) " + spec->Name + ": " + spec->Description);
 				Print("(AGENT REPLY) Usage: " + spec->Usage);
+				String^ semanticNotes = AgentCommandSemantics::GetSemanticNotes(spec->Name);
+				if (!String::IsNullOrEmpty(semanticNotes))
+					Print("(AGENT REPLY) Notes: " + semanticNotes);
 			}
 			return;
 		}
@@ -500,8 +570,13 @@ namespace GTA {
 		}
 
 		if (result->Decision == AgentReasoningDecision::NoExactBuiltInFit) {
+			AgentCommandSpec^ consideredSpec = AgentCommandRegistry::Find(result->CommandName);
+			if (isNotNULL(consideredSpec))
+				Print("(AGENT STATUS) Considered built-in command: " + consideredSpec->Name);
 			if (!String::IsNullOrEmpty(result->FailureReason))
 				Print("(AGENT STATUS) " + result->FailureReason);
+			if (FailureReasonPointsToDifferentBuiltInIntent(result->FailureReason))
+				Print("(AGENT STATUS) The considered built-in command was not the right exact fit for that request.");
 			else
 				Print("(AGENT STATUS) No exact built-in ScriptHookDotNet command can satisfy that request.");
 			Print("(AGENT STATUS) If you want, I can help design a script for GAME_ROOT/scripts and then reload scripts so it applies.");
@@ -564,6 +639,9 @@ namespace GTA {
 			if isNotNULL(spec) {
 				Print("(AGENT REPLY) " + spec->Name + ": " + spec->Description);
 				Print("(AGENT REPLY) Usage: " + spec->Usage);
+				String^ semanticNotes = AgentCommandSemantics::GetSemanticNotes(spec->Name);
+				if (!String::IsNullOrEmpty(semanticNotes))
+					Print("(AGENT REPLY) Notes: " + semanticNotes);
 				if (!spec->AgentAccessible)
 					Print("(AGENT STATUS) This command exists, but agent mode does not execute it directly.");
 				else if (spec->RequiresConfirmation)
@@ -583,15 +661,28 @@ namespace GTA {
 				return;
 			}
 
-			Print("(AGENT STATUS) Interpreted request as command: " + intent->CommandLine);
+			AgentReasoningResult^ directResult = BuildDirectBuiltInReasoningResult(intent);
+			if (directResult->Decision == AgentReasoningDecision::NoExactBuiltInFit) {
+				HandleReasoningResult(directResult);
+				return;
+			}
+			if (String::IsNullOrEmpty(directResult->ValidatedCommandLine)) {
+				if (!String::IsNullOrEmpty(directResult->FailureReason))
+					Print("(AGENT ERROR) " + directResult->FailureReason);
+				else
+					Print("(AGENT ERROR) Local semantic validation failed for that built-in command.");
+				return;
+			}
+
+			Print("(AGENT STATUS) Interpreted request as command: " + directResult->ValidatedCommandLine);
 			if (spec->RequiresConfirmation) {
 				pPendingCommandSpec = spec;
-				pPendingCommandLine = intent->CommandLine;
+				pPendingCommandLine = directResult->ValidatedCommandLine;
 				Print("(AGENT STATUS) Reply yes/confirm or no/cancel.");
 				return;
 			}
 
-			ExecuteBuiltInCommand(intent->CommandLine, spec);
+			ExecuteBuiltInCommand(directResult->ValidatedCommandLine, spec);
 			return;
 		}
 

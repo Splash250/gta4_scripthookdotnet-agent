@@ -35,6 +35,98 @@ namespace GTA {
 
 	namespace {
 
+		bool ContainsNormalizedPhrase(String^ normalized, String^ phrase) {
+			if (String::IsNullOrWhiteSpace(normalized) || String::IsNullOrWhiteSpace(phrase)) return false;
+
+			array<String^>^ tokens = Regex::Split(phrase->Trim()->ToLowerInvariant(), "\\s+");
+			List<String^>^ escapedTokens = gcnew List<String^>();
+			for each (String^ token in tokens) {
+				if (!String::IsNullOrWhiteSpace(token))
+					escapedTokens->Add(Regex::Escape(token));
+			}
+			if (escapedTokens->Count == 0) return false;
+
+			String^ pattern = "\\b" + String::Join("\\s+", escapedTokens->ToArray()) + "\\b";
+			return Regex::IsMatch(normalized, pattern);
+		}
+
+		bool ContainsAnyNormalizedPhrase(String^ normalized, array<String^>^ phrases) {
+			if (String::IsNullOrWhiteSpace(normalized) || isNULL(phrases)) return false;
+			for each (String^ phrase in phrases) {
+				if (ContainsNormalizedPhrase(normalized, phrase))
+					return true;
+			}
+			return false;
+		}
+
+		bool MentionsSelectiveSingleScriptRequest(String^ normalized) {
+			if (String::IsNullOrWhiteSpace(normalized)) return false;
+			return
+				Regex::IsMatch(normalized, "\\b(?:this|that|one|single) script\\b") ||
+				Regex::IsMatch(normalized, "\\b(?:just|only) this script\\b") ||
+				Regex::IsMatch(normalized, "\\b(?:just|only) one script\\b");
+		}
+
+		bool MentionsSelectiveScriptSubsetRequest(String^ normalized) {
+			if (MentionsSelectiveSingleScriptRequest(normalized)) return true;
+			if (String::IsNullOrWhiteSpace(normalized)) return false;
+
+			String^ selectiveQualifierBeforeScriptsPattern =
+				"\\b(?:these|those|some|several|a\\s+few|few|selected|specific|broken|certain|particular|individual)\\s+scripts\\b";
+			String^ selectiveQualifierWithArticleBeforeScriptsPattern =
+				"\\b(?:the\\s+)?(?:selected|specific|broken|certain|particular|individual)\\s+scripts\\b";
+			String^ exclusionCueAfterScriptsPattern =
+				"\\bscripts\\b.*\\b(?:except|excluding|without|minus)\\b";
+			String^ exclusionPhraseAfterScriptsPattern =
+				"\\bscripts\\b.*\\b(?:but\\s+not|other\\s+than|apart\\s+from)\\b";
+
+			return
+				Regex::IsMatch(normalized, selectiveQualifierBeforeScriptsPattern) ||
+				Regex::IsMatch(normalized, selectiveQualifierWithArticleBeforeScriptsPattern) ||
+				Regex::IsMatch(normalized, exclusionCueAfterScriptsPattern) ||
+				Regex::IsMatch(normalized, exclusionPhraseAfterScriptsPattern);
+		}
+
+		bool MentionsFileEditIntent(String^ normalized) {
+			return ContainsAnyNormalizedPhrase(
+				normalized,
+				gcnew array<String^>{
+					"write",
+					"modify",
+					"change file",
+					"edit file",
+					"rewrite"
+				});
+		}
+
+		bool MentionsScripts(String^ normalized) {
+			if (String::IsNullOrWhiteSpace(normalized)) return false;
+			return Regex::IsMatch(normalized, "\\bscripts?\\b");
+		}
+
+		bool MatchesExactAllScriptsReloadIntent(String^ normalized) {
+			if (String::IsNullOrWhiteSpace(normalized)) return false;
+			String^ allScriptsPhrase = "(?:scripts|the scripts|all scripts|all the scripts)";
+			String^ benignSuffix = "(?: (?:now|please|immediately))*";
+			return Regex::IsMatch(normalized, "^(?:please )?(?:reload|refresh|restart) " + allScriptsPhrase + benignSuffix + "$");
+		}
+
+		bool MatchesExactAllScriptsStartIntent(String^ normalized) {
+			if (String::IsNullOrWhiteSpace(normalized)) return false;
+			String^ allScriptsPhrase = "(?:scripts|the scripts|all scripts|all the scripts)";
+			String^ benignSuffix = "(?: (?:now|please|immediately))*";
+			return
+				Regex::IsMatch(normalized, "^(?:please )?start " + allScriptsPhrase + " again" + benignSuffix + "$") ||
+				Regex::IsMatch(normalized, "^(?:please )?resume " + allScriptsPhrase + benignSuffix + "$");
+		}
+
+		bool MatchesExactAllScriptsAbortIntent(String^ normalized) {
+			if (String::IsNullOrWhiteSpace(normalized)) return false;
+			String^ allScriptsPhrase = "(?:scripts|the scripts|all scripts|all the scripts)";
+			String^ benignSuffix = "(?: (?:now|please|immediately))*";
+			return Regex::IsMatch(normalized, "^(?:please )?(?:abort|stop) " + allScriptsPhrase + benignSuffix + "$");
+		}
+
 		bool IsCommonSpawnNonModelToken(String^ token) {
 			if (String::IsNullOrWhiteSpace(token)) return true;
 			String^ normalized = token->Trim()->ToLowerInvariant();
@@ -476,26 +568,104 @@ namespace GTA {
 
 	bool AgentCommandSemantics::ValidateReloadScripts(String^ userInput, AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
 		commandLine = String::Empty;
-		(void)userInput;
-		(void)result;
-		failureReason = "reloadscripts semantic validator is declared but not enabled in this phase step.";
-		return false;
+		if (!ValidateNoArgumentCommand(result, failureReason)) return false;
+
+		String^ normalized = Normalize(userInput);
+
+		if (MentionsSelectiveScriptSubsetRequest(normalized)) {
+			failureReason = "The built-in reloadscripts command only reloads all scripts; it cannot reload one selected script or a selected subset of scripts.";
+			return false;
+		}
+		if (MentionsFileEditIntent(normalized)) {
+			failureReason = "The built-in reloadscripts command reloads all scripts from disk; it does not write or modify script files.";
+			return false;
+		}
+		if (!MatchesExactAllScriptsReloadIntent(normalized)) {
+			failureReason = "The built-in reloadscripts command is only an exact fit for requests to reload, refresh, or restart all scripts.";
+			return false;
+		}
+
+		commandLine = "reloadscripts";
+		return true;
 	}
 
 	bool AgentCommandSemantics::ValidateStartScripts(String^ userInput, AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
 		commandLine = String::Empty;
-		(void)userInput;
-		(void)result;
-		failureReason = "startscripts semantic validator is declared but not enabled in this phase step.";
-		return false;
+		if (!ValidateNoArgumentCommand(result, failureReason)) return false;
+
+		String^ normalized = Normalize(userInput);
+
+		if (MatchesExactAllScriptsReloadIntent(normalized) || Regex::IsMatch(normalized, "\\b(?:reload|refresh|restart)\\b")) {
+			failureReason = "Requests to reload, refresh, or restart scripts are a reloadscripts intent, not startscripts.";
+			return false;
+		}
+		if (MentionsFileEditIntent(normalized)) {
+			failureReason = "The built-in startscripts command starts scripts again after an abort; it does not edit script files.";
+			return false;
+		}
+		if (MentionsSelectiveScriptSubsetRequest(normalized)) {
+			failureReason = "The built-in startscripts command only starts all scripts again; it cannot start one selected script or a selected subset of scripts.";
+			return false;
+		}
+		if (!MatchesExactAllScriptsStartIntent(normalized)) {
+			failureReason = "The built-in startscripts command is only an exact fit for starting scripts again after they were stopped or for resuming scripts.";
+			return false;
+		}
+
+		commandLine = "startscripts";
+		return true;
 	}
 
 	bool AgentCommandSemantics::ValidateAbortScripts(String^ userInput, AgentReasoningResult^ result, [System::Runtime::InteropServices::Out] String^% commandLine, [System::Runtime::InteropServices::Out] String^% failureReason) {
 		commandLine = String::Empty;
-		(void)userInput;
-		(void)result;
-		failureReason = "abortscripts semantic validator is declared but not enabled in this phase step.";
-		return false;
+		if (!ValidateNoArgumentCommand(result, failureReason)) return false;
+
+		String^ normalized = Normalize(userInput);
+		bool mentionsPauseOrDisableSingleScript =
+			ContainsAnyNormalizedPhrase(
+				normalized,
+				gcnew array<String^>{
+					"pause this one script",
+					"disable just the broken script",
+					"pause one script",
+					"disable one script"
+				}) ||
+			(MentionsSelectiveSingleScriptRequest(normalized) &&
+				(Regex::IsMatch(normalized, "\\bpause\\b") || Regex::IsMatch(normalized, "\\bdisable\\b") || Regex::IsMatch(normalized, "\\bstop\\b") || Regex::IsMatch(normalized, "\\babort\\b")));
+		bool mentionsSelectiveScriptSubset =
+			MentionsSelectiveScriptSubsetRequest(normalized) &&
+			(Regex::IsMatch(normalized, "\\bstop\\b") || Regex::IsMatch(normalized, "\\babort\\b"));
+		bool mentionsStopGameOrMod =
+			ContainsAnyNormalizedPhrase(
+				normalized,
+				gcnew array<String^>{
+					"stop the game",
+					"stop game",
+					"stop the mod",
+					"stop mod",
+					"stop the game entirely",
+					"stop the mod entirely"
+				});
+
+		if (mentionsPauseOrDisableSingleScript) {
+			failureReason = "The built-in abortscripts command stops all scripts immediately; it cannot pause or disable one selected script.";
+			return false;
+		}
+		if (mentionsSelectiveScriptSubset) {
+			failureReason = "The built-in abortscripts command only stops all scripts; it cannot stop or abort a selected subset of scripts.";
+			return false;
+		}
+		if (mentionsStopGameOrMod) {
+			failureReason = "The built-in abortscripts command only stops all scripts; it does not stop the game or the mod entirely.";
+			return false;
+		}
+		if (!MatchesExactAllScriptsAbortIntent(normalized)) {
+			failureReason = "The built-in abortscripts command is only an exact fit for requests to stop or abort all scripts.";
+			return false;
+		}
+
+		commandLine = "abortscripts";
+		return true;
 	}
 
 	String^ AgentCommandSemantics::GetArgumentSchema(String^ commandName) {
@@ -515,18 +685,18 @@ namespace GTA {
 	String^ AgentCommandSemantics::GetSemanticNotes(String^ commandName) {
 		if (String::IsNullOrEmpty(commandName)) return String::Empty;
 		String^ name = commandName->Trim()->ToLowerInvariant();
-		if (name == "abortscripts") return "Stops all loaded .NET scripts. Exact fit for stop or abort all scripts requests, not for pausing or stopping one selected script.";
+		if (name == "abortscripts") return "Stops all loaded .NET scripts immediately. Exact fit for stop or abort all scripts requests only; it does not pause one script, disable one broken script, or stop the game or mod entirely.";
 		if (name == "flip") return "Flips only the local player's current vehicle upright. Exact fit for overturn or upright-current-vehicle requests only; it does not repair, customize, or affect another vehicle.";
 		if (name == "heal") return "Restores health and armor to full and repairs the current vehicle. Usually silent on success. Cannot remove armor, set an exact numeric health value, or satisfy vehicle-only repair requests exactly.";
 		if (name == "spawn") return "Spawns by one exact model token only. The user request must explicitly contain that exact GTA IV model token, and the local validator only accepts tokens it can recognize as ped or vehicle-type GTA::Model values through local hash-plus-type predicates before the normal runtime spawn path. This is intentionally stricter than broad object spawning. It does not support categories, random choices, aliases, colors, tuning, performance adjectives, or other customization arguments.";
 		if (name == "teleport") return "Supports waypoint teleport or explicit coordinates. Usually emits output when reporting a destination or a missing waypoint. Does not infer destinations from vague location descriptions.";
 		if (name == "setdaytime") return "Sets exact in-game time from HH:MM only.";
 		if (name == "settimescale") return "Sets a positive numeric timescale multiplier only.";
-		if (name == "reloadscripts") return "Reloads all .NET scripts from disk. Exact fit for reload-all-scripts requests only; it does not reload one selected script or edit script contents.";
+		if (name == "reloadscripts") return "Reloads all .NET scripts from disk and starts them again. Exact fit for reload, refresh, or restart all scripts requests only; it does not reload one selected script or edit script contents.";
 		if (name == "scripthelp") return "Displays script-provided console commands and normally emits a help listing.";
 		if (name == "showplayers") return "Lists players in the current game and normally emits player names or identifiers.";
 		if (name == "showposition") return "Shows current player position and heading. Exact fit for position queries and normally emits coordinates.";
-		if (name == "startscripts") return "Starts or resumes all .NET scripts after an earlier abort. Exact fit for start scripts or resume scripts requests; it does not reload scripts from disk or edit script contents.";
+		if (name == "startscripts") return "Starts scripts again after they were stopped, or resumes them after an earlier abort. Exact fit for start scripts again or resume scripts requests only; reload, refresh, and restart scripts are reloadscripts intents instead.";
 		return String::Empty;
 	}
 
@@ -575,6 +745,12 @@ namespace GTA {
 			return ValidateSetDaytime(result, commandLine, failureReason);
 		if (name == "settimescale")
 			return ValidateSetTimescale(result, commandLine, failureReason);
+		if (name == "reloadscripts")
+			return ValidateReloadScripts(userInput, result, commandLine, failureReason);
+		if (name == "startscripts")
+			return ValidateStartScripts(userInput, result, commandLine, failureReason);
+		if (name == "abortscripts")
+			return ValidateAbortScripts(userInput, result, commandLine, failureReason);
 
 		if (!ValidateNoArgumentCommand(result, failureReason))
 			return false;
