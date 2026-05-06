@@ -558,9 +558,18 @@ namespace GTA {
 		if (String::IsNullOrEmpty(commandLine) || isNULL(spec)) return;
 
 		AgentCommandExecution^ execution = gcnew AgentCommandExecution(commandLine, spec->Name);
+		execution->TurnId = pActiveTurnId;
 		pActiveCommandExecution = execution;
 
 		try {
+			if (execution->TurnId > 0) {
+				AgentLogger::LogEvent(
+					execution->TurnId,
+					AgentLogEventType::CommandStarted,
+					"AgentConsole",
+					"Running command: " + commandLine,
+					"{\"command_name\":\"" + EscapeAgentConsoleJson(spec->Name) + "\",\"command_line\":\"" + EscapeAgentConsoleJson(commandLine) + "\"}");
+			}
 			Print("(AGENT STATUS) Running command: " + commandLine);
 			Print("(AGENT STATUS) Mirroring built-in command output below when available.");
 			NetHook::BeginAgentCommandCapture(this, execution);
@@ -609,12 +618,22 @@ namespace GTA {
 		}
 		catch (Exception^ ex) {
 			pActiveCommandExecution = nullptr;
+			if (!execution->CompletionLogged) {
+				execution->SetCompletionResult(
+					"exception",
+					"Command execution failed: " + (isNULL(ex) ? "Unknown exception." : ex->Message));
+				RememberCommandExecution(execution);
+			}
 			ClearPendingAction();
 			FailActiveTurnFromException("built_in_run", ex);
 			throw;
 		}
 		catch (...) {
 			pActiveCommandExecution = nullptr;
+			if (!execution->CompletionLogged) {
+				execution->SetCompletionResult("native_exception", "Command execution failed with a native exception.");
+				RememberCommandExecution(execution);
+			}
 			ClearPendingAction();
 			EmitReplyAndFinishActiveTurn(
 				true,

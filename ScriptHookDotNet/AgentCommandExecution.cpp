@@ -23,6 +23,7 @@
 #include "stdafx.h"
 
 #include "AgentCommandExecution.h"
+#include "AgentLogger.h"
 
 #pragma managed
 
@@ -63,9 +64,12 @@ namespace GTA {
 	AgentCommandExecution::AgentCommandExecution(String^ commandLine, String^ commandName) {
 		CommandLine = isNULL(commandLine) ? String::Empty : commandLine;
 		CommandName = isNULL(commandName) ? String::Empty : commandName;
+		TurnId = 0;
 		StartedAt = DateTime::Now;
 		CompletedAt = DateTime::MinValue;
 		Completed = false;
+		HasLoggedOutput = false;
+		CompletionLogged = false;
 		OutputLines = gcnew System::Collections::Generic::List<String^>();
 		TotalOutputLineCount = 0;
 		ResultCode = String::Empty;
@@ -94,11 +98,57 @@ namespace GTA {
 			normalized->Contains("warning")) {
 			SawWarningLikeOutput = true;
 		}
+
+		if (TurnId > 0) {
+			String^ humanSummary = HasLoggedOutput
+				? ("    " + outputLine)
+				: ("  Command output:" + Environment::NewLine + "    " + outputLine);
+			StringBuilder^ payload = gcnew StringBuilder();
+			payload->Append("{\"command_name\":\"")->Append(EscapeJson(CommandName));
+			payload->Append("\",\"command_line\":\"")->Append(EscapeJson(CommandLine));
+			payload->Append("\",\"output_index\":")->Append(TotalOutputLineCount.ToString(CultureInfo::InvariantCulture));
+			payload->Append(",\"output_line\":\"")->Append(EscapeJson(outputLine))->Append("\"}");
+			AgentLogger::LogEvent(
+				TurnId,
+				AgentLogEventType::CommandOutput,
+				"AgentCommandExecution",
+				humanSummary,
+				payload->ToString()
+			);
+			HasLoggedOutput = true;
+		}
 	}
 
 	void AgentCommandExecution::SetCompletionResult(String^ resultCode, String^ completionSummary) {
 		ResultCode = isNULL(resultCode) ? String::Empty : resultCode;
 		CompletionSummary = isNULL(completionSummary) ? String::Empty : completionSummary;
+		if (CompletionLogged || (TurnId <= 0))
+			return;
+
+		StringBuilder^ payload = gcnew StringBuilder();
+		payload->Append("{\"command_name\":\"")->Append(EscapeJson(CommandName));
+		payload->Append("\",\"command_line\":\"")->Append(EscapeJson(CommandLine));
+		payload->Append("\",\"result_code\":\"")->Append(EscapeJson(ResultCode));
+		payload->Append("\",\"completion_summary\":\"")->Append(EscapeJson(CompletionSummary));
+		payload->Append("\",\"started_at\":\"")->Append(StartedAt.ToString("o", CultureInfo::InvariantCulture));
+		payload->Append("\",\"completed_at\":\"");
+		payload->Append(
+			(CompletedAt == DateTime::MinValue)
+				? DateTime::Now.ToString("o", CultureInfo::InvariantCulture)
+				: CompletedAt.ToString("o", CultureInfo::InvariantCulture));
+		payload->Append("\",\"completed\":")->Append(Completed ? "true" : "false");
+		payload->Append(",\"total_output_line_count\":")->Append(TotalOutputLineCount.ToString(CultureInfo::InvariantCulture));
+		payload->Append(",\"saw_error_like_output\":")->Append(SawErrorLikeOutput ? "true" : "false");
+		payload->Append(",\"saw_warning_like_output\":")->Append(SawWarningLikeOutput ? "true" : "false");
+		payload->Append("}");
+		AgentLogger::LogEvent(
+			TurnId,
+			AgentLogEventType::CommandCompleted,
+			"AgentCommandExecution",
+			"Command completed (" + ResultCode + "): " + CompletionSummary,
+			payload->ToString()
+		);
+		CompletionLogged = true;
 	}
 
 	String^ AgentCommandExecution::BuildStructuredTranscript(int maxOutputLines) {
