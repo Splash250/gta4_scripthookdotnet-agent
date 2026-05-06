@@ -33,6 +33,71 @@ namespace GTA {
 	using namespace System::Globalization;
 	using namespace System::Text::RegularExpressions;
 
+	namespace {
+
+		bool IsCommonSpawnNonModelToken(String^ token) {
+			if (String::IsNullOrWhiteSpace(token)) return true;
+			String^ normalized = token->Trim()->ToLowerInvariant();
+			return
+				(normalized == "spawn") ||
+				(normalized == "please") ||
+				(normalized == "the") ||
+				(normalized == "a") ||
+				(normalized == "an") ||
+				(normalized == "that") ||
+				(normalized == "this") ||
+				(normalized == "me") ||
+				(normalized == "my") ||
+				(normalized == "or") ||
+				(normalized == "not") ||
+				(normalized == "instead") ||
+				(normalized == "rather") ||
+				(normalized == "than") ||
+				(normalized == "another") ||
+				(normalized == "some") ||
+				(normalized == "something") ||
+				(normalized == "anything") ||
+				(normalized == "vehicle") ||
+				(normalized == "car") ||
+				(normalized == "bike") ||
+				(normalized == "boat") ||
+				(normalized == "plane") ||
+				(normalized == "train") ||
+				(normalized == "helicopter") ||
+				(normalized == "heli") ||
+				(normalized == "ped") ||
+				(normalized == "object") ||
+				(normalized == "sports") ||
+				(normalized == "sport") ||
+				(normalized == "police");
+		}
+
+		bool IsPlausibleSpawnModelToken(String^ token) {
+			if (String::IsNullOrWhiteSpace(token)) return false;
+			String^ trimmed = token->Trim();
+			if ((trimmed->Length < 3) || (trimmed->Length > 24)) return false;
+			if (IsCommonSpawnNonModelToken(trimmed)) return false;
+			return Regex::IsMatch(trimmed, "^[A-Za-z][A-Za-z0-9_]*$");
+		}
+
+		bool IsLocallyRecognizedSpawnModelToken(String^ token) {
+			if (!IsPlausibleSpawnModelToken(token)) return false;
+
+			GTA::Model candidateModel = token->Trim()->ToUpperInvariant();
+			if (candidateModel.Hash == 0) return false;
+
+			return
+				candidateModel.isPed ||
+				candidateModel.isVehicle ||
+				candidateModel.isBoat ||
+				candidateModel.isBike ||
+				candidateModel.isHelicopter ||
+				candidateModel.isPlane ||
+				candidateModel.isTrain;
+		}
+
+	}
+
 	String^ AgentCommandSemantics::Normalize(String^ input) {
 		if (String::IsNullOrEmpty(input)) return String::Empty;
 		String^ normalized = input->Trim()->ToLowerInvariant();
@@ -204,9 +269,8 @@ namespace GTA {
 			return false;
 		}
 
-		GTA::Model resolvedModel = model;
-		if (resolvedModel.Hash == 0) {
-			failureReason = "Spawn requires an exact GTA IV model token that converts locally through GTA::Model to a non-zero hash.";
+		if (!IsLocallyRecognizedSpawnModelToken(model)) {
+			failureReason = "Spawn requires one exact GTA IV model token that locally resolves to a recognized ped or vehicle-type model.";
 			return false;
 		}
 
@@ -272,6 +336,16 @@ namespace GTA {
 		bool mentionsCommaSeparatedAlternative =
 			Regex::IsMatch(normalized, "\\b" + Regex::Escape(normalizedModel) + "\\b\\s*,\\s*(?:another|some|any|or|not|instead|rather)\\b") ||
 			Regex::IsMatch(normalized, "\\b" + Regex::Escape(normalizedModel) + "\\b\\s*,\\s*[a-z0-9_]+\\s+(?:or|rather|instead)\\b");
+		HashSet<String^>^ recognizedModelCandidates = gcnew HashSet<String^>();
+		MatchCollection^ tokenMatches = Regex::Matches(userInput, "[A-Za-z][A-Za-z0-9_]*");
+		for each (Match^ tokenMatch in tokenMatches) {
+			if (isNULL(tokenMatch) || !tokenMatch->Success) continue;
+
+			String^ candidate = tokenMatch->Value->Trim()->ToUpperInvariant();
+			if (IsLocallyRecognizedSpawnModelToken(candidate)) {
+				recognizedModelCandidates->Add(candidate);
+			}
+		}
 
 		if (!hasExactModelEvidence) {
 			if (mentionsColorOrTuning || mentionsUnsupportedPerformance || mentionsBrandOrAliasRequirement || mentionsGenericCategory) {
@@ -286,7 +360,7 @@ namespace GTA {
 			failureReason = "The built-in spawn command only accepts one exact GTA IV model token; it cannot satisfy extra color, tuning, performance, or brand-mapping requirements exactly.";
 			return false;
 		}
-		if (mentionsAlternativeChoice || mentionsCommaSeparatedAlternative) {
+		if ((recognizedModelCandidates->Count > 1) || mentionsAlternativeChoice || mentionsCommaSeparatedAlternative) {
 			failureReason = "The built-in spawn command requires one unambiguous exact GTA IV model token, not multiple options, contradictions, or alternatives.";
 			return false;
 		}
@@ -444,7 +518,7 @@ namespace GTA {
 		if (name == "abortscripts") return "Stops all loaded .NET scripts. Exact fit for stop or abort all scripts requests, not for pausing or stopping one selected script.";
 		if (name == "flip") return "Flips only the local player's current vehicle upright. Exact fit for overturn or upright-current-vehicle requests only; it does not repair, customize, or affect another vehicle.";
 		if (name == "heal") return "Restores health and armor to full and repairs the current vehicle. Usually silent on success. Cannot remove armor, set an exact numeric health value, or satisfy vehicle-only repair requests exactly.";
-		if (name == "spawn") return "Spawns a ped, vehicle, or object by one exact model token only. The user request must explicitly contain that exact GTA IV model token, and the local validator only accepts it when the token converts locally through GTA::Model to a non-zero hash before the normal runtime spawn path. It does not support categories, random choices, aliases, colors, tuning, performance adjectives, or other customization arguments.";
+		if (name == "spawn") return "Spawns by one exact model token only. The user request must explicitly contain that exact GTA IV model token, and the local validator only accepts tokens it can recognize as ped or vehicle-type GTA::Model values through local hash-plus-type predicates before the normal runtime spawn path. This is intentionally stricter than broad object spawning. It does not support categories, random choices, aliases, colors, tuning, performance adjectives, or other customization arguments.";
 		if (name == "teleport") return "Supports waypoint teleport or explicit coordinates. Usually emits output when reporting a destination or a missing waypoint. Does not infer destinations from vague location descriptions.";
 		if (name == "setdaytime") return "Sets exact in-game time from HH:MM only.";
 		if (name == "settimescale") return "Sets a positive numeric timescale multiplier only.";
