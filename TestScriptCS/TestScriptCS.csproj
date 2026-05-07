@@ -66,6 +66,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Scripts\AgentBuiltInSmokeScripts.cs" />
     <Compile Include="Scripts\AnyTaxiScript.cs" />
     <Compile Include="Scripts\BodyguardScript.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

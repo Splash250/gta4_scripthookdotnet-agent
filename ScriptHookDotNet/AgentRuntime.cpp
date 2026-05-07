@@ -363,6 +363,10 @@ namespace GTA {
 		return domain->CurrentScript;
 	}
 
+	Script^ AgentRuntime::CaptureOwningScriptForManagedCall() {
+		return CaptureOwningScript();
+	}
+
 	int AgentRuntime::ReserveRequestId() {
 		return Interlocked::Increment(pNextRequestId);
 	}
@@ -622,6 +626,21 @@ namespace GTA {
 		state = gcnew AgentRuntimeLaneState(lane, ownerScript);
 		pLaneStates->Add(state);
 		return state;
+	}
+
+	void AgentRuntime::RemoveLaneStatesForScriptLocked(Script^ ownerScript) {
+		if isNULL(ownerScript)
+			return;
+
+		for (int i = pLaneStates->Count - 1; i >= 0; i--) {
+			AgentRuntimeLaneState^ state = pLaneStates[i];
+			if isNULL(state)
+				continue;
+			if (!IsSameScript(state->OwnerScript, ownerScript))
+				continue;
+
+			pLaneStates->RemoveAt(i);
+		}
 	}
 
 	bool AgentRuntime::IsLaneBusyLocked(AgentRuntimeLane lane) {
@@ -1357,9 +1376,7 @@ namespace GTA {
 
 	void AgentRuntime::AbandonScriptOwnedWorkCore(Script^ ownerScript) {
 		RemoveAuthorizedBuiltInExecutionsForScriptLocked(ownerScript);
-		AbandonLaneWorkCore(AgentRuntimeLane::Prompt, ownerScript);
-		AbandonLaneWorkCore(AgentRuntimeLane::BuiltInClassification, ownerScript);
-		AbandonLaneWorkCore(AgentRuntimeLane::ValidatedBuiltInExecution, ownerScript);
+		RemoveLaneStatesForScriptLocked(ownerScript);
 	}
 
 	void AgentRuntime::AbandonPromptWork() {

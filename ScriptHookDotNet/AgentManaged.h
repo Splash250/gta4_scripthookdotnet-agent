@@ -103,6 +103,7 @@ namespace GTA {
 		static void PromptAsync(AgentPromptRequest^ request, AgentPromptCallback^ callback);
 		static void ClassifyBuiltInAsync(BuiltInCommandRequest^ request, BuiltInCommandCallback^ callback);
 		static void ExecuteBuiltInAsync(BuiltInCommandResult^ validatedResult, BuiltInExecutionCallback^ callback);
+		static String^ GetRecentBuiltInTranscriptJson();
 	};
 
 }

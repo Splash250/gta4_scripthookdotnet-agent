@@ -167,6 +167,29 @@ namespace GTA {
 				&& System::Object::ReferenceEquals(execution->OwnerScript, ownerScript);
 		}
 
+		bool IsSameRetentionBucket(
+			AgentCommandExecution^ left,
+			AgentCommandExecution^ right) {
+			if (isNULL(left) || isNULL(right))
+				return false;
+
+			bool leftIsScriptOrigin = IsScriptOriginExecution(left);
+			bool rightIsScriptOrigin = IsScriptOriginExecution(right);
+			if (leftIsScriptOrigin != rightIsScriptOrigin)
+				return false;
+
+			if (!leftIsScriptOrigin)
+				return true;
+
+			if (isNotNULL(left->OwnerScript) && isNotNULL(right->OwnerScript))
+				return System::Object::ReferenceEquals(left->OwnerScript, right->OwnerScript);
+
+			return String::Equals(
+				left->OriginTag,
+				right->OriginTag,
+				StringComparison::OrdinalIgnoreCase);
+		}
+
 	}
 
 	AgentConsole::AgentConsole() {
@@ -635,26 +658,25 @@ namespace GTA {
 		System::Threading::Monitor::Enter(pSharedRecentCommandExecutionsSyncRoot);
 		try {
 			pSharedRecentCommandExecutions->Add(execution);
-			bool isScriptOrigin = IsScriptOriginExecution(execution);
-			int sameOriginCount = 0;
+			int sameBucketCount = 0;
 			for (int i = 0; i < pSharedRecentCommandExecutions->Count; i++) {
 				AgentCommandExecution^ current = pSharedRecentCommandExecutions[i];
 				if (isNULL(current))
 					continue;
-				if (IsScriptOriginExecution(current) == isScriptOrigin)
-					sameOriginCount++;
+				if (IsSameRetentionBucket(current, execution))
+					sameBucketCount++;
 			}
 
-			while (sameOriginCount > MAX_RECENT_COMMAND_EXECUTIONS) {
+			while (sameBucketCount > MAX_RECENT_COMMAND_EXECUTIONS) {
 				for (int i = 0; i < pSharedRecentCommandExecutions->Count; i++) {
 					AgentCommandExecution^ current = pSharedRecentCommandExecutions[i];
 					if (isNULL(current))
 						continue;
-					if (IsScriptOriginExecution(current) != isScriptOrigin)
+					if (!IsSameRetentionBucket(current, execution))
 						continue;
 
 					pSharedRecentCommandExecutions->RemoveAt(i);
-					sameOriginCount--;
+					sameBucketCount--;
 					break;
 				}
 			}

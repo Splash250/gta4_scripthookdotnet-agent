@@ -286,6 +286,7 @@ namespace GTA {
 		static bool IsSameScript(Script^ left, Script^ right);
 		AgentRuntimeLaneState^ FindLaneStateLocked(AgentRuntimeLane lane, Script^ ownerScript);
 		AgentRuntimeLaneState^ GetOrCreateLaneStateLocked(AgentRuntimeLane lane, Script^ ownerScript);
+		void RemoveLaneStatesForScriptLocked(Script^ ownerScript);
 		bool IsLaneBusyLocked(AgentRuntimeLane lane);
 		void AbandonLaneWorkCore(AgentRuntimeLane lane, Script^ ownerScript);
 		int ReserveExecutionAuthorizationId();
@@ -312,6 +313,7 @@ namespace GTA {
 
 	public:
 		AgentRuntime();
+		static Script^ CaptureOwningScriptForManagedCall();
 
 		property bool IsPromptBusy {
 			bool get();

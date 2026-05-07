@@ -439,4 +439,8 @@ namespace GTA {
 		}
 	}
 
+	String^ Agent::GetRecentBuiltInTranscriptJson() {
+		return AgentConsole::BuildScriptRecentCommandTranscriptJson(AgentRuntime::CaptureOwningScriptForManagedCall());
+	}
+
 }
