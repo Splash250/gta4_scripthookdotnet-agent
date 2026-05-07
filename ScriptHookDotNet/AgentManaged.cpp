@@ -69,14 +69,15 @@ namespace GTA {
 		}
 
 		BuiltInExecutionResult^ CreateBuiltInExecutionFailureResult(
+			String^ resultCode,
 			String^ errorText,
 			BuiltInCommandResult^ validatedResult) {
 			BuiltInExecutionResult^ result = gcnew BuiltInExecutionResult();
 			result->Success = false;
 			result->CommandName = isNULL(validatedResult) ? String::Empty : SafeText(validatedResult->CommandName);
 			result->ExecutedCommandLine = String::Empty;
-			result->ResultCode = "invalid_validated_result";
-			result->CompletionSummary = String::Empty;
+			result->ResultCode = SafeText(resultCode);
+			result->CompletionSummary = SafeText(errorText);
 			result->ErrorText = SafeText(errorText);
 			return result;
 		}
@@ -117,6 +118,7 @@ namespace GTA {
 		}
 
 		AgentRuntimeValidatedBuiltInExecutionCompletion^ CreateBuiltInExecutionFailureCompletion(
+			String^ resultCode,
 			String^ errorText,
 			BuiltInCommandResult^ validatedResult) {
 			AgentRuntimeValidatedBuiltInExecutionCompletion^ completion =
@@ -125,7 +127,7 @@ namespace GTA {
 			completion->ValidatedResult = CreateRuntimeValidatedResultSnapshot(validatedResult);
 			completion->Error = SafeText(errorText);
 			completion->CompletionSummary = completion->Error;
-			completion->ResultCode = "invalid_validated_result";
+			completion->ResultCode = SafeText(resultCode);
 			return completion;
 		}
 
@@ -141,10 +143,11 @@ namespace GTA {
 
 		void DeliverBuiltInExecutionFailure(
 			BuiltInExecutionCallback^ callback,
+			String^ resultCode,
 			String^ errorText,
 			BuiltInCommandResult^ validatedResult) {
 			if isNotNULL(callback)
-				callback(CreateBuiltInExecutionFailureResult(errorText, validatedResult));
+				callback(CreateBuiltInExecutionFailureResult(resultCode, errorText, validatedResult));
 		}
 
 		AgentPromptResult^ MapPromptResult(AgentRuntimePromptCompletion^ completion) {
@@ -303,6 +306,7 @@ namespace GTA {
 
 		void DeliverBuiltInExecutionFailureDeferred(
 			BuiltInExecutionCallback^ callback,
+			String^ resultCode,
 			String^ errorText,
 			BuiltInCommandResult^ validatedResult) {
 			if isNULL(callback)
@@ -311,7 +315,7 @@ namespace GTA {
 			BuiltInExecutionRuntimeCallbackAdapter^ adapter =
 				gcnew BuiltInExecutionRuntimeCallbackAdapter(callback);
 			if (!GetManagedRuntime()->QueueDeferredValidatedBuiltInExecutionCompletion(
-				CreateBuiltInExecutionFailureCompletion(errorText, validatedResult),
+				CreateBuiltInExecutionFailureCompletion(resultCode, errorText, validatedResult),
 				gcnew AgentRuntimeValidatedBuiltInExecutionCompletedCallback(
 					adapter,
 					&BuiltInExecutionRuntimeCallbackAdapter::OnCompleted))) {
@@ -432,6 +436,7 @@ namespace GTA {
 		if isNULL(validatedResult) {
 			DeliverBuiltInExecutionFailureDeferred(
 				callback,
+				"invalid_validated_result",
 				"Validated built-in result is required.",
 				validatedResult);
 			return;
@@ -440,6 +445,7 @@ namespace GTA {
 		if (!validatedResult->IsValidatedForExecution) {
 			DeliverBuiltInExecutionFailureDeferred(
 				callback,
+				"invalid_validated_result",
 				"Built-in execution requires a result with IsValidatedForExecution == true.",
 				validatedResult);
 			return;
@@ -456,6 +462,7 @@ namespace GTA {
 				&BuiltInExecutionRuntimeCallbackAdapter::OnCompleted))) {
 			DeliverBuiltInExecutionFailureDeferred(
 				callback,
+				"runtime_submission_rejected",
 				"Built-in execution could not be submitted to AgentRuntime.",
 				validatedResult);
 		}
