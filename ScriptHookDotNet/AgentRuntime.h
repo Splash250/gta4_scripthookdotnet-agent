@@ -93,30 +93,16 @@ namespace GTA {
 		String^ ResponseText;
 		String^ FailureReason;
 		String^ Error;
+		bool IsValidatedForExecution;
 
 		AgentRuntimeBuiltInClassificationCompletion();
-	};
-
-	CLASS_ATTRIBUTES
-	private ref class AgentRuntimeValidatedBuiltInExecutionRequest sealed {
-
-	public:
-		int RequestId;
-		int TurnId;
-		Script^ OwnerScript;
-		String^ UserInput;
-		String^ CommandName;
-		System::Collections::Generic::Dictionary<String^, String^>^ Arguments;
-		String^ ValidatedCommandLine;
-
-		AgentRuntimeValidatedBuiltInExecutionRequest();
 	};
 
 	CLASS_ATTRIBUTES
 	private ref class AgentRuntimeValidatedBuiltInExecutionCompletion sealed {
 
 	public:
-		AgentRuntimeValidatedBuiltInExecutionRequest^ Request;
+		AgentRuntimeBuiltInClassificationCompletion^ ValidatedResult;
 		bool Success;
 		bool WasAbandoned;
 		DateTime StartedAt;
@@ -232,7 +218,10 @@ namespace GTA {
 		ref class ValidatedBuiltInExecutionSubmissionContext sealed {
 		public:
 			int Generation;
-			AgentRuntimeValidatedBuiltInExecutionRequest^ Request;
+			int RequestId;
+			int TurnId;
+			Script^ OwnerScript;
+			AgentRuntimeBuiltInClassificationCompletion^ ValidatedResult;
 			AgentRuntimeValidatedBuiltInExecutionCompletedCallback^ Callback;
 		};
 
@@ -259,10 +248,8 @@ namespace GTA {
 			AgentRuntimeBuiltInClassificationRequest^ request,
 			int requestId,
 			int turnId);
-		static AgentRuntimeValidatedBuiltInExecutionRequest^ CloneValidatedBuiltInExecutionRequest(
-			AgentRuntimeValidatedBuiltInExecutionRequest^ request,
-			int requestId,
-			int turnId);
+		static AgentRuntimeBuiltInClassificationCompletion^ CloneBuiltInClassificationCompletionForExecution(
+			AgentRuntimeBuiltInClassificationCompletion^ validatedResult);
 		static bool IsSameScript(Script^ left, Script^ right);
 		bool IsCallbackGenerationCurrentLocked(AgentRuntimeQueuedCallback^ callback);
 		bool ShouldDeliverCallback(AgentRuntimeQueuedCallback^ callback);
@@ -296,7 +283,7 @@ namespace GTA {
 			AgentRuntimeBuiltInClassificationRequest^ request,
 			AgentRuntimeBuiltInClassificationCompletedCallback^ callback);
 		bool SubmitValidatedBuiltInExecution(
-			AgentRuntimeValidatedBuiltInExecutionRequest^ request,
+			AgentRuntimeBuiltInClassificationCompletion^ validatedResult,
 			AgentRuntimeValidatedBuiltInExecutionCompletedCallback^ callback);
 		static void PumpCallbacks();
 		static void AbandonScriptOwnedWork(Script^ ownerScript);

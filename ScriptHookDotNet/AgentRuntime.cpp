@@ -64,16 +64,14 @@ namespace GTA {
 			return "script:" + ownerScript->Name->Trim();
 		}
 
-		String^ BuildExecutionTurnInput(AgentRuntimeValidatedBuiltInExecutionRequest^ request) {
-			if (isNULL(request))
+		String^ BuildExecutionTurnInput(AgentRuntimeBuiltInClassificationCompletion^ validatedResult) {
+			if (isNULL(validatedResult))
 				return "Execute validated built-in";
 
-			if (!String::IsNullOrWhiteSpace(request->UserInput))
-				return request->UserInput->Trim();
-			if (!String::IsNullOrWhiteSpace(request->ValidatedCommandLine))
-				return "Execute validated built-in: " + request->ValidatedCommandLine->Trim();
-			if (!String::IsNullOrWhiteSpace(request->CommandName))
-				return "Execute validated built-in: " + request->CommandName->Trim();
+			if (!String::IsNullOrWhiteSpace(validatedResult->ValidatedCommandLine))
+				return "Execute validated built-in: " + validatedResult->ValidatedCommandLine->Trim();
+			if (!String::IsNullOrWhiteSpace(validatedResult->CommandName))
+				return "Execute validated built-in: " + validatedResult->CommandName->Trim();
 			return "Execute validated built-in";
 		}
 
@@ -92,7 +90,7 @@ namespace GTA {
 		}
 
 		bool TryResolveExecutableBuiltIn(
-			AgentRuntimeValidatedBuiltInExecutionRequest^ request,
+			AgentRuntimeBuiltInClassificationCompletion^ validatedResult,
 			String^% resolvedCommandName,
 			String^% normalizedCommandLine,
 			AgentCommandSpec^% resolvedSpec,
@@ -102,26 +100,31 @@ namespace GTA {
 			resolvedSpec = nullptr;
 			errorText = String::Empty;
 
-			if isNULL(request) {
+			if isNULL(validatedResult) {
 				errorText = "Validated built-in execution requires a validated result record.";
 				return false;
 			}
 
-			if (String::IsNullOrWhiteSpace(request->ValidatedCommandLine)) {
+			if (!validatedResult->IsValidatedForExecution) {
+				errorText = "Validated built-in execution requires a result with IsValidatedForExecution == true.";
+				return false;
+			}
+
+			if (String::IsNullOrWhiteSpace(validatedResult->ValidatedCommandLine)) {
 				errorText = "Validated built-in execution requires a non-empty ValidatedCommandLine.";
 				return false;
 			}
 
-			normalizedCommandLine = request->ValidatedCommandLine->Trim();
+			normalizedCommandLine = validatedResult->ValidatedCommandLine->Trim();
 			resolvedCommandName = ExtractCommandNameFromCommandLine(normalizedCommandLine);
 			if (String::IsNullOrWhiteSpace(resolvedCommandName)) {
 				errorText = "Validated built-in execution could not determine a command name from ValidatedCommandLine.";
 				return false;
 			}
 
-			String^ requestedCommandName = String::IsNullOrWhiteSpace(request->CommandName)
+			String^ requestedCommandName = String::IsNullOrWhiteSpace(validatedResult->CommandName)
 				? String::Empty
-				: request->CommandName->Trim()->ToLowerInvariant();
+				: validatedResult->CommandName->Trim()->ToLowerInvariant();
 			if (!String::IsNullOrWhiteSpace(requestedCommandName)
 				&& !String::Equals(requestedCommandName, resolvedCommandName, StringComparison::OrdinalIgnoreCase)) {
 				errorText = "Validated built-in execution rejected a mismatched command record.";
@@ -304,20 +307,11 @@ namespace GTA {
 		ResponseText = String::Empty;
 		FailureReason = String::Empty;
 		Error = String::Empty;
-	}
-
-	AgentRuntimeValidatedBuiltInExecutionRequest::AgentRuntimeValidatedBuiltInExecutionRequest() {
-		RequestId = 0;
-		TurnId = 0;
-		OwnerScript = nullptr;
-		UserInput = String::Empty;
-		CommandName = String::Empty;
-		Arguments = gcnew Dictionary<String^, String^>();
-		ValidatedCommandLine = String::Empty;
+		IsValidatedForExecution = false;
 	}
 
 	AgentRuntimeValidatedBuiltInExecutionCompletion::AgentRuntimeValidatedBuiltInExecutionCompletion() {
-		Request = nullptr;
+		ValidatedResult = nullptr;
 		Success = false;
 		WasAbandoned = false;
 		StartedAt = DateTime::MinValue;
@@ -476,20 +470,45 @@ namespace GTA {
 		return clone;
 	}
 
-	AgentRuntimeValidatedBuiltInExecutionRequest^ AgentRuntime::CloneValidatedBuiltInExecutionRequest(
-		AgentRuntimeValidatedBuiltInExecutionRequest^ request,
-		int requestId,
-		int turnId) {
-		AgentRuntimeValidatedBuiltInExecutionRequest^ clone = gcnew AgentRuntimeValidatedBuiltInExecutionRequest();
-		clone->RequestId = requestId;
-		clone->TurnId = turnId;
-		clone->OwnerScript = isNULL(request) ? nullptr : request->OwnerScript;
-		clone->UserInput = isNULL(request) || isNULL(request->UserInput) ? String::Empty : String::Copy(request->UserInput);
-		clone->CommandName = isNULL(request) || isNULL(request->CommandName) ? String::Empty : String::Copy(request->CommandName);
-		clone->Arguments = CloneStringDictionary(isNULL(request) ? nullptr : request->Arguments);
-		clone->ValidatedCommandLine = isNULL(request) || isNULL(request->ValidatedCommandLine)
+	AgentRuntimeBuiltInClassificationCompletion^ AgentRuntime::CloneBuiltInClassificationCompletionForExecution(
+		AgentRuntimeBuiltInClassificationCompletion^ validatedResult) {
+		AgentRuntimeBuiltInClassificationCompletion^ clone = gcnew AgentRuntimeBuiltInClassificationCompletion();
+		if isNULL(validatedResult)
+			return clone;
+
+		clone->Request = validatedResult->Request;
+		clone->Success = validatedResult->Success;
+		clone->WasAbandoned = validatedResult->WasAbandoned;
+		clone->Decision = isNULL(validatedResult->Decision) ? String::Empty : String::Copy(validatedResult->Decision);
+		clone->ContractDecision = isNULL(validatedResult->ContractDecision)
 			? String::Empty
-			: String::Copy(request->ValidatedCommandLine);
+			: String::Copy(validatedResult->ContractDecision);
+		clone->ContractFormat = isNULL(validatedResult->ContractFormat)
+			? String::Empty
+			: String::Copy(validatedResult->ContractFormat);
+		clone->ContractSchema = isNULL(validatedResult->ContractSchema)
+			? String::Empty
+			: String::Copy(validatedResult->ContractSchema);
+		clone->CommandName = isNULL(validatedResult->CommandName)
+			? String::Empty
+			: String::Copy(validatedResult->CommandName);
+		clone->Arguments = CloneStringDictionary(validatedResult->Arguments);
+		clone->ValidatedCommandLine = isNULL(validatedResult->ValidatedCommandLine)
+			? String::Empty
+			: String::Copy(validatedResult->ValidatedCommandLine);
+		clone->Explanation = isNULL(validatedResult->Explanation)
+			? String::Empty
+			: String::Copy(validatedResult->Explanation);
+		clone->ResponseText = isNULL(validatedResult->ResponseText)
+			? String::Empty
+			: String::Copy(validatedResult->ResponseText);
+		clone->FailureReason = isNULL(validatedResult->FailureReason)
+			? String::Empty
+			: String::Copy(validatedResult->FailureReason);
+		clone->Error = isNULL(validatedResult->Error)
+			? String::Empty
+			: String::Copy(validatedResult->Error);
+		clone->IsValidatedForExecution = validatedResult->IsValidatedForExecution;
 		return clone;
 	}
 
@@ -722,14 +741,15 @@ namespace GTA {
 	}
 
 	bool AgentRuntime::SubmitValidatedBuiltInExecution(
-		AgentRuntimeValidatedBuiltInExecutionRequest^ request,
+		AgentRuntimeBuiltInClassificationCompletion^ validatedResult,
 		AgentRuntimeValidatedBuiltInExecutionCompletedCallback^ callback) {
-		if isNULL(request) return false;
+		if isNULL(validatedResult) return false;
 
 		int generation;
 		int requestId = 0;
+		int turnId = 0;
 		bool ownsTurn = false;
-		AgentRuntimeValidatedBuiltInExecutionRequest^ requestSnapshot;
+		AgentRuntimeBuiltInClassificationCompletion^ validatedResultSnapshot;
 		Script^ ownerScript = CaptureOwningScript();
 		if isNULL(ownerScript)
 			return false;
@@ -738,25 +758,27 @@ namespace GTA {
 		try {
 			if (bValidatedBuiltInExecutionBusy) return false;
 			generation = pValidatedBuiltInExecutionGeneration;
-			request->OwnerScript = ownerScript;
-			requestId = (request->RequestId > 0) ? request->RequestId : ReserveRequestId();
-			int turnId = (request->TurnId > 0) ? request->TurnId : CaptureActiveTurnId();
+			requestId = ReserveRequestId();
+			turnId = CaptureActiveTurnId();
 			if (turnId <= 0) {
-				turnId = AgentLogger::BeginTurn(BuildExecutionTurnInput(request), BuildScriptLogSource(ownerScript));
+				turnId = AgentLogger::BeginTurn(BuildExecutionTurnInput(validatedResult), BuildScriptLogSource(ownerScript));
 				ownsTurn = turnId > 0;
 				if (ownsTurn)
 					RememberOwnedTurn(requestId, turnId);
 			}
-			requestSnapshot = CloneValidatedBuiltInExecutionRequest(request, requestId, turnId);
+			validatedResultSnapshot = CloneBuiltInClassificationCompletionForExecution(validatedResult);
 			bValidatedBuiltInExecutionBusy = true;
-			pValidatedBuiltInExecutionOwnerScript = requestSnapshot->OwnerScript;
+			pValidatedBuiltInExecutionOwnerScript = ownerScript;
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}
 
 		ValidatedBuiltInExecutionSubmissionContext^ context = gcnew ValidatedBuiltInExecutionSubmissionContext();
 		context->Generation = generation;
-		context->Request = requestSnapshot;
+		context->RequestId = requestId;
+		context->TurnId = turnId;
+		context->OwnerScript = ownerScript;
+		context->ValidatedResult = validatedResultSnapshot;
 		context->Callback = callback;
 
 		try {
@@ -926,6 +948,7 @@ namespace GTA {
 					bool isNeedsClarification =
 						result->ContractDecision == AgentReasoningContractDecision::NeedsClarification;
 					completion->Success = isValidatedRun || isExplainResult || isNoExactFit || isNeedsClarification;
+					completion->IsValidatedForExecution = isValidatedRun;
 					if ((result->Decision == AgentReasoningDecision::BuiltInRun) && !isValidatedRun) {
 						completion->Error = !String::IsNullOrWhiteSpace(completion->FailureReason)
 							? completion->FailureReason
@@ -986,20 +1009,20 @@ namespace GTA {
 		int ownedTurnId = 0;
 
 		try {
-			completion->Request = isNULL(context) ? nullptr : context->Request;
-			if ((isNULL(context) || isNULL(context->Request))) {
+			completion->ValidatedResult = (isNULL(context) ? nullptr : context->ValidatedResult);
+			if ((isNULL(context) || isNULL(context->ValidatedResult))) {
 				completion->ResultCode = "invalid_validated_result";
-				completion->CompletionSummary = "Validated built-in execution completed without a runtime request context.";
+				completion->CompletionSummary = "Validated built-in execution completed without a validated result context.";
 				completion->Error = completion->CompletionSummary;
 			} else {
-				ownedTurnId = TakeOwnedTurn(context->Request->RequestId);
+				ownedTurnId = TakeOwnedTurn(context->RequestId);
 
 				String^ resolvedCommandName;
 				String^ normalizedCommandLine;
 				AgentCommandSpec^ resolvedSpec;
 				String^ validationError;
 				if (!TryResolveExecutableBuiltIn(
-					context->Request,
+					context->ValidatedResult,
 					resolvedCommandName,
 					normalizedCommandLine,
 					resolvedSpec,
@@ -1008,14 +1031,14 @@ namespace GTA {
 					completion->CompletionSummary = validationError;
 					completion->Error = validationError;
 				} else {
-					context->Request->CommandName = resolvedSpec->Name;
+					context->ValidatedResult->CommandName = resolvedSpec->Name;
 					String^ executionError = String::Empty;
 					AgentCommandExecution^ execution = AgentCommandExecution::ExecuteValidatedBuiltInCommand(
-						context->Request->TurnId,
+						context->TurnId,
 						normalizedCommandLine,
 						resolvedSpec->Name,
 						"AgentRuntime",
-						BuildScriptLogSource(context->Request->OwnerScript),
+						BuildScriptLogSource(context->OwnerScript),
 						executionError);
 					CopyExecutionIntoCompletion(execution, completion);
 					completion->Success = DidExecutionSucceed(execution);
@@ -1067,7 +1090,7 @@ namespace GTA {
 		if (enqueue)
 			EnqueueCallback(gcnew ValidatedBuiltInExecutionQueuedCallback(
 				context->Generation,
-				context->Request->OwnerScript,
+				context->OwnerScript,
 				context->Callback,
 				completion));
 	}

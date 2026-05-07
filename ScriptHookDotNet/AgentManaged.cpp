@@ -133,7 +133,7 @@ namespace GTA {
 			} else {
 				result->MessageText = SafeText(completion->FailureReason);
 			}
-			result->IsValidatedForExecution = completion->Success
+			result->IsValidatedForExecution = completion->IsValidatedForExecution
 				&& IsBuiltInRunnable(result->Decision, result->CommandName, result->ValidatedCommandLine);
 			return result;
 		}
@@ -146,10 +146,12 @@ namespace GTA {
 			}
 
 			result->Success = completion->Success;
-			result->CommandName = isNULL(completion->Request) ? String::Empty : SafeText(completion->Request->CommandName);
-			result->ExecutedCommandLine = isNULL(completion->Request)
+			result->CommandName = isNULL(completion->ValidatedResult)
 				? String::Empty
-				: SafeText(completion->Request->ValidatedCommandLine);
+				: SafeText(completion->ValidatedResult->CommandName);
+			result->ExecutedCommandLine = isNULL(completion->ValidatedResult)
+				? String::Empty
+				: SafeText(completion->ValidatedResult->ValidatedCommandLine);
 			result->CompletionSummary = SafeText(completion->CompletionSummary);
 			result->ErrorText = SafeText(completion->Error);
 			return result;
@@ -312,15 +314,19 @@ namespace GTA {
 			return;
 		}
 
-		AgentRuntimeValidatedBuiltInExecutionRequest^ runtimeRequest =
-			gcnew AgentRuntimeValidatedBuiltInExecutionRequest();
-		runtimeRequest->UserInput = String::Empty;
-		runtimeRequest->CommandName = SafeText(validatedResult->CommandName);
-		runtimeRequest->ValidatedCommandLine = validatedResult->ValidatedCommandLine;
+		AgentRuntimeBuiltInClassificationCompletion^ runtimeValidatedResult =
+			gcnew AgentRuntimeBuiltInClassificationCompletion();
+		runtimeValidatedResult->Success = validatedResult->Success;
+		runtimeValidatedResult->Decision = SafeText(validatedResult->Decision);
+		runtimeValidatedResult->CommandName = SafeText(validatedResult->CommandName);
+		runtimeValidatedResult->ValidatedCommandLine = SafeText(validatedResult->ValidatedCommandLine);
+		runtimeValidatedResult->Explanation = SafeText(validatedResult->MessageText);
+		runtimeValidatedResult->Error = SafeText(validatedResult->ErrorText);
+		runtimeValidatedResult->IsValidatedForExecution = validatedResult->IsValidatedForExecution;
 
 		BuiltInExecutionRuntimeCallbackAdapter^ adapter = gcnew BuiltInExecutionRuntimeCallbackAdapter(callback);
 		if (!GetManagedRuntime()->SubmitValidatedBuiltInExecution(
-			runtimeRequest,
+			runtimeValidatedResult,
 			gcnew AgentRuntimeValidatedBuiltInExecutionCompletedCallback(
 				adapter,
 				&BuiltInExecutionRuntimeCallbackAdapter::OnCompleted))) {
