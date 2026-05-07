@@ -161,7 +161,7 @@ namespace GTA {
 		pWorker = gcnew AgentRequestWorker();
 		pReasoningWorker = gcnew AgentReasoningWorker();
 		pActiveCommandExecution = nullptr;
-		pRecentCommandExecutions = gcnew List<AgentCommandExecution^>();
+		pRecentCommandExecutions = pSharedRecentCommandExecutions;
 		pPendingCommandSpec = nullptr;
 		pPendingCommandLine = String::Empty;
 		pPendingClarificationInput = String::Empty;
@@ -514,13 +514,17 @@ namespace GTA {
 	}
 
 	String^ AgentConsole::BuildRecentCommandTranscriptJson() {
-		if isNULL(pRecentCommandExecutions) return String::Empty;
-		if (pRecentCommandExecutions->Count == 0) return String::Empty;
+		return BuildSharedRecentCommandTranscriptJson();
+	}
+
+	String^ AgentConsole::BuildSharedRecentCommandTranscriptJson() {
+		if isNULL(pSharedRecentCommandExecutions) return String::Empty;
+		if (pSharedRecentCommandExecutions->Count == 0) return String::Empty;
 
 		System::Text::StringBuilder^ sb = gcnew System::Text::StringBuilder();
 		sb->Append("[");
-		for (int i = 0; i < pRecentCommandExecutions->Count; i++) {
-			AgentCommandExecution^ execution = pRecentCommandExecutions[i];
+		for (int i = 0; i < pSharedRecentCommandExecutions->Count; i++) {
+			AgentCommandExecution^ execution = pSharedRecentCommandExecutions[i];
 			if isNULL(execution) continue;
 			if (sb->Length > 1) sb->Append(",");
 			sb->Append(execution->BuildStructuredTranscript(MAX_CONTEXT_OUTPUT_LINES_PER_COMMAND));
@@ -546,12 +550,14 @@ namespace GTA {
 	}
 
 	void AgentConsole::RememberCommandExecution(AgentCommandExecution^ execution) {
+		RememberSharedCommandExecution(execution);
+	}
+
+	void AgentConsole::RememberSharedCommandExecution(AgentCommandExecution^ execution) {
 		if isNULL(execution) return;
-		if isNULL(pRecentCommandExecutions)
-			pRecentCommandExecutions = gcnew List<AgentCommandExecution^>();
-		pRecentCommandExecutions->Add(execution);
-		while (pRecentCommandExecutions->Count > MAX_RECENT_COMMAND_EXECUTIONS)
-			pRecentCommandExecutions->RemoveAt(0);
+		pSharedRecentCommandExecutions->Add(execution);
+		while (pSharedRecentCommandExecutions->Count > MAX_RECENT_COMMAND_EXECUTIONS)
+			pSharedRecentCommandExecutions->RemoveAt(0);
 	}
 
 	void AgentConsole::ExecuteBuiltInCommand(String^ commandLine, AgentCommandSpec^ spec) {

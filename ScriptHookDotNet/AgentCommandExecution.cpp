@@ -28,6 +28,7 @@
 #include "AgentLogger.h"
 #include "Console.h"
 #include "NetHook.h"
+#include "Script.h"
 
 #pragma managed
 
@@ -94,6 +95,12 @@ namespace GTA {
 			return AgentLogger::ComposeSource(execution->LogSource, execution->OriginTag);
 		}
 
+		String^ BuildScriptExecutionOriginTag(Script^ ownerScript) {
+			if (isNULL(ownerScript) || String::IsNullOrWhiteSpace(ownerScript->Name))
+				return "script:unknown";
+			return "script:" + ownerScript->Name->Trim();
+		}
+
 		AgentConsole^ GetAgentConsoleForCommandCapture() {
 			try {
 				FieldInfo^ field = NetHook::typeid->GetField(
@@ -144,6 +151,8 @@ namespace GTA {
 		CommandName = String::Empty;
 		ValidatedCommandLine = String::Empty;
 		IsValidatedForExecution = false;
+		OwnerScript = nullptr;
+		Spec = nullptr;
 	}
 
 	AgentCommandExecution::AgentCommandExecution(String^ commandLine, String^ commandName) {
@@ -168,8 +177,6 @@ namespace GTA {
 	AgentCommandExecution^ AgentCommandExecution::ExecuteValidatedBuiltInCommand(
 		int turnId,
 		AgentValidatedBuiltInExecutionRecord^ validatedResult,
-		String^ logSource,
-		String^ originTag,
 		String^% errorText) {
 		errorText = String::Empty;
 
@@ -181,10 +188,12 @@ namespace GTA {
 			: validatedResult->CommandName->Trim()->ToLowerInvariant();
 		AgentCommandExecution^ execution = gcnew AgentCommandExecution(normalizedCommandLine, normalizedCommandName);
 		execution->TurnId = turnId;
-		execution->LogSource = String::IsNullOrWhiteSpace(logSource) ? "AgentCommandExecution" : logSource->Trim();
-		execution->OriginTag = isNULL(originTag) ? String::Empty : originTag->Trim();
+		execution->LogSource = "AgentRuntime";
+		execution->OriginTag = isNULL(validatedResult)
+			? String::Empty
+			: BuildScriptExecutionOriginTag(validatedResult->OwnerScript);
 
-		AgentCommandSpec^ spec = AgentCommandRegistry::Find(normalizedCommandName);
+		AgentCommandSpec^ spec = isNULL(validatedResult) ? nullptr : validatedResult->Spec;
 		if isNULL(spec) {
 			errorText = "Built-in execution could not resolve the validated command to a known command.";
 			execution->MarkCompleted();
@@ -213,6 +222,7 @@ namespace GTA {
 			}
 
 			PopulateExecutionSummary(execution);
+			AgentConsole::RememberSharedCommandExecution(execution);
 			if (String::Equals(execution->ResultCode, "problem_reported", StringComparison::OrdinalIgnoreCase))
 				errorText = execution->CompletionSummary;
 		}
@@ -220,11 +230,13 @@ namespace GTA {
 			execution->MarkCompleted();
 			errorText = "Command execution failed: " + (isNULL(ex) ? "Unknown exception." : ex->Message);
 			execution->SetCompletionResult("exception", errorText);
+			AgentConsole::RememberSharedCommandExecution(execution);
 		}
 		catch (...) {
 			execution->MarkCompleted();
 			errorText = "Command execution failed with a native exception.";
 			execution->SetCompletionResult("native_exception", errorText);
+			AgentConsole::RememberSharedCommandExecution(execution);
 		}
 
 		return execution;

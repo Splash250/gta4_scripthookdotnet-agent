@@ -25,12 +25,17 @@
 
 namespace GTA {
 
+	ref class Script;
+	ref class AgentCommandSpec;
+
 	CLASS_ATTRIBUTES
-	public ref class AgentValidatedBuiltInExecutionRecord sealed {
+	private ref class AgentValidatedBuiltInExecutionRecord sealed {
 	public:
 		String^ CommandName;
 		String^ ValidatedCommandLine;
 		bool IsValidatedForExecution;
+		Script^ OwnerScript;
+		AgentCommandSpec^ Spec;
 
 		AgentValidatedBuiltInExecutionRecord();
 	};
@@ -57,16 +62,16 @@ namespace GTA {
 		bool SawWarningLikeOutput;
 
 		AgentCommandExecution(String^ commandLine, String^ commandName);
-		static AgentCommandExecution^ ExecuteValidatedBuiltInCommand(
-			int turnId,
-			AgentValidatedBuiltInExecutionRecord^ validatedResult,
-			String^ logSource,
-			String^ originTag,
-			String^% errorText);
 		void AppendOutputLine(String^ line);
 		void SetCompletionResult(String^ resultCode, String^ completionSummary);
 		String^ BuildStructuredTranscript(int maxOutputLines);
 		void MarkCompleted();
+
+	internal:
+		static AgentCommandExecution^ ExecuteValidatedBuiltInCommand(
+			int turnId,
+			AgentValidatedBuiltInExecutionRecord^ validatedResult,
+			String^% errorText);
 	};
 
 }

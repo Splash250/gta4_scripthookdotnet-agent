@@ -78,6 +78,9 @@ namespace GTA {
 		property bool IsValidatedForExecution;
 
 		BuiltInCommandResult();
+
+	internal:
+		int RuntimeExecutionAuthorizationId;
 	};
 
 	CLASS_ATTRIBUTES

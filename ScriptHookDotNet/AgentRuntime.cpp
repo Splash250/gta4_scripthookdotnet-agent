@@ -29,6 +29,7 @@
 #include "AgentCommandRegistry.h"
 #include "AgentCommandReasoning.h"
 #include "AgentLogger.h"
+#include "Console.h"
 #include "NetHook.h"
 #include "RemoteScriptDomain.h"
 #include "Script.h"
@@ -87,62 +88,6 @@ namespace GTA {
 				return String::Empty;
 
 			return parts[0]->Trim()->ToLowerInvariant();
-		}
-
-		bool TryResolveExecutableBuiltIn(
-			AgentRuntimeBuiltInClassificationCompletion^ validatedResult,
-			String^% resolvedCommandName,
-			String^% normalizedCommandLine,
-			AgentCommandSpec^% resolvedSpec,
-			String^% errorText) {
-			resolvedCommandName = String::Empty;
-			normalizedCommandLine = String::Empty;
-			resolvedSpec = nullptr;
-			errorText = String::Empty;
-
-			if isNULL(validatedResult) {
-				errorText = "Validated built-in execution requires a validated result record.";
-				return false;
-			}
-
-			if (!validatedResult->IsValidatedForExecution) {
-				errorText = "Validated built-in execution requires a result with IsValidatedForExecution == true.";
-				return false;
-			}
-
-			if (String::IsNullOrWhiteSpace(validatedResult->ValidatedCommandLine)) {
-				errorText = "Validated built-in execution requires a non-empty ValidatedCommandLine.";
-				return false;
-			}
-
-			normalizedCommandLine = validatedResult->ValidatedCommandLine->Trim();
-			resolvedCommandName = ExtractCommandNameFromCommandLine(normalizedCommandLine);
-			if (String::IsNullOrWhiteSpace(resolvedCommandName)) {
-				errorText = "Validated built-in execution could not determine a command name from ValidatedCommandLine.";
-				return false;
-			}
-
-			String^ requestedCommandName = String::IsNullOrWhiteSpace(validatedResult->CommandName)
-				? String::Empty
-				: validatedResult->CommandName->Trim()->ToLowerInvariant();
-			if (!String::IsNullOrWhiteSpace(requestedCommandName)
-				&& !String::Equals(requestedCommandName, resolvedCommandName, StringComparison::OrdinalIgnoreCase)) {
-				errorText = "Validated built-in execution rejected a mismatched command record.";
-				return false;
-			}
-
-			resolvedSpec = AgentCommandRegistry::Find(resolvedCommandName);
-			if isNULL(resolvedSpec) {
-				errorText = "Validated built-in execution could not resolve the command to a known built-in.";
-				return false;
-			}
-
-			if (!resolvedSpec->AgentAccessible) {
-				errorText = "Validated built-in execution rejected a built-in that is not agent-accessible.";
-				return false;
-			}
-
-			return true;
 		}
 
 		bool DidExecutionSucceed(AgentCommandExecution^ execution) {
@@ -308,6 +253,8 @@ namespace GTA {
 		FailureReason = String::Empty;
 		Error = String::Empty;
 		IsValidatedForExecution = false;
+		RequiresConfirmation = false;
+		ExecutionAuthorizationId = 0;
 	}
 
 	AgentRuntimeValidatedBuiltInExecutionCompletion::AgentRuntimeValidatedBuiltInExecutionCompletion() {
@@ -403,11 +350,13 @@ namespace GTA {
 		pPromptGeneration = 0;
 		pBuiltInClassificationGeneration = 0;
 		pValidatedBuiltInExecutionGeneration = 0;
+		pNextExecutionAuthorizationId = 0;
 		pPromptOwnerScript = nullptr;
 		pBuiltInClassificationOwnerScript = nullptr;
 		pValidatedBuiltInExecutionOwnerScript = nullptr;
 		pNextRequestId = 0;
 		pCallbackQueue = gcnew Queue<AgentRuntimeQueuedCallback^>();
+		pAuthorizedBuiltInExecutions = gcnew Dictionary<int, AuthorizedBuiltInExecutionRecord^>();
 		AgentRuntimePumpState::ManagedRuntimeInstance = this;
 	}
 
@@ -421,6 +370,10 @@ namespace GTA {
 
 	int AgentRuntime::ReserveRequestId() {
 		return Interlocked::Increment(pNextRequestId);
+	}
+
+	int AgentRuntime::ReserveExecutionAuthorizationId() {
+		return Interlocked::Increment(pNextExecutionAuthorizationId);
 	}
 
 	Dictionary<String^, String^>^ AgentRuntime::CloneStringDictionary(Dictionary<String^, String^>^ source) {
@@ -464,9 +417,14 @@ namespace GTA {
 		clone->TurnId = turnId;
 		clone->OwnerScript = isNULL(request) ? nullptr : request->OwnerScript;
 		clone->UserInput = isNULL(request) || isNULL(request->UserInput) ? String::Empty : String::Copy(request->UserInput);
-		clone->RecentCommandTranscriptJson = isNULL(request) || isNULL(request->RecentCommandTranscriptJson)
+		String^ recentTranscriptJson = isNULL(request) || isNULL(request->RecentCommandTranscriptJson)
 			? String::Empty
-			: String::Copy(request->RecentCommandTranscriptJson);
+			: request->RecentCommandTranscriptJson;
+		if (String::IsNullOrWhiteSpace(recentTranscriptJson))
+			recentTranscriptJson = AgentConsole::BuildSharedRecentCommandTranscriptJson();
+		clone->RecentCommandTranscriptJson = String::IsNullOrWhiteSpace(recentTranscriptJson)
+			? String::Empty
+			: String::Copy(recentTranscriptJson);
 		return clone;
 	}
 
@@ -509,7 +467,127 @@ namespace GTA {
 			? String::Empty
 			: String::Copy(validatedResult->Error);
 		clone->IsValidatedForExecution = validatedResult->IsValidatedForExecution;
+		clone->RequiresConfirmation = validatedResult->RequiresConfirmation;
+		clone->ExecutionAuthorizationId = validatedResult->ExecutionAuthorizationId;
 		return clone;
+	}
+
+	void AgentRuntime::RememberAuthorizedBuiltInExecutionLocked(
+		Script^ ownerScript,
+		AgentRuntimeBuiltInClassificationCompletion^ validatedResult) {
+		if (isNULL(ownerScript) || isNULL(validatedResult) || !validatedResult->IsValidatedForExecution)
+			return;
+
+		int authorizationId = ReserveExecutionAuthorizationId();
+		AuthorizedBuiltInExecutionRecord^ record = gcnew AuthorizedBuiltInExecutionRecord();
+		record->AuthorizationId = authorizationId;
+		record->OwnerScript = ownerScript;
+		record->CommandName = isNULL(validatedResult->CommandName) ? String::Empty : String::Copy(validatedResult->CommandName);
+		record->ValidatedCommandLine = isNULL(validatedResult->ValidatedCommandLine)
+			? String::Empty
+			: String::Copy(validatedResult->ValidatedCommandLine);
+		pAuthorizedBuiltInExecutions[authorizationId] = record;
+		validatedResult->ExecutionAuthorizationId = authorizationId;
+	}
+
+	AgentValidatedBuiltInExecutionRecord^ AgentRuntime::BuildTrustedExecutionRecordLocked(
+		Script^ ownerScript,
+		AgentRuntimeBuiltInClassificationCompletion^ validatedResult,
+		String^% errorText) {
+		errorText = String::Empty;
+
+		if isNULL(validatedResult) {
+			errorText = "Validated built-in execution requires a validated result record.";
+			return nullptr;
+		}
+
+		if (!validatedResult->IsValidatedForExecution) {
+			errorText = "Validated built-in execution requires a result with IsValidatedForExecution == true.";
+			return nullptr;
+		}
+
+		if (validatedResult->RequiresConfirmation) {
+			errorText = "This built-in requires confirmation and is not executable from the script API.";
+			return nullptr;
+		}
+
+		if (String::IsNullOrWhiteSpace(validatedResult->ValidatedCommandLine)) {
+			errorText = "Validated built-in execution requires a non-empty ValidatedCommandLine.";
+			return nullptr;
+		}
+
+		AuthorizedBuiltInExecutionRecord^ authorizedRecord = nullptr;
+		if ((validatedResult->ExecutionAuthorizationId <= 0)
+			|| !pAuthorizedBuiltInExecutions->TryGetValue(validatedResult->ExecutionAuthorizationId, authorizedRecord)
+			|| isNULL(authorizedRecord)) {
+			errorText = "Validated built-in execution requires a trusted semantic-validation authorization.";
+			return nullptr;
+		}
+
+		if (!IsSameScript(authorizedRecord->OwnerScript, ownerScript)) {
+			errorText = "Validated built-in execution rejected a result that was not authorized for the current script.";
+			return nullptr;
+		}
+
+		String^ authorizedCommandLine = isNULL(authorizedRecord->ValidatedCommandLine)
+			? String::Empty
+			: authorizedRecord->ValidatedCommandLine->Trim();
+		if (!String::Equals(
+			authorizedCommandLine,
+			validatedResult->ValidatedCommandLine->Trim(),
+			StringComparison::Ordinal)) {
+			errorText = "Validated built-in execution rejected a tampered command line.";
+			return nullptr;
+		}
+
+		String^ authorizedCommandName = isNULL(authorizedRecord->CommandName)
+			? String::Empty
+			: authorizedRecord->CommandName->Trim()->ToLowerInvariant();
+		String^ requestedCommandName = String::IsNullOrWhiteSpace(validatedResult->CommandName)
+			? String::Empty
+			: validatedResult->CommandName->Trim()->ToLowerInvariant();
+		if (!String::IsNullOrWhiteSpace(requestedCommandName)
+			&& !String::Equals(authorizedCommandName, requestedCommandName, StringComparison::OrdinalIgnoreCase)) {
+			errorText = "Validated built-in execution rejected a tampered command name.";
+			return nullptr;
+		}
+
+		AgentCommandSpec^ spec = AgentCommandRegistry::Find(authorizedCommandName);
+		if isNULL(spec) {
+			errorText = "Validated built-in execution could not resolve the command to a known built-in.";
+			return nullptr;
+		}
+
+		if (!spec->AgentAccessible) {
+			errorText = "Validated built-in execution rejected a built-in that is not agent-accessible.";
+			return nullptr;
+		}
+
+		if (spec->RequiresConfirmation) {
+			errorText = "This built-in requires confirmation and is not executable from the script API.";
+			return nullptr;
+		}
+
+		AgentValidatedBuiltInExecutionRecord^ trustedRecord = gcnew AgentValidatedBuiltInExecutionRecord();
+		trustedRecord->CommandName = spec->Name;
+		trustedRecord->ValidatedCommandLine = authorizedCommandLine;
+		trustedRecord->IsValidatedForExecution = true;
+		trustedRecord->OwnerScript = ownerScript;
+		trustedRecord->Spec = spec;
+		return trustedRecord;
+	}
+
+	void AgentRuntime::RemoveAuthorizedBuiltInExecutionsForScriptLocked(Script^ ownerScript) {
+		if isNULL(ownerScript) return;
+
+		List<int>^ keysToRemove = gcnew List<int>();
+		for each (KeyValuePair<int, AuthorizedBuiltInExecutionRecord^> kvp in pAuthorizedBuiltInExecutions) {
+			if (isNotNULL(kvp.Value) && IsSameScript(kvp.Value->OwnerScript, ownerScript))
+				keysToRemove->Add(kvp.Key);
+		}
+
+		for each (int key in keysToRemove)
+			pAuthorizedBuiltInExecutions->Remove(key);
 	}
 
 	bool AgentRuntime::IsSameScript(Script^ left, Script^ right) {
@@ -939,16 +1017,28 @@ namespace GTA {
 					completion->ResponseText = NormalizeRuntimeText(result->ResponseText);
 					completion->FailureReason = NormalizeRuntimeText(result->FailureReason);
 
+					AgentCommandSpec^ resolvedSpec = AgentCommandRegistry::Find(completion->CommandName);
 					bool isValidatedRun =
 						(result->Decision == AgentReasoningDecision::BuiltInRun) &&
-						!String::IsNullOrWhiteSpace(result->ValidatedCommandLine);
+						!String::IsNullOrWhiteSpace(result->ValidatedCommandLine) &&
+						isNotNULL(resolvedSpec) &&
+						resolvedSpec->AgentAccessible;
 					bool isExplainResult = (result->Decision == AgentReasoningDecision::BuiltInExplain);
 					bool isNoExactFit =
 						result->ContractDecision == AgentReasoningContractDecision::NoExactBuiltInFit;
 					bool isNeedsClarification =
 						result->ContractDecision == AgentReasoningContractDecision::NeedsClarification;
 					completion->Success = isValidatedRun || isExplainResult || isNoExactFit || isNeedsClarification;
-					completion->IsValidatedForExecution = isValidatedRun;
+					completion->RequiresConfirmation = isValidatedRun && resolvedSpec->RequiresConfirmation;
+					completion->IsValidatedForExecution = isValidatedRun && !completion->RequiresConfirmation;
+					if (completion->RequiresConfirmation) {
+						String^ confirmationMessage =
+							"This built-in requires confirmation and is not executable from the script API.";
+						if (String::IsNullOrWhiteSpace(completion->Explanation))
+							completion->Explanation = confirmationMessage;
+						else
+							completion->Explanation = completion->Explanation + " " + confirmationMessage;
+					}
 					if ((result->Decision == AgentReasoningDecision::BuiltInRun) && !isValidatedRun) {
 						completion->Error = !String::IsNullOrWhiteSpace(completion->FailureReason)
 							? completion->FailureReason
@@ -969,6 +1059,12 @@ namespace GTA {
 		Monitor::Enter(pSyncRoot);
 		try {
 			if (isNULL(context) || (context->Generation == pBuiltInClassificationGeneration)) {
+				if (isNotNULL(context)
+					&& isNotNULL(context->Request)
+					&& completion->IsValidatedForExecution
+					&& !completion->RequiresConfirmation) {
+					RememberAuthorizedBuiltInExecutionLocked(context->Request->OwnerScript, completion);
+				}
 				bBuiltInClassificationBusy = false;
 				pBuiltInClassificationOwnerScript = nullptr;
 				enqueue = isNotNULL(context);
@@ -1017,32 +1113,29 @@ namespace GTA {
 			} else {
 				ownedTurnId = TakeOwnedTurn(context->RequestId);
 
-				String^ resolvedCommandName;
-				String^ normalizedCommandLine;
-				AgentCommandSpec^ resolvedSpec;
 				String^ validationError;
-				if (!TryResolveExecutableBuiltIn(
-					context->ValidatedResult,
-					resolvedCommandName,
-					normalizedCommandLine,
-					resolvedSpec,
-					validationError)) {
+				AgentValidatedBuiltInExecutionRecord^ trustedExecutionRecord = nullptr;
+				Monitor::Enter(pSyncRoot);
+				try {
+					trustedExecutionRecord = BuildTrustedExecutionRecordLocked(
+						context->OwnerScript,
+						context->ValidatedResult,
+						validationError);
+				} finally {
+					Monitor::Exit(pSyncRoot);
+				}
+
+				if isNULL(trustedExecutionRecord) {
 					completion->ResultCode = "invalid_validated_result";
 					completion->CompletionSummary = validationError;
 					completion->Error = validationError;
 				} else {
-					context->ValidatedResult->CommandName = resolvedSpec->Name;
+					context->ValidatedResult->CommandName = trustedExecutionRecord->CommandName;
+					context->ValidatedResult->ValidatedCommandLine = trustedExecutionRecord->ValidatedCommandLine;
 					String^ executionError = String::Empty;
-					AgentValidatedBuiltInExecutionRecord^ executionRecord =
-						gcnew AgentValidatedBuiltInExecutionRecord();
-					executionRecord->CommandName = context->ValidatedResult->CommandName;
-					executionRecord->ValidatedCommandLine = context->ValidatedResult->ValidatedCommandLine;
-					executionRecord->IsValidatedForExecution = context->ValidatedResult->IsValidatedForExecution;
 					AgentCommandExecution^ execution = AgentCommandExecution::ExecuteValidatedBuiltInCommand(
 						context->TurnId,
-						executionRecord,
-						"AgentRuntime",
-						BuildScriptLogSource(context->OwnerScript),
+						trustedExecutionRecord,
 						executionError);
 					CopyExecutionIntoCompletion(execution, completion);
 					completion->Success = DidExecutionSucceed(execution);
@@ -1118,6 +1211,7 @@ namespace GTA {
 	}
 
 	void AgentRuntime::AbandonScriptOwnedWorkCore(Script^ ownerScript) {
+		RemoveAuthorizedBuiltInExecutionsForScriptLocked(ownerScript);
 		if (IsSameScript(pPromptOwnerScript, ownerScript))
 			AbandonPromptWorkCore();
 		if (IsSameScript(pBuiltInClassificationOwnerScript, ownerScript))
@@ -1156,6 +1250,7 @@ namespace GTA {
 	void AgentRuntime::AbandonPendingWork() {
 		Monitor::Enter(pSyncRoot);
 		try {
+			pAuthorizedBuiltInExecutions->Clear();
 			AbandonPromptWorkCore();
 			AbandonBuiltInClassificationWorkCore();
 			AbandonValidatedBuiltInExecutionWorkCore();

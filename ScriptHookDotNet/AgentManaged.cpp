@@ -133,8 +133,17 @@ namespace GTA {
 			} else {
 				result->MessageText = SafeText(completion->FailureReason);
 			}
+			if (completion->RequiresConfirmation) {
+				String^ confirmationMessage =
+					"This built-in requires confirmation and is not executable from the script API.";
+				if (String::IsNullOrWhiteSpace(result->MessageText))
+					result->MessageText = confirmationMessage;
+				else if (!result->MessageText->Contains(confirmationMessage))
+					result->MessageText = result->MessageText + " " + confirmationMessage;
+			}
 			result->IsValidatedForExecution = completion->IsValidatedForExecution
 				&& IsBuiltInRunnable(result->Decision, result->CommandName, result->ValidatedCommandLine);
+			result->RuntimeExecutionAuthorizationId = completion->ExecutionAuthorizationId;
 			return result;
 		}
 
@@ -227,6 +236,7 @@ namespace GTA {
 		MessageText = String::Empty;
 		ErrorText = String::Empty;
 		IsValidatedForExecution = false;
+		RuntimeExecutionAuthorizationId = 0;
 	}
 
 	BuiltInExecutionResult::BuiltInExecutionResult() {
@@ -323,6 +333,7 @@ namespace GTA {
 		runtimeValidatedResult->Explanation = SafeText(validatedResult->MessageText);
 		runtimeValidatedResult->Error = SafeText(validatedResult->ErrorText);
 		runtimeValidatedResult->IsValidatedForExecution = validatedResult->IsValidatedForExecution;
+		runtimeValidatedResult->ExecutionAuthorizationId = validatedResult->RuntimeExecutionAuthorizationId;
 
 		BuiltInExecutionRuntimeCallbackAdapter^ adapter = gcnew BuiltInExecutionRuntimeCallbackAdapter(callback);
 		if (!GetManagedRuntime()->SubmitValidatedBuiltInExecution(

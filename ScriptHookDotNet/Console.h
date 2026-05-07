@@ -159,6 +159,8 @@ namespace GTA {
 		AgentReasoningWorker^ pReasoningWorker;
 		AgentCommandExecution^ pActiveCommandExecution;
 		List<AgentCommandExecution^>^ pRecentCommandExecutions;
+		static initonly List<AgentCommandExecution^>^ pSharedRecentCommandExecutions =
+			gcnew List<AgentCommandExecution^>();
 		AgentCommandSpec^ pPendingCommandSpec;
 		String^ pPendingCommandLine;
 		String^ pPendingClarificationInput;
@@ -221,6 +223,9 @@ namespace GTA {
 		virtual void AddOldCommand(String^ CommandLine) override;
 
 	public:
+		static String^ BuildSharedRecentCommandTranscriptJson();
+		static void RememberSharedCommandExecution(AgentCommandExecution^ execution);
+
 		property bool isActive {
 			virtual bool get() override {
 				return bActive;

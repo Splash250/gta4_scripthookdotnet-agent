@@ -26,6 +26,7 @@
 namespace GTA {
 
 	ref class Script;
+	ref class AgentValidatedBuiltInExecutionRecord;
 
 	CLASS_ATTRIBUTES
 	private ref class AgentRuntimePromptRequest sealed {
@@ -94,6 +95,8 @@ namespace GTA {
 		String^ FailureReason;
 		String^ Error;
 		bool IsValidatedForExecution;
+		bool RequiresConfirmation;
+		int ExecutionAuthorizationId;
 
 		AgentRuntimeBuiltInClassificationCompletion();
 	};
@@ -225,6 +228,14 @@ namespace GTA {
 			AgentRuntimeValidatedBuiltInExecutionCompletedCallback^ Callback;
 		};
 
+		ref class AuthorizedBuiltInExecutionRecord sealed {
+		public:
+			int AuthorizationId;
+			Script^ OwnerScript;
+			String^ CommandName;
+			String^ ValidatedCommandLine;
+		};
+
 		System::Object^ pSyncRoot;
 		System::Object^ pCallbackSyncRoot;
 		bool bPromptBusy;
@@ -233,11 +244,13 @@ namespace GTA {
 		int pPromptGeneration;
 		int pBuiltInClassificationGeneration;
 		int pValidatedBuiltInExecutionGeneration;
+		int pNextExecutionAuthorizationId;
 		Script^ pPromptOwnerScript;
 		Script^ pBuiltInClassificationOwnerScript;
 		Script^ pValidatedBuiltInExecutionOwnerScript;
 		int pNextRequestId;
 		System::Collections::Generic::Queue<AgentRuntimeQueuedCallback^>^ pCallbackQueue;
+		System::Collections::Generic::Dictionary<int, AuthorizedBuiltInExecutionRecord^>^ pAuthorizedBuiltInExecutions;
 
 		static Script^ CaptureOwningScript();
 		int ReserveRequestId();
@@ -251,6 +264,15 @@ namespace GTA {
 		static AgentRuntimeBuiltInClassificationCompletion^ CloneBuiltInClassificationCompletionForExecution(
 			AgentRuntimeBuiltInClassificationCompletion^ validatedResult);
 		static bool IsSameScript(Script^ left, Script^ right);
+		int ReserveExecutionAuthorizationId();
+		void RememberAuthorizedBuiltInExecutionLocked(
+			Script^ ownerScript,
+			AgentRuntimeBuiltInClassificationCompletion^ validatedResult);
+		AgentValidatedBuiltInExecutionRecord^ BuildTrustedExecutionRecordLocked(
+			Script^ ownerScript,
+			AgentRuntimeBuiltInClassificationCompletion^ validatedResult,
+			String^% errorText);
+		void RemoveAuthorizedBuiltInExecutionsForScriptLocked(Script^ ownerScript);
 		bool IsCallbackGenerationCurrentLocked(AgentRuntimeQueuedCallback^ callback);
 		bool ShouldDeliverCallback(AgentRuntimeQueuedCallback^ callback);
 		void EnqueueCallback(AgentRuntimeQueuedCallback^ callback);
