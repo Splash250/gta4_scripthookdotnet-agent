@@ -5,7 +5,7 @@ using GTA;
 // AgentHelloWorld.cs
 //
 // Hotkey:
-//   F7 - Send one simple PromptAsync request to the agent.
+//   F6 - Send one simple PromptAsync request to the agent.
 //
 // What this example teaches:
 //   1. How to create an AgentPromptRequest.
@@ -18,7 +18,7 @@ using GTA;
 
 public class AgentHelloWorld : Script {
    // Pick a hotkey that is easy to reach and unlikely to collide with Steam's F12 screenshot key.
-   private const Keys PromptHotkey = Keys.F7;
+   private const Keys PromptHotkey = Keys.F6;
 
    // A timeout keeps the example from getting stuck forever if the request never completes.
    // In a real mod, you might choose a different timeout or a richer retry strategy.
