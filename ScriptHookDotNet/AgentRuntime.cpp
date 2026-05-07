@@ -40,6 +40,8 @@ namespace GTA {
 
 	using namespace System;
 	using namespace System::Collections::Generic;
+	using namespace System::Globalization;
+	using namespace System::Text;
 	using namespace System::Threading;
 
 	namespace {
@@ -57,6 +59,32 @@ namespace GTA {
 
 		String^ NormalizeRuntimeText(String^ value) {
 			return isNULL(value) ? String::Empty : value;
+		}
+
+		String^ EscapeRuntimeJson(String^ value) {
+			if (isNULL(value))
+				return String::Empty;
+
+			StringBuilder^ sb = gcnew StringBuilder();
+			for each (wchar_t ch in value) {
+				switch (ch) {
+					case L'\\': sb->Append("\\\\"); break;
+					case L'"': sb->Append("\\\""); break;
+					case L'\b': sb->Append("\\b"); break;
+					case L'\f': sb->Append("\\f"); break;
+					case L'\n': sb->Append("\\n"); break;
+					case L'\r': sb->Append("\\r"); break;
+					case L'\t': sb->Append("\\t"); break;
+					default:
+						if (ch < 32)
+							sb->AppendFormat("\\u{0:x4}", (int)ch);
+						else
+							sb->Append(ch);
+						break;
+				}
+			}
+
+			return sb->ToString();
 		}
 
 		String^ BuildScriptLogSource(Script^ ownerScript) {
@@ -99,6 +127,122 @@ namespace GTA {
 				&& !String::Equals(resultCode, "exception", StringComparison::OrdinalIgnoreCase)
 				&& !String::Equals(resultCode, "native_exception", StringComparison::OrdinalIgnoreCase)
 				&& !String::Equals(resultCode, "unknown_command", StringComparison::OrdinalIgnoreCase);
+		}
+
+		void LogScriptReplyEmitted(int turnId, Script^ ownerScript, String^ humanSummary, String^ jsonPayload) {
+			if (turnId <= 0)
+				return;
+
+			AgentLogger::LogEvent(
+				turnId,
+				AgentLogEventType::ReplyEmitted,
+				BuildScriptLogSource(ownerScript),
+				humanSummary,
+				jsonPayload);
+		}
+
+		void LogPromptReplyEmitted(int turnId, AgentRuntimePromptCompletion^ completion) {
+			AgentRuntimePromptCompletion^ safeCompletion =
+				isNULL(completion) ? gcnew AgentRuntimePromptCompletion() : completion;
+			AgentRuntimePromptRequest^ request = safeCompletion->Request;
+			String^ responseText = NormalizeRuntimeText(safeCompletion->ResponseText);
+			String^ errorText = NormalizeRuntimeText(safeCompletion->Error);
+			String^ responseId = NormalizeRuntimeText(safeCompletion->ResponseId);
+			String^ requestKind = NormalizeRuntimeText(safeCompletion->RequestKind);
+			String^ model = NormalizeRuntimeText(safeCompletion->Model);
+			String^ mode = safeCompletion->Success ? "script_prompt_completed" : "script_prompt_failed";
+			String^ humanSummary = safeCompletion->Success
+				? "Script prompt reply emitted."
+				: "Script prompt failure emitted.";
+
+			LogScriptReplyEmitted(
+				turnId,
+				isNULL(request) ? nullptr : request->OwnerScript,
+				humanSummary,
+				String::Concat(
+					"{\"mode\":\"", mode,
+					"\",\"request_kind\":\"", EscapeRuntimeJson(requestKind),
+					"\",\"success\":", safeCompletion->Success ? "true" : "false",
+					",\"response_id\":\"", EscapeRuntimeJson(responseId),
+					"\",\"response_text\":\"", EscapeRuntimeJson(responseText),
+					"\",\"error\":\"", EscapeRuntimeJson(errorText),
+					"\",\"model\":\"", EscapeRuntimeJson(model),
+					"\"}"));
+		}
+
+		void LogBuiltInClassificationReplyEmitted(int turnId, AgentRuntimeBuiltInClassificationCompletion^ completion) {
+			AgentRuntimeBuiltInClassificationCompletion^ safeCompletion =
+				isNULL(completion) ? gcnew AgentRuntimeBuiltInClassificationCompletion() : completion;
+			AgentRuntimeBuiltInClassificationRequest^ request = safeCompletion->Request;
+			String^ decision = NormalizeRuntimeText(safeCompletion->Decision);
+			String^ contractDecision = NormalizeRuntimeText(safeCompletion->ContractDecision);
+			String^ commandName = NormalizeRuntimeText(safeCompletion->CommandName);
+			String^ validatedCommandLine = NormalizeRuntimeText(safeCompletion->ValidatedCommandLine);
+			String^ responseText = NormalizeRuntimeText(safeCompletion->ResponseText);
+			String^ explanation = NormalizeRuntimeText(safeCompletion->Explanation);
+			String^ failureReason = NormalizeRuntimeText(safeCompletion->FailureReason);
+			String^ errorText = NormalizeRuntimeText(safeCompletion->Error);
+			String^ mode = safeCompletion->Success
+				? "script_built_in_classification_completed"
+				: "script_built_in_classification_failed";
+			String^ humanSummary = safeCompletion->Success
+				? "Script built-in classification result emitted."
+				: "Script built-in classification failure emitted.";
+
+			LogScriptReplyEmitted(
+				turnId,
+				isNULL(request) ? nullptr : request->OwnerScript,
+				humanSummary,
+				String::Concat(
+					"{\"mode\":\"", mode,
+					"\",\"success\":", safeCompletion->Success ? "true" : "false",
+					",\"decision\":\"", EscapeRuntimeJson(decision),
+					"\",\"contract_decision\":\"", EscapeRuntimeJson(contractDecision),
+					"\",\"command_name\":\"", EscapeRuntimeJson(commandName),
+					"\",\"validated_command_line\":\"", EscapeRuntimeJson(validatedCommandLine),
+					"\",\"response_text\":\"", EscapeRuntimeJson(responseText),
+					"\",\"explanation\":\"", EscapeRuntimeJson(explanation),
+					"\",\"failure_reason\":\"", EscapeRuntimeJson(failureReason),
+					"\",\"error\":\"", EscapeRuntimeJson(errorText),
+					"\",\"requires_confirmation\":", safeCompletion->RequiresConfirmation ? "true" : "false",
+					",\"is_validated_for_execution\":", safeCompletion->IsValidatedForExecution ? "true" : "false",
+					",\"execution_authorization_id\":", safeCompletion->ExecutionAuthorizationId.ToString(CultureInfo::InvariantCulture),
+					"}"));
+		}
+
+		void LogValidatedBuiltInExecutionReplyEmitted(int turnId, Script^ ownerScript, AgentRuntimeValidatedBuiltInExecutionCompletion^ completion) {
+			AgentRuntimeValidatedBuiltInExecutionCompletion^ safeCompletion =
+				isNULL(completion) ? gcnew AgentRuntimeValidatedBuiltInExecutionCompletion() : completion;
+			AgentRuntimeBuiltInClassificationCompletion^ validatedResult = safeCompletion->ValidatedResult;
+			String^ commandName = isNULL(validatedResult) ? String::Empty : NormalizeRuntimeText(validatedResult->CommandName);
+			String^ commandLine = isNULL(validatedResult) ? String::Empty : NormalizeRuntimeText(validatedResult->ValidatedCommandLine);
+			String^ resultCode = NormalizeRuntimeText(safeCompletion->ResultCode);
+			String^ completionSummary = NormalizeRuntimeText(safeCompletion->CompletionSummary);
+			String^ errorText = NormalizeRuntimeText(safeCompletion->Error);
+			String^ mode = safeCompletion->Success
+				? "script_built_in_execution_completed"
+				: "script_built_in_execution_failed";
+			String^ humanSummary = safeCompletion->Success
+				? "Script built-in execution result emitted."
+				: "Script built-in execution failure emitted.";
+
+			LogScriptReplyEmitted(
+				turnId,
+				ownerScript,
+				humanSummary,
+				String::Concat(
+					"{\"mode\":\"", mode,
+					"\",\"success\":", safeCompletion->Success ? "true" : "false",
+					",\"command_name\":\"", EscapeRuntimeJson(commandName),
+					"\",\"validated_command_line\":\"", EscapeRuntimeJson(commandLine),
+					"\",\"result_code\":\"", EscapeRuntimeJson(resultCode),
+					"\",\"completion_summary\":\"", EscapeRuntimeJson(completionSummary),
+					"\",\"error\":\"", EscapeRuntimeJson(errorText),
+					"\",\"completed\":", safeCompletion->Completed ? "true" : "false",
+					",\"total_output_line_count\":", safeCompletion->TotalOutputLineCount.ToString(CultureInfo::InvariantCulture),
+					",\"saw_error_like_output\":", safeCompletion->SawErrorLikeOutput ? "true" : "false",
+					",\"saw_warning_like_output\":", safeCompletion->SawWarningLikeOutput ? "true" : "false",
+					"}"));
 		}
 
 		void CopyExecutionIntoCompletion(
@@ -1109,6 +1253,7 @@ namespace GTA {
 			if (enqueue && !callbackQueued) {
 				AgentLogger::EndTurn(ownedTurnId, true, "Prompt request was abandoned before callback delivery.");
 			} else {
+				LogPromptReplyEmitted(ownedTurnId, completion);
 				String^ summary = completion->Success
 					? "Script prompt request completed."
 					: "Script prompt request failed.";
@@ -1241,6 +1386,7 @@ namespace GTA {
 			if (enqueue && !callbackQueued) {
 				AgentLogger::EndTurn(ownedTurnId, true, "Built-in classification was abandoned before callback delivery.");
 			} else {
+				LogBuiltInClassificationReplyEmitted(ownedTurnId, completion);
 				bool failed = !completion->Success && !String::IsNullOrWhiteSpace(completion->Error);
 				String^ summary = failed
 					? "Script built-in classification failed."
@@ -1341,6 +1487,7 @@ namespace GTA {
 		}
 
 		if (ownedTurnId > 0) {
+			LogValidatedBuiltInExecutionReplyEmitted(ownedTurnId, isNULL(context) ? nullptr : context->OwnerScript, completion);
 			String^ summary = completion->Success
 				? "Script built-in execution completed."
 				: NormalizeRuntimeText(completion->CompletionSummary);
