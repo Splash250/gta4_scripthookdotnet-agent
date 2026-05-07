@@ -6,7 +6,7 @@ using GTA;
 //
 // Hotkeys:
 //   F7 - Classify a natural-language built-in request without executing it.
-//   F8 - Classify a natural-language built-in request and execute it only if the API says it is safe.
+//   F5 - Classify a natural-language built-in request and execute it only if the API says it is safe.
 //
 // What this example teaches:
 //   1. How to send a BuiltInCommandRequest through Agent.ClassifyBuiltInAsync(...).
@@ -22,9 +22,9 @@ using GTA;
 public class AgentCommandHelper : Script {
    // These hotkeys match scripts/agent-examples/README.md.
    // F7 is the "classify only" path.
-   // F8 is the "classify, then execute if validated" path.
+   // F5 is the "classify, then execute if validated" path.
    private const Keys ClassifyOnlyHotkey = Keys.F7;
-   private const Keys ClassifyAndExecuteHotkey = Keys.F8;
+   private const Keys ClassifyAndExecuteHotkey = Keys.F5;
 
    // The example uses two concrete requests so modders can see both modes clearly.
    // You can safely change these strings first when adapting this file to your own mod.

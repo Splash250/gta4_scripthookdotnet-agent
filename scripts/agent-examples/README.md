@@ -14,7 +14,7 @@ Then read [AgentCommandHelper.cs](./AgentCommandHelper.cs) to see built-in comma
 
 - `F6`: run the `AgentHelloWorld.cs` prompt example
 - `F7`: run the `AgentCommandHelper.cs` classify-only example
-- `F8`: run the `AgentCommandHelper.cs` classify-and-execute example
+- `F5`: run the `AgentCommandHelper.cs` classify-and-execute example
 
 ## Expected In-Game Behavior
 
