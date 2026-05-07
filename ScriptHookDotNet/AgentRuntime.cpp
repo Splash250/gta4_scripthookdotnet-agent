@@ -398,8 +398,6 @@ namespace GTA {
 		String^ recentTranscriptJson = isNULL(request) || isNULL(request->RecentCommandTranscriptJson)
 			? String::Empty
 			: request->RecentCommandTranscriptJson;
-		if (String::IsNullOrWhiteSpace(recentTranscriptJson))
-			recentTranscriptJson = AgentConsole::BuildSharedRecentCommandTranscriptJson();
 		clone->RecentCommandTranscriptJson = String::IsNullOrWhiteSpace(recentTranscriptJson)
 			? String::Empty
 			: String::Copy(recentTranscriptJson);
