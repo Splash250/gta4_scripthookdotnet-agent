@@ -90,7 +90,15 @@ namespace GTA {
 		property bool Success;
 		property String^ CommandName;
 		property String^ ExecutedCommandLine;
+		property String^ ResultCode;
 		property String^ CompletionSummary;
+		property array<String^>^ TranscriptLines;
+		property int TotalOutputLineCount;
+		property bool Completed;
+		property bool HasLoggedOutput;
+		property bool CompletionLogged;
+		property bool SawErrorLikeOutput;
+		property bool SawWarningLikeOutput;
 		property String^ ErrorText;
 
 		BuiltInExecutionResult();

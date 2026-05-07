@@ -75,6 +75,7 @@ namespace GTA {
 			result->Success = false;
 			result->CommandName = isNULL(validatedResult) ? String::Empty : SafeText(validatedResult->CommandName);
 			result->ExecutedCommandLine = String::Empty;
+			result->ResultCode = "invalid_validated_result";
 			result->CompletionSummary = String::Empty;
 			result->ErrorText = SafeText(errorText);
 			return result;
@@ -212,7 +213,17 @@ namespace GTA {
 			result->ExecutedCommandLine = !DidBuiltInExecutionStart(completion) || isNULL(completion->ValidatedResult)
 				? String::Empty
 				: SafeText(completion->ValidatedResult->ValidatedCommandLine);
+			result->ResultCode = SafeText(completion->ResultCode);
 			result->CompletionSummary = SafeText(completion->CompletionSummary);
+			result->TranscriptLines = isNULL(completion->OutputLines)
+				? gcnew array<String^>(0)
+				: completion->OutputLines->ToArray();
+			result->TotalOutputLineCount = completion->TotalOutputLineCount;
+			result->Completed = completion->Completed;
+			result->HasLoggedOutput = completion->HasLoggedOutput;
+			result->CompletionLogged = completion->CompletionLogged;
+			result->SawErrorLikeOutput = completion->SawErrorLikeOutput;
+			result->SawWarningLikeOutput = completion->SawWarningLikeOutput;
 			result->ErrorText = SafeText(completion->Error);
 			return result;
 		}
@@ -341,7 +352,15 @@ namespace GTA {
 		Success = false;
 		CommandName = String::Empty;
 		ExecutedCommandLine = String::Empty;
+		ResultCode = String::Empty;
 		CompletionSummary = String::Empty;
+		TranscriptLines = gcnew array<String^>(0);
+		TotalOutputLineCount = 0;
+		Completed = false;
+		HasLoggedOutput = false;
+		CompletionLogged = false;
+		SawErrorLikeOutput = false;
+		SawWarningLikeOutput = false;
 		ErrorText = String::Empty;
 	}
 
