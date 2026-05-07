@@ -70,6 +70,7 @@ namespace GTA {
 	internal:
 		Script^ OwnerScript;
 
+		// Compatibility wrapper until Task 3 migrates AgentRuntime to AgentBuiltInExecutor directly.
 		static AgentCommandExecution^ ExecuteValidatedBuiltInCommand(
 			int turnId,
 			AgentValidatedBuiltInExecutionRecord^ validatedResult,

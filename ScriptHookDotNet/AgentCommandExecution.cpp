@@ -22,13 +22,11 @@
 
 #include "stdafx.h"
 
+#include "AgentBuiltInExecutor.h"
 #include "AgentCommandExecution.h"
-#include "AgentCommandRegistry.h"
-#include "AgentCommandSemantics.h"
 #include "AgentLogger.h"
-#include "Console.h"
-#include "NetHook.h"
 #include "Script.h"
+#include "AgentCommandSemantics.h"
 
 #pragma managed
 
@@ -95,56 +93,6 @@ namespace GTA {
 			return AgentLogger::ComposeSource(execution->LogSource, execution->OriginTag);
 		}
 
-		String^ BuildScriptExecutionOriginTag(Script^ ownerScript) {
-			if (isNULL(ownerScript) || String::IsNullOrWhiteSpace(ownerScript->Name))
-				return "script:unknown";
-			return "script:" + ownerScript->Name->Trim();
-		}
-
-		AgentConsole^ GetAgentConsoleForCommandCapture() {
-			try {
-				FieldInfo^ field = NetHook::typeid->GetField(
-					"pAgentConsole",
-					BindingFlags::NonPublic | BindingFlags::Static);
-				if isNULL(field)
-					return nullptr;
-
-				return dynamic_cast<AgentConsole^>(field->GetValue(nullptr));
-			} catch (...) {
-				return nullptr;
-			}
-		}
-
-		void PopulateExecutionSummary(AgentCommandExecution^ execution) {
-			if isNULL(execution)
-				return;
-
-			String^ resultCode = "completed";
-			String^ completionSummary = "Command completed.";
-			if (execution->SawErrorLikeOutput) {
-				resultCode = "problem_reported";
-				completionSummary = "Command reported a problem. Review mirrored output above.";
-			}
-			else if (execution->SawWarningLikeOutput) {
-				resultCode = "warning_reported";
-				completionSummary = "Command completed with warnings.";
-			}
-			else if (execution->TotalOutputLineCount > 0) {
-				resultCode = "output_observed";
-				completionSummary = "Command completed with output mirrored above.";
-			}
-			else if (AgentCommandSemantics::IsUsuallySilentOnSuccess(execution->CommandName)) {
-				resultCode = "silent_success";
-				completionSummary = "Command completed. This command is usually silent on success.";
-			}
-			else if (AgentCommandSemantics::IsExpectedToEmitOutput(execution->CommandName)) {
-				resultCode = "no_visible_output";
-				completionSummary = "Command completed without visible output, although this command often prints results.";
-			}
-
-			execution->SetCompletionResult(resultCode, completionSummary);
-		}
-
 	}
 
 	AgentValidatedBuiltInExecutionRecord::AgentValidatedBuiltInExecutionRecord() {
@@ -179,78 +127,15 @@ namespace GTA {
 		int turnId,
 		AgentValidatedBuiltInExecutionRecord^ validatedResult,
 		String^% errorText) {
-		errorText = String::Empty;
-
-		String^ normalizedCommandLine = (isNULL(validatedResult) || isNULL(validatedResult->ValidatedCommandLine))
-			? String::Empty
-			: validatedResult->ValidatedCommandLine->Trim();
-		String^ normalizedCommandName = (isNULL(validatedResult) || isNULL(validatedResult->CommandName))
-			? String::Empty
-			: validatedResult->CommandName->Trim()->ToLowerInvariant();
-		AgentCommandExecution^ execution = gcnew AgentCommandExecution(normalizedCommandLine, normalizedCommandName);
-		execution->TurnId = turnId;
-		execution->LogSource = "AgentRuntime";
-		execution->OriginTag = isNULL(validatedResult)
-			? String::Empty
-			: BuildScriptExecutionOriginTag(validatedResult->OwnerScript);
-		execution->OwnerScript = isNULL(validatedResult) ? nullptr : validatedResult->OwnerScript;
-
-		AgentCommandSpec^ spec = isNULL(validatedResult) ? nullptr : validatedResult->Spec;
-		if isNULL(spec) {
-			errorText = "Built-in execution could not resolve the validated command to a known command.";
-			execution->MarkCompleted();
-			execution->SetCompletionResult("unknown_command", errorText);
-			return execution;
-		}
-
-		try {
-			if (execution->TurnId > 0) {
-				AgentLogger::LogEvent(
-					execution->TurnId,
-					AgentLogEventType::CommandStarted,
-					AgentLogger::ComposeSource(execution->LogSource, execution->OriginTag),
-					"Running command: " + normalizedCommandLine,
-					BuildCommandPayload(execution, String::Empty, String::Empty, String::Empty, 0));
-			}
-
-			Console^ commandConsole = NetHook::DefaultConsole;
-			if isNULL(commandConsole) {
-				errorText = "Built-in execution could not run because the default console is unavailable.";
-				execution->MarkCompleted();
-				execution->SetCompletionResult("console_unavailable", errorText);
-				AgentConsole::RememberSharedCommandExecution(execution);
-				return execution;
-			}
-
-			AgentConsole^ captureConsole = GetAgentConsoleForCommandCapture();
-			NetHook::BeginAgentCommandCapture(captureConsole, execution);
-			try {
-				commandConsole->SendCommand(normalizedCommandLine);
-			}
-			finally {
-				NetHook::EndAgentCommandCapture();
-				execution->MarkCompleted();
-			}
-
-			PopulateExecutionSummary(execution);
-			AgentConsole::RememberSharedCommandExecution(execution);
-			if (String::Equals(execution->ResultCode, "problem_reported", StringComparison::OrdinalIgnoreCase))
-				errorText = execution->CompletionSummary;
-		}
-		catch (Exception^ ex) {
-			execution->MarkCompleted();
-			errorText = "Command execution failed: " + (isNULL(ex) ? "Unknown exception." : ex->Message);
-			execution->SetCompletionResult("exception", errorText);
-			AgentConsole::RememberSharedCommandExecution(execution);
-		}
-		catch (...) {
-			execution->MarkCompleted();
-			errorText = "Command execution failed with a native exception.";
-			execution->SetCompletionResult("native_exception", errorText);
-			AgentConsole::RememberSharedCommandExecution(execution);
-		}
-
-		return execution;
+		AgentBuiltInExecutionContext^ context = gcnew AgentBuiltInExecutionContext();
+		context->CommandLine = isNULL(validatedResult) ? String::Empty : validatedResult->ValidatedCommandLine;
+		context->CommandName = isNULL(validatedResult) ? String::Empty : validatedResult->CommandName;
+		context->Spec = isNULL(validatedResult) ? nullptr : validatedResult->Spec;
+		context->LogSource = "AgentRuntime";
+		context->OriginTag = String::Empty;
+		context->TurnId = turnId;
+		context->OwnerScript = isNULL(validatedResult) ? nullptr : validatedResult->OwnerScript;
+		return AgentBuiltInExecutor::Execute(context, errorText);
 	}
 
 	void AgentCommandExecution::AppendOutputLine(String^ line) {
