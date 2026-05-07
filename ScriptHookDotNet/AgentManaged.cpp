@@ -184,14 +184,6 @@ namespace GTA {
 			} else {
 				result->MessageText = SafeText(completion->FailureReason);
 			}
-			if (completion->RequiresConfirmation) {
-				String^ confirmationMessage =
-					"This built-in requires confirmation and is not executable from the script API.";
-				if (String::IsNullOrWhiteSpace(result->MessageText))
-					result->MessageText = confirmationMessage;
-				else if (!result->MessageText->Contains(confirmationMessage))
-					result->MessageText = result->MessageText + " " + confirmationMessage;
-			}
 			result->IsValidatedForExecution = completion->IsValidatedForExecution
 				&& IsBuiltInRunnable(result->Decision, result->CommandName, result->ValidatedCommandLine);
 			result->RuntimeExecutionAuthorizationId = completion->ExecutionAuthorizationId;

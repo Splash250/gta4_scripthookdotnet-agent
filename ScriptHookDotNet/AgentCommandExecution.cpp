@@ -213,10 +213,19 @@ namespace GTA {
 					BuildCommandPayload(execution, String::Empty, String::Empty, String::Empty, 0));
 			}
 
+			Console^ commandConsole = NetHook::DefaultConsole;
+			if isNULL(commandConsole) {
+				errorText = "Built-in execution could not run because the default console is unavailable.";
+				execution->MarkCompleted();
+				execution->SetCompletionResult("console_unavailable", errorText);
+				AgentConsole::RememberSharedCommandExecution(execution);
+				return execution;
+			}
+
 			AgentConsole^ captureConsole = GetAgentConsoleForCommandCapture();
 			NetHook::BeginAgentCommandCapture(captureConsole, execution);
 			try {
-				NetHook::DefaultConsole->SendCommand(normalizedCommandLine);
+				commandConsole->SendCommand(normalizedCommandLine);
 			}
 			finally {
 				NetHook::EndAgentCommandCapture();

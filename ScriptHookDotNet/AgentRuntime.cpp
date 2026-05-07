@@ -659,11 +659,6 @@ namespace GTA {
 			return nullptr;
 		}
 
-		if (validatedResult->RequiresConfirmation) {
-			errorText = "This built-in requires confirmation and is not executable from the script API.";
-			return nullptr;
-		}
-
 		if (String::IsNullOrWhiteSpace(validatedResult->ValidatedCommandLine)) {
 			errorText = "Validated built-in execution requires a non-empty ValidatedCommandLine.";
 			return nullptr;
@@ -713,11 +708,6 @@ namespace GTA {
 
 		if (!spec->AgentAccessible) {
 			errorText = "Validated built-in execution rejected a built-in that is not agent-accessible.";
-			return nullptr;
-		}
-
-		if (spec->RequiresConfirmation) {
-			errorText = "This built-in requires confirmation and is not executable from the script API.";
 			return nullptr;
 		}
 
@@ -1322,15 +1312,7 @@ namespace GTA {
 						result->ContractDecision == AgentReasoningContractDecision::NeedsClarification;
 					completion->Success = isValidatedRun || isExplainResult || isNoExactFit || isNeedsClarification;
 					completion->RequiresConfirmation = isValidatedRun && resolvedSpec->RequiresConfirmation;
-					completion->IsValidatedForExecution = isValidatedRun && !completion->RequiresConfirmation;
-					if (completion->RequiresConfirmation) {
-						String^ confirmationMessage =
-							"This built-in requires confirmation and is not executable from the script API.";
-						if (String::IsNullOrWhiteSpace(completion->Explanation))
-							completion->Explanation = confirmationMessage;
-						else
-							completion->Explanation = completion->Explanation + " " + confirmationMessage;
-					}
+					completion->IsValidatedForExecution = isValidatedRun;
 					if ((result->Decision == AgentReasoningDecision::BuiltInRun) && !isValidatedRun) {
 						completion->Error = !String::IsNullOrWhiteSpace(completion->FailureReason)
 							? completion->FailureReason
@@ -1357,8 +1339,7 @@ namespace GTA {
 			if (isNotNULL(context) && isNotNULL(laneState) && (context->Generation == laneState->Generation)) {
 				if (isNotNULL(context)
 					&& isNotNULL(context->Request)
-					&& completion->IsValidatedForExecution
-					&& !completion->RequiresConfirmation) {
+					&& completion->IsValidatedForExecution) {
 					RememberAuthorizedBuiltInExecutionLocked(context->Request->OwnerScript, completion);
 				}
 				enqueue = isNotNULL(context);
