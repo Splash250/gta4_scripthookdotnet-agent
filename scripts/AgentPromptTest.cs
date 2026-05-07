@@ -5,16 +5,29 @@ using GTA;
 
 public class AgentPromptTest : Script {
 
+   private class PromptCompletionSnapshot {
+      public int RequestId;
+      public int CallbackThreadId;
+      public int OriginalThreadId;
+      public bool SameThread;
+      public bool ReturnedBeforeCallback;
+      public bool LaterTick;
+      public AgentPromptResult Result;
+   }
+
    private const int RequestTimeoutMs = 15000;
+   private readonly object stateLock = new object();
 
    private bool promptPending = false;
    private bool promptReturned = false;
+   private bool promptCallbackReady = false;
    private int requestThreadId = -1;
    private int requestTickId = -1;
    private int currentRequestId = 0;
    private int nextRequestId = 0;
    private int tickCount = 0;
    private DateTime requestStartedAt = DateTime.MinValue;
+   private PromptCompletionSnapshot promptCompletion = null;
 
    public AgentPromptTest() {
       Interval = 250;
@@ -25,34 +38,66 @@ public class AgentPromptTest : Script {
    }
 
    private void AgentPromptTest_Tick(object sender, EventArgs e) {
-      tickCount++;
+      PromptCompletionSnapshot completion = null;
+      bool timedOut = false;
+      int tickThreadId = Thread.CurrentThread.ManagedThreadId;
 
-      if (!promptPending) return;
-      if ((DateTime.Now - requestStartedAt).TotalMilliseconds < RequestTimeoutMs) return;
+      lock (stateLock) {
+         tickCount++;
+
+         if (promptPending && promptCallbackReady && tickThreadId == requestThreadId) {
+            completion = promptCompletion;
+            ResetPromptStateNoLock();
+         } else if (promptPending && (DateTime.Now - requestStartedAt).TotalMilliseconds >= RequestTimeoutMs) {
+            timedOut = true;
+            ResetPromptStateNoLock();
+         }
+      }
+
+      if (completion != null) {
+         ReportPromptCompletion(completion);
+         return;
+      }
+
+      if (!timedOut) return;
 
       PrintLine("Prompt request timed out after " + RequestTimeoutMs + "ms. Clearing pending state so you can retry.");
       Game.DisplayText("AgentPromptTest timed out. Press F9 to retry.", 4000);
-      ResetPromptState();
    }
 
    private void RunPromptTest() {
-      if (promptPending) {
+      int requestId = 0;
+      int submissionThreadId = 0;
+      int submissionTickId = 0;
+      bool alreadyPending = false;
+
+      lock (stateLock) {
+         if (promptPending) {
+            alreadyPending = true;
+         } else {
+            requestId = ++nextRequestId;
+            promptPending = true;
+            promptReturned = false;
+            promptCallbackReady = false;
+            promptCompletion = null;
+            currentRequestId = requestId;
+            requestThreadId = Thread.CurrentThread.ManagedThreadId;
+            requestTickId = tickCount;
+            requestStartedAt = DateTime.Now;
+            submissionThreadId = requestThreadId;
+            submissionTickId = requestTickId;
+         }
+      }
+
+      if (alreadyPending) {
          PrintLine("Prompt request already in flight. Wait for completion or timeout recovery.");
          return;
       }
 
-      int requestId = ++nextRequestId;
-      promptPending = true;
-      promptReturned = false;
-      currentRequestId = requestId;
-      requestThreadId = Thread.CurrentThread.ManagedThreadId;
-      requestTickId = tickCount;
-      requestStartedAt = DateTime.Now;
-
       AgentPromptRequest request = new AgentPromptRequest();
       request.PromptText = "general prompt test";
 
-      PrintLine("Sending prompt request " + requestId + " on thread " + requestThreadId + ", tick " + requestTickId + ": " + request.PromptText);
+      PrintLine("Sending prompt request " + requestId + " on thread " + submissionThreadId + ", tick " + submissionTickId + ": " + request.PromptText);
 
       Agent.PromptAsync(
          request,
@@ -61,8 +106,16 @@ public class AgentPromptTest : Script {
          }
       );
 
-      if (promptPending && currentRequestId == requestId) {
-         promptReturned = true;
+      bool callbackArrivedBeforeReturn = false;
+
+      lock (stateLock) {
+         if (promptPending && currentRequestId == requestId) {
+            callbackArrivedBeforeReturn = promptCallbackReady;
+            if (!callbackArrivedBeforeReturn) promptReturned = true;
+         }
+      }
+
+      if (!callbackArrivedBeforeReturn) {
          PrintLine("PromptAsync returned to the caller. Awaiting callback.");
       } else {
          PrintLine("Prompt callback completed before the submission method resumed.");
@@ -70,46 +123,22 @@ public class AgentPromptTest : Script {
    }
 
    private void OnPromptCompleted(int requestId, AgentPromptResult result) {
-      if (!promptPending || currentRequestId != requestId) {
-         PrintLine("Ignoring stale prompt callback for request " + requestId + ".");
-         return;
+      lock (stateLock) {
+         if (!promptPending || currentRequestId != requestId || promptCallbackReady) return;
+
+         int callbackThreadId = Thread.CurrentThread.ManagedThreadId;
+         PromptCompletionSnapshot completion = new PromptCompletionSnapshot();
+         completion.RequestId = requestId;
+         completion.CallbackThreadId = callbackThreadId;
+         completion.OriginalThreadId = requestThreadId;
+         completion.SameThread = (callbackThreadId == requestThreadId);
+         completion.ReturnedBeforeCallback = promptReturned;
+         completion.LaterTick = (tickCount > requestTickId);
+         completion.Result = result;
+
+         promptCompletion = completion;
+         promptCallbackReady = true;
       }
-
-      int callbackThreadId = Thread.CurrentThread.ManagedThreadId;
-      bool sameThread = (callbackThreadId == requestThreadId);
-      bool returnedBeforeCallback = promptReturned;
-      bool laterTick = (tickCount > requestTickId);
-
-      PrintLine(
-         "Prompt callback request=" + requestId +
-         ", thread=" + callbackThreadId +
-         ", originalThread=" + requestThreadId +
-         ", sameThread=" + sameThread +
-         ", returnedBeforeCallback=" + returnedBeforeCallback +
-         ", laterTick=" + laterTick
-      );
-
-      if (result == null) {
-         PrintLine("Prompt callback returned null result.");
-      } else {
-         PrintLine("Success=" + result.Success + ", ResponseId=" + Safe(result.ResponseId));
-         PrintLine("Reply=" + Safe(result.ReplyText));
-         PrintLine("Error=" + Safe(result.ErrorText));
-      }
-
-      if (!returnedBeforeCallback) {
-         Game.DisplayText("AgentPromptTest callback arrived inline before PromptAsync returned.", 4000);
-      } else if (!sameThread) {
-         Game.DisplayText("AgentPromptTest callback arrived on the wrong thread.", 4000);
-      } else if (result == null) {
-         Game.DisplayText("AgentPromptTest callback plumbing worked, but the result was null.", 4000);
-      } else if (!result.Success) {
-         Game.DisplayText("AgentPromptTest callback was async on the script thread, but the prompt failed.", 4000);
-      } else {
-         Game.DisplayText("AgentPromptTest passed: async callback on the script thread with a successful result.", 4000);
-      }
-
-      ResetPromptState();
    }
 
    private void PrintLine(string message) {
@@ -117,13 +146,46 @@ public class AgentPromptTest : Script {
       Game.Console.Print(line);
    }
 
-   private void ResetPromptState() {
+   private void ReportPromptCompletion(PromptCompletionSnapshot completion) {
+      PrintLine(
+         "Prompt callback request=" + completion.RequestId +
+         ", thread=" + completion.CallbackThreadId +
+         ", originalThread=" + completion.OriginalThreadId +
+         ", sameThread=" + completion.SameThread +
+         ", returnedBeforeCallback=" + completion.ReturnedBeforeCallback +
+         ", laterTick=" + completion.LaterTick
+      );
+
+      if (completion.Result == null) {
+         PrintLine("Prompt callback returned null result.");
+      } else {
+         PrintLine("Success=" + completion.Result.Success + ", ResponseId=" + Safe(completion.Result.ResponseId));
+         PrintLine("Reply=" + Safe(completion.Result.ReplyText));
+         PrintLine("Error=" + Safe(completion.Result.ErrorText));
+      }
+
+      if (!completion.ReturnedBeforeCallback) {
+         Game.DisplayText("AgentPromptTest callback arrived inline before PromptAsync returned.", 4000);
+      } else if (!completion.SameThread) {
+         Game.DisplayText("AgentPromptTest callback arrived on the wrong thread.", 4000);
+      } else if (completion.Result == null) {
+         Game.DisplayText("AgentPromptTest callback plumbing worked, but the result was null.", 4000);
+      } else if (!completion.Result.Success) {
+         Game.DisplayText("AgentPromptTest callback was async on the script thread, but the prompt failed.", 4000);
+      } else {
+         Game.DisplayText("AgentPromptTest passed: async callback on the script thread with a successful result.", 4000);
+      }
+   }
+
+   private void ResetPromptStateNoLock() {
       promptPending = false;
       promptReturned = false;
+      promptCallbackReady = false;
       requestThreadId = -1;
       requestTickId = -1;
       currentRequestId = 0;
       requestStartedAt = DateTime.MinValue;
+      promptCompletion = null;
    }
 
    private string Safe(string value) {

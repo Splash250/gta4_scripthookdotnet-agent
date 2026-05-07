@@ -5,12 +5,38 @@ using GTA;
 
 public class AgentBuiltInTest : Script {
 
+   private class BuiltInClassificationSnapshot {
+      public int RequestId;
+      public string RequestText;
+      public bool ExecuteIfValidated;
+      public int CallbackThreadId;
+      public int OriginalThreadId;
+      public bool SameThread;
+      public bool ReturnedBeforeCallback;
+      public bool LaterTick;
+      public BuiltInCommandResult Result;
+   }
+
+   private class BuiltInExecutionSnapshot {
+      public int RequestId;
+      public string RequestText;
+      public int CallbackThreadId;
+      public int OriginalThreadId;
+      public bool SameThread;
+      public bool ReturnedBeforeCallback;
+      public bool LaterTick;
+      public BuiltInExecutionResult Result;
+   }
+
    private const int RequestTimeoutMs = 15000;
+   private readonly object stateLock = new object();
 
    private bool classificationPending = false;
    private bool classificationReturned = false;
+   private bool classificationCallbackReady = false;
    private bool executionPending = false;
    private bool executionReturned = false;
+   private bool executionCallbackReady = false;
    private int classificationThreadId = -1;
    private int executionThreadId = -1;
    private int classificationTickId = -1;
@@ -23,6 +49,8 @@ public class AgentBuiltInTest : Script {
    private DateTime classificationStartedAt = DateTime.MinValue;
    private DateTime executionStartedAt = DateTime.MinValue;
    private string activeRequestText = String.Empty;
+   private BuiltInClassificationSnapshot classificationCompletion = null;
+   private BuiltInExecutionSnapshot executionCompletion = null;
 
    public AgentBuiltInTest() {
       Interval = 250;
@@ -34,18 +62,48 @@ public class AgentBuiltInTest : Script {
    }
 
    private void AgentBuiltInTest_Tick(object sender, EventArgs e) {
-      tickCount++;
+      BuiltInClassificationSnapshot classification = null;
+      BuiltInExecutionSnapshot execution = null;
+      bool classificationTimedOut = false;
+      bool executionTimedOut = false;
+      string classificationTimedOutRequestText = String.Empty;
+      string executionTimedOutRequestText = String.Empty;
+      int tickThreadId = Thread.CurrentThread.ManagedThreadId;
 
-      if (classificationPending && (DateTime.Now - classificationStartedAt).TotalMilliseconds >= RequestTimeoutMs) {
-         PrintLine("Classification timed out after " + RequestTimeoutMs + "ms for '" + activeRequestText + "'. Clearing pending state so you can retry.");
-         Game.DisplayText("AgentBuiltInTest classification timed out. Retry with F10 or F11.", 4000);
-         ResetClassificationState();
+      lock (stateLock) {
+         tickCount++;
+
+         if (classificationPending && classificationCallbackReady && tickThreadId == classificationThreadId) {
+            classification = classificationCompletion;
+            ResetClassificationStateNoLock();
+         } else if (classificationPending && (DateTime.Now - classificationStartedAt).TotalMilliseconds >= RequestTimeoutMs) {
+            classificationTimedOut = true;
+            classificationTimedOutRequestText = activeRequestText;
+            ResetClassificationStateNoLock();
+         }
+
+         if (executionPending && executionCallbackReady && tickThreadId == executionThreadId) {
+            execution = executionCompletion;
+            ResetExecutionStateNoLock();
+         } else if (executionPending && (DateTime.Now - executionStartedAt).TotalMilliseconds >= RequestTimeoutMs) {
+            executionTimedOut = true;
+            executionTimedOutRequestText = activeRequestText;
+            ResetExecutionStateNoLock();
+         }
       }
 
-      if (executionPending && (DateTime.Now - executionStartedAt).TotalMilliseconds >= RequestTimeoutMs) {
-         PrintLine("Execution timed out after " + RequestTimeoutMs + "ms for '" + activeRequestText + "'. Clearing pending state so you can retry.");
+      if (classification != null) {
+         ReportClassificationCompletion(classification);
+      } else if (classificationTimedOut) {
+         PrintLine("Classification timed out after " + RequestTimeoutMs + "ms for '" + classificationTimedOutRequestText + "'. Clearing pending state so you can retry.");
+         Game.DisplayText("AgentBuiltInTest classification timed out. Retry with F10 or F11.", 4000);
+      }
+
+      if (execution != null) {
+         ReportExecutionCompletion(execution);
+      } else if (executionTimedOut) {
+         PrintLine("Execution timed out after " + RequestTimeoutMs + "ms for '" + executionTimedOutRequestText + "'. Clearing pending state so you can retry.");
          Game.DisplayText("AgentBuiltInTest execution timed out. Retry with F11.", 4000);
-         ResetExecutionState();
       }
    }
 
@@ -58,24 +116,39 @@ public class AgentBuiltInTest : Script {
    }
 
    private void BeginClassification(string requestText, bool executeIfValidated) {
-      if (classificationPending || executionPending) {
+      int requestId = 0;
+      int submissionThreadId = 0;
+      int submissionTickId = 0;
+      bool alreadyPending = false;
+
+      lock (stateLock) {
+         if (classificationPending || executionPending) {
+            alreadyPending = true;
+         } else {
+            requestId = ++nextClassificationRequestId;
+            classificationPending = true;
+            classificationReturned = false;
+            classificationCallbackReady = false;
+            classificationCompletion = null;
+            currentClassificationRequestId = requestId;
+            classificationThreadId = Thread.CurrentThread.ManagedThreadId;
+            classificationTickId = tickCount;
+            classificationStartedAt = DateTime.Now;
+            activeRequestText = requestText;
+            submissionThreadId = classificationThreadId;
+            submissionTickId = classificationTickId;
+         }
+      }
+
+      if (alreadyPending) {
          PrintLine("Another built-in request is already in flight. Wait for completion or timeout recovery.");
          return;
       }
 
-      int requestId = ++nextClassificationRequestId;
-      classificationPending = true;
-      classificationReturned = false;
-      currentClassificationRequestId = requestId;
-      classificationThreadId = Thread.CurrentThread.ManagedThreadId;
-      classificationTickId = tickCount;
-      classificationStartedAt = DateTime.Now;
-      activeRequestText = requestText;
-
       BuiltInCommandRequest request = new BuiltInCommandRequest();
       request.RequestText = requestText;
 
-      PrintLine("Classifying request " + requestId + " on thread " + classificationThreadId + ", tick " + classificationTickId + ": " + request.RequestText);
+      PrintLine("Classifying request " + requestId + " on thread " + submissionThreadId + ", tick " + submissionTickId + ": " + request.RequestText);
 
       Agent.ClassifyBuiltInAsync(
          request,
@@ -84,8 +157,16 @@ public class AgentBuiltInTest : Script {
          }
       );
 
-      if (classificationPending && currentClassificationRequestId == requestId) {
-         classificationReturned = true;
+      bool callbackArrivedBeforeReturn = false;
+
+      lock (stateLock) {
+         if (classificationPending && currentClassificationRequestId == requestId) {
+            callbackArrivedBeforeReturn = classificationCallbackReady;
+            if (!callbackArrivedBeforeReturn) classificationReturned = true;
+         }
+      }
+
+      if (!callbackArrivedBeforeReturn) {
          PrintLine("ClassifyBuiltInAsync returned to the caller. Awaiting callback.");
       } else {
          PrintLine("Classification callback completed before the submission method resumed.");
@@ -93,144 +174,44 @@ public class AgentBuiltInTest : Script {
    }
 
    private void OnClassificationCompleted(int requestId, BuiltInCommandResult result, bool executeIfValidated) {
-      if (!classificationPending || currentClassificationRequestId != requestId) {
-         PrintLine("Ignoring stale classification callback for request " + requestId + ".");
-         return;
+      lock (stateLock) {
+         if (!classificationPending || currentClassificationRequestId != requestId || classificationCallbackReady) return;
+
+         int callbackThreadId = Thread.CurrentThread.ManagedThreadId;
+         BuiltInClassificationSnapshot completion = new BuiltInClassificationSnapshot();
+         completion.RequestId = requestId;
+         completion.RequestText = activeRequestText;
+         completion.ExecuteIfValidated = executeIfValidated;
+         completion.CallbackThreadId = callbackThreadId;
+         completion.OriginalThreadId = classificationThreadId;
+         completion.SameThread = (callbackThreadId == classificationThreadId);
+         completion.ReturnedBeforeCallback = classificationReturned;
+         completion.LaterTick = (tickCount > classificationTickId);
+         completion.Result = result;
+
+         classificationCompletion = completion;
+         classificationCallbackReady = true;
       }
-
-      int callbackThreadId = Thread.CurrentThread.ManagedThreadId;
-      bool sameThread = (callbackThreadId == classificationThreadId);
-      bool returnedBeforeCallback = classificationReturned;
-      bool laterTick = (tickCount > classificationTickId);
-      bool plumbingOk = (result != null && sameThread && returnedBeforeCallback);
-
-      PrintLine(
-         "Classification callback request=" + requestId +
-         ", thread=" + callbackThreadId +
-         ", originalThread=" + classificationThreadId +
-         ", sameThread=" + sameThread +
-         ", returnedBeforeCallback=" + returnedBeforeCallback +
-         ", laterTick=" + laterTick
-      );
-
-      if (result == null) {
-         PrintLine("Classification callback returned null result.");
-         Game.DisplayText("AgentBuiltInTest classification plumbing failed: null result.", 4000);
-         ResetClassificationState();
-         return;
-      }
-
-      PrintLine("Success=" + result.Success + ", Decision=" + Safe(result.Decision) + ", Command=" + Safe(result.CommandName));
-      PrintLine("ValidatedCommandLine=" + Safe(result.ValidatedCommandLine));
-      PrintLine("Message=" + Safe(result.MessageText) + ", Error=" + Safe(result.ErrorText));
-      PrintLine("IsValidatedForExecution=" + result.IsValidatedForExecution);
-
-      if (!returnedBeforeCallback) {
-         Game.DisplayText("AgentBuiltInTest classification callback arrived inline before the API returned.", 4000);
-         ResetClassificationState();
-         return;
-      }
-
-      if (!sameThread) {
-         Game.DisplayText("AgentBuiltInTest classification callback arrived on the wrong thread.", 4000);
-         ResetClassificationState();
-         return;
-      }
-
-      if (!result.Success) {
-         Game.DisplayText("AgentBuiltInTest classification plumbing passed, but the request failed.", 4000);
-         ResetClassificationState();
-         return;
-      }
-
-      if (!executeIfValidated) {
-         Game.DisplayText("AgentBuiltInTest classification plumbing passed. Decision: " + Safe(result.Decision), 4000);
-         ResetClassificationState();
-         return;
-      }
-
-      if (executeIfValidated && result.Success && result.IsValidatedForExecution) {
-         int executionRequestId = ++nextExecutionRequestId;
-         executionPending = true;
-         executionReturned = false;
-         currentExecutionRequestId = executionRequestId;
-         executionThreadId = Thread.CurrentThread.ManagedThreadId;
-         executionTickId = tickCount;
-         executionStartedAt = DateTime.Now;
-         PrintLine("Classification plumbing passed. Executing validated built-in command on thread " + executionThreadId + ", tick " + executionTickId + ".");
-
-         classificationPending = false;
-         classificationReturned = false;
-         classificationThreadId = -1;
-         classificationTickId = -1;
-         currentClassificationRequestId = 0;
-         classificationStartedAt = DateTime.MinValue;
-
-         Agent.ExecuteBuiltInAsync(
-            result,
-            delegate(BuiltInExecutionResult executionResult) {
-               OnExecutionCompleted(executionRequestId, executionResult);
-            }
-         );
-
-         if (executionPending && currentExecutionRequestId == executionRequestId) {
-            executionReturned = true;
-            PrintLine("ExecuteBuiltInAsync returned to the caller. Awaiting callback.");
-         } else {
-            PrintLine("Execution callback completed before the submission method resumed.");
-         }
-         return;
-      }
-
-      if (plumbingOk) {
-         Game.DisplayText("AgentBuiltInTest plumbing passed, but execution was not validated for this request.", 4000);
-      } else {
-         Game.DisplayText("AgentBuiltInTest classification delivery failed before execution.", 4000);
-      }
-
-      ResetClassificationState();
    }
 
    private void OnExecutionCompleted(int requestId, BuiltInExecutionResult result) {
-      if (!executionPending || currentExecutionRequestId != requestId) {
-         PrintLine("Ignoring stale execution callback for request " + requestId + ".");
-         return;
+      lock (stateLock) {
+         if (!executionPending || currentExecutionRequestId != requestId || executionCallbackReady) return;
+
+         int callbackThreadId = Thread.CurrentThread.ManagedThreadId;
+         BuiltInExecutionSnapshot completion = new BuiltInExecutionSnapshot();
+         completion.RequestId = requestId;
+         completion.RequestText = activeRequestText;
+         completion.CallbackThreadId = callbackThreadId;
+         completion.OriginalThreadId = executionThreadId;
+         completion.SameThread = (callbackThreadId == executionThreadId);
+         completion.ReturnedBeforeCallback = executionReturned;
+         completion.LaterTick = (tickCount > executionTickId);
+         completion.Result = result;
+
+         executionCompletion = completion;
+         executionCallbackReady = true;
       }
-
-      int callbackThreadId = Thread.CurrentThread.ManagedThreadId;
-      bool sameThread = (callbackThreadId == executionThreadId);
-      bool returnedBeforeCallback = executionReturned;
-      bool laterTick = (tickCount > executionTickId);
-
-      PrintLine(
-         "Execution callback request=" + requestId +
-         ", thread=" + callbackThreadId +
-         ", originalThread=" + executionThreadId +
-         ", sameThread=" + sameThread +
-         ", returnedBeforeCallback=" + returnedBeforeCallback +
-         ", laterTick=" + laterTick
-      );
-
-      if (result == null) {
-         PrintLine("Execution callback returned null result.");
-         Game.DisplayText("AgentBuiltInTest execution plumbing failed: null result.", 4000);
-      } else {
-         PrintLine("Success=" + result.Success + ", Command=" + Safe(result.CommandName));
-         PrintLine("ExecutedCommandLine=" + Safe(result.ExecutedCommandLine));
-         PrintLine("CompletionSummary=" + Safe(result.CompletionSummary) + ", Error=" + Safe(result.ErrorText));
-
-         if (!returnedBeforeCallback) {
-            Game.DisplayText("AgentBuiltInTest execution callback arrived inline before the API returned.", 4000);
-         } else if (!sameThread) {
-            Game.DisplayText("AgentBuiltInTest execution callback arrived on the wrong thread.", 4000);
-         } else if (!result.Success) {
-            Game.DisplayText("AgentBuiltInTest plumbing passed, but execution failed after validation.", 4000);
-         } else {
-            Game.DisplayText("AgentBuiltInTest passed: plumbing and validated execution both succeeded.", 4000);
-         }
-      }
-
-      ResetExecutionState();
    }
 
    private void PrintLine(string message) {
@@ -238,23 +219,152 @@ public class AgentBuiltInTest : Script {
       Game.Console.Print(line);
    }
 
-   private void ResetClassificationState() {
+   private void ReportClassificationCompletion(BuiltInClassificationSnapshot completion) {
+      PrintLine(
+         "Classification callback request=" + completion.RequestId +
+         ", thread=" + completion.CallbackThreadId +
+         ", originalThread=" + completion.OriginalThreadId +
+         ", sameThread=" + completion.SameThread +
+         ", returnedBeforeCallback=" + completion.ReturnedBeforeCallback +
+         ", laterTick=" + completion.LaterTick
+      );
+
+      if (completion.Result == null) {
+         PrintLine("Classification callback returned null result.");
+         Game.DisplayText("AgentBuiltInTest classification plumbing failed: null result.", 4000);
+         return;
+      }
+
+      PrintLine("Success=" + completion.Result.Success + ", Decision=" + Safe(completion.Result.Decision) + ", Command=" + Safe(completion.Result.CommandName));
+      PrintLine("ValidatedCommandLine=" + Safe(completion.Result.ValidatedCommandLine));
+      PrintLine("Message=" + Safe(completion.Result.MessageText) + ", Error=" + Safe(completion.Result.ErrorText));
+      PrintLine("IsValidatedForExecution=" + completion.Result.IsValidatedForExecution);
+
+      if (!completion.ReturnedBeforeCallback) {
+         Game.DisplayText("AgentBuiltInTest classification callback arrived inline before the API returned.", 4000);
+         return;
+      }
+
+      if (!completion.SameThread) {
+         Game.DisplayText("AgentBuiltInTest classification callback arrived on the wrong thread.", 4000);
+         return;
+      }
+
+      if (!completion.Result.Success) {
+         Game.DisplayText("AgentBuiltInTest classification plumbing passed, but the request failed.", 4000);
+         return;
+      }
+
+      if (!completion.ExecuteIfValidated) {
+         Game.DisplayText("AgentBuiltInTest classification plumbing passed. Decision: " + Safe(completion.Result.Decision), 4000);
+         return;
+      }
+
+      if (completion.Result.IsValidatedForExecution) {
+         StartExecution(completion.Result, completion.RequestText);
+         return;
+      }
+
+      Game.DisplayText("AgentBuiltInTest plumbing passed, but execution was not validated for this request.", 4000);
+   }
+
+   private void StartExecution(BuiltInCommandResult validatedResult, string requestText) {
+      int executionRequestId = 0;
+      int submissionThreadId = 0;
+      int submissionTickId = 0;
+
+      lock (stateLock) {
+         executionRequestId = ++nextExecutionRequestId;
+         executionPending = true;
+         executionReturned = false;
+         executionCallbackReady = false;
+         executionCompletion = null;
+         currentExecutionRequestId = executionRequestId;
+         executionThreadId = Thread.CurrentThread.ManagedThreadId;
+         executionTickId = tickCount;
+         executionStartedAt = DateTime.Now;
+         activeRequestText = requestText;
+         submissionThreadId = executionThreadId;
+         submissionTickId = executionTickId;
+      }
+
+      PrintLine("Classification plumbing passed. Executing validated built-in command on thread " + submissionThreadId + ", tick " + submissionTickId + ".");
+
+      Agent.ExecuteBuiltInAsync(
+         validatedResult,
+         delegate(BuiltInExecutionResult executionResult) {
+            OnExecutionCompleted(executionRequestId, executionResult);
+         }
+      );
+
+      bool callbackArrivedBeforeReturn = false;
+
+      lock (stateLock) {
+         if (executionPending && currentExecutionRequestId == executionRequestId) {
+            callbackArrivedBeforeReturn = executionCallbackReady;
+            if (!callbackArrivedBeforeReturn) executionReturned = true;
+         }
+      }
+
+      if (!callbackArrivedBeforeReturn) {
+         PrintLine("ExecuteBuiltInAsync returned to the caller. Awaiting callback.");
+      } else {
+         PrintLine("Execution callback completed before the submission method resumed.");
+      }
+   }
+
+   private void ReportExecutionCompletion(BuiltInExecutionSnapshot completion) {
+      PrintLine(
+         "Execution callback request=" + completion.RequestId +
+         ", thread=" + completion.CallbackThreadId +
+         ", originalThread=" + completion.OriginalThreadId +
+         ", sameThread=" + completion.SameThread +
+         ", returnedBeforeCallback=" + completion.ReturnedBeforeCallback +
+         ", laterTick=" + completion.LaterTick
+      );
+
+      if (completion.Result == null) {
+         PrintLine("Execution callback returned null result.");
+         Game.DisplayText("AgentBuiltInTest execution plumbing failed: null result.", 4000);
+         return;
+      }
+
+      PrintLine("Success=" + completion.Result.Success + ", Command=" + Safe(completion.Result.CommandName));
+      PrintLine("ExecutedCommandLine=" + Safe(completion.Result.ExecutedCommandLine));
+      PrintLine("CompletionSummary=" + Safe(completion.Result.CompletionSummary) + ", Error=" + Safe(completion.Result.ErrorText));
+
+      if (!completion.ReturnedBeforeCallback) {
+         Game.DisplayText("AgentBuiltInTest execution callback arrived inline before the API returned.", 4000);
+      } else if (!completion.SameThread) {
+         Game.DisplayText("AgentBuiltInTest execution callback arrived on the wrong thread.", 4000);
+      } else if (!completion.Result.Success) {
+         Game.DisplayText("AgentBuiltInTest plumbing passed, but execution failed after validation.", 4000);
+      } else {
+         Game.DisplayText("AgentBuiltInTest passed: plumbing and validated execution both succeeded.", 4000);
+      }
+   }
+
+   private void ResetClassificationStateNoLock() {
       classificationPending = false;
       classificationReturned = false;
+      classificationCallbackReady = false;
       classificationThreadId = -1;
       classificationTickId = -1;
       currentClassificationRequestId = 0;
       classificationStartedAt = DateTime.MinValue;
+      classificationCompletion = null;
    }
 
-   private void ResetExecutionState() {
+   private void ResetExecutionStateNoLock() {
       executionPending = false;
       executionReturned = false;
+      executionCallbackReady = false;
       executionThreadId = -1;
       executionTickId = -1;
       currentExecutionRequestId = 0;
       executionStartedAt = DateTime.MinValue;
       activeRequestText = String.Empty;
+      executionCompletion = null;
    }
 
    private string Safe(string value) {
