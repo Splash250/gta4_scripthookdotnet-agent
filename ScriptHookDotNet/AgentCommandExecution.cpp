@@ -140,6 +140,12 @@ namespace GTA {
 
 	}
 
+	AgentValidatedBuiltInExecutionRecord::AgentValidatedBuiltInExecutionRecord() {
+		CommandName = String::Empty;
+		ValidatedCommandLine = String::Empty;
+		IsValidatedForExecution = false;
+	}
+
 	AgentCommandExecution::AgentCommandExecution(String^ commandLine, String^ commandName) {
 		CommandLine = isNULL(commandLine) ? String::Empty : commandLine;
 		CommandName = isNULL(commandName) ? String::Empty : commandName;
@@ -161,15 +167,18 @@ namespace GTA {
 
 	AgentCommandExecution^ AgentCommandExecution::ExecuteValidatedBuiltInCommand(
 		int turnId,
-		String^ commandLine,
-		String^ commandName,
+		AgentValidatedBuiltInExecutionRecord^ validatedResult,
 		String^ logSource,
 		String^ originTag,
 		String^% errorText) {
 		errorText = String::Empty;
 
-		String^ normalizedCommandLine = isNULL(commandLine) ? String::Empty : commandLine->Trim();
-		String^ normalizedCommandName = isNULL(commandName) ? String::Empty : commandName->Trim()->ToLowerInvariant();
+		String^ normalizedCommandLine = (isNULL(validatedResult) || isNULL(validatedResult->ValidatedCommandLine))
+			? String::Empty
+			: validatedResult->ValidatedCommandLine->Trim();
+		String^ normalizedCommandName = (isNULL(validatedResult) || isNULL(validatedResult->CommandName))
+			? String::Empty
+			: validatedResult->CommandName->Trim()->ToLowerInvariant();
 		AgentCommandExecution^ execution = gcnew AgentCommandExecution(normalizedCommandLine, normalizedCommandName);
 		execution->TurnId = turnId;
 		execution->LogSource = String::IsNullOrWhiteSpace(logSource) ? "AgentCommandExecution" : logSource->Trim();

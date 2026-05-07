@@ -26,6 +26,16 @@
 namespace GTA {
 
 	CLASS_ATTRIBUTES
+	public ref class AgentValidatedBuiltInExecutionRecord sealed {
+	public:
+		String^ CommandName;
+		String^ ValidatedCommandLine;
+		bool IsValidatedForExecution;
+
+		AgentValidatedBuiltInExecutionRecord();
+	};
+
+	CLASS_ATTRIBUTES
 	public ref class AgentCommandExecution sealed {
 
 	public:
@@ -49,8 +59,7 @@ namespace GTA {
 		AgentCommandExecution(String^ commandLine, String^ commandName);
 		static AgentCommandExecution^ ExecuteValidatedBuiltInCommand(
 			int turnId,
-			String^ commandLine,
-			String^ commandName,
+			AgentValidatedBuiltInExecutionRecord^ validatedResult,
 			String^ logSource,
 			String^ originTag,
 			String^% errorText);

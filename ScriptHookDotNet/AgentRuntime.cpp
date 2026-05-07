@@ -1033,10 +1033,14 @@ namespace GTA {
 				} else {
 					context->ValidatedResult->CommandName = resolvedSpec->Name;
 					String^ executionError = String::Empty;
+					AgentValidatedBuiltInExecutionRecord^ executionRecord =
+						gcnew AgentValidatedBuiltInExecutionRecord();
+					executionRecord->CommandName = context->ValidatedResult->CommandName;
+					executionRecord->ValidatedCommandLine = context->ValidatedResult->ValidatedCommandLine;
+					executionRecord->IsValidatedForExecution = context->ValidatedResult->IsValidatedForExecution;
 					AgentCommandExecution^ execution = AgentCommandExecution::ExecuteValidatedBuiltInCommand(
 						context->TurnId,
-						normalizedCommandLine,
-						resolvedSpec->Name,
+						executionRecord,
 						"AgentRuntime",
 						BuildScriptLogSource(context->OwnerScript),
 						executionError);
