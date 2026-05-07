@@ -451,13 +451,6 @@ namespace GTA {
 		if isNotNULL(pWorker) pWorker->AbandonPendingWork();
 		if isNotNULL(pReasoningWorker) pReasoningWorker->AbandonPendingWork();
 		pActiveCommandExecution = nullptr;
-		System::Threading::Monitor::Enter(pSharedRecentCommandExecutionsSyncRoot);
-		try {
-			if isNotNULL(pRecentCommandExecutions)
-				pRecentCommandExecutions->Clear();
-		} finally {
-			System::Threading::Monitor::Exit(pSharedRecentCommandExecutionsSyncRoot);
-		}
 		pPendingReasoningInput = String::Empty;
 		ClearActiveTurn();
 		ClearPendingAction();

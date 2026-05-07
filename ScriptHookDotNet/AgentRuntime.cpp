@@ -180,28 +180,6 @@ namespace GTA {
 			}
 		}
 
-		int CaptureActiveTurnId() {
-			try {
-				if (!NetHook::isPrimary)
-					return 0;
-
-				System::Object^ console = NetHook::Console;
-				if isNULL(console)
-					return 0;
-
-				System::Reflection::FieldInfo^ field = console->GetType()->GetField(
-					"pActiveTurnId",
-					System::Reflection::BindingFlags::Instance | System::Reflection::BindingFlags::NonPublic);
-				if (isNULL(field) || (field->FieldType != Int32::typeid))
-					return 0;
-
-				System::Object^ value = field->GetValue(console);
-				return isNULL(value) ? 0 : safe_cast<int>(value);
-			} catch (...) {
-				return 0;
-			}
-		}
-
 	}
 
 	AgentRuntimePromptRequest::AgentRuntimePromptRequest() {
@@ -680,7 +658,7 @@ namespace GTA {
 			generation = pPromptGeneration;
 			request->OwnerScript = ownerScript;
 			requestId = (request->RequestId > 0) ? request->RequestId : ReserveRequestId();
-			int turnId = (request->TurnId > 0) ? request->TurnId : CaptureActiveTurnId();
+			int turnId = request->TurnId;
 			if (turnId <= 0) {
 				turnId = AgentLogger::BeginTurn(request->UserInput, BuildScriptLogSource(ownerScript));
 				ownsTurn = turnId > 0;
@@ -758,7 +736,7 @@ namespace GTA {
 			generation = pBuiltInClassificationGeneration;
 			request->OwnerScript = ownerScript;
 			requestId = (request->RequestId > 0) ? request->RequestId : ReserveRequestId();
-			int turnId = (request->TurnId > 0) ? request->TurnId : CaptureActiveTurnId();
+			int turnId = request->TurnId;
 			if (turnId <= 0) {
 				turnId = AgentLogger::BeginTurn(request->UserInput, BuildScriptLogSource(ownerScript));
 				ownsTurn = turnId > 0;
@@ -837,13 +815,10 @@ namespace GTA {
 			if (bValidatedBuiltInExecutionBusy) return false;
 			generation = pValidatedBuiltInExecutionGeneration;
 			requestId = ReserveRequestId();
-			turnId = CaptureActiveTurnId();
-			if (turnId <= 0) {
-				turnId = AgentLogger::BeginTurn(BuildExecutionTurnInput(validatedResult), BuildScriptLogSource(ownerScript));
-				ownsTurn = turnId > 0;
-				if (ownsTurn)
-					RememberOwnedTurn(requestId, turnId);
-			}
+			turnId = AgentLogger::BeginTurn(BuildExecutionTurnInput(validatedResult), BuildScriptLogSource(ownerScript));
+			ownsTurn = turnId > 0;
+			if (ownsTurn)
+				RememberOwnedTurn(requestId, turnId);
 			validatedResultSnapshot = CloneBuiltInClassificationCompletionForExecution(validatedResult);
 			bValidatedBuiltInExecutionBusy = true;
 			pValidatedBuiltInExecutionOwnerScript = ownerScript;
