@@ -25,6 +25,7 @@
 #include "AgentRuntime.h"
 
 #include "AgentClient.h"
+#include "AgentBuiltInExecutor.h"
 #include "AgentCommandExecution.h"
 #include "AgentCommandRegistry.h"
 #include "AgentCommandReasoning.h"
@@ -1423,10 +1424,21 @@ namespace GTA {
 				} else {
 					context->ValidatedResult->CommandName = trustedExecutionRecord->CommandName;
 					context->ValidatedResult->ValidatedCommandLine = trustedExecutionRecord->ValidatedCommandLine;
+
+					AgentBuiltInExecutionContext^ executionContext = gcnew AgentBuiltInExecutionContext();
+					executionContext->CommandLine = trustedExecutionRecord->ValidatedCommandLine;
+					executionContext->CommandName = trustedExecutionRecord->CommandName;
+					executionContext->Spec = trustedExecutionRecord->Spec;
+					executionContext->LogSource = "AgentRuntime";
+					executionContext->OriginTag = isNULL(context->OwnerScript)
+						? "script:unknown"
+						: "script:" + context->OwnerScript->Name;
+					executionContext->TurnId = context->TurnId;
+					executionContext->OwnerScript = context->OwnerScript;
+
 					String^ executionError = String::Empty;
-					AgentCommandExecution^ execution = AgentCommandExecution::ExecuteValidatedBuiltInCommand(
-						context->TurnId,
-						trustedExecutionRecord,
+					AgentCommandExecution^ execution = AgentBuiltInExecutor::Execute(
+						executionContext,
 						executionError);
 					CopyExecutionIntoCompletion(execution, completion);
 					completion->Success = DidExecutionSucceed(execution);
