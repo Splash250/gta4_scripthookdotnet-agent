@@ -298,21 +298,19 @@ namespace GTA {
 	}
 
 	void AgentLogger::Initialize(bool enableHumanLog, bool enableJsonLog) {
-		if (!NetHook::isPrimary)
-			return;
-
 		System::Threading::Monitor::Enter(pSyncRoot);
 		try {
+			bool isPrimaryDomain = NetHook::isPrimary;
 			bInitialized = false;
 			bHumanEnabled = enableHumanLog;
 			bJsonEnabled = enableJsonLog;
 			bWarnedAboutFailure = false;
 			pSessionId = Guid::NewGuid().ToString("N");
-			pNextTurnId = 1;
-			pNextSequence = 1;
+			pNextTurnId = isPrimaryDomain ? 1 : 1000000;
+			pNextSequence = isPrimaryDomain ? 1 : 1000000;
 
 			if (bHumanEnabled) {
-				WriteHumanLine("=== Agent session started (" + pSessionId + ") ===", true);
+				WriteHumanLine("=== Agent session started (" + pSessionId + ") ===", isPrimaryDomain);
 			}
 			if (bJsonEnabled) {
 				String^ payload = String::Concat(
@@ -320,7 +318,7 @@ namespace GTA {
 					"\",\"session_id\":\"", EscapeJson(pSessionId),
 					"\",\"turn_id\":0,\"event_type\":\"session_started\",\"source\":\"AgentLogger\",\"sequence\":0}"
 				);
-				WriteJsonLine(payload, true);
+				WriteJsonLine(payload, isPrimaryDomain);
 			}
 
 			bInitialized = true;
@@ -330,9 +328,6 @@ namespace GTA {
 	}
 
 	int AgentLogger::BeginTurn(String^ userInput, String^ inputMode) {
-		if (!NetHook::isPrimary)
-			return 0;
-
 		String^ safeInputMode = NormalizeText(inputMode);
 		String^ safeUserInput = NormalizeText(userInput);
 
@@ -387,8 +382,6 @@ namespace GTA {
 		String^ source,
 		String^ humanSummary,
 		String^ jsonPayload) {
-		if (!NetHook::isPrimary)
-			return;
 		if (turnId < 0)
 			return;
 

@@ -25,6 +25,8 @@
 #include "RemoteScriptDomain.h"
 
 #include "ContentCache.h"
+#include "AgentLogger.h"
+#include "AgentSettings.h"
 #include "Game.h"
 #include "Graphics.h"
 #include "NetThread.h"
@@ -67,6 +69,10 @@ namespace GTA {
 #ifdef USE_APPDOMAINS
 
 		NetHook::Initialize(false, 0);
+		AgentLogger::Initialize(
+			AgentSettings::EnableAgentLogging,
+			AgentSettings::EnableAgentJsonLogging
+		);
 		AppDomain::CurrentDomain->AssemblyResolve += gcnew ResolveEventHandler(&MyResolveEventHandler);
 		AppDomain::CurrentDomain->UnhandledException += gcnew UnhandledExceptionEventHandler(&CatchUnhandledExceptions);
 
