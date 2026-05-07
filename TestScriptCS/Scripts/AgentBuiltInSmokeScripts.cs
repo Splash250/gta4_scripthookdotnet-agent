@@ -270,7 +270,7 @@ namespace TestScriptCS {
       }
 
       private static int Elapsed(int nowTick, int previousTick) {
-         return nowTick - previousTick;
+         return unchecked(nowTick - previousTick);
       }
 
       private static void FailLocked(string message) {
@@ -311,6 +311,11 @@ namespace TestScriptCS {
       private int observedScenarioId = 0;
       private AgentBuiltInSmokePhase lastStartedPhase = AgentBuiltInSmokePhase.Idle;
       private bool reportedTerminalState = false;
+      private int nextAsyncEpoch = 0;
+      private int classificationScenarioId = 0;
+      private int executionScenarioId = 0;
+      private int classificationEpoch = 0;
+      private int executionEpoch = 0;
 
       protected AgentBuiltInSmokeScriptBase(
          AgentBuiltInSmokeRole role,
@@ -349,6 +354,7 @@ namespace TestScriptCS {
          AgentBuiltInSmokePhase currentPhase = AgentBuiltInSmokeCoordinator.Phase;
 
          if (currentScenarioId != observedScenarioId) {
+            InvalidatePendingAsyncState("scenario rolled over from " + observedScenarioId + " to " + currentScenarioId + ".");
             observedScenarioId = currentScenarioId;
             lastStartedPhase = AgentBuiltInSmokePhase.Idle;
             reportedTerminalState = false;
@@ -365,6 +371,10 @@ namespace TestScriptCS {
                Game.DisplayText("Agent built-in cross-script smoke failed.", 4000);
                reportedTerminalState = true;
             }
+         }
+
+         if (currentPhase == AgentBuiltInSmokePhase.Passed || currentPhase == AgentBuiltInSmokePhase.Failed) {
+            InvalidatePendingAsyncState("scenario entered terminal phase " + currentPhase + ".");
          }
 
          if (classificationPending || executionPending) return;
@@ -433,20 +443,28 @@ namespace TestScriptCS {
          BuiltInCommandRequest request = new BuiltInCommandRequest();
          request.RequestText = requestText;
 
+         int submissionScenarioId = observedScenarioId;
+         int submissionEpoch = ++nextAsyncEpoch;
          pendingAction = action;
          pendingRequestText = requestText;
          classificationPending = true;
+         classificationScenarioId = submissionScenarioId;
+         classificationEpoch = submissionEpoch;
 
          Agent.ClassifyBuiltInAsync(
             request,
             delegate(BuiltInCommandResult result) {
-               OnClassificationCompleted(result);
+               OnClassificationCompleted(result, submissionScenarioId, submissionEpoch);
             }
          );
       }
 
-      private void OnClassificationCompleted(BuiltInCommandResult result) {
+      private void OnClassificationCompleted(BuiltInCommandResult result, int callbackScenarioId, int callbackEpoch) {
+         if (!classificationPending || classificationScenarioId != callbackScenarioId || classificationEpoch != callbackEpoch) return;
+
          classificationPending = false;
+         classificationScenarioId = 0;
+         classificationEpoch = 0;
 
          if (pendingAction == PendingAction.SeedExecution) {
             if (result == null) {
@@ -466,11 +484,14 @@ namespace TestScriptCS {
                return;
             }
 
+            int executionSubmissionEpoch = ++nextAsyncEpoch;
             executionPending = true;
+            executionScenarioId = callbackScenarioId;
+            executionEpoch = executionSubmissionEpoch;
             Agent.ExecuteBuiltInAsync(
                result,
                delegate(BuiltInExecutionResult executionResult) {
-                  OnExecutionCompleted(executionResult);
+                  OnExecutionCompleted(executionResult, callbackScenarioId, executionSubmissionEpoch);
                }
             );
             return;
@@ -487,8 +508,12 @@ namespace TestScriptCS {
          pendingAction = PendingAction.None;
       }
 
-      private void OnExecutionCompleted(BuiltInExecutionResult result) {
+      private void OnExecutionCompleted(BuiltInExecutionResult result, int callbackScenarioId, int callbackEpoch) {
+         if (!executionPending || executionScenarioId != callbackScenarioId || executionEpoch != callbackEpoch) return;
+
          executionPending = false;
+         executionScenarioId = 0;
+         executionEpoch = 0;
          LogExecutionResult(result);
 
          bool success = result != null && result.Success;
@@ -577,8 +602,31 @@ namespace TestScriptCS {
          AgentBuiltInSmokeCoordinator.Unregister(role, registrationId, reason);
       }
 
+      private void InvalidatePendingAsyncState(string reason) {
+         if (!classificationPending && !executionPending && pendingAction == PendingAction.None) return;
+
+         string requestText = pendingRequestText;
+         bool hadClassification = classificationPending;
+         bool hadExecution = executionPending;
+
+         classificationPending = false;
+         executionPending = false;
+         classificationScenarioId = 0;
+         executionScenarioId = 0;
+         classificationEpoch = 0;
+         executionEpoch = 0;
+         pendingAction = PendingAction.None;
+         pendingRequestText = String.Empty;
+
+         PrintLine(
+            "Discarded stale async state for '" + Safe(requestText) +
+            "' after " + Safe(reason) +
+            " (classificationPending=" + hadClassification +
+            ", executionPending=" + hadExecution + ").");
+      }
+
       private static int GetNowTick() {
-         return Environment.TickCount & Int32.MaxValue;
+         return Environment.TickCount;
       }
 
       private string Safe(string value) {
