@@ -159,6 +159,7 @@ namespace GTA {
 		AgentReasoningWorker^ pReasoningWorker;
 		AgentCommandExecution^ pActiveCommandExecution;
 		List<AgentCommandExecution^>^ pRecentCommandExecutions;
+		static initonly System::Object^ pSharedRecentCommandExecutionsSyncRoot = gcnew System::Object();
 		static initonly List<AgentCommandExecution^>^ pSharedRecentCommandExecutions =
 			gcnew List<AgentCommandExecution^>();
 		AgentCommandSpec^ pPendingCommandSpec;
