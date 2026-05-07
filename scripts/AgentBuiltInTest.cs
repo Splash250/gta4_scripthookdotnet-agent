@@ -217,6 +217,15 @@ public class AgentBuiltInTest : Script {
    private void PrintLine(string message) {
       string line = "[AgentBuiltInTest] " + message;
       Game.Console.Print(line);
+      AppendTestLog(line);
+   }
+
+   private static void AppendTestLog(string line) {
+      try {
+         string path = System.IO.Path.Combine(Game.InstallFolder, "agent-script-tests.log");
+         System.IO.File.AppendAllText(path, DateTime.Now.ToString("o") + " " + line + Environment.NewLine);
+      } catch {
+      }
    }
 
    private void ReportClassificationCompletion(BuiltInClassificationSnapshot completion) {
@@ -331,6 +340,7 @@ public class AgentBuiltInTest : Script {
 
       PrintLine("Success=" + completion.Result.Success + ", Command=" + Safe(completion.Result.CommandName));
       PrintLine("ExecutedCommandLine=" + Safe(completion.Result.ExecutedCommandLine));
+      PrintLine("ResultCode=" + Safe(completion.Result.ResultCode));
       PrintLine("CompletionSummary=" + Safe(completion.Result.CompletionSummary) + ", Error=" + Safe(completion.Result.ErrorText));
 
       if (!completion.ReturnedBeforeCallback) {

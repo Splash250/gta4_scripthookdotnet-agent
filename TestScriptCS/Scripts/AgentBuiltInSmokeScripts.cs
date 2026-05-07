@@ -287,13 +287,14 @@ namespace TestScriptCS {
       }
    }
 
-   public abstract class AgentBuiltInSmokeScriptBase : Script {
+   internal sealed class AgentBuiltInSmokeLogic {
       private enum PendingAction {
          None,
          SeedExecution,
          LaneClassification
       }
 
+      private readonly Script owner;
       private readonly AgentBuiltInSmokeRole role;
       private readonly string roleLabel;
       private readonly int registrationId;
@@ -317,36 +318,27 @@ namespace TestScriptCS {
       private int classificationEpoch = 0;
       private int executionEpoch = 0;
 
-      protected AgentBuiltInSmokeScriptBase(
+      public AgentBuiltInSmokeLogic(
+         Script owner,
          AgentBuiltInSmokeRole role,
          string seedCommandName,
-         string laneRequestText,
-         bool canStartScenario) {
+         string laneRequestText) {
+         this.owner = owner;
          this.role = role;
          this.roleLabel = role == AgentBuiltInSmokeRole.Primary ? "primary" : "peer";
          this.seedCommandName = seedCommandName;
          this.seedRequestText = seedCommandName;
          this.otherSeedCommandName = role == AgentBuiltInSmokeRole.Primary ? "showplayers" : "help";
          this.laneRequestText = laneRequestText;
-         this.canStartScenario = canStartScenario;
+         this.canStartScenario = role == AgentBuiltInSmokeRole.Primary;
          this.registrationId = AgentBuiltInSmokeCoordinator.Register(role, GetNowTick());
 
-         Interval = 100;
-         this.Tick += new EventHandler(this.AgentBuiltInSmokeScriptBase_Tick);
-
-         if (canStartScenario)
-            BindKey(Keys.F12, new KeyPressDelegate(StartCrossScriptSmoke));
-
          PrintLine(canStartScenario
-            ? "Loaded. Press F12 to run the cross-script built-in smoke."
+            ? "Loaded. Press F8 to run the cross-script built-in smoke."
             : "Loaded as the peer script for the cross-script built-in smoke.");
       }
 
-      ~AgentBuiltInSmokeScriptBase() {
-         RequestUnregister("script finalized");
-      }
-
-      private void AgentBuiltInSmokeScriptBase_Tick(object sender, EventArgs e) {
+      public void OnTick(object sender, EventArgs e) {
          int nowTick = GetNowTick();
          AgentBuiltInSmokeCoordinator.Heartbeat(role, registrationId, nowTick);
 
@@ -371,6 +363,8 @@ namespace TestScriptCS {
          if (currentPhase == AgentBuiltInSmokePhase.Idle) return;
          if (currentPhase == AgentBuiltInSmokePhase.Passed || currentPhase == AgentBuiltInSmokePhase.Failed) return;
          if (currentPhase == lastStartedPhase) return;
+
+         PrintLine("Phase changed to " + currentPhase + " for scenario " + currentScenarioId + ".");
 
          if (currentPhase == AgentBuiltInSmokePhase.WaitingForPeers) {
             lastStartedPhase = currentPhase;
@@ -403,7 +397,7 @@ namespace TestScriptCS {
          }
       }
 
-      private void StartCrossScriptSmoke() {
+      public void StartCrossScriptSmoke() {
          string failureReason;
          int nowTick = GetNowTick();
          if (!AgentBuiltInSmokeCoordinator.TryStart(nowTick, out failureReason)) {
@@ -588,10 +582,20 @@ namespace TestScriptCS {
       }
 
       private void PrintLine(string message) {
-         Game.Console.Print("[AgentBuiltInSmoke:" + roleLabel + "] " + message);
+         string line = "[AgentBuiltInSmoke:" + roleLabel + "] " + message;
+         Game.Console.Print(line);
+         AppendTestLog(line);
       }
 
-      private void RequestUnregister(string reason) {
+      private static void AppendTestLog(string line) {
+         try {
+            string path = System.IO.Path.Combine(Game.InstallFolder, "agent-script-tests.log");
+            System.IO.File.AppendAllText(path, DateTime.Now.ToString("o") + " " + line + Environment.NewLine);
+         } catch {
+         }
+      }
+
+      public void RequestUnregister(string reason) {
          if (unregisterRequested) return;
 
          unregisterRequested = true;
@@ -643,15 +647,32 @@ namespace TestScriptCS {
       }
    }
 
-   public class AgentBuiltInTest : AgentBuiltInSmokeScriptBase {
-      public AgentBuiltInTest()
-         : base(AgentBuiltInSmokeRole.Primary, "help", "showposition", true) {
+   public class AgentBuiltInTest : Script {
+      private readonly AgentBuiltInSmokeLogic smoke;
+
+      public AgentBuiltInTest() {
+         Interval = 100;
+         smoke = new AgentBuiltInSmokeLogic(this, AgentBuiltInSmokeRole.Primary, "help", "showposition");
+         this.Tick += new EventHandler(smoke.OnTick);
+         BindKey(Keys.F8, new KeyPressDelegate(smoke.StartCrossScriptSmoke));
+      }
+
+      ~AgentBuiltInTest() {
+         if (smoke != null) smoke.RequestUnregister("script finalized");
       }
    }
 
-   public class AgentBuiltInPeerTest : AgentBuiltInSmokeScriptBase {
-      public AgentBuiltInPeerTest()
-         : base(AgentBuiltInSmokeRole.Peer, "showplayers", "showplayers", false) {
+   public class AgentBuiltInPeerTest : Script {
+      private readonly AgentBuiltInSmokeLogic smoke;
+
+      public AgentBuiltInPeerTest() {
+         Interval = 100;
+         smoke = new AgentBuiltInSmokeLogic(this, AgentBuiltInSmokeRole.Peer, "showplayers", "showplayers");
+         this.Tick += new EventHandler(smoke.OnTick);
+      }
+
+      ~AgentBuiltInPeerTest() {
+         if (smoke != null) smoke.RequestUnregister("script finalized");
       }
    }
 

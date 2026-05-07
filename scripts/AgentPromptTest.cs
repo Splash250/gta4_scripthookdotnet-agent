@@ -144,6 +144,15 @@ public class AgentPromptTest : Script {
    private void PrintLine(string message) {
       string line = "[AgentPromptTest] " + message;
       Game.Console.Print(line);
+      AppendTestLog(line);
+   }
+
+   private static void AppendTestLog(string line) {
+      try {
+         string path = System.IO.Path.Combine(Game.InstallFolder, "agent-script-tests.log");
+         System.IO.File.AppendAllText(path, DateTime.Now.ToString("o") + " " + line + Environment.NewLine);
+      } catch {
+      }
    }
 
    private void ReportPromptCompletion(PromptCompletionSnapshot completion) {
