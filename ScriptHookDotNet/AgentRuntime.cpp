@@ -985,6 +985,7 @@ namespace GTA {
 		AgentRuntimePromptCompletion^ completion = gcnew AgentRuntimePromptCompletion();
 		AgentResponse^ response = nullptr;
 		bool enqueue = false;
+		bool callbackQueued = false;
 		int ownedTurnId = 0;
 
 		try {
@@ -1046,19 +1047,23 @@ namespace GTA {
 			return;
 		}
 
-		if (ownedTurnId > 0) {
-			String^ summary = completion->Success
-				? "Script prompt request completed."
-				: "Script prompt request failed.";
-			AgentLogger::EndTurn(ownedTurnId, !completion->Success, summary);
-		}
-
 		if (enqueue)
-			TryEnqueueCallback(gcnew PromptQueuedCallback(
+			callbackQueued = TryEnqueueCallback(gcnew PromptQueuedCallback(
 				context->Generation,
 				context->Request->OwnerScript,
 				context->Callback,
 				completion));
+
+		if (ownedTurnId > 0) {
+			if (enqueue && !callbackQueued) {
+				AgentLogger::EndTurn(ownedTurnId, true, "Prompt request was abandoned before callback delivery.");
+			} else {
+				String^ summary = completion->Success
+					? "Script prompt request completed."
+					: "Script prompt request failed.";
+				AgentLogger::EndTurn(ownedTurnId, !completion->Success, summary);
+			}
+		}
 
 		Monitor::Enter(pSyncRoot);
 		try {
@@ -1075,6 +1080,7 @@ namespace GTA {
 		BuiltInClassificationSubmissionContext^ context = dynamic_cast<BuiltInClassificationSubmissionContext^>(state);
 		AgentRuntimeBuiltInClassificationCompletion^ completion = gcnew AgentRuntimeBuiltInClassificationCompletion();
 		bool enqueue = false;
+		bool callbackQueued = false;
 		int ownedTurnId = 0;
 
 		try {
@@ -1167,20 +1173,24 @@ namespace GTA {
 			return;
 		}
 
-		if (ownedTurnId > 0) {
-			bool failed = !completion->Success && !String::IsNullOrWhiteSpace(completion->Error);
-			String^ summary = failed
-				? "Script built-in classification failed."
-				: "Script built-in classification completed.";
-			AgentLogger::EndTurn(ownedTurnId, failed, summary);
-		}
-
 		if (enqueue)
-			TryEnqueueCallback(gcnew BuiltInClassificationQueuedCallback(
+			callbackQueued = TryEnqueueCallback(gcnew BuiltInClassificationQueuedCallback(
 				context->Generation,
 				context->Request->OwnerScript,
 				context->Callback,
 				completion));
+
+		if (ownedTurnId > 0) {
+			if (enqueue && !callbackQueued) {
+				AgentLogger::EndTurn(ownedTurnId, true, "Built-in classification was abandoned before callback delivery.");
+			} else {
+				bool failed = !completion->Success && !String::IsNullOrWhiteSpace(completion->Error);
+				String^ summary = failed
+					? "Script built-in classification failed."
+					: "Script built-in classification completed.";
+				AgentLogger::EndTurn(ownedTurnId, failed, summary);
+			}
+		}
 
 		Monitor::Enter(pSyncRoot);
 		try {

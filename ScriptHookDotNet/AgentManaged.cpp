@@ -74,9 +74,7 @@ namespace GTA {
 			BuiltInExecutionResult^ result = gcnew BuiltInExecutionResult();
 			result->Success = false;
 			result->CommandName = isNULL(validatedResult) ? String::Empty : SafeText(validatedResult->CommandName);
-			result->ExecutedCommandLine = isNULL(validatedResult)
-				? String::Empty
-				: SafeText(validatedResult->ValidatedCommandLine);
+			result->ExecutedCommandLine = String::Empty;
 			result->CompletionSummary = String::Empty;
 			result->ErrorText = SafeText(errorText);
 			return result;
@@ -196,6 +194,10 @@ namespace GTA {
 			return result;
 		}
 
+		bool DidBuiltInExecutionStart(AgentRuntimeValidatedBuiltInExecutionCompletion^ completion) {
+			return isNotNULL(completion) && (completion->StartedAt != DateTime::MinValue);
+		}
+
 		BuiltInExecutionResult^ MapBuiltInExecutionResult(AgentRuntimeValidatedBuiltInExecutionCompletion^ completion) {
 			BuiltInExecutionResult^ result = gcnew BuiltInExecutionResult();
 			if isNULL(completion) {
@@ -207,7 +209,7 @@ namespace GTA {
 			result->CommandName = isNULL(completion->ValidatedResult)
 				? String::Empty
 				: SafeText(completion->ValidatedResult->CommandName);
-			result->ExecutedCommandLine = isNULL(completion->ValidatedResult)
+			result->ExecutedCommandLine = !DidBuiltInExecutionStart(completion) || isNULL(completion->ValidatedResult)
 				? String::Empty
 				: SafeText(completion->ValidatedResult->ValidatedCommandLine);
 			result->CompletionSummary = SafeText(completion->CompletionSummary);
