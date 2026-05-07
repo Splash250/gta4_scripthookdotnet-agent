@@ -615,7 +615,11 @@ namespace GTA {
 	}
 
 	bool AgentRuntime::ShouldDeliverCallback(AgentRuntimeQueuedCallback^ callback) {
-		return isNotNULL(callback);
+		if isNULL(callback)
+			return false;
+
+		Script^ ownerScript = callback->OwnerScript;
+		return isNotNULL(ownerScript) && ownerScript->isRunning;
 	}
 
 	bool AgentRuntime::IsPromptBusy::get() {
@@ -1022,8 +1026,6 @@ namespace GTA {
 		Monitor::Enter(pSyncRoot);
 		try {
 			if (isNULL(context) || (context->Generation == pPromptGeneration)) {
-				bPromptBusy = false;
-				pPromptOwnerScript = nullptr;
 				enqueue = isNotNULL(context);
 			} else {
 				completion->WasAbandoned = true;
@@ -1057,6 +1059,16 @@ namespace GTA {
 				context->Request->OwnerScript,
 				context->Callback,
 				completion));
+
+		Monitor::Enter(pSyncRoot);
+		try {
+			if (isNULL(context) || (context->Generation == pPromptGeneration)) {
+				bPromptBusy = false;
+				pPromptOwnerScript = nullptr;
+			}
+		} finally {
+			Monitor::Exit(pSyncRoot);
+		}
 	}
 
 	void AgentRuntime::BuiltInClassificationWorkerMain(Object^ state) {
@@ -1141,8 +1153,6 @@ namespace GTA {
 					&& !completion->RequiresConfirmation) {
 					RememberAuthorizedBuiltInExecutionLocked(context->Request->OwnerScript, completion);
 				}
-				bBuiltInClassificationBusy = false;
-				pBuiltInClassificationOwnerScript = nullptr;
 				enqueue = isNotNULL(context);
 			} else {
 				completion->WasAbandoned = true;
@@ -1171,6 +1181,16 @@ namespace GTA {
 				context->Request->OwnerScript,
 				context->Callback,
 				completion));
+
+		Monitor::Enter(pSyncRoot);
+		try {
+			if (isNULL(context) || (context->Generation == pBuiltInClassificationGeneration)) {
+				bBuiltInClassificationBusy = false;
+				pBuiltInClassificationOwnerScript = nullptr;
+			}
+		} finally {
+			Monitor::Exit(pSyncRoot);
+		}
 	}
 
 	void AgentRuntime::ExecuteValidatedBuiltInExecutionOnScriptThread(
@@ -1412,6 +1432,9 @@ namespace GTA {
 
 		for each (AgentRuntimeQueuedCallback^ callback in readyCallbacks) {
 			try {
+				if (!ShouldDeliverCallback(callback))
+					continue;
+
 				callback->Invoke();
 			} catch (Exception^ ex) {
 					String^ laneName = "unknown";
