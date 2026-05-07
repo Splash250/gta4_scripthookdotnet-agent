@@ -253,6 +253,13 @@ namespace GTA {
 		Error = String::Empty;
 	}
 
+	AgentRuntime::AgentRuntimeLaneState::AgentRuntimeLaneState(AgentRuntimeLane lane, Script^ ownerScript) {
+		Lane = lane;
+		OwnerScript = ownerScript;
+		Busy = false;
+		Generation = 0;
+	}
+
 	AgentRuntime::AgentRuntimeQueuedCallback::AgentRuntimeQueuedCallback(
 		AgentRuntimeLane lane,
 		int generation,
@@ -337,19 +344,14 @@ namespace GTA {
 	AgentRuntime::AgentRuntime() {
 		pSyncRoot = gcnew System::Object();
 		pCallbackSyncRoot = gcnew System::Object();
-		bPromptBusy = false;
-		bBuiltInClassificationBusy = false;
-		bValidatedBuiltInExecutionBusy = false;
-		pPromptGeneration = 0;
-		pBuiltInClassificationGeneration = 0;
-		pValidatedBuiltInExecutionGeneration = 0;
+		pLaneStates = gcnew List<AgentRuntimeLaneState^>();
 		pNextExecutionAuthorizationId = 0;
-		pPromptOwnerScript = nullptr;
-		pBuiltInClassificationOwnerScript = nullptr;
-		pValidatedBuiltInExecutionOwnerScript = nullptr;
 		pNextRequestId = 0;
 		pCallbackQueue = gcnew Queue<AgentRuntimeQueuedCallback^>();
 		pAuthorizedBuiltInExecutions = gcnew Dictionary<int, AuthorizedBuiltInExecutionRecord^>();
+		GetOrCreateLaneStateLocked(AgentRuntimeLane::Prompt, nullptr);
+		GetOrCreateLaneStateLocked(AgentRuntimeLane::BuiltInClassification, nullptr);
+		GetOrCreateLaneStateLocked(AgentRuntimeLane::ValidatedBuiltInExecution, nullptr);
 		AgentRuntimePumpState::ManagedRuntimeInstance = this;
 	}
 
@@ -598,20 +600,46 @@ namespace GTA {
 		return Object::ReferenceEquals(left, right);
 	}
 
+	AgentRuntime::AgentRuntimeLaneState^ AgentRuntime::FindLaneStateLocked(
+		AgentRuntimeLane lane,
+		Script^ ownerScript) {
+		for each (AgentRuntimeLaneState^ state in pLaneStates) {
+			if isNULL(state)
+				continue;
+			if ((state->Lane == lane) && IsSameScript(state->OwnerScript, ownerScript))
+				return state;
+		}
+		return nullptr;
+	}
+
+	AgentRuntime::AgentRuntimeLaneState^ AgentRuntime::GetOrCreateLaneStateLocked(
+		AgentRuntimeLane lane,
+		Script^ ownerScript) {
+		AgentRuntimeLaneState^ state = FindLaneStateLocked(lane, ownerScript);
+		if isNotNULL(state)
+			return state;
+
+		state = gcnew AgentRuntimeLaneState(lane, ownerScript);
+		pLaneStates->Add(state);
+		return state;
+	}
+
+	bool AgentRuntime::IsLaneBusyLocked(AgentRuntimeLane lane) {
+		for each (AgentRuntimeLaneState^ state in pLaneStates) {
+			if isNULL(state)
+				continue;
+			if ((state->Lane == lane) && state->Busy)
+				return true;
+		}
+		return false;
+	}
+
 	bool AgentRuntime::IsCallbackGenerationCurrentLocked(AgentRuntimeQueuedCallback^ callback) {
 		if isNULL(callback)
 			return false;
 
-		switch (callback->Lane) {
-			case AgentRuntimeLane::Prompt:
-				return callback->Generation == pPromptGeneration;
-			case AgentRuntimeLane::BuiltInClassification:
-				return callback->Generation == pBuiltInClassificationGeneration;
-			case AgentRuntimeLane::ValidatedBuiltInExecution:
-				return callback->Generation == pValidatedBuiltInExecutionGeneration;
-			default:
-				return false;
-		}
+		AgentRuntimeLaneState^ state = FindLaneStateLocked(callback->Lane, callback->OwnerScript);
+		return isNotNULL(state) && (callback->Generation == state->Generation);
 	}
 
 	bool AgentRuntime::ShouldDeliverCallback(AgentRuntimeQueuedCallback^ callback) {
@@ -625,7 +653,7 @@ namespace GTA {
 	bool AgentRuntime::IsPromptBusy::get() {
 		Monitor::Enter(pSyncRoot);
 		try {
-			return bPromptBusy;
+			return IsLaneBusyLocked(AgentRuntimeLane::Prompt);
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}
@@ -634,7 +662,7 @@ namespace GTA {
 	bool AgentRuntime::IsBuiltInClassificationBusy::get() {
 		Monitor::Enter(pSyncRoot);
 		try {
-			return bBuiltInClassificationBusy;
+			return IsLaneBusyLocked(AgentRuntimeLane::BuiltInClassification);
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}
@@ -643,7 +671,7 @@ namespace GTA {
 	bool AgentRuntime::IsValidatedBuiltInExecutionBusy::get() {
 		Monitor::Enter(pSyncRoot);
 		try {
-			return bValidatedBuiltInExecutionBusy;
+			return IsLaneBusyLocked(AgentRuntimeLane::ValidatedBuiltInExecution);
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}
@@ -685,14 +713,16 @@ namespace GTA {
 		int requestId = 0;
 		bool ownsTurn = false;
 		AgentRuntimePromptRequest^ requestSnapshot;
+		AgentRuntimeLaneState^ laneState = nullptr;
 		Script^ ownerScript = CaptureOwningScript();
 		if isNULL(ownerScript)
 			return false;
 
 		Monitor::Enter(pSyncRoot);
 		try {
-			if (bPromptBusy) return false;
-			generation = pPromptGeneration;
+			laneState = GetOrCreateLaneStateLocked(AgentRuntimeLane::Prompt, ownerScript);
+			if (laneState->Busy) return false;
+			generation = laneState->Generation;
 			request->OwnerScript = ownerScript;
 			requestId = (request->RequestId > 0) ? request->RequestId : ReserveRequestId();
 			int turnId = request->TurnId;
@@ -703,8 +733,7 @@ namespace GTA {
 					RememberOwnedTurn(requestId, turnId);
 			}
 			requestSnapshot = ClonePromptRequest(request, requestId, turnId);
-			bPromptBusy = true;
-			pPromptOwnerScript = requestSnapshot->OwnerScript;
+			laneState->Busy = true;
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}
@@ -722,10 +751,9 @@ namespace GTA {
 		} catch (Exception^) {
 			Monitor::Enter(pSyncRoot);
 			try {
-				if (generation == pPromptGeneration) {
-					bPromptBusy = false;
-					pPromptOwnerScript = nullptr;
-				}
+				laneState = FindLaneStateLocked(AgentRuntimeLane::Prompt, ownerScript);
+				if (isNotNULL(laneState) && (generation == laneState->Generation))
+					laneState->Busy = false;
 			} finally {
 				Monitor::Exit(pSyncRoot);
 			}
@@ -738,10 +766,9 @@ namespace GTA {
 		} catch (...) {
 			Monitor::Enter(pSyncRoot);
 			try {
-				if (generation == pPromptGeneration) {
-					bPromptBusy = false;
-					pPromptOwnerScript = nullptr;
-				}
+				laneState = FindLaneStateLocked(AgentRuntimeLane::Prompt, ownerScript);
+				if (isNotNULL(laneState) && (generation == laneState->Generation))
+					laneState->Busy = false;
 			} finally {
 				Monitor::Exit(pSyncRoot);
 			}
@@ -763,15 +790,19 @@ namespace GTA {
 		int requestId = 0;
 		bool ownsTurn = false;
 		AgentRuntimeBuiltInClassificationRequest^ requestSnapshot;
+		AgentRuntimeLaneState^ laneState = nullptr;
 		Script^ ownerScript = CaptureOwningScript();
 		if isNULL(ownerScript)
 			return false;
 
 		Monitor::Enter(pSyncRoot);
 		try {
-			if (bBuiltInClassificationBusy) return false;
-			generation = pBuiltInClassificationGeneration;
+			laneState = GetOrCreateLaneStateLocked(AgentRuntimeLane::BuiltInClassification, ownerScript);
+			if (laneState->Busy) return false;
+			generation = laneState->Generation;
 			request->OwnerScript = ownerScript;
+			if (String::IsNullOrWhiteSpace(request->RecentCommandTranscriptJson))
+				request->RecentCommandTranscriptJson = AgentConsole::BuildScriptRecentCommandTranscriptJson(ownerScript);
 			requestId = (request->RequestId > 0) ? request->RequestId : ReserveRequestId();
 			int turnId = request->TurnId;
 			if (turnId <= 0) {
@@ -781,8 +812,7 @@ namespace GTA {
 					RememberOwnedTurn(requestId, turnId);
 			}
 			requestSnapshot = CloneBuiltInClassificationRequest(request, requestId, turnId);
-			bBuiltInClassificationBusy = true;
-			pBuiltInClassificationOwnerScript = requestSnapshot->OwnerScript;
+			laneState->Busy = true;
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}
@@ -801,10 +831,9 @@ namespace GTA {
 		} catch (Exception^) {
 			Monitor::Enter(pSyncRoot);
 			try {
-				if (generation == pBuiltInClassificationGeneration) {
-					bBuiltInClassificationBusy = false;
-					pBuiltInClassificationOwnerScript = nullptr;
-				}
+				laneState = FindLaneStateLocked(AgentRuntimeLane::BuiltInClassification, ownerScript);
+				if (isNotNULL(laneState) && (generation == laneState->Generation))
+					laneState->Busy = false;
 			} finally {
 				Monitor::Exit(pSyncRoot);
 			}
@@ -817,10 +846,9 @@ namespace GTA {
 		} catch (...) {
 			Monitor::Enter(pSyncRoot);
 			try {
-				if (generation == pBuiltInClassificationGeneration) {
-					bBuiltInClassificationBusy = false;
-					pBuiltInClassificationOwnerScript = nullptr;
-				}
+				laneState = FindLaneStateLocked(AgentRuntimeLane::BuiltInClassification, ownerScript);
+				if (isNotNULL(laneState) && (generation == laneState->Generation))
+					laneState->Busy = false;
 			} finally {
 				Monitor::Exit(pSyncRoot);
 			}
@@ -843,22 +871,23 @@ namespace GTA {
 		int turnId = 0;
 		bool ownsTurn = false;
 		AgentRuntimeBuiltInClassificationCompletion^ validatedResultSnapshot;
+		AgentRuntimeLaneState^ laneState = nullptr;
 		Script^ ownerScript = CaptureOwningScript();
 		if isNULL(ownerScript)
 			return false;
 
 		Monitor::Enter(pSyncRoot);
 		try {
-			if (bValidatedBuiltInExecutionBusy) return false;
-			generation = pValidatedBuiltInExecutionGeneration;
+			laneState = GetOrCreateLaneStateLocked(AgentRuntimeLane::ValidatedBuiltInExecution, ownerScript);
+			if (laneState->Busy) return false;
+			generation = laneState->Generation;
 			requestId = ReserveRequestId();
 			turnId = AgentLogger::BeginTurn(BuildExecutionTurnInput(validatedResult), BuildScriptLogSource(ownerScript));
 			ownsTurn = turnId > 0;
 			if (ownsTurn)
 				RememberOwnedTurn(requestId, turnId);
 			validatedResultSnapshot = CloneBuiltInClassificationCompletionForExecution(validatedResult);
-			bValidatedBuiltInExecutionBusy = true;
-			pValidatedBuiltInExecutionOwnerScript = ownerScript;
+			laneState->Busy = true;
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}
@@ -885,10 +914,9 @@ namespace GTA {
 
 		Monitor::Enter(pSyncRoot);
 		try {
-			if (generation == pValidatedBuiltInExecutionGeneration) {
-				bValidatedBuiltInExecutionBusy = false;
-				pValidatedBuiltInExecutionOwnerScript = nullptr;
-			}
+			laneState = FindLaneStateLocked(AgentRuntimeLane::ValidatedBuiltInExecution, ownerScript);
+			if (isNotNULL(laneState) && (generation == laneState->Generation))
+				laneState->Busy = false;
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}
@@ -916,7 +944,7 @@ namespace GTA {
 		int generation = 0;
 		Monitor::Enter(pSyncRoot);
 		try {
-			generation = pPromptGeneration;
+			generation = GetOrCreateLaneStateLocked(AgentRuntimeLane::Prompt, ownerScript)->Generation;
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}
@@ -940,7 +968,7 @@ namespace GTA {
 		int generation = 0;
 		Monitor::Enter(pSyncRoot);
 		try {
-			generation = pBuiltInClassificationGeneration;
+			generation = GetOrCreateLaneStateLocked(AgentRuntimeLane::BuiltInClassification, ownerScript)->Generation;
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}
@@ -968,7 +996,7 @@ namespace GTA {
 		int generation = 0;
 		Monitor::Enter(pSyncRoot);
 		try {
-			generation = pValidatedBuiltInExecutionGeneration;
+			generation = GetOrCreateLaneStateLocked(AgentRuntimeLane::ValidatedBuiltInExecution, ownerScript)->Generation;
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}
@@ -1026,7 +1054,11 @@ namespace GTA {
 
 		Monitor::Enter(pSyncRoot);
 		try {
-			if (isNULL(context) || (context->Generation == pPromptGeneration)) {
+			Script^ ownerScript = (isNULL(context) || isNULL(context->Request)) ? nullptr : context->Request->OwnerScript;
+			AgentRuntimeLaneState^ laneState = isNULL(context)
+				? nullptr
+				: FindLaneStateLocked(AgentRuntimeLane::Prompt, ownerScript);
+			if (isNotNULL(context) && isNotNULL(laneState) && (context->Generation == laneState->Generation)) {
 				enqueue = isNotNULL(context);
 			} else {
 				completion->WasAbandoned = true;
@@ -1067,10 +1099,12 @@ namespace GTA {
 
 		Monitor::Enter(pSyncRoot);
 		try {
-			if (isNULL(context) || (context->Generation == pPromptGeneration)) {
-				bPromptBusy = false;
-				pPromptOwnerScript = nullptr;
-			}
+			Script^ ownerScript = (isNULL(context) || isNULL(context->Request)) ? nullptr : context->Request->OwnerScript;
+			AgentRuntimeLaneState^ laneState = isNULL(context)
+				? nullptr
+				: FindLaneStateLocked(AgentRuntimeLane::Prompt, ownerScript);
+			if (isNotNULL(laneState) && (context->Generation == laneState->Generation))
+				laneState->Busy = false;
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}
@@ -1152,7 +1186,11 @@ namespace GTA {
 
 		Monitor::Enter(pSyncRoot);
 		try {
-			if (isNULL(context) || (context->Generation == pBuiltInClassificationGeneration)) {
+			Script^ ownerScript = (isNULL(context) || isNULL(context->Request)) ? nullptr : context->Request->OwnerScript;
+			AgentRuntimeLaneState^ laneState = isNULL(context)
+				? nullptr
+				: FindLaneStateLocked(AgentRuntimeLane::BuiltInClassification, ownerScript);
+			if (isNotNULL(context) && isNotNULL(laneState) && (context->Generation == laneState->Generation)) {
 				if (isNotNULL(context)
 					&& isNotNULL(context->Request)
 					&& completion->IsValidatedForExecution
@@ -1194,10 +1232,12 @@ namespace GTA {
 
 		Monitor::Enter(pSyncRoot);
 		try {
-			if (isNULL(context) || (context->Generation == pBuiltInClassificationGeneration)) {
-				bBuiltInClassificationBusy = false;
-				pBuiltInClassificationOwnerScript = nullptr;
-			}
+			Script^ ownerScript = (isNULL(context) || isNULL(context->Request)) ? nullptr : context->Request->OwnerScript;
+			AgentRuntimeLaneState^ laneState = isNULL(context)
+				? nullptr
+				: FindLaneStateLocked(AgentRuntimeLane::BuiltInClassification, ownerScript);
+			if (isNotNULL(laneState) && (context->Generation == laneState->Generation))
+				laneState->Busy = false;
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}
@@ -1263,9 +1303,11 @@ namespace GTA {
 
 		Monitor::Enter(pSyncRoot);
 		try {
-			if (isNULL(context) || (context->Generation == pValidatedBuiltInExecutionGeneration)) {
-				bValidatedBuiltInExecutionBusy = false;
-				pValidatedBuiltInExecutionOwnerScript = nullptr;
+			AgentRuntimeLaneState^ laneState = isNULL(context)
+				? nullptr
+				: FindLaneStateLocked(AgentRuntimeLane::ValidatedBuiltInExecution, context->OwnerScript);
+			if (isNotNULL(laneState) && (context->Generation == laneState->Generation)) {
+				laneState->Busy = false;
 			} else {
 				completion->WasAbandoned = true;
 			}
@@ -1292,32 +1334,32 @@ namespace GTA {
 			context->Callback(completion);
 	}
 
+	void AgentRuntime::AbandonLaneWorkCore(AgentRuntimeLane lane, Script^ ownerScript) {
+		AgentRuntimeLaneState^ laneState = FindLaneStateLocked(lane, ownerScript);
+		if isNULL(laneState)
+			return;
+
+		laneState->Generation++;
+		laneState->Busy = false;
+	}
+
 	void AgentRuntime::AbandonPromptWorkCore() {
-		pPromptGeneration++;
-		bPromptBusy = false;
-		pPromptOwnerScript = nullptr;
+		AbandonLaneWorkCore(AgentRuntimeLane::Prompt, nullptr);
 	}
 
 	void AgentRuntime::AbandonBuiltInClassificationWorkCore() {
-		pBuiltInClassificationGeneration++;
-		bBuiltInClassificationBusy = false;
-		pBuiltInClassificationOwnerScript = nullptr;
+		AbandonLaneWorkCore(AgentRuntimeLane::BuiltInClassification, nullptr);
 	}
 
 	void AgentRuntime::AbandonValidatedBuiltInExecutionWorkCore() {
-		pValidatedBuiltInExecutionGeneration++;
-		bValidatedBuiltInExecutionBusy = false;
-		pValidatedBuiltInExecutionOwnerScript = nullptr;
+		AbandonLaneWorkCore(AgentRuntimeLane::ValidatedBuiltInExecution, nullptr);
 	}
 
 	void AgentRuntime::AbandonScriptOwnedWorkCore(Script^ ownerScript) {
 		RemoveAuthorizedBuiltInExecutionsForScriptLocked(ownerScript);
-		if (IsSameScript(pPromptOwnerScript, ownerScript))
-			AbandonPromptWorkCore();
-		if (IsSameScript(pBuiltInClassificationOwnerScript, ownerScript))
-			AbandonBuiltInClassificationWorkCore();
-		if (IsSameScript(pValidatedBuiltInExecutionOwnerScript, ownerScript))
-			AbandonValidatedBuiltInExecutionWorkCore();
+		AbandonLaneWorkCore(AgentRuntimeLane::Prompt, ownerScript);
+		AbandonLaneWorkCore(AgentRuntimeLane::BuiltInClassification, ownerScript);
+		AbandonLaneWorkCore(AgentRuntimeLane::ValidatedBuiltInExecution, ownerScript);
 	}
 
 	void AgentRuntime::AbandonPromptWork() {
@@ -1351,9 +1393,12 @@ namespace GTA {
 		Monitor::Enter(pSyncRoot);
 		try {
 			pAuthorizedBuiltInExecutions->Clear();
-			AbandonPromptWorkCore();
-			AbandonBuiltInClassificationWorkCore();
-			AbandonValidatedBuiltInExecutionWorkCore();
+			for each (AgentRuntimeLaneState^ state in pLaneStates) {
+				if isNULL(state)
+					continue;
+				state->Generation++;
+				state->Busy = false;
+			}
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}

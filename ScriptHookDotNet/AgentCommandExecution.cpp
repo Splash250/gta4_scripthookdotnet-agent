@@ -160,6 +160,7 @@ namespace GTA {
 		CommandName = isNULL(commandName) ? String::Empty : commandName;
 		LogSource = "AgentCommandExecution";
 		OriginTag = String::Empty;
+		OwnerScript = nullptr;
 		TurnId = 0;
 		StartedAt = DateTime::Now;
 		CompletedAt = DateTime::MinValue;
@@ -192,6 +193,7 @@ namespace GTA {
 		execution->OriginTag = isNULL(validatedResult)
 			? String::Empty
 			: BuildScriptExecutionOriginTag(validatedResult->OwnerScript);
+		execution->OwnerScript = isNULL(validatedResult) ? nullptr : validatedResult->OwnerScript;
 
 		AgentCommandSpec^ spec = isNULL(validatedResult) ? nullptr : validatedResult->Spec;
 		if isNULL(spec) {

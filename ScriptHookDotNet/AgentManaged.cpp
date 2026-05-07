@@ -388,7 +388,6 @@ namespace GTA {
 
 		AgentRuntimeBuiltInClassificationRequest^ runtimeRequest = gcnew AgentRuntimeBuiltInClassificationRequest();
 		runtimeRequest->UserInput = request->RequestText;
-		runtimeRequest->RecentCommandTranscriptJson = AgentConsole::BuildSharedRecentCommandTranscriptJson();
 
 		BuiltInCommandRuntimeCallbackAdapter^ adapter = gcnew BuiltInCommandRuntimeCallbackAdapter(callback);
 		if (!GetManagedRuntime()->SubmitBuiltInClassification(

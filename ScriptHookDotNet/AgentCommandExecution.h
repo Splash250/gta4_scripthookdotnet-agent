@@ -68,6 +68,8 @@ namespace GTA {
 		void MarkCompleted();
 
 	internal:
+		Script^ OwnerScript;
+
 		static AgentCommandExecution^ ExecuteValidatedBuiltInCommand(
 			int turnId,
 			AgentValidatedBuiltInExecutionRecord^ validatedResult,

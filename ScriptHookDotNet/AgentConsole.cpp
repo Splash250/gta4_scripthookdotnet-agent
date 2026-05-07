@@ -161,6 +161,12 @@ namespace GTA {
 				&& execution->OriginTag->StartsWith("script:", StringComparison::OrdinalIgnoreCase);
 		}
 
+		bool IsSameScriptOriginExecution(AgentCommandExecution^ execution, Script^ ownerScript) {
+			return isNotNULL(execution)
+				&& isNotNULL(ownerScript)
+				&& System::Object::ReferenceEquals(execution->OwnerScript, ownerScript);
+		}
+
 	}
 
 	AgentConsole::AgentConsole() {
@@ -575,6 +581,33 @@ namespace GTA {
 		}
 		sb->Append("]");
 		return sb->ToString();
+	}
+
+	String^ AgentConsole::BuildScriptRecentCommandTranscriptJson(Script^ ownerScript) {
+		if isNULL(ownerScript)
+			return String::Empty;
+
+		array<AgentCommandExecution^>^ snapshot = nullptr;
+		System::Threading::Monitor::Enter(pSharedRecentCommandExecutionsSyncRoot);
+		try {
+			if isNULL(pSharedRecentCommandExecutions) return String::Empty;
+			if (pSharedRecentCommandExecutions->Count == 0) return String::Empty;
+			snapshot = pSharedRecentCommandExecutions->ToArray();
+		} finally {
+			System::Threading::Monitor::Exit(pSharedRecentCommandExecutionsSyncRoot);
+		}
+
+		System::Text::StringBuilder^ sb = gcnew System::Text::StringBuilder();
+		sb->Append("[");
+		for (int i = 0; i < snapshot->Length; i++) {
+			AgentCommandExecution^ execution = snapshot[i];
+			if (!IsSameScriptOriginExecution(execution, ownerScript))
+				continue;
+			if (sb->Length > 1) sb->Append(",");
+			sb->Append(execution->BuildStructuredTranscript(MAX_CONTEXT_OUTPUT_LINES_PER_COMMAND));
+		}
+		sb->Append("]");
+		return (sb->Length <= 2) ? String::Empty : sb->ToString();
 	}
 
 	String^ AgentConsole::BuildModelRequestWithRecentCommandContext(String^ userInput, String^ recentTranscriptJson) {

@@ -138,6 +138,16 @@ namespace GTA {
 			ValidatedBuiltInExecution
 		};
 
+		ref class AgentRuntimeLaneState sealed {
+		public:
+			AgentRuntimeLane Lane;
+			Script^ OwnerScript;
+			bool Busy;
+			int Generation;
+
+			AgentRuntimeLaneState(AgentRuntimeLane lane, Script^ ownerScript);
+		};
+
 		ref class AgentRuntimeQueuedCallback abstract {
 		private:
 			AgentRuntimeLane pLane;
@@ -256,16 +266,8 @@ namespace GTA {
 
 		System::Object^ pSyncRoot;
 		System::Object^ pCallbackSyncRoot;
-		bool bPromptBusy;
-		bool bBuiltInClassificationBusy;
-		bool bValidatedBuiltInExecutionBusy;
-		int pPromptGeneration;
-		int pBuiltInClassificationGeneration;
-		int pValidatedBuiltInExecutionGeneration;
+		System::Collections::Generic::List<AgentRuntimeLaneState^>^ pLaneStates;
 		int pNextExecutionAuthorizationId;
-		Script^ pPromptOwnerScript;
-		Script^ pBuiltInClassificationOwnerScript;
-		Script^ pValidatedBuiltInExecutionOwnerScript;
 		int pNextRequestId;
 		System::Collections::Generic::Queue<AgentRuntimeQueuedCallback^>^ pCallbackQueue;
 		System::Collections::Generic::Dictionary<int, AuthorizedBuiltInExecutionRecord^>^ pAuthorizedBuiltInExecutions;
@@ -282,6 +284,10 @@ namespace GTA {
 		static AgentRuntimeBuiltInClassificationCompletion^ CloneBuiltInClassificationCompletionForExecution(
 			AgentRuntimeBuiltInClassificationCompletion^ validatedResult);
 		static bool IsSameScript(Script^ left, Script^ right);
+		AgentRuntimeLaneState^ FindLaneStateLocked(AgentRuntimeLane lane, Script^ ownerScript);
+		AgentRuntimeLaneState^ GetOrCreateLaneStateLocked(AgentRuntimeLane lane, Script^ ownerScript);
+		bool IsLaneBusyLocked(AgentRuntimeLane lane);
+		void AbandonLaneWorkCore(AgentRuntimeLane lane, Script^ ownerScript);
 		int ReserveExecutionAuthorizationId();
 		void RememberAuthorizedBuiltInExecutionLocked(
 			Script^ ownerScript,

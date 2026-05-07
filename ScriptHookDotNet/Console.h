@@ -225,6 +225,7 @@ namespace GTA {
 
 	public:
 		static String^ BuildSharedRecentCommandTranscriptJson();
+		static String^ BuildScriptRecentCommandTranscriptJson(Script^ ownerScript);
 		static void RememberSharedCommandExecution(AgentCommandExecution^ execution);
 
 		property bool isActive {
