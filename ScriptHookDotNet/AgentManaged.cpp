@@ -270,7 +270,8 @@ namespace GTA {
 			if (!GetManagedRuntime()->QueueDeferredPromptCompletion(
 				CreatePromptFailureCompletion(errorText),
 				gcnew AgentRuntimePromptCompletedCallback(adapter, &PromptRuntimeCallbackAdapter::OnCompleted))) {
-				DeliverPromptFailure(callback, errorText);
+				NetHook::Log("AgentManaged: dropped prompt completion after script teardown.");
+				return;
 			}
 		}
 
@@ -284,7 +285,8 @@ namespace GTA {
 				gcnew AgentRuntimeBuiltInClassificationCompletedCallback(
 					adapter,
 					&BuiltInCommandRuntimeCallbackAdapter::OnCompleted))) {
-				DeliverBuiltInCommandFailure(callback, errorText);
+				NetHook::Log("AgentManaged: dropped built-in classification completion after script teardown.");
+				return;
 			}
 		}
 
@@ -302,7 +304,8 @@ namespace GTA {
 				gcnew AgentRuntimeValidatedBuiltInExecutionCompletedCallback(
 					adapter,
 					&BuiltInExecutionRuntimeCallbackAdapter::OnCompleted))) {
-				DeliverBuiltInExecutionFailure(callback, errorText, validatedResult);
+				NetHook::Log("AgentManaged: dropped built-in execution completion after script teardown.");
+				return;
 			}
 		}
 
