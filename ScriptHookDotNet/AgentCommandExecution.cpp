@@ -23,13 +23,19 @@
 #include "stdafx.h"
 
 #include "AgentCommandExecution.h"
+#include "AgentCommandRegistry.h"
+#include "AgentCommandSemantics.h"
 #include "AgentLogger.h"
+#include "Console.h"
+#include "NetHook.h"
 
 #pragma managed
 
 namespace GTA {
 
+	using namespace System;
 	using namespace System::Globalization;
+	using namespace System::Reflection;
 	using namespace System::Text;
 
 	namespace {
@@ -59,11 +65,86 @@ namespace GTA {
 			return sb->ToString();
 		}
 
+		String^ BuildCommandPayload(
+			AgentCommandExecution^ execution,
+			String^ resultCode,
+			String^ completionSummary,
+			String^ outputLine,
+			int outputIndex) {
+			StringBuilder^ payload = gcnew StringBuilder();
+			payload->Append("{\"command_name\":\"")->Append(EscapeJson(isNULL(execution) ? String::Empty : execution->CommandName));
+			payload->Append("\",\"command_line\":\"")->Append(EscapeJson(isNULL(execution) ? String::Empty : execution->CommandLine))->Append("\"");
+			if (isNotNULL(execution) && !String::IsNullOrWhiteSpace(execution->OriginTag))
+				payload->Append(",\"origin\":\"")->Append(EscapeJson(execution->OriginTag))->Append("\"");
+			if (!String::IsNullOrWhiteSpace(resultCode))
+				payload->Append(",\"result_code\":\"")->Append(EscapeJson(resultCode))->Append("\"");
+			if (!String::IsNullOrWhiteSpace(completionSummary))
+				payload->Append(",\"completion_summary\":\"")->Append(EscapeJson(completionSummary))->Append("\"");
+			if (outputIndex > 0)
+				payload->Append(",\"output_index\":")->Append(outputIndex.ToString(CultureInfo::InvariantCulture));
+			if (!String::IsNullOrWhiteSpace(outputLine))
+				payload->Append(",\"output_line\":\"")->Append(EscapeJson(outputLine))->Append("\"");
+			payload->Append("}");
+			return payload->ToString();
+		}
+
+		String^ BuildExecutionLogSource(AgentCommandExecution^ execution) {
+			if isNULL(execution)
+				return "AgentCommandExecution";
+			return AgentLogger::ComposeSource(execution->LogSource, execution->OriginTag);
+		}
+
+		AgentConsole^ GetAgentConsoleForCommandCapture() {
+			try {
+				FieldInfo^ field = NetHook::typeid->GetField(
+					"pAgentConsole",
+					BindingFlags::NonPublic | BindingFlags::Static);
+				if isNULL(field)
+					return nullptr;
+
+				return dynamic_cast<AgentConsole^>(field->GetValue(nullptr));
+			} catch (...) {
+				return nullptr;
+			}
+		}
+
+		void PopulateExecutionSummary(AgentCommandExecution^ execution) {
+			if isNULL(execution)
+				return;
+
+			String^ resultCode = "completed";
+			String^ completionSummary = "Command completed.";
+			if (execution->SawErrorLikeOutput) {
+				resultCode = "problem_reported";
+				completionSummary = "Command reported a problem. Review mirrored output above.";
+			}
+			else if (execution->SawWarningLikeOutput) {
+				resultCode = "warning_reported";
+				completionSummary = "Command completed with warnings.";
+			}
+			else if (execution->TotalOutputLineCount > 0) {
+				resultCode = "output_observed";
+				completionSummary = "Command completed with output mirrored above.";
+			}
+			else if (AgentCommandSemantics::IsUsuallySilentOnSuccess(execution->CommandName)) {
+				resultCode = "silent_success";
+				completionSummary = "Command completed. This command is usually silent on success.";
+			}
+			else if (AgentCommandSemantics::IsExpectedToEmitOutput(execution->CommandName)) {
+				resultCode = "no_visible_output";
+				completionSummary = "Command completed without visible output, although this command often prints results.";
+			}
+
+			execution->SetCompletionResult(resultCode, completionSummary);
+		}
+
 	}
 
 	AgentCommandExecution::AgentCommandExecution(String^ commandLine, String^ commandName) {
 		CommandLine = isNULL(commandLine) ? String::Empty : commandLine;
 		CommandName = isNULL(commandName) ? String::Empty : commandName;
+		LogSource = "AgentCommandExecution";
+		OriginTag = String::Empty;
 		TurnId = 0;
 		StartedAt = DateTime::Now;
 		CompletedAt = DateTime::MinValue;
@@ -76,6 +157,68 @@ namespace GTA {
 		CompletionSummary = String::Empty;
 		SawErrorLikeOutput = false;
 		SawWarningLikeOutput = false;
+	}
+
+	AgentCommandExecution^ AgentCommandExecution::ExecuteValidatedBuiltInCommand(
+		int turnId,
+		String^ commandLine,
+		String^ commandName,
+		String^ logSource,
+		String^ originTag,
+		String^% errorText) {
+		errorText = String::Empty;
+
+		String^ normalizedCommandLine = isNULL(commandLine) ? String::Empty : commandLine->Trim();
+		String^ normalizedCommandName = isNULL(commandName) ? String::Empty : commandName->Trim()->ToLowerInvariant();
+		AgentCommandExecution^ execution = gcnew AgentCommandExecution(normalizedCommandLine, normalizedCommandName);
+		execution->TurnId = turnId;
+		execution->LogSource = String::IsNullOrWhiteSpace(logSource) ? "AgentCommandExecution" : logSource->Trim();
+		execution->OriginTag = isNULL(originTag) ? String::Empty : originTag->Trim();
+
+		AgentCommandSpec^ spec = AgentCommandRegistry::Find(normalizedCommandName);
+		if isNULL(spec) {
+			errorText = "Built-in execution could not resolve the validated command to a known command.";
+			execution->MarkCompleted();
+			execution->SetCompletionResult("unknown_command", errorText);
+			return execution;
+		}
+
+		try {
+			if (execution->TurnId > 0) {
+				AgentLogger::LogEvent(
+					execution->TurnId,
+					AgentLogEventType::CommandStarted,
+					AgentLogger::ComposeSource(execution->LogSource, execution->OriginTag),
+					"Running command: " + normalizedCommandLine,
+					BuildCommandPayload(execution, String::Empty, String::Empty, String::Empty, 0));
+			}
+
+			AgentConsole^ captureConsole = GetAgentConsoleForCommandCapture();
+			NetHook::BeginAgentCommandCapture(captureConsole, execution);
+			try {
+				NetHook::DefaultConsole->SendCommand(normalizedCommandLine);
+			}
+			finally {
+				NetHook::EndAgentCommandCapture();
+				execution->MarkCompleted();
+			}
+
+			PopulateExecutionSummary(execution);
+			if (String::Equals(execution->ResultCode, "problem_reported", StringComparison::OrdinalIgnoreCase))
+				errorText = execution->CompletionSummary;
+		}
+		catch (Exception^ ex) {
+			execution->MarkCompleted();
+			errorText = "Command execution failed: " + (isNULL(ex) ? "Unknown exception." : ex->Message);
+			execution->SetCompletionResult("exception", errorText);
+		}
+		catch (...) {
+			execution->MarkCompleted();
+			errorText = "Command execution failed with a native exception.";
+			execution->SetCompletionResult("native_exception", errorText);
+		}
+
+		return execution;
 	}
 
 	void AgentCommandExecution::AppendOutputLine(String^ line) {
@@ -103,17 +246,12 @@ namespace GTA {
 			String^ humanSummary = HasLoggedOutput
 				? ("    " + outputLine)
 				: ("  Command output:" + Environment::NewLine + "    " + outputLine);
-			StringBuilder^ payload = gcnew StringBuilder();
-			payload->Append("{\"command_name\":\"")->Append(EscapeJson(CommandName));
-			payload->Append("\",\"command_line\":\"")->Append(EscapeJson(CommandLine));
-			payload->Append("\",\"output_index\":")->Append(TotalOutputLineCount.ToString(CultureInfo::InvariantCulture));
-			payload->Append(",\"output_line\":\"")->Append(EscapeJson(outputLine))->Append("\"}");
 			AgentLogger::LogEvent(
 				TurnId,
 				AgentLogEventType::CommandOutput,
-				"AgentCommandExecution",
+				BuildExecutionLogSource(this),
 				humanSummary,
-				payload->ToString()
+				BuildCommandPayload(this, String::Empty, String::Empty, outputLine, TotalOutputLineCount)
 			);
 			HasLoggedOutput = true;
 		}
@@ -127,8 +265,10 @@ namespace GTA {
 
 		StringBuilder^ payload = gcnew StringBuilder();
 		payload->Append("{\"command_name\":\"")->Append(EscapeJson(CommandName));
-		payload->Append("\",\"command_line\":\"")->Append(EscapeJson(CommandLine));
-		payload->Append("\",\"result_code\":\"")->Append(EscapeJson(ResultCode));
+		payload->Append("\",\"command_line\":\"")->Append(EscapeJson(CommandLine))->Append("\"");
+		if (!String::IsNullOrWhiteSpace(OriginTag))
+			payload->Append(",\"origin\":\"")->Append(EscapeJson(OriginTag))->Append("\"");
+		payload->Append(",\"result_code\":\"")->Append(EscapeJson(ResultCode));
 		payload->Append("\",\"completion_summary\":\"")->Append(EscapeJson(CompletionSummary));
 		payload->Append("\",\"started_at\":\"")->Append(StartedAt.ToString("o", CultureInfo::InvariantCulture));
 		payload->Append("\",\"completed_at\":\"");
@@ -144,7 +284,7 @@ namespace GTA {
 		AgentLogger::LogEvent(
 			TurnId,
 			AgentLogEventType::CommandCompleted,
-			"AgentCommandExecution",
+			BuildExecutionLogSource(this),
 			"Command completed (" + ResultCode + "): " + CompletionSummary,
 			payload->ToString()
 		);

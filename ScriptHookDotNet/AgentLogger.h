@@ -83,6 +83,7 @@ namespace GTA {
 		static int BeginTurn(String^ userInput, String^ inputMode);
 		static void EndTurn(int turnId, bool failed, String^ summary);
 		static void LogEvent(int turnId, AgentLogEventType eventType, String^ source, String^ humanSummary, String^ jsonPayload);
+		static String^ ComposeSource(String^ source, String^ originTag);
 	};
 
 }

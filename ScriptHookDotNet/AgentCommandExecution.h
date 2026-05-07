@@ -31,6 +31,8 @@ namespace GTA {
 	public:
 		String^ CommandLine;
 		String^ CommandName;
+		String^ LogSource;
+		String^ OriginTag;
 		int TurnId;
 		DateTime StartedAt;
 		DateTime CompletedAt;
@@ -45,6 +47,13 @@ namespace GTA {
 		bool SawWarningLikeOutput;
 
 		AgentCommandExecution(String^ commandLine, String^ commandName);
+		static AgentCommandExecution^ ExecuteValidatedBuiltInCommand(
+			int turnId,
+			String^ commandLine,
+			String^ commandName,
+			String^ logSource,
+			String^ originTag,
+			String^% errorText);
 		void AppendOutputLine(String^ line);
 		void SetCompletionResult(String^ resultCode, String^ completionSummary);
 		String^ BuildStructuredTranscript(int maxOutputLines);

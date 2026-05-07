@@ -402,4 +402,16 @@ namespace GTA {
 		}
 	}
 
+	String^ AgentLogger::ComposeSource(String^ source, String^ originTag) {
+		String^ safeSource = NormalizeText(source)->Trim();
+		if (safeSource->Length == 0)
+			safeSource = "AgentLogger";
+
+		String^ safeOriginTag = NormalizeText(originTag)->Trim();
+		if (safeOriginTag->Length == 0)
+			return safeSource;
+
+		return String::Concat(safeSource, "[", safeOriginTag, "]");
+	}
+
 }
