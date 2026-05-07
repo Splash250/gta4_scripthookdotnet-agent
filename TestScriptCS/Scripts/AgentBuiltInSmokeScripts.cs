@@ -290,7 +290,7 @@ namespace TestScriptCS {
    internal sealed class AgentBuiltInSmokeLogic {
       private const string SharedLogMutexName = @"Local\ScriptHookDotNet.AgentScriptTestsLog";
       private static readonly object LogFailureLock = new object();
-      private static bool durableLogFailureReported = false;
+      private static int durableLogFailureCount = 0;
 
       private enum PendingAction {
          None,
@@ -591,11 +591,11 @@ namespace TestScriptCS {
          AppendTestLog(line);
       }
 
-      private static void AppendTestLog(string line) {
+      private void AppendTestLog(string line) {
          string entry = DateTime.Now.ToString("o") + " " + line + Environment.NewLine;
          string root = Game.InstallFolder;
          string sharedPath = System.IO.Path.Combine(root, "agent-script-tests.log");
-         string fallbackPath = System.IO.Path.Combine(root, "agent-script-tests-AgentBuiltInSmoke.log");
+         string fallbackPath = System.IO.Path.Combine(root, "agent-script-tests-AgentBuiltInSmoke-" + roleLabel + ".log");
          string sharedFailure;
          if (TryAppendSharedLog(sharedPath, entry, out sharedFailure)) return;
 
@@ -603,7 +603,7 @@ namespace TestScriptCS {
          string fallbackEntry = DateTime.Now.ToString("o") + " [logger-warning] Shared log append failed: " + sharedFailure + Environment.NewLine + entry;
          if (TryAppendFile(fallbackPath, fallbackEntry, out fallbackFailure)) return;
 
-         ReportDurableLogFailureOnce("Shared log failure: " + sharedFailure + "; fallback failure: " + fallbackFailure);
+         ReportDurableLogFailure("Shared log failure: " + sharedFailure + "; fallback failure: " + fallbackFailure);
       }
 
       private static bool TryAppendSharedLog(string path, string entry, out string failure) {
@@ -651,13 +651,16 @@ namespace TestScriptCS {
          }
       }
 
-      private static void ReportDurableLogFailureOnce(string failure) {
+      private static void ReportDurableLogFailure(string failure) {
+         int failureCount;
+
          lock (LogFailureLock) {
-            if (durableLogFailureReported) return;
-            durableLogFailureReported = true;
+            durableLogFailureCount++;
+            failureCount = durableLogFailureCount;
+            if (failureCount > 3 && (failureCount % 10) != 0) return;
          }
 
-         Game.Console.Print("[AgentBuiltInSmoke] Durable log write failed. " + failure);
+         Game.Console.Print("[AgentBuiltInSmoke] Durable log write failed (" + failureCount + " total). " + failure);
       }
 
       public void RequestUnregister(string reason) {

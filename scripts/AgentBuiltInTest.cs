@@ -6,7 +6,7 @@ using GTA;
 public class AgentBuiltInTest : Script {
    private const string SharedLogMutexName = @"Local\ScriptHookDotNet.AgentScriptTestsLog";
    private static readonly object LogFailureLock = new object();
-   private static bool durableLogFailureReported = false;
+   private static int durableLogFailureCount = 0;
 
    private class BuiltInClassificationSnapshot {
       public int RequestId;
@@ -235,7 +235,7 @@ public class AgentBuiltInTest : Script {
       string fallbackEntry = DateTime.Now.ToString("o") + " [logger-warning] Shared log append failed: " + sharedFailure + Environment.NewLine + entry;
       if (TryAppendFile(fallbackPath, fallbackEntry, out fallbackFailure)) return;
 
-      ReportDurableLogFailureOnce("Shared log failure: " + sharedFailure + "; fallback failure: " + fallbackFailure);
+      ReportDurableLogFailure("Shared log failure: " + sharedFailure + "; fallback failure: " + fallbackFailure);
    }
 
    private static bool TryAppendSharedLog(string path, string entry, out string failure) {
@@ -283,13 +283,16 @@ public class AgentBuiltInTest : Script {
       }
    }
 
-   private static void ReportDurableLogFailureOnce(string failure) {
+   private static void ReportDurableLogFailure(string failure) {
+      int failureCount;
+
       lock (LogFailureLock) {
-         if (durableLogFailureReported) return;
-         durableLogFailureReported = true;
+         durableLogFailureCount++;
+         failureCount = durableLogFailureCount;
+         if (failureCount > 3 && (failureCount % 10) != 0) return;
       }
 
-      Game.Console.Print("[AgentBuiltInTest] Durable log write failed. " + failure);
+      Game.Console.Print("[AgentBuiltInTest] Durable log write failed (" + failureCount + " total). " + failure);
    }
 
    private void ReportClassificationCompletion(BuiltInClassificationSnapshot completion) {
