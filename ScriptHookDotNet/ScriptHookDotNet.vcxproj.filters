@@ -286,6 +286,9 @@
     <ClCompile Include="MemoryAccess.cpp">
       <Filter>Objects\LocalObjects\_unmanaged</Filter>
     </ClCompile>
+    <ClCompile Include="AgentBuiltInExecutor.cpp">
+      <Filter>Objects\LocalObjects\general</Filter>
+    </ClCompile>
     <ClCompile Include="Console.cpp">
       <Filter>Objects\LocalObjects\general</Filter>
     </ClCompile>
@@ -629,6 +632,9 @@
     </ClInclude>
     <ClInclude Include="MemoryAccess.h">
       <Filter>Objects\LocalObjects\_unmanaged</Filter>
+    </ClInclude>
+    <ClInclude Include="AgentBuiltInExecutor.h">
+      <Filter>Objects\LocalObjects\general</Filter>
     </ClInclude>
     <ClInclude Include="NativeHashes.h">
       <Filter>Objects\LocalObjects\_unmanaged</Filter>
