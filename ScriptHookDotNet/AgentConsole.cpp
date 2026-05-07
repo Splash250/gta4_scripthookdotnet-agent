@@ -602,8 +602,29 @@ namespace GTA {
 		System::Threading::Monitor::Enter(pSharedRecentCommandExecutionsSyncRoot);
 		try {
 			pSharedRecentCommandExecutions->Add(execution);
-			while (pSharedRecentCommandExecutions->Count > MAX_RECENT_COMMAND_EXECUTIONS)
-				pSharedRecentCommandExecutions->RemoveAt(0);
+			bool isScriptOrigin = IsScriptOriginExecution(execution);
+			int sameOriginCount = 0;
+			for (int i = 0; i < pSharedRecentCommandExecutions->Count; i++) {
+				AgentCommandExecution^ current = pSharedRecentCommandExecutions[i];
+				if (isNULL(current))
+					continue;
+				if (IsScriptOriginExecution(current) == isScriptOrigin)
+					sameOriginCount++;
+			}
+
+			while (sameOriginCount > MAX_RECENT_COMMAND_EXECUTIONS) {
+				for (int i = 0; i < pSharedRecentCommandExecutions->Count; i++) {
+					AgentCommandExecution^ current = pSharedRecentCommandExecutions[i];
+					if (isNULL(current))
+						continue;
+					if (IsScriptOriginExecution(current) != isScriptOrigin)
+						continue;
+
+					pSharedRecentCommandExecutions->RemoveAt(i);
+					sameOriginCount--;
+					break;
+				}
+			}
 		} finally {
 			System::Threading::Monitor::Exit(pSharedRecentCommandExecutionsSyncRoot);
 		}
