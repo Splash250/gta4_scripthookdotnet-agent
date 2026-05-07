@@ -23,6 +23,7 @@
 #include "stdafx.h"
 
 #include "AgentClient.h"
+#include "AgentBuiltInExecutor.h"
 #include "AgentCommandExecution.h"
 #include "AgentCommandIntent.h"
 #include "AgentCommandReasoning.h"
@@ -688,83 +689,60 @@ namespace GTA {
 	void AgentConsole::ExecuteBuiltInCommand(String^ commandLine, AgentCommandSpec^ spec) {
 		if (String::IsNullOrEmpty(commandLine) || isNULL(spec)) return;
 
-		AgentCommandExecution^ execution = gcnew AgentCommandExecution(commandLine, spec->Name);
-		execution->TurnId = pActiveTurnId;
-		pActiveCommandExecution = execution;
+		AgentBuiltInExecutionContext^ executionContext = gcnew AgentBuiltInExecutionContext();
+		executionContext->CommandLine = commandLine;
+		executionContext->CommandName = spec->Name;
+		executionContext->Spec = spec;
+		executionContext->LogSource = "AgentConsole";
+		executionContext->OriginTag = String::Empty;
+		executionContext->TurnId = pActiveTurnId;
+		executionContext->OwnerScript = nullptr;
 
 		try {
-			if (execution->TurnId > 0) {
-				AgentLogger::LogEvent(
-					execution->TurnId,
-					AgentLogEventType::CommandStarted,
-					"AgentConsole",
-					"Running command: " + commandLine,
-					"{\"command_name\":\"" + EscapeAgentConsoleJson(spec->Name) + "\",\"command_line\":\"" + EscapeAgentConsoleJson(commandLine) + "\"}");
-			}
 			Print("(AGENT STATUS) Running command: " + commandLine);
 			Print("(AGENT STATUS) Mirroring built-in command output below when available.");
-			NetHook::BeginAgentCommandCapture(this, execution);
+			String^ executionError = String::Empty;
+			AgentCommandExecution^ execution = AgentBuiltInExecutor::Execute(executionContext, executionError);
+			pActiveCommandExecution = execution;
 			try {
-				NetHook::DefaultConsole->SendCommand(commandLine);
+				if (isNULL(execution)) {
+					throw gcnew InvalidOperationException("Built-in executor returned no execution result.");
+				}
+
+				for each (String ^ outputLine in execution->OutputLines) {
+					AddPrintLine(isNULL(outputLine) ? String::Empty : outputLine);
+				}
+
+				String^ resultCode = String::IsNullOrWhiteSpace(execution->ResultCode)
+					? "completed"
+					: execution->ResultCode;
+				String^ completionSummary = String::IsNullOrWhiteSpace(execution->CompletionSummary)
+					? (!String::IsNullOrWhiteSpace(executionError)
+						? executionError
+						: "Command completed.")
+					: execution->CompletionSummary;
+
+				Print("(AGENT STATUS) " + completionSummary);
+
+				ClearPendingAction();
+				EmitReplyAndFinishActiveTurn(
+					false,
+					"Built-in command result emitted for: " + commandLine,
+					"{\"mode\":\"built_in_run\",\"command_line\":\"" + EscapeAgentConsoleJson(commandLine) + "\",\"command_name\":\"" + EscapeAgentConsoleJson(spec->Name) + "\",\"result_code\":\"" + EscapeAgentConsoleJson(resultCode) + "\"}",
+					"Reply mode: built_in_run");
 			}
 			finally {
-				NetHook::EndAgentCommandCapture();
-				execution->MarkCompleted();
 				pActiveCommandExecution = nullptr;
 			}
-
-			String^ resultCode = "completed";
-			String^ completionSummary = "Command completed.";
-			if (execution->SawErrorLikeOutput) {
-				resultCode = "problem_reported";
-				completionSummary = "Command reported a problem. Review mirrored output above.";
-			}
-			else if (execution->SawWarningLikeOutput) {
-				resultCode = "warning_reported";
-				completionSummary = "Command completed with warnings.";
-			}
-			else if (execution->TotalOutputLineCount > 0) {
-				resultCode = "output_observed";
-				completionSummary = "Command completed with output mirrored above.";
-			}
-			else if (AgentCommandSemantics::IsUsuallySilentOnSuccess(spec->Name)) {
-				resultCode = "silent_success";
-				completionSummary = "Command completed. This command is usually silent on success.";
-			}
-			else if (AgentCommandSemantics::IsExpectedToEmitOutput(spec->Name)) {
-				resultCode = "no_visible_output";
-				completionSummary = "Command completed without visible output, although this command often prints results.";
-			}
-
-			execution->SetCompletionResult(resultCode, completionSummary);
-			RememberCommandExecution(execution);
-			Print("(AGENT STATUS) " + completionSummary);
-
-			ClearPendingAction();
-			EmitReplyAndFinishActiveTurn(
-				false,
-				"Built-in command result emitted for: " + commandLine,
-				"{\"mode\":\"built_in_run\",\"command_line\":\"" + EscapeAgentConsoleJson(commandLine) + "\",\"command_name\":\"" + EscapeAgentConsoleJson(spec->Name) + "\",\"result_code\":\"" + EscapeAgentConsoleJson(resultCode) + "\"}",
-				"Reply mode: built_in_run");
 		}
 		catch (Exception^ ex) {
 			pActiveCommandExecution = nullptr;
-			if (!execution->CompletionLogged) {
-				execution->SetCompletionResult(
-					"exception",
-					"Command execution failed: " + (isNULL(ex) ? "Unknown exception." : ex->Message));
-				RememberCommandExecution(execution);
-			}
 			ClearPendingAction();
 			FailActiveTurnFromException("built_in_run", ex);
 			throw;
 		}
 		catch (...) {
 			pActiveCommandExecution = nullptr;
-			if (!execution->CompletionLogged) {
-				execution->SetCompletionResult("native_exception", "Command execution failed with a native exception.");
-				RememberCommandExecution(execution);
-			}
 			ClearPendingAction();
 			EmitReplyAndFinishActiveTurn(
 				true,
