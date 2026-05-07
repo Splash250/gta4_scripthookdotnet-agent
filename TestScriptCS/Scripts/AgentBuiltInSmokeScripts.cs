@@ -11,6 +11,7 @@ namespace TestScriptCS {
 
    internal enum AgentBuiltInSmokePhase {
       Idle,
+      WaitingForPeers,
       SeedPrimary,
       SeedPeer,
       VerifyIsolation,
@@ -20,39 +21,93 @@ namespace TestScriptCS {
    }
 
    internal static class AgentBuiltInSmokeCoordinator {
+      private sealed class PeerState {
+         public int RegistrationId;
+         public int LastHeartbeatTick;
+      }
+
+      private const int PeerTimeoutMs = 2000;
+      private const int PhaseTimeoutMs = 15000;
       private static readonly object SyncRoot = new object();
 
       private static AgentBuiltInSmokePhase phase = AgentBuiltInSmokePhase.Idle;
       private static int scenarioId = 0;
-      private static bool primaryRegistered = false;
-      private static bool peerRegistered = false;
+      private static int phaseStartedTick = 0;
+      private static int nextRegistrationId = 0;
       private static bool primaryIsolationVerified = false;
       private static bool peerIsolationVerified = false;
       private static bool primaryLaneComplete = false;
       private static bool peerLaneComplete = false;
       private static string failureMessage = String.Empty;
+      private static PeerState primaryState = null;
+      private static PeerState peerState = null;
 
-      public static void Register(AgentBuiltInSmokeRole role) {
+      public static int Register(AgentBuiltInSmokeRole role, int nowTick) {
          lock (SyncRoot) {
-            if (role == AgentBuiltInSmokeRole.Primary) primaryRegistered = true;
-            if (role == AgentBuiltInSmokeRole.Peer) peerRegistered = true;
+            int registrationId = ++nextRegistrationId;
+            PeerState previousState = GetPeerStateLocked(role);
+            SetPeerStateLocked(role, new PeerState {
+               RegistrationId = registrationId,
+               LastHeartbeatTick = nowTick
+            });
+
+            if (previousState != null && previousState.RegistrationId != registrationId && IsScenarioActiveLocked()) {
+               FailLocked(RoleLabel(role) + " reloaded during phase " + phase + ".");
+            } else {
+               EvaluateHealthLocked(nowTick);
+            }
+
+            return registrationId;
          }
       }
 
-      public static bool TryStart(out string failureReason) {
+      public static void Heartbeat(AgentBuiltInSmokeRole role, int registrationId, int nowTick) {
          lock (SyncRoot) {
-            if (!primaryRegistered || !peerRegistered) {
-               failureReason = "Both AgentBuiltInTest and AgentBuiltInPeerTest must be loaded before starting the cross-script smoke.";
+            PeerState state = GetPeerStateLocked(role);
+            if (state == null || state.RegistrationId != registrationId) return;
+
+            state.LastHeartbeatTick = nowTick;
+            EvaluateHealthLocked(nowTick);
+         }
+      }
+
+      public static void Unregister(AgentBuiltInSmokeRole role, int registrationId, string reason) {
+         lock (SyncRoot) {
+            PeerState state = GetPeerStateLocked(role);
+            if (state == null || state.RegistrationId != registrationId) return;
+
+            SetPeerStateLocked(role, null);
+
+            if (IsScenarioActiveLocked()) {
+               FailLocked(RoleLabel(role) + " unloaded during phase " + phase + ": " + Safe(reason));
+            }
+         }
+      }
+
+      public static bool TryStart(int nowTick, out string failureReason) {
+         lock (SyncRoot) {
+            EvaluateHealthLocked(nowTick);
+
+            if (IsScenarioActiveLocked()) {
+               failureReason = "The cross-script smoke is already running.";
+               return false;
+            }
+
+            if (!IsRoleAliveLocked(AgentBuiltInSmokeRole.Primary, nowTick)) {
+               failureReason = "The primary smoke script is not alive.";
                return false;
             }
 
             scenarioId++;
-            phase = AgentBuiltInSmokePhase.SeedPrimary;
             primaryIsolationVerified = false;
             peerIsolationVerified = false;
             primaryLaneComplete = false;
             peerLaneComplete = false;
             failureMessage = String.Empty;
+            phaseStartedTick = nowTick;
+            phase = IsRoleAliveLocked(AgentBuiltInSmokeRole.Peer, nowTick)
+               ? AgentBuiltInSmokePhase.SeedPrimary
+               : AgentBuiltInSmokePhase.WaitingForPeers;
             failureReason = String.Empty;
             return true;
          }
@@ -82,8 +137,11 @@ namespace TestScriptCS {
          }
       }
 
-      public static void ReportSeed(AgentBuiltInSmokeRole role, bool success, string failureReason) {
+      public static void ReportSeed(AgentBuiltInSmokeRole role, int registrationId, int nowTick, bool success, string failureReason) {
          lock (SyncRoot) {
+            EvaluateHealthLocked(nowTick);
+
+            if (!IsCurrentRegistrationLocked(role, registrationId)) return;
             if (phase == AgentBuiltInSmokePhase.Failed || phase == AgentBuiltInSmokePhase.Passed) return;
 
             if (!success) {
@@ -92,12 +150,12 @@ namespace TestScriptCS {
             }
 
             if (role == AgentBuiltInSmokeRole.Primary && phase == AgentBuiltInSmokePhase.SeedPrimary) {
-               phase = AgentBuiltInSmokePhase.SeedPeer;
+               AdvancePhaseLocked(AgentBuiltInSmokePhase.SeedPeer, nowTick);
                return;
             }
 
             if (role == AgentBuiltInSmokeRole.Peer && phase == AgentBuiltInSmokePhase.SeedPeer) {
-               phase = AgentBuiltInSmokePhase.VerifyIsolation;
+               AdvancePhaseLocked(AgentBuiltInSmokePhase.VerifyIsolation, nowTick);
                return;
             }
 
@@ -105,8 +163,11 @@ namespace TestScriptCS {
          }
       }
 
-      public static void ReportIsolation(AgentBuiltInSmokeRole role, bool success, string failureReason) {
+      public static void ReportIsolation(AgentBuiltInSmokeRole role, int registrationId, int nowTick, bool success, string failureReason) {
          lock (SyncRoot) {
+            EvaluateHealthLocked(nowTick);
+
+            if (!IsCurrentRegistrationLocked(role, registrationId)) return;
             if (phase != AgentBuiltInSmokePhase.VerifyIsolation) return;
 
             if (!success) {
@@ -118,12 +179,15 @@ namespace TestScriptCS {
             if (role == AgentBuiltInSmokeRole.Peer) peerIsolationVerified = true;
 
             if (primaryIsolationVerified && peerIsolationVerified)
-               phase = AgentBuiltInSmokePhase.LaneContention;
+               AdvancePhaseLocked(AgentBuiltInSmokePhase.LaneContention, nowTick);
          }
       }
 
-      public static void ReportLane(AgentBuiltInSmokeRole role, bool success, string failureReason) {
+      public static void ReportLane(AgentBuiltInSmokeRole role, int registrationId, int nowTick, bool success, string failureReason) {
          lock (SyncRoot) {
+            EvaluateHealthLocked(nowTick);
+
+            if (!IsCurrentRegistrationLocked(role, registrationId)) return;
             if (phase != AgentBuiltInSmokePhase.LaneContention) return;
 
             if (!success) {
@@ -135,8 +199,78 @@ namespace TestScriptCS {
             if (role == AgentBuiltInSmokeRole.Peer) peerLaneComplete = true;
 
             if (primaryLaneComplete && peerLaneComplete)
-               phase = AgentBuiltInSmokePhase.Passed;
+               AdvancePhaseLocked(AgentBuiltInSmokePhase.Passed, nowTick);
          }
+      }
+
+      private static void EvaluateHealthLocked(int nowTick) {
+         if (phase == AgentBuiltInSmokePhase.Idle || phase == AgentBuiltInSmokePhase.Passed || phase == AgentBuiltInSmokePhase.Failed) {
+            return;
+         }
+
+         if (!IsRoleAliveLocked(AgentBuiltInSmokeRole.Primary, nowTick)) {
+            FailLocked("Primary is no longer alive during phase " + phase + ".");
+            return;
+         }
+
+         if (phase == AgentBuiltInSmokePhase.WaitingForPeers) {
+            if (IsRoleAliveLocked(AgentBuiltInSmokeRole.Peer, nowTick)) {
+               AdvancePhaseLocked(AgentBuiltInSmokePhase.SeedPrimary, nowTick);
+               return;
+            }
+
+            if (Elapsed(nowTick, phaseStartedTick) >= PhaseTimeoutMs) {
+               FailLocked("Peer did not register and heartbeat within " + PhaseTimeoutMs + "ms.");
+            }
+
+            return;
+         }
+
+         if (!IsRoleAliveLocked(AgentBuiltInSmokeRole.Peer, nowTick)) {
+            FailLocked("Peer is no longer alive during phase " + phase + ".");
+            return;
+         }
+
+         if (Elapsed(nowTick, phaseStartedTick) >= PhaseTimeoutMs) {
+            FailLocked("Phase " + phase + " timed out after " + PhaseTimeoutMs + "ms.");
+         }
+      }
+
+      private static void AdvancePhaseLocked(AgentBuiltInSmokePhase nextPhase, int nowTick) {
+         phase = nextPhase;
+         phaseStartedTick = nowTick;
+      }
+
+      private static bool IsScenarioActiveLocked() {
+         return phase != AgentBuiltInSmokePhase.Idle &&
+            phase != AgentBuiltInSmokePhase.Passed &&
+            phase != AgentBuiltInSmokePhase.Failed;
+      }
+
+      private static bool IsCurrentRegistrationLocked(AgentBuiltInSmokeRole role, int registrationId) {
+         PeerState state = GetPeerStateLocked(role);
+         return state != null && state.RegistrationId == registrationId;
+      }
+
+      private static bool IsRoleAliveLocked(AgentBuiltInSmokeRole role, int nowTick) {
+         PeerState state = GetPeerStateLocked(role);
+         return state != null && Elapsed(nowTick, state.LastHeartbeatTick) <= PeerTimeoutMs;
+      }
+
+      private static PeerState GetPeerStateLocked(AgentBuiltInSmokeRole role) {
+         return role == AgentBuiltInSmokeRole.Primary ? primaryState : peerState;
+      }
+
+      private static void SetPeerStateLocked(AgentBuiltInSmokeRole role, PeerState state) {
+         if (role == AgentBuiltInSmokeRole.Primary) {
+            primaryState = state;
+         } else {
+            peerState = state;
+         }
+      }
+
+      private static int Elapsed(int nowTick, int previousTick) {
+         return nowTick - previousTick;
       }
 
       private static void FailLocked(string message) {
@@ -162,6 +296,7 @@ namespace TestScriptCS {
 
       private readonly AgentBuiltInSmokeRole role;
       private readonly string roleLabel;
+      private readonly int registrationId;
       private readonly string seedCommandName;
       private readonly string seedRequestText;
       private readonly string otherSeedCommandName;
@@ -170,6 +305,7 @@ namespace TestScriptCS {
 
       private bool classificationPending = false;
       private bool executionPending = false;
+      private bool unregisterRequested = false;
       private PendingAction pendingAction = PendingAction.None;
       private string pendingRequestText = String.Empty;
       private int observedScenarioId = 0;
@@ -188,10 +324,10 @@ namespace TestScriptCS {
          this.otherSeedCommandName = role == AgentBuiltInSmokeRole.Primary ? "showplayers" : "help";
          this.laneRequestText = laneRequestText;
          this.canStartScenario = canStartScenario;
+         this.registrationId = AgentBuiltInSmokeCoordinator.Register(role, GetNowTick());
 
          Interval = 100;
          this.Tick += new EventHandler(this.AgentBuiltInSmokeScriptBase_Tick);
-         AgentBuiltInSmokeCoordinator.Register(role);
 
          if (canStartScenario)
             BindKey(Keys.F12, new KeyPressDelegate(StartCrossScriptSmoke));
@@ -201,7 +337,14 @@ namespace TestScriptCS {
             : "Loaded as the peer script for the cross-script built-in smoke.");
       }
 
+      ~AgentBuiltInSmokeScriptBase() {
+         RequestUnregister("script finalized");
+      }
+
       private void AgentBuiltInSmokeScriptBase_Tick(object sender, EventArgs e) {
+         int nowTick = GetNowTick();
+         AgentBuiltInSmokeCoordinator.Heartbeat(role, registrationId, nowTick);
+
          int currentScenarioId = AgentBuiltInSmokeCoordinator.ScenarioId;
          AgentBuiltInSmokePhase currentPhase = AgentBuiltInSmokeCoordinator.Phase;
 
@@ -229,6 +372,13 @@ namespace TestScriptCS {
          if (currentPhase == AgentBuiltInSmokePhase.Passed || currentPhase == AgentBuiltInSmokePhase.Failed) return;
          if (currentPhase == lastStartedPhase) return;
 
+         if (currentPhase == AgentBuiltInSmokePhase.WaitingForPeers) {
+            lastStartedPhase = currentPhase;
+            if (canStartScenario)
+               PrintLine("Cross-script smoke is waiting for the peer script heartbeat before seeding.");
+            return;
+         }
+
          if (currentPhase == AgentBuiltInSmokePhase.SeedPrimary && role == AgentBuiltInSmokeRole.Primary) {
             lastStartedPhase = currentPhase;
             BeginSeedExecution();
@@ -255,13 +405,18 @@ namespace TestScriptCS {
 
       private void StartCrossScriptSmoke() {
          string failureReason;
-         if (!AgentBuiltInSmokeCoordinator.TryStart(out failureReason)) {
+         int nowTick = GetNowTick();
+         if (!AgentBuiltInSmokeCoordinator.TryStart(nowTick, out failureReason)) {
             PrintLine("Cross-script smoke could not start: " + Safe(failureReason));
             Game.DisplayText("Agent built-in cross-script smoke could not start.", 4000);
             return;
          }
 
-         PrintLine("Started cross-script smoke. Primary will seed 'help', peer will seed 'showplayers', then both scripts will verify isolation and contend on classification.");
+         if (AgentBuiltInSmokeCoordinator.Phase == AgentBuiltInSmokePhase.WaitingForPeers) {
+            PrintLine("Started cross-script smoke. Waiting for the peer script to register and heartbeat before seeding.");
+         } else {
+            PrintLine("Started cross-script smoke. Primary will seed 'help', peer will seed 'showplayers', then both scripts will verify isolation and contend on classification.");
+         }
       }
 
       private void BeginSeedExecution() {
@@ -295,7 +450,7 @@ namespace TestScriptCS {
 
          if (pendingAction == PendingAction.SeedExecution) {
             if (result == null) {
-               AgentBuiltInSmokeCoordinator.ReportSeed(role, false, "Classification returned null before execution.");
+               AgentBuiltInSmokeCoordinator.ReportSeed(role, registrationId, GetNowTick(), false, "Classification returned null before execution.");
                pendingAction = PendingAction.None;
                return;
             }
@@ -303,6 +458,8 @@ namespace TestScriptCS {
             if (!result.Success || !result.IsValidatedForExecution) {
                AgentBuiltInSmokeCoordinator.ReportSeed(
                   role,
+                  registrationId,
+                  GetNowTick(),
                   false,
                   "Classification did not yield an executable built-in for '" + pendingRequestText + "'. Error=" + Safe(result.ErrorText));
                pendingAction = PendingAction.None;
@@ -324,7 +481,7 @@ namespace TestScriptCS {
             string failureReason = success
                ? String.Empty
                : "Classification failed for '" + pendingRequestText + "'. Error=" + Safe(result == null ? String.Empty : result.ErrorText);
-            AgentBuiltInSmokeCoordinator.ReportLane(role, success, failureReason);
+            AgentBuiltInSmokeCoordinator.ReportLane(role, registrationId, GetNowTick(), success, failureReason);
          }
 
          pendingAction = PendingAction.None;
@@ -332,13 +489,14 @@ namespace TestScriptCS {
 
       private void OnExecutionCompleted(BuiltInExecutionResult result) {
          executionPending = false;
+         LogExecutionResult(result);
 
          bool success = result != null && result.Success;
          string failureReason = success
             ? ValidateSeedTranscript()
-            : "Execution failed for '" + pendingRequestText + "'. Error=" + Safe(result == null ? String.Empty : result.ErrorText);
+            : "Execution failed for '" + pendingRequestText + "'. ResultCode=" + Safe(result == null ? String.Empty : result.ResultCode) + ", Error=" + Safe(result == null ? String.Empty : result.ErrorText);
 
-         AgentBuiltInSmokeCoordinator.ReportSeed(role, success && String.IsNullOrEmpty(failureReason), failureReason);
+         AgentBuiltInSmokeCoordinator.ReportSeed(role, registrationId, GetNowTick(), success && String.IsNullOrEmpty(failureReason), failureReason);
          pendingAction = PendingAction.None;
       }
 
@@ -362,6 +520,8 @@ namespace TestScriptCS {
          if (!hasOwnCommand) {
             AgentBuiltInSmokeCoordinator.ReportIsolation(
                role,
+               registrationId,
+               GetNowTick(),
                false,
                "Transcript no longer contains '" + seedCommandName + "' after the other script seeded its own history.");
             return;
@@ -370,12 +530,34 @@ namespace TestScriptCS {
          if (hasOtherCommand) {
             AgentBuiltInSmokeCoordinator.ReportIsolation(
                role,
+               registrationId,
+               GetNowTick(),
                false,
                "Transcript leaked the other script's command '" + otherSeedCommandName + "'.");
             return;
          }
 
-         AgentBuiltInSmokeCoordinator.ReportIsolation(role, true, String.Empty);
+         AgentBuiltInSmokeCoordinator.ReportIsolation(role, registrationId, GetNowTick(), true, String.Empty);
+      }
+
+      private void LogExecutionResult(BuiltInExecutionResult result) {
+         if (result == null) {
+            PrintLine("Execution result was null.");
+            return;
+         }
+
+         PrintLine(
+            "Execution status: success=" + result.Success +
+            ", resultCode=" + Safe(result.ResultCode) +
+            ", summary=" + Safe(result.CompletionSummary) +
+            ", error=" + Safe(result.ErrorText));
+
+         if (result.TranscriptLines == null || result.TranscriptLines.Length == 0) {
+            PrintLine("Execution transcript lines: <empty>");
+            return;
+         }
+
+         PrintLine("Execution transcript lines: " + String.Join(" | ", result.TranscriptLines));
       }
 
       private bool ContainsCommand(string transcriptJson, string commandName) {
@@ -386,6 +568,17 @@ namespace TestScriptCS {
 
       private void PrintLine(string message) {
          Game.Console.Print("[AgentBuiltInSmoke:" + roleLabel + "] " + message);
+      }
+
+      private void RequestUnregister(string reason) {
+         if (unregisterRequested) return;
+
+         unregisterRequested = true;
+         AgentBuiltInSmokeCoordinator.Unregister(role, registrationId, reason);
+      }
+
+      private static int GetNowTick() {
+         return Environment.TickCount & Int32.MaxValue;
       }
 
       private string Safe(string value) {
