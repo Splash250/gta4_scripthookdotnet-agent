@@ -319,6 +319,21 @@ namespace GTA {
 			pCallback(pCompletion);
 	}
 
+	AgentRuntime::ValidatedBuiltInExecutionQueuedWorkItem::ValidatedBuiltInExecutionQueuedWorkItem(
+		AgentRuntime^ runtime,
+		int generation,
+		Script^ ownerScript,
+		ValidatedBuiltInExecutionSubmissionContext^ context)
+		: AgentRuntimeQueuedCallback(AgentRuntimeLane::ValidatedBuiltInExecution, generation, ownerScript) {
+		pRuntime = runtime;
+		pContext = context;
+	}
+
+	void AgentRuntime::ValidatedBuiltInExecutionQueuedWorkItem::Invoke() {
+		if isNotNULL(pRuntime)
+			pRuntime->ExecuteValidatedBuiltInExecutionOnScriptThread(pContext);
+	}
+
 	AgentRuntime::AgentRuntime() {
 		pSyncRoot = gcnew System::Object();
 		pCallbackSyncRoot = gcnew System::Object();
@@ -630,24 +645,31 @@ namespace GTA {
 		}
 	}
 
-	void AgentRuntime::EnqueueCallback(AgentRuntimeQueuedCallback^ callback) {
-		if isNULL(callback) return;
+	bool AgentRuntime::TryEnqueueCallback(AgentRuntimeQueuedCallback^ callback) {
+		if isNULL(callback)
+			return false;
+
+		bool enqueued = false;
 
 		Monitor::Enter(pSyncRoot);
 		try {
 			if (!IsCallbackGenerationCurrentLocked(callback))
-				return;
+				return false;
 
 			Monitor::Enter(pCallbackSyncRoot);
 			try {
-				if (IsCallbackGenerationCurrentLocked(callback))
+				if (IsCallbackGenerationCurrentLocked(callback)) {
 					pCallbackQueue->Enqueue(callback);
+					enqueued = true;
+				}
 			} finally {
 				Monitor::Exit(pCallbackSyncRoot);
 			}
 		} finally {
 			Monitor::Exit(pSyncRoot);
 		}
+
+		return enqueued;
 	}
 
 	bool AgentRuntime::SubmitPrompt(
@@ -846,44 +868,112 @@ namespace GTA {
 		context->Callback = callback;
 
 		try {
-			Thread^ worker = gcnew Thread(
-				gcnew ParameterizedThreadStart(this, &AgentRuntime::ValidatedBuiltInExecutionWorkerMain));
-			worker->IsBackground = true;
-			worker->Start(context);
-			return true;
+			if (TryEnqueueCallback(gcnew ValidatedBuiltInExecutionQueuedWorkItem(
+				this,
+				generation,
+				ownerScript,
+				context))) {
+				return true;
+			}
 		} catch (Exception^) {
-			Monitor::Enter(pSyncRoot);
-			try {
-				if (generation == pValidatedBuiltInExecutionGeneration) {
-					bValidatedBuiltInExecutionBusy = false;
-					pValidatedBuiltInExecutionOwnerScript = nullptr;
-				}
-			} finally {
-				Monitor::Exit(pSyncRoot);
-			}
-			if (ownsTurn) {
-				int ownedTurnId = TakeOwnedTurn(requestId);
-				if (ownedTurnId > 0)
-					AgentLogger::EndTurn(ownedTurnId, true, "Built-in execution could not start its background worker.");
-			}
-			return false;
 		} catch (...) {
-			Monitor::Enter(pSyncRoot);
-			try {
-				if (generation == pValidatedBuiltInExecutionGeneration) {
-					bValidatedBuiltInExecutionBusy = false;
-					pValidatedBuiltInExecutionOwnerScript = nullptr;
-				}
-			} finally {
-				Monitor::Exit(pSyncRoot);
-			}
-			if (ownsTurn) {
-				int ownedTurnId = TakeOwnedTurn(requestId);
-				if (ownedTurnId > 0)
-					AgentLogger::EndTurn(ownedTurnId, true, "Built-in execution could not start its background worker.");
-			}
-			return false;
 		}
+
+		Monitor::Enter(pSyncRoot);
+		try {
+			if (generation == pValidatedBuiltInExecutionGeneration) {
+				bValidatedBuiltInExecutionBusy = false;
+				pValidatedBuiltInExecutionOwnerScript = nullptr;
+			}
+		} finally {
+			Monitor::Exit(pSyncRoot);
+		}
+		if (ownsTurn) {
+			int ownedTurnId = TakeOwnedTurn(requestId);
+			if (ownedTurnId > 0)
+				AgentLogger::EndTurn(ownedTurnId, true, "Built-in execution could not queue its script-thread work item.");
+		}
+		return false;
+	}
+
+	bool AgentRuntime::QueueDeferredPromptCompletion(
+		AgentRuntimePromptCompletion^ completion,
+		AgentRuntimePromptCompletedCallback^ callback) {
+		if isNULL(callback)
+			return false;
+
+		Script^ ownerScript = CaptureOwningScript();
+		if isNULL(ownerScript)
+			return false;
+
+		if isNULL(completion)
+			completion = gcnew AgentRuntimePromptCompletion();
+
+		int generation = 0;
+		Monitor::Enter(pSyncRoot);
+		try {
+			generation = pPromptGeneration;
+		} finally {
+			Monitor::Exit(pSyncRoot);
+		}
+
+		return TryEnqueueCallback(gcnew PromptQueuedCallback(generation, ownerScript, callback, completion));
+	}
+
+	bool AgentRuntime::QueueDeferredBuiltInClassificationCompletion(
+		AgentRuntimeBuiltInClassificationCompletion^ completion,
+		AgentRuntimeBuiltInClassificationCompletedCallback^ callback) {
+		if isNULL(callback)
+			return false;
+
+		Script^ ownerScript = CaptureOwningScript();
+		if isNULL(ownerScript)
+			return false;
+
+		if isNULL(completion)
+			completion = gcnew AgentRuntimeBuiltInClassificationCompletion();
+
+		int generation = 0;
+		Monitor::Enter(pSyncRoot);
+		try {
+			generation = pBuiltInClassificationGeneration;
+		} finally {
+			Monitor::Exit(pSyncRoot);
+		}
+
+		return TryEnqueueCallback(gcnew BuiltInClassificationQueuedCallback(
+			generation,
+			ownerScript,
+			callback,
+			completion));
+	}
+
+	bool AgentRuntime::QueueDeferredValidatedBuiltInExecutionCompletion(
+		AgentRuntimeValidatedBuiltInExecutionCompletion^ completion,
+		AgentRuntimeValidatedBuiltInExecutionCompletedCallback^ callback) {
+		if isNULL(callback)
+			return false;
+
+		Script^ ownerScript = CaptureOwningScript();
+		if isNULL(ownerScript)
+			return false;
+
+		if isNULL(completion)
+			completion = gcnew AgentRuntimeValidatedBuiltInExecutionCompletion();
+
+		int generation = 0;
+		Monitor::Enter(pSyncRoot);
+		try {
+			generation = pValidatedBuiltInExecutionGeneration;
+		} finally {
+			Monitor::Exit(pSyncRoot);
+		}
+
+		return TryEnqueueCallback(gcnew ValidatedBuiltInExecutionQueuedCallback(
+			generation,
+			ownerScript,
+			callback,
+			completion));
 	}
 
 	void AgentRuntime::PromptWorkerMain(Object^ state) {
@@ -962,7 +1052,7 @@ namespace GTA {
 		}
 
 		if (enqueue)
-			EnqueueCallback(gcnew PromptQueuedCallback(
+			TryEnqueueCallback(gcnew PromptQueuedCallback(
 				context->Generation,
 				context->Request->OwnerScript,
 				context->Callback,
@@ -1076,18 +1166,17 @@ namespace GTA {
 		}
 
 		if (enqueue)
-			EnqueueCallback(gcnew BuiltInClassificationQueuedCallback(
+			TryEnqueueCallback(gcnew BuiltInClassificationQueuedCallback(
 				context->Generation,
 				context->Request->OwnerScript,
 				context->Callback,
 				completion));
 	}
 
-	void AgentRuntime::ValidatedBuiltInExecutionWorkerMain(Object^ state) {
-		ValidatedBuiltInExecutionSubmissionContext^ context = dynamic_cast<ValidatedBuiltInExecutionSubmissionContext^>(state);
+	void AgentRuntime::ExecuteValidatedBuiltInExecutionOnScriptThread(
+		ValidatedBuiltInExecutionSubmissionContext^ context) {
 		AgentRuntimeValidatedBuiltInExecutionCompletion^ completion =
 			gcnew AgentRuntimeValidatedBuiltInExecutionCompletion();
-		bool enqueue = false;
 		int ownedTurnId = 0;
 
 		try {
@@ -1147,7 +1236,6 @@ namespace GTA {
 			if (isNULL(context) || (context->Generation == pValidatedBuiltInExecutionGeneration)) {
 				bValidatedBuiltInExecutionBusy = false;
 				pValidatedBuiltInExecutionOwnerScript = nullptr;
-				enqueue = isNotNULL(context);
 			} else {
 				completion->WasAbandoned = true;
 			}
@@ -1170,12 +1258,8 @@ namespace GTA {
 			AgentLogger::EndTurn(ownedTurnId, !completion->Success, summary);
 		}
 
-		if (enqueue)
-			EnqueueCallback(gcnew ValidatedBuiltInExecutionQueuedCallback(
-				context->Generation,
-				context->OwnerScript,
-				context->Callback,
-				completion));
+		if (isNotNULL(context) && isNotNULL(context->Callback))
+			context->Callback(completion);
 	}
 
 	void AgentRuntime::AbandonPromptWorkCore() {

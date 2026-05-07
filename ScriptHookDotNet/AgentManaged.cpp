@@ -23,6 +23,7 @@
 #include "stdafx.h"
 
 #include "AgentManaged.h"
+#include "Console.h"
 #include "AgentRuntime.h"
 
 #pragma managed
@@ -79,6 +80,54 @@ namespace GTA {
 			result->CompletionSummary = String::Empty;
 			result->ErrorText = SafeText(errorText);
 			return result;
+		}
+
+		AgentRuntimePromptCompletion^ CreatePromptFailureCompletion(String^ errorText) {
+			AgentRuntimePromptCompletion^ completion = gcnew AgentRuntimePromptCompletion();
+			completion->Success = false;
+			completion->Error = SafeText(errorText);
+			return completion;
+		}
+
+		AgentRuntimeBuiltInClassificationCompletion^ CreateBuiltInCommandFailureCompletion(String^ errorText) {
+			AgentRuntimeBuiltInClassificationCompletion^ completion =
+				gcnew AgentRuntimeBuiltInClassificationCompletion();
+			completion->Success = false;
+			completion->Error = SafeText(errorText);
+			completion->FailureReason = completion->Error;
+			completion->Explanation = completion->Error;
+			return completion;
+		}
+
+		AgentRuntimeBuiltInClassificationCompletion^ CreateRuntimeValidatedResultSnapshot(
+			BuiltInCommandResult^ validatedResult) {
+			AgentRuntimeBuiltInClassificationCompletion^ runtimeValidatedResult =
+				gcnew AgentRuntimeBuiltInClassificationCompletion();
+			if isNULL(validatedResult)
+				return runtimeValidatedResult;
+
+			runtimeValidatedResult->Success = validatedResult->Success;
+			runtimeValidatedResult->Decision = SafeText(validatedResult->Decision);
+			runtimeValidatedResult->CommandName = SafeText(validatedResult->CommandName);
+			runtimeValidatedResult->ValidatedCommandLine = SafeText(validatedResult->ValidatedCommandLine);
+			runtimeValidatedResult->Explanation = SafeText(validatedResult->MessageText);
+			runtimeValidatedResult->Error = SafeText(validatedResult->ErrorText);
+			runtimeValidatedResult->IsValidatedForExecution = validatedResult->IsValidatedForExecution;
+			runtimeValidatedResult->ExecutionAuthorizationId = validatedResult->RuntimeExecutionAuthorizationId;
+			return runtimeValidatedResult;
+		}
+
+		AgentRuntimeValidatedBuiltInExecutionCompletion^ CreateBuiltInExecutionFailureCompletion(
+			String^ errorText,
+			BuiltInCommandResult^ validatedResult) {
+			AgentRuntimeValidatedBuiltInExecutionCompletion^ completion =
+				gcnew AgentRuntimeValidatedBuiltInExecutionCompletion();
+			completion->Success = false;
+			completion->ValidatedResult = CreateRuntimeValidatedResultSnapshot(validatedResult);
+			completion->Error = SafeText(errorText);
+			completion->CompletionSummary = completion->Error;
+			completion->ResultCode = "invalid_validated_result";
+			return completion;
 		}
 
 		void DeliverPromptFailure(AgentPromptCallback^ callback, String^ errorText) {
@@ -211,6 +260,50 @@ namespace GTA {
 			}
 		};
 
+		void DeliverPromptFailureDeferred(AgentPromptCallback^ callback, String^ errorText) {
+			if isNULL(callback)
+				return;
+
+			PromptRuntimeCallbackAdapter^ adapter = gcnew PromptRuntimeCallbackAdapter(callback);
+			if (!GetManagedRuntime()->QueueDeferredPromptCompletion(
+				CreatePromptFailureCompletion(errorText),
+				gcnew AgentRuntimePromptCompletedCallback(adapter, &PromptRuntimeCallbackAdapter::OnCompleted))) {
+				DeliverPromptFailure(callback, errorText);
+			}
+		}
+
+		void DeliverBuiltInCommandFailureDeferred(BuiltInCommandCallback^ callback, String^ errorText) {
+			if isNULL(callback)
+				return;
+
+			BuiltInCommandRuntimeCallbackAdapter^ adapter = gcnew BuiltInCommandRuntimeCallbackAdapter(callback);
+			if (!GetManagedRuntime()->QueueDeferredBuiltInClassificationCompletion(
+				CreateBuiltInCommandFailureCompletion(errorText),
+				gcnew AgentRuntimeBuiltInClassificationCompletedCallback(
+					adapter,
+					&BuiltInCommandRuntimeCallbackAdapter::OnCompleted))) {
+				DeliverBuiltInCommandFailure(callback, errorText);
+			}
+		}
+
+		void DeliverBuiltInExecutionFailureDeferred(
+			BuiltInExecutionCallback^ callback,
+			String^ errorText,
+			BuiltInCommandResult^ validatedResult) {
+			if isNULL(callback)
+				return;
+
+			BuiltInExecutionRuntimeCallbackAdapter^ adapter =
+				gcnew BuiltInExecutionRuntimeCallbackAdapter(callback);
+			if (!GetManagedRuntime()->QueueDeferredValidatedBuiltInExecutionCompletion(
+				CreateBuiltInExecutionFailureCompletion(errorText, validatedResult),
+				gcnew AgentRuntimeValidatedBuiltInExecutionCompletedCallback(
+					adapter,
+					&BuiltInExecutionRuntimeCallbackAdapter::OnCompleted))) {
+				DeliverBuiltInExecutionFailure(callback, errorText, validatedResult);
+			}
+		}
+
 	}
 
 	AgentPromptRequest::AgentPromptRequest() {
@@ -252,12 +345,12 @@ namespace GTA {
 			throw gcnew ArgumentNullException("callback");
 
 		if isNULL(request) {
-			DeliverPromptFailure(callback, "Prompt request is required.");
+			DeliverPromptFailureDeferred(callback, "Prompt request is required.");
 			return;
 		}
 
 		if (String::IsNullOrWhiteSpace(request->PromptText)) {
-			DeliverPromptFailure(callback, "PromptText is required.");
+			DeliverPromptFailureDeferred(callback, "PromptText is required.");
 			return;
 		}
 
@@ -273,7 +366,7 @@ namespace GTA {
 		if (!GetManagedRuntime()->SubmitPrompt(
 			runtimeRequest,
 			gcnew AgentRuntimePromptCompletedCallback(adapter, &PromptRuntimeCallbackAdapter::OnCompleted))) {
-			DeliverPromptFailure(callback, "Prompt request could not be submitted to AgentRuntime.");
+			DeliverPromptFailureDeferred(callback, "Prompt request could not be submitted to AgentRuntime.");
 		}
 	}
 
@@ -282,18 +375,18 @@ namespace GTA {
 			throw gcnew ArgumentNullException("callback");
 
 		if isNULL(request) {
-			DeliverBuiltInCommandFailure(callback, "Built-in command request is required.");
+			DeliverBuiltInCommandFailureDeferred(callback, "Built-in command request is required.");
 			return;
 		}
 
 		if (String::IsNullOrWhiteSpace(request->RequestText)) {
-			DeliverBuiltInCommandFailure(callback, "RequestText is required.");
+			DeliverBuiltInCommandFailureDeferred(callback, "RequestText is required.");
 			return;
 		}
 
 		AgentRuntimeBuiltInClassificationRequest^ runtimeRequest = gcnew AgentRuntimeBuiltInClassificationRequest();
 		runtimeRequest->UserInput = request->RequestText;
-		runtimeRequest->RecentCommandTranscriptJson = String::Empty;
+		runtimeRequest->RecentCommandTranscriptJson = AgentConsole::BuildSharedRecentCommandTranscriptJson();
 
 		BuiltInCommandRuntimeCallbackAdapter^ adapter = gcnew BuiltInCommandRuntimeCallbackAdapter(callback);
 		if (!GetManagedRuntime()->SubmitBuiltInClassification(
@@ -301,7 +394,9 @@ namespace GTA {
 			gcnew AgentRuntimeBuiltInClassificationCompletedCallback(
 				adapter,
 				&BuiltInCommandRuntimeCallbackAdapter::OnCompleted))) {
-			DeliverBuiltInCommandFailure(callback, "Built-in classification could not be submitted to AgentRuntime.");
+			DeliverBuiltInCommandFailureDeferred(
+				callback,
+				"Built-in classification could not be submitted to AgentRuntime.");
 		}
 	}
 
@@ -312,12 +407,15 @@ namespace GTA {
 			throw gcnew ArgumentNullException("callback");
 
 		if isNULL(validatedResult) {
-			DeliverBuiltInExecutionFailure(callback, "Validated built-in result is required.", validatedResult);
+			DeliverBuiltInExecutionFailureDeferred(
+				callback,
+				"Validated built-in result is required.",
+				validatedResult);
 			return;
 		}
 
 		if (!validatedResult->IsValidatedForExecution) {
-			DeliverBuiltInExecutionFailure(
+			DeliverBuiltInExecutionFailureDeferred(
 				callback,
 				"Built-in execution requires a result with IsValidatedForExecution == true.",
 				validatedResult);
@@ -325,15 +423,7 @@ namespace GTA {
 		}
 
 		AgentRuntimeBuiltInClassificationCompletion^ runtimeValidatedResult =
-			gcnew AgentRuntimeBuiltInClassificationCompletion();
-		runtimeValidatedResult->Success = validatedResult->Success;
-		runtimeValidatedResult->Decision = SafeText(validatedResult->Decision);
-		runtimeValidatedResult->CommandName = SafeText(validatedResult->CommandName);
-		runtimeValidatedResult->ValidatedCommandLine = SafeText(validatedResult->ValidatedCommandLine);
-		runtimeValidatedResult->Explanation = SafeText(validatedResult->MessageText);
-		runtimeValidatedResult->Error = SafeText(validatedResult->ErrorText);
-		runtimeValidatedResult->IsValidatedForExecution = validatedResult->IsValidatedForExecution;
-		runtimeValidatedResult->ExecutionAuthorizationId = validatedResult->RuntimeExecutionAuthorizationId;
+			CreateRuntimeValidatedResultSnapshot(validatedResult);
 
 		BuiltInExecutionRuntimeCallbackAdapter^ adapter = gcnew BuiltInExecutionRuntimeCallbackAdapter(callback);
 		if (!GetManagedRuntime()->SubmitValidatedBuiltInExecution(
@@ -341,7 +431,7 @@ namespace GTA {
 			gcnew AgentRuntimeValidatedBuiltInExecutionCompletedCallback(
 				adapter,
 				&BuiltInExecutionRuntimeCallbackAdapter::OnCompleted))) {
-			DeliverBuiltInExecutionFailure(
+			DeliverBuiltInExecutionFailureDeferred(
 				callback,
 				"Built-in execution could not be submitted to AgentRuntime.",
 				validatedResult);

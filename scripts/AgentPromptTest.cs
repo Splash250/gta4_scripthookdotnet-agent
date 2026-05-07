@@ -15,7 +15,7 @@ public class AgentPromptTest : Script {
       public AgentPromptResult Result;
    }
 
-   private const int RequestTimeoutMs = 15000;
+   private const int RequestTimeoutMs = 130000;
    private readonly object stateLock = new object();
 
    private bool promptPending = false;

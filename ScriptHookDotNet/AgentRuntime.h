@@ -162,6 +162,10 @@ namespace GTA {
 			virtual void Invoke() = 0;
 		};
 
+		ref class PromptSubmissionContext;
+		ref class BuiltInClassificationSubmissionContext;
+		ref class ValidatedBuiltInExecutionSubmissionContext;
+
 		ref class PromptQueuedCallback sealed : AgentRuntimeQueuedCallback {
 		private:
 			AgentRuntimePromptCompletedCallback^ pCallback;
@@ -201,6 +205,20 @@ namespace GTA {
 				Script^ ownerScript,
 				AgentRuntimeValidatedBuiltInExecutionCompletedCallback^ callback,
 				AgentRuntimeValidatedBuiltInExecutionCompletion^ completion);
+			virtual void Invoke() override;
+		};
+
+		ref class ValidatedBuiltInExecutionQueuedWorkItem sealed : AgentRuntimeQueuedCallback {
+		private:
+			AgentRuntime^ pRuntime;
+			ValidatedBuiltInExecutionSubmissionContext^ pContext;
+
+		public:
+			ValidatedBuiltInExecutionQueuedWorkItem(
+				AgentRuntime^ runtime,
+				int generation,
+				Script^ ownerScript,
+				ValidatedBuiltInExecutionSubmissionContext^ context);
 			virtual void Invoke() override;
 		};
 
@@ -275,15 +293,16 @@ namespace GTA {
 		void RemoveAuthorizedBuiltInExecutionsForScriptLocked(Script^ ownerScript);
 		bool IsCallbackGenerationCurrentLocked(AgentRuntimeQueuedCallback^ callback);
 		bool ShouldDeliverCallback(AgentRuntimeQueuedCallback^ callback);
-		void EnqueueCallback(AgentRuntimeQueuedCallback^ callback);
 		void AbandonScriptOwnedWorkCore(Script^ ownerScript);
 		void AbandonPromptWorkCore();
 		void AbandonBuiltInClassificationWorkCore();
 		void AbandonValidatedBuiltInExecutionWorkCore();
 		void PromptWorkerMain(System::Object^ state);
 		void BuiltInClassificationWorkerMain(System::Object^ state);
-		void ValidatedBuiltInExecutionWorkerMain(System::Object^ state);
+		void ExecuteValidatedBuiltInExecutionOnScriptThread(
+			ValidatedBuiltInExecutionSubmissionContext^ context);
 		int DrainCallbacksForScript(Script^ ownerScript, int maxCallbacks);
+		bool TryEnqueueCallback(AgentRuntimeQueuedCallback^ callback);
 
 	public:
 		AgentRuntime();
@@ -306,6 +325,15 @@ namespace GTA {
 			AgentRuntimeBuiltInClassificationCompletedCallback^ callback);
 		bool SubmitValidatedBuiltInExecution(
 			AgentRuntimeBuiltInClassificationCompletion^ validatedResult,
+			AgentRuntimeValidatedBuiltInExecutionCompletedCallback^ callback);
+		bool QueueDeferredPromptCompletion(
+			AgentRuntimePromptCompletion^ completion,
+			AgentRuntimePromptCompletedCallback^ callback);
+		bool QueueDeferredBuiltInClassificationCompletion(
+			AgentRuntimeBuiltInClassificationCompletion^ completion,
+			AgentRuntimeBuiltInClassificationCompletedCallback^ callback);
+		bool QueueDeferredValidatedBuiltInExecutionCompletion(
+			AgentRuntimeValidatedBuiltInExecutionCompletion^ completion,
 			AgentRuntimeValidatedBuiltInExecutionCompletedCallback^ callback);
 		static void PumpCallbacks();
 		static void AbandonScriptOwnedWork(Script^ ownerScript);

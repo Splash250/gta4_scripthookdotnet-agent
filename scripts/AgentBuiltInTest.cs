@@ -28,7 +28,7 @@ public class AgentBuiltInTest : Script {
       public BuiltInExecutionResult Result;
    }
 
-   private const int RequestTimeoutMs = 15000;
+   private const int RequestTimeoutMs = 130000;
    private readonly object stateLock = new object();
 
    private bool classificationPending = false;
