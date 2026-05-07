@@ -454,6 +454,18 @@ namespace GTA {
 		if (isNULL(ownerScript) || isNULL(validatedResult) || !validatedResult->IsValidatedForExecution)
 			return;
 
+		const int maxPendingExecutionAuthorizationsPerScript = 8;
+		List<int>^ authorizationIdsForScript = gcnew List<int>();
+		for each (KeyValuePair<int, AuthorizedBuiltInExecutionRecord^> kvp in pAuthorizedBuiltInExecutions) {
+			if (isNotNULL(kvp.Value) && IsSameScript(kvp.Value->OwnerScript, ownerScript))
+				authorizationIdsForScript->Add(kvp.Key);
+		}
+		authorizationIdsForScript->Sort();
+		while (authorizationIdsForScript->Count >= maxPendingExecutionAuthorizationsPerScript) {
+			pAuthorizedBuiltInExecutions->Remove(authorizationIdsForScript[0]);
+			authorizationIdsForScript->RemoveAt(0);
+		}
+
 		int authorizationId = ReserveExecutionAuthorizationId();
 		AuthorizedBuiltInExecutionRecord^ record = gcnew AuthorizedBuiltInExecutionRecord();
 		record->AuthorizationId = authorizationId;

@@ -435,6 +435,16 @@ namespace GTA {
 		AgentSettings::Reload();
 		if isNULL(pWorker) pWorker = gcnew AgentRequestWorker();
 		if isNULL(pReasoningWorker) pReasoningWorker = gcnew AgentReasoningWorker();
+		System::Threading::Monitor::Enter(pSharedRecentCommandExecutionsSyncRoot);
+		try {
+			for (int i = pSharedRecentCommandExecutions->Count - 1; i >= 0; i--) {
+				AgentCommandExecution^ execution = pSharedRecentCommandExecutions[i];
+				if (!IsScriptOriginExecution(execution))
+					pSharedRecentCommandExecutions->RemoveAt(i);
+			}
+		} finally {
+			System::Threading::Monitor::Exit(pSharedRecentCommandExecutionsSyncRoot);
+		}
 		ScrollToEnd();
 		bActive = true;
 		OnOpened();
