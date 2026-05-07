@@ -550,6 +550,7 @@ namespace GTA {
 		trustedRecord->IsValidatedForExecution = true;
 		trustedRecord->OwnerScript = ownerScript;
 		trustedRecord->Spec = spec;
+		pAuthorizedBuiltInExecutions->Remove(validatedResult->ExecutionAuthorizationId);
 		return trustedRecord;
 	}
 
