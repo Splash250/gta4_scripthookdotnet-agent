@@ -4,6 +4,9 @@ using System.Windows.Forms;
 using GTA;
 
 public class AgentBuiltInTest : Script {
+   private const string SharedLogMutexName = @"Local\ScriptHookDotNet.AgentScriptTestsLog";
+   private static readonly object LogFailureLock = new object();
+   private static bool durableLogFailureReported = false;
 
    private class BuiltInClassificationSnapshot {
       public int RequestId;
@@ -221,11 +224,72 @@ public class AgentBuiltInTest : Script {
    }
 
    private static void AppendTestLog(string line) {
+      string entry = DateTime.Now.ToString("o") + " " + line + Environment.NewLine;
+      string root = Game.InstallFolder;
+      string sharedPath = System.IO.Path.Combine(root, "agent-script-tests.log");
+      string fallbackPath = System.IO.Path.Combine(root, "agent-script-tests-AgentBuiltInTest.log");
+      string sharedFailure;
+      if (TryAppendSharedLog(sharedPath, entry, out sharedFailure)) return;
+
+      string fallbackFailure;
+      string fallbackEntry = DateTime.Now.ToString("o") + " [logger-warning] Shared log append failed: " + sharedFailure + Environment.NewLine + entry;
+      if (TryAppendFile(fallbackPath, fallbackEntry, out fallbackFailure)) return;
+
+      ReportDurableLogFailureOnce("Shared log failure: " + sharedFailure + "; fallback failure: " + fallbackFailure);
+   }
+
+   private static bool TryAppendSharedLog(string path, string entry, out string failure) {
+      Mutex mutex = null;
+      bool acquired = false;
+
       try {
-         string path = System.IO.Path.Combine(Game.InstallFolder, "agent-script-tests.log");
-         System.IO.File.AppendAllText(path, DateTime.Now.ToString("o") + " " + line + Environment.NewLine);
-      } catch {
+         mutex = new Mutex(false, SharedLogMutexName);
+
+         try {
+            acquired = mutex.WaitOne(250);
+         } catch (AbandonedMutexException) {
+            acquired = true;
+         }
+
+         if (!acquired) {
+            failure = "timed out waiting for log mutex";
+            return false;
+         }
+
+         return TryAppendFile(path, entry, out failure);
+      } catch (Exception ex) {
+         failure = ex.GetType().Name + ": " + ex.Message;
+         return false;
+      } finally {
+         if (mutex != null) {
+            if (acquired) mutex.ReleaseMutex();
+            mutex.Close();
+         }
       }
+   }
+
+   private static bool TryAppendFile(string path, string entry, out string failure) {
+      try {
+         using (System.IO.FileStream stream = new System.IO.FileStream(path, System.IO.FileMode.Append, System.IO.FileAccess.Write, System.IO.FileShare.Read))
+         using (System.IO.StreamWriter writer = new System.IO.StreamWriter(stream)) {
+            writer.Write(entry);
+         }
+
+         failure = String.Empty;
+         return true;
+      } catch (Exception ex) {
+         failure = ex.GetType().Name + ": " + ex.Message;
+         return false;
+      }
+   }
+
+   private static void ReportDurableLogFailureOnce(string failure) {
+      lock (LogFailureLock) {
+         if (durableLogFailureReported) return;
+         durableLogFailureReported = true;
+      }
+
+      Game.Console.Print("[AgentBuiltInTest] Durable log write failed. " + failure);
    }
 
    private void ReportClassificationCompletion(BuiltInClassificationSnapshot completion) {
