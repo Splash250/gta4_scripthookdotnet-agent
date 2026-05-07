@@ -352,13 +352,7 @@ namespace TestScriptCS {
 
          int currentScenarioId = AgentBuiltInSmokeCoordinator.ScenarioId;
          AgentBuiltInSmokePhase currentPhase = AgentBuiltInSmokeCoordinator.Phase;
-
-         if (currentScenarioId != observedScenarioId) {
-            InvalidatePendingAsyncState("scenario rolled over from " + observedScenarioId + " to " + currentScenarioId + ".");
-            observedScenarioId = currentScenarioId;
-            lastStartedPhase = AgentBuiltInSmokePhase.Idle;
-            reportedTerminalState = false;
-         }
+         SynchronizeScenarioState(currentScenarioId, currentPhase);
 
          if (canStartScenario && !reportedTerminalState) {
             if (currentPhase == AgentBuiltInSmokePhase.Passed) {
@@ -371,10 +365,6 @@ namespace TestScriptCS {
                Game.DisplayText("Agent built-in cross-script smoke failed.", 4000);
                reportedTerminalState = true;
             }
-         }
-
-         if (currentPhase == AgentBuiltInSmokePhase.Passed || currentPhase == AgentBuiltInSmokePhase.Failed) {
-            InvalidatePendingAsyncState("scenario entered terminal phase " + currentPhase + ".");
          }
 
          if (classificationPending || executionPending) return;
@@ -460,6 +450,9 @@ namespace TestScriptCS {
       }
 
       private void OnClassificationCompleted(BuiltInCommandResult result, int callbackScenarioId, int callbackEpoch) {
+         SynchronizeScenarioState(
+            AgentBuiltInSmokeCoordinator.ScenarioId,
+            AgentBuiltInSmokeCoordinator.Phase);
          if (!classificationPending || classificationScenarioId != callbackScenarioId || classificationEpoch != callbackEpoch) return;
 
          classificationPending = false;
@@ -509,6 +502,9 @@ namespace TestScriptCS {
       }
 
       private void OnExecutionCompleted(BuiltInExecutionResult result, int callbackScenarioId, int callbackEpoch) {
+         SynchronizeScenarioState(
+            AgentBuiltInSmokeCoordinator.ScenarioId,
+            AgentBuiltInSmokeCoordinator.Phase);
          if (!executionPending || executionScenarioId != callbackScenarioId || executionEpoch != callbackEpoch) return;
 
          executionPending = false;
@@ -600,6 +596,19 @@ namespace TestScriptCS {
 
          unregisterRequested = true;
          AgentBuiltInSmokeCoordinator.Unregister(role, registrationId, reason);
+      }
+
+      private void SynchronizeScenarioState(int currentScenarioId, AgentBuiltInSmokePhase currentPhase) {
+         if (currentScenarioId != observedScenarioId) {
+            InvalidatePendingAsyncState("scenario rolled over from " + observedScenarioId + " to " + currentScenarioId + ".");
+            observedScenarioId = currentScenarioId;
+            lastStartedPhase = AgentBuiltInSmokePhase.Idle;
+            reportedTerminalState = false;
+         }
+
+         if (currentPhase == AgentBuiltInSmokePhase.Passed || currentPhase == AgentBuiltInSmokePhase.Failed) {
+            InvalidatePendingAsyncState("scenario entered terminal phase " + currentPhase + ".");
+         }
       }
 
       private void InvalidatePendingAsyncState(string reason) {
