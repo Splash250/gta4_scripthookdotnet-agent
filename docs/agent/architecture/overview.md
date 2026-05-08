@@ -48,7 +48,7 @@ At a high level:
 - `ScriptHookDotNet/AgentLogger.h`
 - `ScriptHookDotNet/AgentLogger.cpp`
 
-## Flow
+## Recommended Reading Order
 
 Read the rest of this architecture set in this order:
 
