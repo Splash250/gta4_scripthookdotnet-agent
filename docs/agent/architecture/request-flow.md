@@ -2,7 +2,7 @@
 
 ## Purpose
 
-This document describes the current end-to-end request lifecycles behind the internal agent runtime. It focuses on how script-origin requests move through `AgentRuntime`, where work leaves the game thread, where validation and execution happen, where logs are emitted, and how completions return to the caller.
+This document describes the current end-to-end request lifecycles behind the internal agent runtime. It focuses on how script-origin requests move through `AgentRuntime`, where work leaves the game thread, where work hands off back to script-thread execution, where logs are emitted, and how completions return to the caller.
 
 ## Current Behavior
 
@@ -72,19 +72,17 @@ Prompt and built-in classification use background worker threads. Validated buil
 8. The worker enqueues `BuiltInClassificationQueuedCallback`, logs `ReplyEmitted` through `LogBuiltInClassificationReplyEmitted(...)`, and closes the turn with `AgentLogger::EndTurn(...)`.
 9. `PumpCallbacks()` later invokes the script callback on the script/game thread, where the managed adapter maps the runtime completion into the public `BuiltInCommandResult`.
 
-### Validated Built-In Execution
+### Validated Built-In Execution Handoff
 
 1. A script calls `GTA::Agent::ExecuteBuiltInAsync(...)` with a previously returned `BuiltInCommandResult`.
 2. The managed layer rejects null input and rejects any result where `IsValidatedForExecution != true`.
 3. `AgentManaged.cpp` snapshots the public result into `AgentRuntimeBuiltInClassificationCompletion`, including `ExecutionAuthorizationId`, then calls `AgentRuntime::SubmitValidatedBuiltInExecution(...)`.
 4. `SubmitValidatedBuiltInExecution(...)` captures the owning script, starts a new turn using `BuildExecutionTurnInput(...)`, clones the validated snapshot, marks the execution lane busy, and enqueues a `ValidatedBuiltInExecutionQueuedWorkItem`.
 5. That queued work item is not a completion callback. It is script-thread execution work that will later call `ExecuteValidatedBuiltInExecutionOnScriptThread(...)`.
-6. During `PumpCallbacks()`, the runtime drains that work item for the owning script and executes the built-in on the script/game thread.
-7. `ExecuteValidatedBuiltInExecutionOnScriptThread(...)` calls `BuildTrustedExecutionRecordLocked(...)`, which revalidates the execution boundary by checking:
-   `IsValidatedForExecution`, non-empty `ValidatedCommandLine`, a valid `ExecutionAuthorizationId`, same-script ownership, untampered command name and command line, and a currently agent-accessible command spec.
-8. If validation passes, the runtime builds `AgentBuiltInExecutionContext` and calls `AgentBuiltInExecutor::Execute(...)`.
-9. `AgentBuiltInExecutor` emits `CommandStarted`, and `AgentCommandExecution` emits `CommandOutput` and `CommandCompleted` as transcript lines and completion state are recorded.
-10. The runtime copies the execution transcript and summary into `AgentRuntimeValidatedBuiltInExecutionCompletion`, logs `ReplyEmitted` through `LogValidatedBuiltInExecutionReplyEmitted(...)`, ends the turn, and invokes the callback immediately because execution is already back on the script thread.
+6. During `PumpCallbacks()`, the runtime drains that work item for the owning script and crosses the handoff boundary into script-thread execution.
+7. `ExecuteValidatedBuiltInExecutionOnScriptThread(...)` re-enters the trusted execution path, produces an execution completion, logs `ReplyEmitted` through `LogValidatedBuiltInExecutionReplyEmitted(...)`, ends the turn, and invokes the callback immediately because execution is already back on the script thread.
+
+The exact validated-execution semantics after that handoff, including authorization rechecks, executor behavior, transcript capture, and result-code/completion payload details, belong to [`built-in-execution.md`](./built-in-execution.md). This document only owns how request submission reaches that boundary and how completion returns to the script callback surface.
 
 ### Deferred Failure Delivery
 
@@ -114,7 +112,7 @@ The runtime treats prompt, classification, and execution as separate lanes becau
 
 - prompt work can leave the game thread and come back as plain text
 - built-in classification can leave the game thread, but it must create a trusted execution token before any later run
-- validated built-in execution must cross back onto the script/game thread before command handlers run
+- validated built-in execution must cross back onto the script/game thread before the shared execution path runs
 
 This split keeps the public script API simple while preserving logging, script ownership, and tamper-resistant execution boundaries in one place.
 

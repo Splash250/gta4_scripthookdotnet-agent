@@ -28,12 +28,13 @@ The runtime instance itself lives behind `ManagedRuntimeHolder::Instance` in `Ag
 
 ### Managed Frontend Shape
 
-The public managed surface is deliberately small:
+The modder-facing public contract is deliberately small and centered on three async entry points:
 
 - `PromptAsync(AgentPromptRequest^ request, AgentPromptCallback^ callback)`
 - `ClassifyBuiltInAsync(BuiltInCommandRequest^ request, BuiltInCommandCallback^ callback)`
 - `ExecuteBuiltInAsync(BuiltInCommandResult^ validatedResult, BuiltInExecutionCallback^ callback)`
-- `GetRecentBuiltInTranscriptJson()`
+
+`GetRecentBuiltInTranscriptJson()` also exists on `GTA::Agent`, but it is an auxiliary transcript accessor rather than one of the primary request/response entry points described in the public overview. It reads recent built-in transcript state through `AgentConsole::BuildScriptRecentCommandTranscriptJson(...)`; it does not own request submission, validation, or execution behavior.
 
 The request and result classes in `AgentManaged.h` are transport types, not owners of live runtime state. The only internal state that crosses the public boundary is the hidden authorization token stored in `BuiltInCommandResult::RuntimeExecutionAuthorizationId`.
 
@@ -117,6 +118,7 @@ This internal document explains the implementation constraints behind that contr
 - why execution accepts only validated results
 - why the runtime, not `GTA::Agent`, owns turns, lanes, and logging
 - why callbacks can safely touch script/game-thread-bound state
+- where auxiliary helpers such as `GetRecentBuiltInTranscriptJson()` fit without becoming separate ownership centers
 
 ## Rationale
 
