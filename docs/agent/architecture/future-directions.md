@@ -25,7 +25,6 @@ None of the topics below are implemented end-to-end today.
 - `docs/agent/architecture/built-in-execution.md`
 - `ScriptHookDotNet/AgentRuntime.cpp`
 - `ScriptHookDotNet/AgentBuiltInExecutor.cpp`
-- `.future/logging/2026-05-06-logging-refinements.md`
 
 ## Flow
 
@@ -112,5 +111,5 @@ This area should be designed carefully because it would extend, not replace, the
 ## Known Limitations
 
 - this document is intentionally speculative and does not commit to order, API shape, or delivery dates
-- the existing `.future` backlog currently contains logging refinements, not fully designed execution-surface expansions
+- related backlog notes may exist outside this document, but they are not part of the shipped architecture contract
 - none of these topics should be cited as proof that the current agent can write files, speak aloud, own detached jobs, or drive NPC conversations
