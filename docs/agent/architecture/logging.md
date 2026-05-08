@@ -72,14 +72,13 @@ The logger’s current event stream is turn-oriented:
 For a script-origin validated built-in execution turn, the typical current sequence is:
 
 1. `turn_started`
-2. any routing or validation events emitted before execution
-3. `command_started`
-4. zero or more `command_output`
-5. `command_completed`
-6. `reply_emitted`
-7. `turn_completed` or `turn_failed`
+2. `command_started`
+3. zero or more `command_output`
+4. `command_completed`
+5. `reply_emitted`
+6. `turn_completed` or `turn_failed`
 
-Prompt and classification turns follow the same framing even though their interior events differ. Prompt/model work adds `model_request_started`, `model_request_completed`, `model_request_failed`, or `model_request_abandoned`. Built-in classification can add `routing_started`, `routing_result`, and `semantic_validation`.
+Prompt and classification turns follow the same framing even though their interior events differ. Prompt/model work adds `model_request_started`, `model_request_completed`, `model_request_failed`, or `model_request_abandoned`. The earlier built-in classification turn can add `routing_started`, `routing_result`, and `semantic_validation` before any later execution turn begins.
 
 Source tagging is how the log tells those paths apart:
 
