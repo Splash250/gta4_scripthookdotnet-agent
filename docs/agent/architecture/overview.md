@@ -48,16 +48,18 @@ At a high level:
 - `ScriptHookDotNet/AgentLogger.h`
 - `ScriptHookDotNet/AgentLogger.cpp`
 
-## Recommended Reading Order
+## Flow
 
-Read the rest of this architecture set in this order:
+Use this set in two passes:
 
-1. `request-flow.md`
-2. `runtime-and-domains.md`
-3. `script-api.md`
-4. `built-in-execution.md`
-5. `logging.md`
-6. `future-directions.md`
+1. Start with the internal architecture docs in this order:
+   `request-flow.md`, `runtime-and-domains.md`, `script-api.md`,
+   `built-in-execution.md`, `logging.md`, then `future-directions.md`.
+2. Switch to [`../agent-api-overview.md`](../agent-api-overview.md) when you need
+   the modder-facing API contract rather than maintainer-facing implementation
+   details.
+3. Open [`../../../scripts/agent-examples/README.md`](../../../scripts/agent-examples/README.md)
+   when you want runnable public examples instead of runtime internals.
 
 ## Rationale
 
