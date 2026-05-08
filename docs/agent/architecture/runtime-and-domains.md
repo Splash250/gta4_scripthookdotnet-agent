@@ -8,18 +8,19 @@ This document explains the current AppDomain split that the agent code has to li
 
 The current agent implementation spans two managed ownership contexts:
 
-- the primary domain created by `NetHook::Initialize(true, ...)`
-- the remote script domain initialized by `RemoteScriptDomain::Initialize()`
+- the already-existing primary AppDomain, which `ManagedEntryPoint()` detects before calling `NetHook::Initialize(true, ...)`
+- the separate remote script AppDomain created by `ScriptDomain::Create()` and then initialized through `RemoteScriptDomain::Initialize()`
 
 In the primary domain:
 
-- `NetHook` installs the main hooks, console wiring, Direct3D hook, and script-domain host setup in `ScriptHookDotNet/NetHook.cpp`
+- `NetHook::Initialize(true, ...)` installs the main hooks, console wiring, Direct3D hook, and script-domain host setup in `ScriptHookDotNet/NetHook.cpp`
 - the visible agent console lives there, starts console turns with `BeginTurn(..., "agent_console")`, and emits console-origin replies in `ScriptHookDotNet/AgentConsole.cpp`
 - primary-domain logging is initialized during startup in `ScriptHookDotNet/NetHook.cpp`
 
 In the remote script domain:
 
-- `RemoteScriptDomain` initializes its own AppDomain-local services, including `NetHook::Initialize(false, 0)` and `AgentLogger::Initialize(...)`, in `ScriptHookDotNet/RemoteScriptDomain.cpp`
+- `ScriptDomain::Create()` creates the `SHDN_ScriptDomain` AppDomain in `ScriptHookDotNet/ScriptDomain.cpp`
+- `RemoteScriptDomain::Initialize()` then initializes that domain's AppDomain-local services, including `NetHook::Initialize(false, 0)` and `AgentLogger::Initialize(...)`, in `ScriptHookDotNet/RemoteScriptDomain.cpp`
 - `GTA::Agent` and the `AgentManaged` adapters run there, and their static `AgentRuntime` instance is created there when `AgentManaged.cpp` loads in `ScriptHookDotNet/AgentManaged.cpp`
 - script-owned prompt and built-in classification work starts from that runtime, captures `RemoteScriptDomain::Instance->CurrentScript`, and launches background worker threads from `ScriptHookDotNet/AgentRuntime.cpp`
 - validated built-in execution is queued back onto the script thread and executed from the remote domain via `ExecuteValidatedBuiltInExecutionOnScriptThread(...)` in `ScriptHookDotNet/AgentRuntime.cpp`
@@ -71,6 +72,8 @@ That split matters because it changes:
 - how logging starts and how log IDs are kept distinct across domains
 
 Cross-domain care is especially important for callbacks. The runtime deliberately queues completions and drains them from `Script::DoTick()` because invoking script callbacks directly from worker threads would bypass the script-domain ownership model the rest of ScriptHookDotNet uses.
+
+The current teardown path is also script-owned, not an agent-specific domain unload path. When script shutdown runs through `RemoteScriptDomain::AbortScripts()`, each script's `Script::Abort()` is called in `ScriptHookDotNet/Script.cpp`. `Script::Abort()` marks the script as no longer running, calls `AgentRuntime::AbandonScriptOwnedWork(this)`, and only then aborts the script thread. `AgentRuntime::AbandonScriptOwnedWork(...)` removes that script's authorization records, lane state, and queued callbacks in `ScriptHookDotNet/AgentRuntime.cpp`, which is why late agent completions are dropped after script teardown instead of being delivered back into a dead script context.
 
 Logging also needs domain awareness because both domains initialize their own static `AgentLogger` state but write to the same `agent.log` and `agent.log.json` files. The logger therefore treats primary and remote domains differently; the concrete behavior is documented in `logging.md`.
 
